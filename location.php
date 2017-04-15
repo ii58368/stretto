@@ -1,0 +1,119 @@
+<?php
+    require 'framework.php';
+    
+    if ($sort == NULL)
+        $sort = 'name';
+    
+  echo "
+    <h1>Lokale</h1>
+    <form action=\"$php_self\" method=post>
+      <input type=hidden name=_sort value=\"$sort\">
+      <input type=hidden name=_action value=new>
+      <input type=submit value=\"Nytt lokale\">
+    </form>
+    <form action='$php_self' method=post>
+    <table border=1>
+    <tr>
+      <th bgcolor=#A6CAF0>Edit</th>
+      <th bgcolor=#A6CAF0>Lokale</th>
+      <th bgcolor=#A6CAF0>Adresse</th>
+      <th bgcolor=#A6CAF0>URL</th>
+      <th bgcolor=#A6CAF0>Kontaktperson</th>
+      <th bgcolor=#A6CAF0>Kommentar</th>
+      </tr>";
+
+if ($action == 'new')
+{
+  echo "  <tr>
+    <td align=left><input type=hidden name=_action value=update>
+    <input type=hidden name=_sort value=\"$sort\">
+    <input type=submit value=ok></td>
+    <th><input type=text size=30 name=name></th>
+    <th><input type=text size=30 name=address></th>
+    <th><input type=text size=50 name=url></th>
+    <th><textarea cols=20 rows=7 wrap=virtual name=contact></textarea></th>
+    <th><textarea cols=60 rows=7 wrap=virtual name=comment></textarea></th>
+  </tr>";
+}
+
+if ($action == 'update')
+{
+  if ($no == NULL)
+    $query = "insert into location (name, address, url, contact, comment) " .
+             "values ('$_POST[name]', '$_POST[address]', '$_POST[url]', '$_POST[contact]', '$_POST[comment]')";
+  else
+  {
+    if ($delete != NULL)
+    {
+      $q = "select count(*) as count from plan where id_location = {$no}";
+      $r = mysql_query($q);
+      $e = mysql_fetch_array($r, MYSQL_ASSOC);
+      if ($e[count] == 0)
+        $query = "DELETE FROM location WHERE id = {$no}";
+      else
+        echo "<font color=red>Location in use</font>";
+    }
+    else
+      $query = "update location set name = '$_POST[name]'," .
+                               "address = '$_POST[address]'," .
+                               "url = '$_POST[url]'," .
+                               "contact = '$_POST[contact]'," .
+                               "comment = '$_POST[comment]' " .
+             "where id = $no";
+    $no = NULL;
+  }
+  mysql_query($query);
+}   
+
+$query  = "SELECT id, name, address, url, contact, comment " .
+          "FROM location order by {$sort}";
+       
+$result = mysql_query($query);
+
+while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+{
+  if ($row[id] != $no)
+  {
+    echo "<tr>
+         <td><center>
+           <a href=\"{$php_self}?_sort={$sort}&_action=view&_no={$row[id]}\"><img src=\"images/cross_re.gif\" border=0></a>
+             </center></td>" .
+         "<td>{$row[name]}</td>" .
+         "<td>{$row[address]}</td>" .
+         "<td>";
+    if (strlen($row[url]) > 0)
+      echo "<a href=\"$row[url]\" title=\"$row[url]\">&lt;link&gt;</a>";
+    echo "</td><td>";
+    echo str_replace("\n", "<br>\n", $row[contact]);
+    echo "</td><td>";
+    echo str_replace("\n", "<br>\n", $row[comment]);
+    echo "</td>" .
+         "</tr>";
+  }
+  else
+  {
+    echo "<tr>
+    <input type=hidden name=_action value=update>
+    <input type=hidden name=_sort value='$sort'>
+    <input type=hidden name=_no value='$no'>
+    <th nowrap><input type=submit value=ok>
+      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette {$row[name]}?');\"></th>
+    <th><input type=text size=30 name=name value=\"{$row[name]}\"></th>
+    <th><input type=text size=30 name=address value=\"{$row[address]}\"></th>
+    <th><input type=text size=50 name=url value=\"{$row[url]}\"></th>
+    <th><textarea cols=20 rows=7 wrap=virtual name=contact>$row[contact]</textarea></th>
+    <th><textarea cols=60 rows=7 wrap=virtual name=comment>$row[comment]</textarea></th>
+    </tr>";
+  }
+} 
+
+?> 
+
+    </table>
+    </form>
+
+<?php
+  require 'framework_end.php';
+?>
+
+
