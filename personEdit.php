@@ -9,12 +9,13 @@ if ($sort == NULL)
 
 function select_instrument($selected)
 {
+   global $db;
    echo "<select name=id_instruments>";
 
    $q = "SELECT id, instrument FROM instruments order by list_order";
-   $r = mysql_query($q);
+   $s = $db->query($q);
 
-   while ($e = mysql_fetch_array($r, MYSQL_ASSOC))
+   foreach ($s as $e)
    {
       echo "<option value=\"" . $e[id] . "\"";
       if ($e[id] == $selected)
@@ -48,9 +49,11 @@ function select_status($selected)
 
 if ($action == 'update_pers')
 {
-   if ($no == NULL)
+   try
    {
-      $query = "insert into person (id_instruments, firstname, lastname, address, 
+      if ($no == NULL)
+      {
+         $query = "insert into person (id_instruments, firstname, lastname, address, 
               postcode, city, email,
               phone1, phone2, phone3, status, comment)
               values ('$_POST[id_instruments]', '$_POST[firstname]', 
@@ -58,36 +61,37 @@ if ($action == 'update_pers')
                       '$_POST[postcode]', '$_POST[city]', '$_POST[email]',
                       '$_POST[phone1]', '$_POST[phone2]', '$_POST[phone3]', 
                       '$_POST[status]', '$_POST[comment]')";
-      $result = mysql_query($query);
-      $no = mysql_insert_id();
-   } else
-   {
-      if ($delete != NULL)
-      {
-         $query = "DELETE FROM person WHERE id = $no";
-         $result = mysql_query($query);
-         $no = NULL;
+         $db->query($query);
+         $no = $db->lastInsertId();
       } else
       {
-         $query = "update person set id_instruments = '$_POST[id_instruments]'," .
-                 "firstname = '$_POST[firstname]'," .
-                 "lastname = '$_POST[lastname]'," .
-                 "address = '$_POST[address]'," .
-                 "postcode = '$_POST[postcode]'," .
-                 "city = '$_POST[city]'," .
-                 "email = '$_POST[email]'," .
-                 "phone1 = '$_POST[phone1]'," .
-                 "phone2 = '$_POST[phone2]'," .
-                 "phone3 = '$_POST[phone3]'," .
-                 "status = '$_POST[status]'," .
-                 "comment = '$_POST[comment]' " .
-                 "where id = $no";
-         $result = mysql_query($query);
+         if ($delete != NULL)
+         {
+            $query = "DELETE FROM person WHERE id = $no";
+            $result = $db->query($query);
+            $no = NULL;
+         } else
+         {
+            $query = "update person set id_instruments = '$_POST[id_instruments]'," .
+                    "firstname = '$_POST[firstname]'," .
+                    "lastname = '$_POST[lastname]'," .
+                    "address = '$_POST[address]'," .
+                    "postcode = '$_POST[postcode]'," .
+                    "city = '$_POST[city]'," .
+                    "email = '$_POST[email]'," .
+                    "phone1 = '$_POST[phone1]'," .
+                    "phone2 = '$_POST[phone2]'," .
+                    "phone3 = '$_POST[phone3]'," .
+                    "status = '$_POST[status]'," .
+                    "comment = '$_POST[comment]' " .
+                    "where id = $no";
+            $db->query($query);
+         }
       }
-   }
-
-   if (!$result)
+   } catch (PDOException $ex)
+   {
       echo "<font color=red>Failed to update</font>";
+   }
 }
 
 
@@ -97,19 +101,21 @@ if ($action == 'update_pwd')
    {
       $query = "update person set password = MD5('$_POST[pwd1]') " .
               "where id = $no";
-      $result = mysql_query($query);
-      if (!$result)
+      try
+      {
+         $db->query($query);
+      } catch (PDOExeption $ex)
+      {
          echo "<font color=red>Failed to update</font>";
-
+      }
       $pwd = $_POST[pwd1];
       $query = "select email from person where id = $no";
-      $result = mysql_query($query);
-      $row = mysql_fetch_array($result, MYSQL_ASSOC);
-      
+      $stmt = $db->query($query);
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
       $ht_cmd = "/usr/sbin/htpasswd -bd /etc/apache2/{$dbname}_user $row[email] $pwd";
       system($ht_cmd);
-   }
-   else
+   } else
    {
       echo "<font color=red>Ikke oppdatert, passordene må være like!</font>";
    }
@@ -121,13 +127,13 @@ if ($no != NULL)
    $query = "SELECT person.id as id, id_instruments, instrument, firstname, lastname, " .
            "address, postcode, city, " .
            "email, phone1, phone2, phone3, status, person.comment as comment, " .
-           "comment_dir, direction " .
+           "comment_dir, status_dir " .
            "FROM person, instruments " .
            "where id_instruments = instruments.id " .
            "and person.id = $no";
 
-   $result = mysql_query($query);
-   $row = mysql_fetch_array($result, MYSQL_ASSOC);
+   $stmt = $db->query($query);
+   $row = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 $person = ($no == NULL) ? "Ny person" : "$row[firstname] $row[lastname] ($row[instrument])";

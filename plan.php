@@ -16,12 +16,14 @@ function select_tsort($selected)
 
 function select_location($selected)
 {
+   global $db;
+   
    echo "<select name=id_location>";
 
    $q = "SELECT id, name FROM location order by name";
-   $r = mysql_query($q);
+   $s = $db->query($q);
 
-   while ($e = mysql_fetch_array($r, MYSQL_ASSOC))
+   foreach($s as $e)
    {
       echo "<option value=\"" . $e[id] . "\"";
       if ($e[id] == $selected)
@@ -34,6 +36,7 @@ function select_location($selected)
 
 function select_project($selected)
 {
+   global $db;
    global $prj_orch_reduced;
    
    echo "<select name=id_project>";
@@ -43,9 +46,9 @@ function select_project($selected)
            "where year >= ${year} " .
            "or id = '${selected}' " .
            "order by year, semester DESC";
-   $r = mysql_query($q);
+   $s = $db->query($q);
 
-   while ($e = mysql_fetch_array($r, MYSQL_ASSOC))
+   foreach($s as $e)
    {
       echo "<option value=\"" . $e[id] . "\"";
       if ($e[id] == $selected)
@@ -108,8 +111,8 @@ if ($action == 'update')
       if ($no == NULL)
       {
          $query2 = "select id_person from project where id = $_POST[id_project]";
-         $result = mysql_query($query2);
-         $row = mysql_fetch_array($result, MYSQL_ASSOC);
+         $stmt = $db->query($query2);
+         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
          $query = "insert into plan (date, tsort, time, id_location, location, id_project, " .
                  "id_responsible, comment, event_type) " .
@@ -136,7 +139,7 @@ if ($action == 'update')
          $no = NULL;
       }
       
-      mysql_query($query);
+      $db->query($query);
    }
 }
 
@@ -155,9 +158,9 @@ $query = "SELECT plan.id as id, date, time, tsort, id_project, " .
         "and project.year >= $cur_year " .
         "order by date,tsort,time";
 
-$result = mysql_query($query);
+$stmt = $db->query($query);
 
-while ($row = mysql_fetch_array($result, MYSQL_ASSOC))
+foreach($stmt as $row)
 {
    if ($row[id] != $no || $action != 'view')
    {

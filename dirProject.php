@@ -6,6 +6,7 @@ if ($sort == NULL)
 
 function list_group($id)
 {
+   global $db;
    global $shi_stat_tentative;
    global $shi_stat_confirmed;
    global $shi_stat_failed;
@@ -21,9 +22,9 @@ function list_group($id)
            "and (shift.status >= $shi_stat_tentative and shift.status <= $shi_stat_failed) " .
            "order by list_order, lastname, firstname";
 
-   $r = mysql_query($q);
+   $s = $db->query($q);
 
-   while ($e = mysql_fetch_array($r, MYSQL_ASSOC))
+   foreach($s as $e)
    {
       if ($e[status] == $shi_stat_tentative)
          echo "<font color=grey>";
@@ -42,15 +43,16 @@ function list_group($id)
 
 function select_person($selected)
 {
+   global $db;
    global $per_stat_member;
 
    $q = "SELECT person.id as id, firstname, lastname, instrument FROM person, instruments " .
            "where status = ${per_stat_member} and id_instruments = instruments.id " .
            "order by list_order, lastname, firstname";
 
-   $r = mysql_query($q);
+   $s = $db->query($q);
 
-   while ($e = mysql_fetch_array($r, MYSQL_ASSOC))
+   foreach($s as $e)
    {
       echo "<option value=\"" . $e[id] . "\"";
       if ($e[id] == $selected)
@@ -61,28 +63,30 @@ function select_person($selected)
 
 function mail2dir($id_project)
 {
+   global $db;
    global $shi_stat_tentative;
    global $shi_stat_confirmed;
 
    $q = "select name from project where id = ${id_project}";
-   $r = mysql_query($q);
-   $e = mysql_fetch_array($r, MYSQL_ASSOC);
+   $s = $db->query($q);
+   $e = $s->fetch(PDO::FETCH_ASSOC);
    $project_name = $e[name];
 
    $q = "select email, phone1 from person, shift " .
            "where person.id = shift.id_person " .
            "and shift.id_project = ${id_project} " .
            "and (shift.status = ${shi_stat_tentative} or shift.status = ${shi_stat_confirmed})";
-   $r = mysql_query($q);
+   $s = $db->query($q);
+   $r = $s->fetchAll(PDO::FETCH_ASSOC);
 
    echo "<a href=\"mailto:";
-   while ($e = mysql_fetch_array($r, MYSQL_ASSOC))
+   foreach($r as $e)
       echo $e[email] . ",";
    echo "?subject=OSO: Regikomit&eacute;, $project_name&body=Se oppdatert regiplan: http://" . $_SERVER['SERVER_NAME'] . "/oso/regi/plan.php?id_project=$id_project\"><image border=0 src=images/image1.gif hspace=20 title=\"Send mail alle i regikomit&eacute;en\"></a>";
 
    echo "<a href=\"sms:";
-   mysql_data_seek($r, 0);
-   while ($e = mysql_fetch_array($r, MYSQL_ASSOC))
+   reset($r);
+   foreach($r as $e)
       $str .= $e[phone1] . ",";
    $str = str_replace(' ', '', $str);
    echo substr($str, 0, -1);
@@ -115,17 +119,17 @@ if ($action == 'update')
            "info_dir = '$_POST[info_dir]' " .
            "where id = $no";
    $query2 = "delete from shift " .
-           "where id_person = $_POST[current_id_person] " .
+           "where id_person = $_POST[id_person] " .
            "and id_project = $no";
-   mysql_query($query2);
+   $db->query($query2);
    $query2 = "insert into shift (id_person, id_project, status) " .
            "values ($_POST[id_person], $no, ${shi_stat_responsible})";
-   mysql_query($query2);
+   $db->query($query2);
    $query2 = "update shift set status = ${shi_stat_responsible} " .
            "where id_person = $_POST[id_person] " .
            "and id_project = $no";
    $no = NULL;
-   mysql_query($query);
+   $db->query($query);
 }
 
 $query = "SELECT project.id as id, name, semester, year, id_person, project.status as status, " .
@@ -136,9 +140,9 @@ $query = "SELECT project.id as id, name, semester, year, id_person, project.stat
         "and project.year >= $sel_year " .
         "order by ${sort}";
 
-$result = mysql_query($query);
+$stmt = $db->query($query);
 
-while ($row = mysql_fetch_array($result, MYSQL_ASSOC))
+foreach($stmt as $row)
 {
    if ($row[id] != $no)
    {
@@ -166,7 +170,7 @@ while ($row = mysql_fetch_array($result, MYSQL_ASSOC))
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
     <input type=hidden name=from value='$sel_year'>
-    <input type hidden name=current_id_def_responsible value=$row[id_def_responsible]>
+    <input type hidden name=id_person value=$row[id_person]>
     <th nowrap><input type=submit value=ok title=\"Lagere endring\" >
     <th>$row[name]</th>
     <th>$row[semester] $row[year]</th>

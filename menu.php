@@ -46,7 +46,7 @@
                         auth_li("Tilbakemeldinger", "feedback.php");
                         auth_li("Lokale", "location.php");
                         auth_li("Permisjon/Deltagelse", "participant.php");
-                        auth_li("Dokumenter", "document?path=common");
+                        auth_li("Dokumenter", "document.php?path=common");
                         auth_li("Kontigent", "contigent.php");
                         auth_li("Om $prj_name", "about.php");
                         ?>
@@ -62,9 +62,9 @@
                                 . "or status = $prj_stat_tentative) "
                                 . "and year >= " . date("Y") . " "
                                 . "order by year,semester DESC";
-                        $r = mysql_query($q);
+                        $s = $db->query($q);
 
-                        while ($e = mysql_fetch_array($r, MYSQL_ASSOC))
+                        foreach ($s as $e)
                         {
                            echo "
                             <li>

@@ -5,7 +5,7 @@ if ($action == 'insert')
 {
    $query = "insert into shift (id_person, id_project, status) " .
            "values ('$_REQUEST[id_person]', '$_REQUEST[id_project]', $shi_stat_tentative)";
-   mysql_query($query);
+   $db->query($query);
 }
 
 if ($action == 'update')
@@ -17,7 +17,7 @@ if ($action == 'update')
    $query = "update shift set status = $next_status " .
            "where id_person = $_REQUEST[id_person] " .
            "and id_project = $_REQUEST[id_project]";
-   mysql_query($query);
+   $db->query($query);
 }
 
 $sel_year = ($_REQUEST[from] == NULL) ? date("Y") : intval($_REQUEST[from]);
@@ -36,9 +36,9 @@ $query = "SELECT id, name, semester, year " .
         "FROM project " .
         "where year >= $sel_year " .
         "order by year, semester DESC, project.id";
-$result = mysql_query($query);
+$stmt = $db->query($query);
 
-while ($row = mysql_fetch_array($result, MYSQL_ASSOC))
+foreach ($stmt as $row)
    echo "<th bgcolor=#A6CAF0><a href=dirPlan.php?_sort=time,date&id_project={$row[id]}>{$row[name]}<br>{$row[semester]}{$row[year]}</a></td>";
 echo "</tr><tr>";
 
@@ -56,7 +56,7 @@ $query = "SELECT person.id as person_id, " .
         "and person.status = $per_stat_member " .
         "and project.year >= $sel_year " .
         "order by $sort, year, semester DESC, project.id";
-$result = mysql_query($query);
+$stmt = $db->query($query);
 
 $prev_id = 0;
 
@@ -69,7 +69,7 @@ $status_tab = array(
     $shi_stat_responsible => "Regiansvarlig"
 );
 
-while ($row = mysql_fetch_array($result, MYSQL_ASSOC))
+foreach ($stmt as $row)
 {
    if ($row[person_id] != $prev_id)
    {
@@ -82,11 +82,11 @@ while ($row = mysql_fetch_array($result, MYSQL_ASSOC))
    $query = "SELECT status, comment from shift " .
            "where id_project = {$row[project_id]} " .
            "and id_person = {$row[person_id]}";
-   $result2 = mysql_query($query);
+   $stmt2 = $db->query($query);
    $status = $shi_stat_free;
    $comment = "";
    $action = "insert";
-   if ($row2 = mysql_fetch_array($result2, MYSQL_ASSOC))
+   foreach ($stmt2 as $row2)
    {
       $status = $row2[status];
       $comment = $row2[comment];

@@ -9,12 +9,14 @@ if ($sort == NULL)
 
 function mail2all()
 {
+   global $db;
+   
   $q = "select email from person " .
        "where (status = '$per_stat_member' or status = '$per_stat_eng')";
-  $r = mysql_query($q);
+  $s = $db->query($q);
 
   echo "<a href=\"mailto:?bcc=";
-  while ($e = mysql_fetch_array($r, MYSQL_ASSOC))
+  foreach($s as $e)
     echo $e[email] . ",";
   echo "&subject=OSO: \"><image border=0 src=images/image1.gif hspace=20 title=\"Send mail alle i OSO med status medlem eller engasjert\"></a>";
 }
@@ -66,9 +68,9 @@ $query  = "SELECT person.id as id, id_instruments, instrument, firstname, lastna
     "FROM person, instruments " .
     "where id_instruments = instruments.id order by $sort";
 
-$result = mysql_query($query);
+$stmt = $db->query($query);
 
-while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+foreach($stmt as $row)
 {
   echo "<tr>
          <td><center>

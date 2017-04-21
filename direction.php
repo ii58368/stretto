@@ -5,6 +5,7 @@ require 'framework.php';
 
 function resources_list($id_plan)
 {
+   global $db;
    global $shi_stat_tentative;
    global $shi_stat_confirmed;
    global $dir_stat_allocated;
@@ -22,9 +23,9 @@ function resources_list($id_plan)
    "and direction.status = $dir_stat_allocated " .
    "order by lastname, firstname";
 
-  $r = mysql_query($q);
+  $s = $db->query($q);
 
-  while($e = mysql_fetch_array($r, MYSQL_ASSOC))
+  foreach ($s as $e)
   {
     echo $e[firstname] . " " . $e[lastname] . " (" . $e[instrument] . ")<br>";
   }
@@ -41,6 +42,7 @@ function format_phone($ph)
 
 function shift_list()
 {
+   global $db;
    global $shi_stat_tentative;
    global $shi_stat_confirmed;
 
@@ -72,9 +74,9 @@ function shift_list()
 
   for ($i = 0; $i < 2; $i++)
   {
-    $r = mysql_query($q[$i]);
+    $s = $db->query($q[$i]);
 
-    while($e = mysql_fetch_array($r, MYSQL_ASSOC))
+    foreach ($s as $e)
     {
       echo "<tr><td>" . $bf[$i] . $e[firstname] . " " . $e[lastname] . $bf_[$i] . "</td><td>" . $e[instrument] . "</td><td>" . format_phone($e[phone1]) . "</a></td></tr>";
     }
@@ -84,8 +86,8 @@ function shift_list()
 }
 
 $query  = "SELECT name, semester, year, info_dir from project where id = $_REQUEST[id_project]";
-$result = mysql_query($query);
-$row = mysql_fetch_array($result, MYSQL_ASSOC);
+$stmt = $db->query($query);
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
 
 $project_info = str_replace("\n", "<br>\n", $row[info_dir]);
 
@@ -129,12 +131,12 @@ $query  = "SELECT plan.id as id, date, time, id_location, location.name as lname
     "and id_responsible = person.id " .
     "and plan.id_project like '$_REQUEST[id_project]' " .
     "order by date,tsort,time";
-$result = mysql_query($query);
+$stmt = $db->query($query);
 
 $last_date = 0;
 $last_time = "";
 
-while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+foreach ($stmt as $row)
 {
     echo "<tr><td nowrap>";
     if ($row[date] != $last_date)

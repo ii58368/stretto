@@ -46,8 +46,8 @@ if ($action == 'update')
     if ($delete != NULL)
     {
       $q = "select count(*) as count from plan where id_location = {$no}";
-      $r = mysql_query($q);
-      $e = mysql_fetch_array($r, MYSQL_ASSOC);
+      $s = $db->query($q);
+      $e = $s->fetch(PDO::FETCH_ASSOC);
       if ($e[count] == 0)
         $query = "DELETE FROM location WHERE id = {$no}";
       else
@@ -62,15 +62,15 @@ if ($action == 'update')
              "where id = $no";
     $no = NULL;
   }
-  mysql_query($query);
+  $db->query($query);
 }   
 
 $query  = "SELECT id, name, address, url, contact, comment " .
           "FROM location order by {$sort}";
        
-$result = mysql_query($query);
+$stmt = $db->query($query);
 
-while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+foreach ($stmt as $row)
 {
   if ($row[id] != $no)
   {

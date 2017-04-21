@@ -97,7 +97,7 @@ if ($handle = opendir($_REQUEST[path]))
          echo "<td><center>
            <a href=\"{$php_self}?_sort={$sort}&_action=view&_no=" . urlencode($file) . "&path=$_REQUEST[path]\"><img src=\"images/cross_re.gif\" border=0></a>
              </center></td>
-             <td>$file</td>";
+             <td><a href=\"$abs_file\">$file</a></td>";
       } else
       {
          echo "

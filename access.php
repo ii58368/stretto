@@ -6,13 +6,13 @@ if ($action == 'insert')
 {
    $query = "insert into auth_person (id_view, id_person) " .
             "values ('$_REQUEST[id_view]', '$_REQUEST[id_person]')";
-   mysql_query($query);
+   $db->query($query);
 }   
 
 if ($action == 'delete')
 {
    $query = "delete from auth_person where id_view = '$_REQUEST[id_view]' and id_person = '$_REQUEST[id_person]'";
-   mysql_query($query);
+   $db->query($query);
 }   
 
 
@@ -28,9 +28,9 @@ echo "
 $query  = "SELECT name " .
           "FROM view " .
           "order by name";
-$result = mysql_query($query);
+$stmt = $db->query($query);
 
-while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+foreach($stmt as $row)
   echo "<th bgcolor=#A6CAF0>$row[name]</td>";
 echo "</tr><tr>";
 
@@ -46,11 +46,11 @@ $query  = "SELECT person.id as person_id, " .
           "where instruments.id = id_instruments " .
           "and not person.status = $per_stat_quited " .
           "order by $sort";
-$result = mysql_query($query);
+$stmt = $db->query($query);
 
 $prev_id = 0;
 
-while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+foreach($stmt as $row)
 {
   if ($row[person_id] != $prev_id)
   {
@@ -62,11 +62,11 @@ while($row = mysql_fetch_array($result, MYSQL_ASSOC))
   $query  = "SELECT comment from auth_person " .
           "where id_view = {$row[view_id]} " .
           "and id_person = {$row[person_id]}"; 
-  $result2 = mysql_query($query);
+  $stmt2 = $db->query($query);
   
   $action = "insert";
   $image = "images/stop_red.gif";
-  if ($row2 = mysql_fetch_array($result2, MYSQL_ASSOC))
+  if ($row2 = $stmt2->fetch(PDO::FETCH_ASSOC))
   {
     $action = "delete";
     $image = "images/tick2.gif";

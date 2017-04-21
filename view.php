@@ -67,15 +67,15 @@ if ($action == 'update')
       $no = NULL;
     }
   }
-  mysql_query($query);
+  $db->query($query);
 }   
 
 $query  = "SELECT id, name, comment, access " .
           "FROM view order by {$sort}";
        
-$result = mysql_query($query);
+$stmt = $db->query($query);
 
-while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+foreach($stmt as $row)
 {
   if ($row[id] != $no)
   {

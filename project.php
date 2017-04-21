@@ -100,6 +100,10 @@ if ($action == 'update')
          $query = "insert into project (name, semester, year, status, deadline, orchestration, info, id_person) " .
                  "values ('$_POST[name]', '$_POST[semester]', " .
                  "'$_POST[year]', '$_POST[status]', '$ts', '$orchestration', '$_POST[info]', 1)";
+         $db->query($query);
+         mkdir("project/" . $db->lastInsertId() . "/rec", 0755, true);
+         mkdir("project/" . $db->lastInsertId() . "/doc", 0755, true);
+         mkdir("project/" . $db->lastInsertId() . "/sheet", 0755, true);
       } else
       {
          if ($delete != NULL)
@@ -116,9 +120,9 @@ if ($action == 'update')
                     "info = '$_POST[info]' " .
                     "where id = $no";
          }
+         $db->query($query);
          $no = NULL;
       }
-      mysql_query($query);
    }
 }
 
@@ -128,9 +132,9 @@ $query = "SELECT project.id as id, name, semester, year, status, " .
         "where project.year >= $sel_year " .
         "order by ${sort}";
 
-$result = mysql_query($query);
+$stmt = $db->query($query);
 
-while ($row = mysql_fetch_array($result, MYSQL_ASSOC))
+foreach($stmt as $row)
 {
    if ($row[id] != $no)
    {

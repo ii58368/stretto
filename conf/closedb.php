@@ -1,5 +1,7 @@
 <?php
 
-mysql_close($conn);
+// Deprecated
+//mysql_close($conn);
+
 ?>
 

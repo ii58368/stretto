@@ -1,9 +1,9 @@
 <?php
-  require 'framework.php';
+require 'framework.php';
 
-  if ($sort == NULL)
-      $sort = 'list_order';
-  
+if ($sort == NULL)
+   $sort = 'list_order';
+
 echo "
 <h1>Instrumentgrupper</h1>
     <form action=\"$php_self\" method=post>
@@ -21,98 +21,96 @@ echo "
       <th bgcolor=#A6CAF0>Kommentar</th>
       </tr>";
 
-
 function select_groups($selected)
 {
-  echo "<select name=id_groups title=\"Ansvarlig\">";
+   global $db;
 
-  $q  = "SELECT id, name FROM groups " .
-   "order by name";
+   echo "<select name=id_groups title=\"Ansvarlig\">";
 
-  $r = mysql_query($q);
+   $q = "SELECT id, name FROM groups " .
+           "order by name";
 
-  while($e = mysql_fetch_array($r, MYSQL_ASSOC))
-  {
-    echo "<option value=\"" . $e[id] . "\"";
-    if ($e[id] == $selected)
-      echo " selected";
-    echo ">$e[name]";
-  }
-  echo "</select>";
+   $s = $db->query($q);
+
+   foreach ($s as $e)
+   {
+      echo "<option value=\"" . $e[id] . "\"";
+      if ($e[id] == $selected)
+         echo " selected";
+      echo ">$e[name]";
+   }
+   echo "</select>";
 }
-
 
 if ($action == 'new')
 {
-  echo "  <tr>
+   echo "  <tr>
     <td align=left><input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"{$sort}\">
     <input type=submit value=ok></td>
     <th><input type=text size=10 name=instrument>
     <th><input type=text size=15 name=list_order></th>
     <th>";
-    select_groups(0);
-  echo "</th>
+   select_groups(0);
+   echo "</th>
     <th><input type=text size=10 name=comment></th>
   </tr>";
 }
 
 if ($action == 'update')
 {
-  if ($no == NULL)
-  {
-    $query = "insert into instruments (instrument, list_order, id_groups, comment)
+   if ($no == NULL)
+   {
+      $query = "insert into instruments (instrument, list_order, id_groups, comment)
               values ('$_POST[instrument]', $_POST[list_order], $_POST[id_groups], '$_POST[comment]')";
-  }
-  else
-  {
-    if ($delete != NULL)
-    {
-      $q = "select count(*) as count from person where id_instruments = {$no}";
-      $r = mysql_query($q);
-      $e = mysql_fetch_array($r, MYSQL_ASSOC);
-      if ($e[count] == 0)
-        $query = "DELETE FROM instruments WHERE id = {$no}";
+   } else
+   {
+      if ($delete != NULL)
+      {
+         $q = "select count(*) as count from person where id_instruments = {$no}";
+         $s = $db->query($q);
+         $e = $s->fetch(PDO::FETCH_ASSOC);
+         if ($e[count] == 0)
+            $query = "DELETE FROM instruments WHERE id = {$no}";
+         else
+            echo "<font color=red>Error: Some persons are already playing this instrument</font>";
+      }
       else
-        echo "<font color=red>Error: Some persons are already playing this instrument</font>";
-    }
-    else
-    {
-      $query = "update instruments set instrument = '$_POST[instrument]'," .
-                               "list_order = $_POST[list_order]," .
-                               "id_groups = $_POST[id_groups]," .
-                               "comment = '$_POST[comment]' " .
-             "where id = $no";
-    }
-    $no = NULL;
-  }
-  mysql_query($query);
-}   
+      {
+         $query = "update instruments set instrument = '$_POST[instrument]'," .
+                 "list_order = $_POST[list_order]," .
+                 "id_groups = $_POST[id_groups]," .
+                 "comment = '$_POST[comment]' " .
+                 "where id = $no";
+      }
+      $no = NULL;
+   }
+   $db->query($query);
+}
 
-$query  = "SELECT instruments.id as id, instrument, list_order, id_groups, groups.name as name, instruments.comment as comment " .
-          "FROM instruments, groups " .
-          "where id_groups = groups.id " .
-          " order by {$sort}";
+$query = "SELECT instruments.id as id, instrument, list_order, id_groups, groups.name as name, instruments.comment as comment " .
+        "FROM instruments, groups " .
+        "where id_groups = groups.id " .
+        " order by {$sort}";
 
-$result = mysql_query($query);
+$stmt = $db->query($query);
 
-while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+foreach ($stmt as $row)
 {
-  if ($row[id] != $no)
-  {
-    echo "<tr>
+   if ($row[id] != $no)
+   {
+      echo "<tr>
          <td><center>
            <a href=\"{$_SERVER[PHP_SELF]}?_sort=$sort&_action=view&_no={$row[id]}\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
              </center></td>" .
-         "<td>{$row[instrument]}</td>" .
-         "<td>{$row[list_order]}</td>" .
-         "<td>{$row[name]}</td>" .
-         "<td>{$row[comment]}</td>" .
-         "</tr>";
-  }
-  else
-  {
-    echo "<tr>
+      "<td>{$row[instrument]}</td>" .
+      "<td>{$row[list_order]}</td>" .
+      "<td>{$row[name]}</td>" .
+      "<td>{$row[comment]}</td>" .
+      "</tr>";
+   } else
+   {
+      echo "<tr>
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
@@ -121,20 +119,18 @@ while($row = mysql_fetch_array($result, MYSQL_ASSOC))
     <th><input type=text size=10 name=instrument value=\"{$row[instrument]}\">
     <th><input type=text size=15 name=list_order value=\"{$row[list_order]}\"></th>
     <th>";
-    select_groups($row[id_groups]);
-    echo "</td>
+      select_groups($row[id_groups]);
+      echo "</td>
     <th><input type=text size=10 name=comment value=\"{$row[comment]}\"></th>
     </tr>";
-  }
-} 
-
-
+   }
+}
 ?> 
 
-    </table>
-    </form>
+</table>
+</form>
 
 <?php
-  require 'framework_end.php';
+require 'framework_end.php';
 ?>
 

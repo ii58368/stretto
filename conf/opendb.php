@@ -9,9 +9,15 @@ $dbuser = 'root';
 $dbpass = 'Knoll.and.Tott';
 $dbname = 'stretto';
 
-$conn = mysql_connect($dbhost, $dbuser, $dbpass) or die ('Error connecting to mysql');
-mysql_select_db($dbname);
-mysql_set_charset('utf8', $conn);
+// Deprecated
+//$conn = mysql_connect($dbhost, $dbuser, $dbpass) or die ('Error connecting to mysql');
+//mysql_select_db($dbname);
+//mysql_set_charset('utf8', $conn);
+
+$db = new PDO("mysql:host=$dbhost;dbname=$dbname;charset=utf8mb4", $dbuser, $dbpass);
+$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+
 ?> 
 
 

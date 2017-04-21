@@ -6,24 +6,28 @@ if ($sort == NULL)
 
 function mail2all()
 {
+   global $db;
+   
    $q = "select email from person " .
            "where (status = '$per_stat_member' or status = '$per_stat_eng')";
-   $r = mysql_query($q);
+   $s = $db->query($q);
 
    echo "<a href=\"mailto:?bcc=";
-   while ($e = mysql_fetch_array($r, MYSQL_ASSOC))
+   foreach ($s as $e)
       echo $e[email] . ",";
    echo "&subject=OSO: \"><image border=0 src=images/image1.gif hspace=20 title=\"Send mail alle i OSO med status medlem eller engasjert\"></a>";
 }
 
 function select_instrument($selected)
 {
+   global $db;
+   
    $q = "SELECT id, instrument FROM instruments order by list_order";
-   $r = mysql_query($q);
+   $s = $db->query($q);
 
    echo "<select name=id_instruments>";
    
-   while ($e = mysql_fetch_array($r, MYSQL_ASSOC))
+   foreach ($s as $e)
    {
       echo "<option value=\"" . $e[id] . "\"";
       if ($e[id] == $selected)
@@ -89,7 +93,7 @@ if ($action == 'update')
            "where id = $no";
    $no = NULL;
 
-   mysql_query($query);
+   $db->query($query);
 }
 
 
@@ -97,9 +101,9 @@ $query = "SELECT person.id as id, id_instruments, instrument, firstname, lastnam
         "email, phone1, status, status_dir, comment_dir " .
         "FROM person, instruments where id_instruments = instruments.id order by ${sort}";
 
-$result = mysql_query($query);
+$stmt = $db->query($query);
 
-while ($row = mysql_fetch_array($result, MYSQL_ASSOC))
+foreach ($stmt as $row)
 {
    if ($row[id] != $no)
    {

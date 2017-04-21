@@ -128,14 +128,16 @@ $auth_list_rw = array(
 
 function auth_access_uid($uid, $auth)
 {
+   global $db;
+   
    $query = "select access from person, auth_person, view " .
            "where person.id = auth_person.id_person " .
            "and auth_person.id_view = view.id " .
            "and person.email = '$uid'";
 
-   $result = mysql_query($query);
+   $stmt = $db->query($query);
 
-   while ($row = mysql_fetch_array($result, MYSQL_ASSOC))
+   foreach($stmt as $row)
    {
       $access |= $row[access];
    }
@@ -181,6 +183,7 @@ function auth_bit(...$auth)
 
 function auth_select_person($selected)
 {
+   global $db;
    global $per_stat_quited;
 
    $q = "SELECT email, firstname, lastname, instrument "
@@ -188,9 +191,9 @@ function auth_select_person($selected)
            . "where not person.status = $per_stat_quited "
            . "and person.id_instruments = instruments.id "
            . "order by list_order, lastname, firstname";
-   $r = mysql_query($q);
+   $s = $db->query($q);
 
-   while ($e = mysql_fetch_array($r, MYSQL_ASSOC))
+   foreach($s as $e)
    {
       echo "<option value=\"" . $e[email] . "\"";
       if ($e[email] == $selected)
@@ -246,6 +249,7 @@ function auth_li($li, $page)
 
 function auth_whoami()
 {
+   global $db;
    global $whoami;
    global $php_self;
    global $auth_su;
@@ -263,8 +267,8 @@ function auth_whoami()
               . "from person, instruments "
               . "where person.id_instruments = instruments.id "
               . "and email = '$whoami'";
-      $result = mysql_query($query);
-      $row = mysql_fetch_array($result, MYSQL_ASSOC);
+      $stmt = $db->query($query);
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
       echo "$row[firstname] $row[lastname] ($row[instrument])";
    }

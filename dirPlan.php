@@ -16,12 +16,14 @@ function select_tsort($selected)
 
 function select_location($selected)
 {
+   global $db;
+
    echo "<select name=id_location>";
 
    $q = "SELECT id, name FROM location order by name";
-   $r = mysql_query($q);
+   $s = $db->query($q);
 
-   while ($e = mysql_fetch_array($r, MYSQL_ASSOC))
+   foreach ($s as $e)
    {
       echo "<option value=\"" . $e[id] . "\"";
       if ($e[id] == $selected)
@@ -33,6 +35,7 @@ function select_location($selected)
 
 function select_person($selected)
 {
+   global $db;
    global $per_stat_member;
 
    echo "<select name=id_responsible title=\"Hovedansvarlig\">";
@@ -42,9 +45,9 @@ function select_person($selected)
            "and person.status = $per_stat_member " .
            "order by list_order, lastname, firstname";
 
-   $r = mysql_query($q);
+   $s = $db->query($q);
 
-   while ($e = mysql_fetch_array($r, MYSQL_ASSOC))
+   foreach ($s as $e)
    {
       echo "<option value=\"" . $e[id] . "\"";
       if ($e[id] == $selected)
@@ -56,6 +59,8 @@ function select_person($selected)
 
 function select_project($selected)
 {
+   global $db;
+
    echo "<select name=id_project>";
 
    $year = date("Y");
@@ -63,9 +68,9 @@ function select_project($selected)
            "where year >= ${year} " .
            "or id = '${selected}' " .
            "order by year, semester DESC";
-   $r = mysql_query($q);
+   $s = $db->query($q);
 
-   while ($e = mysql_fetch_array($r, MYSQL_ASSOC))
+   foreach ($s as $e)
    {
       echo "<option value=\"" . $e[id] . "\"";
       if ($e[id] == $selected)
@@ -77,26 +82,30 @@ function select_project($selected)
 
 function direction_update($id_plan)
 {
+   global $db;
    global $dir_stat_free;
    global $dir_stat_allocated;
 
    // Resources from shift list
    $query = "update direction set status = $dir_stat_free where id_plan = $id_plan";
-   mysql_query($query);
+   $db->query($query);
 
    if ($_POST[id_persons] != null)
    {
       foreach ($_POST[id_persons] as $id_person)
       {
-         $query = "insert into direction (id_person, id_plan, status) " .
-                 "values ('$id_person', '$id_plan', '$dir_stat_allocated')";
-         if (!mysql_query($query))
+         $stmt = $db->query("select * from direction where id_person=$id_person and id_plan=$id_plan");
+         if ($stmt->rowCount() == 0)
+         {
+            $query = "insert into direction (id_person, id_plan, status) " .
+                    "values ('$id_person', '$id_plan', '$dir_stat_allocated')";
+         } else
          {
             $query = "update direction set status = $dir_stat_allocated " .
                     "where id_plan = $id_plan " .
                     "and id_person = $id_person";
-            mysql_query($query);
          }
+         $db->query($query);
       }
    }
 }
@@ -105,6 +114,7 @@ function direction_select($id_plan)
 {
    // Resources from the shift list
 
+   global $db;
    global $shi_stat_tentative;
    global $shi_stat_confirmed;
    global $dir_stat_allocated;
@@ -119,17 +129,17 @@ function direction_select($id_plan)
            "and plan.id = $id_plan " .
            "and (shift.status = $shi_stat_tentative or shift.status = $shi_stat_confirmed) " .
            "order by instruments.list_order, lastname, firstname";
-   $r = mysql_query($q);
+   $s = $db->query($q);
 
    $q2 = "SELECT id_person FROM direction where id_plan = $id_plan and status = $dir_stat_allocated";
-   $r2 = mysql_query($q2);
+   $s2 = $db->query($q2);
+   $r2 = $s2->fetchAll(PDO::FETCH_ASSOC);
 
-   while ($e = mysql_fetch_array($r, MYSQL_ASSOC))
+   foreach ($s as $e)
    {
       echo "<option value=\"" . $e[id_person] . "\"";
-      if (mysql_num_rows($r2) > 0)
-         mysql_data_seek($r2, 0);
-      while ($e2 = mysql_fetch_array($r2, MYSQL_ASSOC))
+      reset($r2);
+      foreach ($r2 as $e2)
          if ($e[id_person] == $e2[id_person])
             echo " selected";
       echo ">$e[firstname] $e[lastname]";
@@ -142,6 +152,7 @@ function direction_select($id_plan)
 
 function direction_list($id_plan)
 {
+   global $db;
    global $dir_stat_allocated;
    global $shi_stat_tentative;
    global $shi_stat_failed;
@@ -159,9 +170,9 @@ function direction_list($id_plan)
            "and direction.status = $dir_stat_allocated " .
            "order by lastname, firstname";
 
-   $r = mysql_query($q);
+   $s = $db->query($q);
 
-   while ($e = mysql_fetch_array($r, MYSQL_ASSOC))
+   foreach ($s as $e)
    {
       if ($e[shift_status] == $shi_stat_tentative)
          echo "<font color=grey>";
@@ -179,7 +190,6 @@ function direction_list($id_plan)
 }
 
 echo "
-  <body BGCOLOR=FFFFF4 TEXT=000000 LINK=00009F VLINK=008B00 ALINK=890000>
     <h1>Regiplan</h1>";
 echo "
     <form action='$php_self' method=post>
@@ -241,8 +251,8 @@ if ($action == 'update')
       if ($no == NULL)
       {
          $query2 = "select id_person from project where id = $_POST[id_project]";
-         $result = mysql_query($query2);
-         $row = mysql_fetch_array($result, MYSQL_ASSOC);
+         $stmt = $db->query($query2);
+         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
          $query = "insert into plan (date, tsort, time, id_location, location, id_project, " .
                  "id_responsible, responsible, comment, event_type) " .
@@ -255,7 +265,7 @@ if ($action == 'update')
          {
             $query = "DELETE FROM plan WHERE id = $no";
             $query2 = "delete from direction where id_plan = $no";
-            mysql_query($query2);
+            $db->query($query2);
          } else
          {
             $query = "update plan set date = '$ts'," .
@@ -273,7 +283,7 @@ if ($action == 'update')
          }
          $no = NULL;
       }
-      mysql_query($query);
+      $db->query($query);
    }
 }
 
@@ -286,19 +296,21 @@ if ($action == 'add')
            "and shift.status = $shi_stat_confirmed " .
            "and project.id = $_REQUEST[id_project] ";
 
-   $result = mysql_query($query);
-   while ($row = mysql_fetch_array($result, MYSQL_ASSOC))
+   $stmt = $db->query($query);
+   foreach ($stmt as $row)
    {
-      $query = "insert into direction (id_person, id_plan, status) " .
-              "values ($row[id_person], $no, $dir_stat_allocated) ";
-      if (!mysql_query($query))
+      $s = $db->query("select * from direction where id_person=$row[id_person] and id_plan=$no");
+      if ($s->rowCount() == 0)
+      {
+         $query = "insert into direction (id_person, id_plan, status) " .
+                 "values ($row[id_person], $no, $dir_stat_allocated) ";
+      } else
       {
          $query = "update direction set status = $dir_stat_allocated " .
                  "where id_plan = $no " .
                  "and id_person = $row[id_person]";
-
-         mysql_query($query);
       }
+      $db->query($query);
    }
 }
 
@@ -318,9 +330,9 @@ $query = "SELECT plan.id as id, date, time, tsort, id_project, event_type, " .
         "and project.year >= $cur_year " .
         "order by date,tsort,time";
 
-$result = mysql_query($query);
+$stmt = $db->query($query);
 
-while ($row = mysql_fetch_array($result, MYSQL_ASSOC))
+foreach($stmt as $row)
 {
    if ($row[id] != $no || $action != 'view')
    {
@@ -380,11 +392,7 @@ while ($row = mysql_fetch_array($result, MYSQL_ASSOC))
    }
 }
 
+echo "</table></form>";
+
 include 'framework_end.php';
 ?> 
-
-</table>
-</form>
-</body>
-</html>
-
