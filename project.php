@@ -41,6 +41,22 @@ function select_status($selected)
    echo "</select>";
 }
 
+function select_valid_par_stat($valid_par_stat)
+{
+   global $par_stat;
+
+   echo "<select size=" . sizeof($par_stat) . " name=\"valid_par_stat[]\" multiple title=\"Ctrl-click to select/unselect single\">";
+
+   for ($i = 0; $i < sizeof($par_stat); $i++)
+   {
+      echo "<option value=\"" . $i . "\"";
+      if ($valid_par_stat & (1 << $i))
+         echo " selected";
+      echo ">$par_stat[$i]";
+   }
+   echo "</select>";
+}
+
 $sel_year = ($_REQUEST[from] == NULL) ? date("Y") : intval($_REQUEST[from]);
 $prev_year = $sel_year - 1;
 
@@ -61,6 +77,7 @@ echo "
       <th bgcolor=#A6CAF0>Status</th>
       <th bgcolor=#A6CAF0>Deadline</th>
       <th bgcolor=#A6CAF0>Tutti</th>
+      <th bgcolor=#A6CAF0>På-/avmeld.</th>
       <th bgcolor=#A6CAF0>Generell info</th>
     </tr>";
 
@@ -80,15 +97,25 @@ if ($action == 'new')
     <th>";
    select_status(null);
    echo "</th>
-    <th><input type=text size=10 name=deadline title=\"Format: <dato>. <mnd> [<&aring;r>] Merk: M&aring;ned p&aring; engelsk. Eksempel: 12. dec\"></th>
+    <th><input type=text size=10 name=deadline value=\"" . 
+    date('j.M y', time() + 60*60*24*7*12) .    // Default dealine: 12 weeks from now
+    "\" title=\"Format: <dato>. <mnd> [<&aring;r>] Merk: M&aring;ned p&aring; engelsk. Eksempel: 12. dec\"></th>
     <th><input type=checkbox name=orchestration></th>
-    <th><textarea cols=44 rows=10 wrap=virtual name=info></textarea></th>
+    <th>";
+   select_valid_par_stat((1 << $par_stat_no) | (1 << $par_stat_yes));
+   echo "</td>
+     <th><textarea cols=44 rows=10 wrap=virtual name=info></textarea></th>
   </tr>";
 }
 
 if ($action == 'update')
 {
    $orchestration = ($_POST[orchestration] == null) ? $prj_orch_reduced : $prj_orch_tutti;
+
+   $valid_par_stat = 0;
+   if ($_POST[valid_par_stat] != null)
+      foreach ($_POST[valid_par_stat] as $idx)
+         $valid_par_stat |= (1 << $idx);
 
    if (($ts = strtotime($_POST[deadline])) == false)
    {
@@ -97,9 +124,9 @@ if ($action == 'update')
    {
       if ($no == NULL)
       {
-         $query = "insert into project (name, semester, year, status, deadline, orchestration, info, id_person) " .
+         $query = "insert into project (name, semester, year, status, deadline, orchestration, info, id_person, valid_par_stat) " .
                  "values ('$_POST[name]', '$_POST[semester]', " .
-                 "'$_POST[year]', '$_POST[status]', '$ts', '$orchestration', '$_POST[info]', 1)";
+                 "'$_POST[year]', '$_POST[status]', '$ts', '$orchestration', '$_POST[info]', 1, $valid_par_stat)";
          $db->query($query);
          mkdir("project/" . $db->lastInsertId() . "/rec", 0755, true);
          mkdir("project/" . $db->lastInsertId() . "/doc", 0755, true);
@@ -117,6 +144,7 @@ if ($action == 'update')
                     "status = '$_POST[status]'," .
                     "deadline = '$ts', " .
                     "orchestration = '$orchestration', " .
+                    "valid_par_stat = $valid_par_stat, " .
                     "info = '$_POST[info]' " .
                     "where id = $no";
          }
@@ -127,14 +155,14 @@ if ($action == 'update')
 }
 
 $query = "SELECT project.id as id, name, semester, year, status, " .
-        "deadline, orchestration, info " .
+        "deadline, orchestration, valid_par_stat, info " .
         "FROM project " .
         "where project.year >= $sel_year " .
         "order by ${sort}";
 
 $stmt = $db->query($query);
 
-foreach($stmt as $row)
+foreach ($stmt as $row)
 {
    if ($row[id] != $no)
    {
@@ -151,7 +179,10 @@ foreach($stmt as $row)
       if ($row[orchestration] == $prj_orch_tutti)
          echo "<center><img src=\"images/tick2.gif\" border=0></center>";
       echo "</td><td>";
-
+      for ($i = 0; $i < sizeof($par_stat); $i++)
+         if ($row[valid_par_stat] & (1 << $i))
+            echo $par_stat[$i] . "<br>\n";
+      echo "</td><td>";
       echo str_replace("\n", "<br>\n", $row[info]);
       echo "</td>" .
       "</tr>";
@@ -176,9 +207,10 @@ foreach($stmt as $row)
       echo "<th><input type=checkbox name=orchestration";
       if ($row[orchestration] == $prj_orch_tutti)
          echo " checked";
-      echo "></th>";
+      echo "></th>\<td>";
+      select_valid_par_stat($row[valid_par_stat]);
       echo " </td>
-    <th><textarea cols=44 rows=10 wrap=virtual name=info>{$row[info]}</textarea></th>
+    <td><textarea cols=44 rows=10 wrap=virtual name=info>{$row[info]}</textarea></td>
     </tr>";
    }
 }
