@@ -44,7 +44,7 @@ function manage_instrument($selected, $row, $edit)
    echo "</td>";
 }
 
-function stat_select($name, $selected)
+function stat_select($name, $selected, $valid_par_stat)
 {
    global $par_stat;
 
@@ -52,10 +52,13 @@ function stat_select($name, $selected)
 
    for ($i = 0; $i < count($par_stat); $i++)
    {
-      echo "<option value=$i";
-      if ($selected == $i)
-         echo " selected";
-      echo ">$par_stat[$i]</option>\n";
+      if ($valid_par_stat & (1 << $i))
+      {
+         echo "<option value=$i";
+         if ($selected == $i)
+            echo " selected";
+         echo ">$par_stat[$i]</option>\n";
+      }
    }
    echo "</select>";
 }
@@ -76,7 +79,7 @@ function manage_self($part, $row, $edit)
    echo "</td>";
 }
 
-function manage_reg($part, $row, $edit)
+function manage_reg($part, $row, $edit, $valid_par_stat)
 {
    global $par_stat_void;
    global $par_stat;
@@ -85,7 +88,7 @@ function manage_reg($part, $row, $edit)
 
    if ($edit)
    {
-      stat_select("stat_reg:$row", $part[stat_reg]);
+      stat_select("stat_reg:$row", $part[stat_reg], $valid_par_stat);
       echo "<input type=text name=comment_reg:$row size=20 value=\"$part[comment_reg]\">";
    } else
    {
@@ -109,7 +112,7 @@ function manage_req($part, $row, $edit)
 
    if ($edit)
    {
-      stat_select("stat_req:$row", $part[stat_req]);
+      stat_select("stat_req:$row", $part[stat_req], 0xff);
       echo "<input type=text name=comment_req:$row size=20 value=\"$part[comment_req]\">";
    } else
    {
@@ -232,7 +235,8 @@ if ($action == 'update')
    }
 }
 
-$query = "select name, semester, year, deadline, orchestration from project where id=$_REQUEST[id]";
+$query = "select name, semester, year, deadline, orchestration, valid_par_stat"
+        . " from project where id=$_REQUEST[id]";
 $stmt = $db->query($query);
 $prj = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -242,7 +246,7 @@ echo "
 if ($prj[orchestration] == $prj_orch_tutti)
    echo "Permisjonsfrist: ";
 else
-   echo "Påmeldingsprist: ";
+   echo "Påmeldingsfrist: ";
 echo date('j.M.y', $prj[deadline]) . "</h2>
     <form action='$php_self' method=post>
     <input type=hidden name=_action value=update>
@@ -296,7 +300,7 @@ foreach ($stmt as $row)
    $id_instruments = ($part[id_instruments] == null) ? $row[id_instruments] : $part[id_instruments];
    manage_instrument($id_instruments, $row[id], $row[id] == $no || $_REQUEST[col] != null);
    manage_self($part, $row[id], false);
-   manage_reg($part, $row[id], $row[id] == $no || $_REQUEST[col] == "reg");
+   manage_reg($part, $row[id], $row[id] == $no || $_REQUEST[col] == "reg", $prj[valid_par_stat]);
    manage_req($part, $row[id], $row[id] == $no || $_REQUEST[col] == "req");
    manage_final($part, $row[id], $row[id] == $no || $_REQUEST[col] == "final");
 
