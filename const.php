@@ -45,3 +45,12 @@
 // table: plan
     $plan_evt_rehearsal = 0;
     $plan_evt_direction = 1;
+    
+// table: participant
+    $par_stat_void = 0;
+    $par_stat_no = 1;
+    $par_stat_tentative = 2;
+    $par_stat_can = 3;
+    $par_stat_yes = 4;
+    
+    $par_stat = array("Udefinert", "Nei", "Tentativt", "Kan hvis behov", "Ja");
