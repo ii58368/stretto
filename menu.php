@@ -45,7 +45,7 @@
                         auth_li("Prosjekter", "project.php");
                         auth_li("Tilbakemeldinger", "feedback.php");
                         auth_li("Lokale", "location.php");
-                        auth_li("Permisjon/Deltagelse", "participant.php");
+                        auth_li("Ressurser", "participant_xx.php");
                         auth_li("Dokumenter", "document.php?path=common");
                         auth_li("Kontigent", "contigent.php");
                         auth_li("Om $prj_name", "about.php");
@@ -82,7 +82,7 @@
                            auth_li("Påmelding/permisjonssøknad", "absence=id=$pid");
                            auth_li("Tilbakemelding", "feedback?id=$pid");
                            auth_li("Fravær", "absence.php?id=$pid");
-                           auth_li("Prosjektressurser", "resources?id=$pid");
+                           auth_li("Prosjektressurser", "participant_x1.php?id=$pid");
                            auth_li("Konsertkalender", "consert?id=$pid");
                            echo "
                                 </ul>
