@@ -13,7 +13,9 @@
                     <a href="#">Mine sider</a>
                     <ul class="dl-submenu">
                         <?php
-                        auth_li("Mine prosjekter", "myProject.php");
+                        $s = $db->query("select id from person where email='$whoami'");
+                        $pers = $s->fetch(PDO::FETCH_ASSOC);
+                        auth_li("Mine prosjekter", "participant_1x.php?id=$pers[id]");
                         auth_li("Min prøveplan", "myPlan.php");
                         auth_li("Min regi", "myDirection.php");
                         auth_li("Mine personopplysninger", "personal.php");
@@ -56,7 +58,7 @@
                     <a href="#">Prosjekter</a>
                     <ul class="dl-submenu">
                         <?php
-                        $q = "select id, name, semester, year "
+                        $q = "select id, name, semester, year, orchestration "
                                 . "from project "
                                 . "where (status = $prj_stat_public "
                                 . "or status = $prj_stat_tentative) "
@@ -79,7 +81,7 @@
                            auth_li("Innspilling", "document.php?path=project/$pid/rec");
                            auth_li("Dokumenter", "document.php?path=project/$pid/doc");
                            auth_li("Regikomité", "direction.php?id_project=$pid");
-                           auth_li("Påmelding/permisjonssøknad", "absence=id=$pid");
+                           auth_li(($e[orchestration] == $prj_orch_tutti) ? "Permisjonssøknad" : "Påmelding", "participant_11.php?id_project=$pid&id_person=$pers[id]");
                            auth_li("Tilbakemelding", "feedback?id=$pid");
                            auth_li("Fravær", "absence.php?id=$pid");
                            auth_li("Prosjektressurser", "participant_x1.php?id=$pid");
