@@ -10,7 +10,7 @@ if ($sort == NULL)
 $sel_year = ($_REQUEST[from] == NULL) ? date("Y") : intval($_REQUEST[from]);
 $prev_year = $sel_year - 1;
 
-$query = "select firstname, lastname, instrument"
+$query = "select person.id as id, firstname, lastname, instrument"
         . " from person, instruments"
         . " where person.id=$_REQUEST[id]"
         . " and id_instruments = instruments.id";
@@ -48,7 +48,7 @@ foreach ($stmt as $row)
    echo "<tr>
       <td>";
    if ($row[status] == $prj_stat_public)
-      echo "<a href=\"participant_11.php?id=$row[id]\" title=\"Påmelding eller søk om permisjon\">";
+      echo "<a href=\"participant_11.php?id_project=$row[id]&id_person=$pers[id]\" title=\"Påmelding eller søk om permisjon\">";
    echo $row[name];
    if ($row[status] == $prj_stat_public)
       echo "</a>";

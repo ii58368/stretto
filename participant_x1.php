@@ -73,8 +73,8 @@ function manage_self($part, $row, $edit)
    {
       echo "<img border=0 src=\"images/part_stat_$part[stat_self].gif\" title=\"" . $par_stat[$part[stat_self]] . "\">\n";
       if ($part[stat_self])
-         echo date('j.M', $part[ts_self]);
-      echo "<br>$part[comment_self]";
+         echo "<i>" . date('j.M', $part[ts_self]) . "</i>";
+      echo "<br>" . str_replace("\n", "<br>\n", $part[comment_self]);
    }
    echo "</td>";
 }
@@ -96,8 +96,8 @@ function manage_reg($part, $row, $edit, $valid_par_stat)
       {
          echo "<img border=0 src=\"images/part_stat_$part[stat_reg].gif\" title=\"" . $par_stat[$part[stat_reg]] . "\">\n";
          if ($part[stat_reg])
-            echo date('j.M', $part[ts_reg]);
-         echo "<br>$part[comment_reg]";
+            echo "<i>" . date('j.M', $part[ts_reg]) . "</i>";
+         echo "<br>" . str_replace("\n", "<br>\n", $part[comment_reg]);
       }
    }
    echo "</td>";
@@ -120,8 +120,8 @@ function manage_req($part, $row, $edit)
       {
          echo "<img border=0 src=\"images/part_stat_$part[stat_req].gif\" title=\"" . $par_stat[$part[stat_req]] . "\">\n";
          if ($part[stat_req])
-            echo date('j.M', $part[ts_req]);
-         echo "<br>$part[comment_req]";
+            echo "<i>" . date('j.M', $part[ts_req]) . "</i>";
+         echo "<br>" . str_replace("\n", "<br>\n", $part[comment_req]);
       }
    }
    echo "</td>";
@@ -148,8 +148,8 @@ function manage_final($part, $row, $edit)
       {
          echo "<img border=0 src=\"images/part_stat_$part[stat_final].gif\" title=\"" . $par_stat[$part[stat_final]] . "\">\n";
          if ($part[stat_final])
-            echo date('j.M', $part[ts_final]);
-         echo "<br>$part[comment_final]";
+            echo "<i>" . date('j.M', $part[ts_final]) . "</i>";
+         echo "<br>" . str_replace("\n", "<br>\n", $part[comment_final]);
       }
    }
    echo "</td>";
