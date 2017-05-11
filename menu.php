@@ -18,7 +18,7 @@
                         auth_li("Mine prosjekter", "participant_1x.php?id=$pers[id]");
                         auth_li("Min prøveplan", "myPlan.php");
                         auth_li("Min regi", "myDirection.php");
-                        auth_li("Mine personopplysninger", "personal.php");
+                        auth_li("Mine personopplysninger", "personEdit.php?_no=$pers[id]");
                         ?>  
                     </ul>
                 </li>

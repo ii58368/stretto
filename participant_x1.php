@@ -63,6 +63,36 @@ function stat_select($name, $selected, $valid_par_stat)
    echo "</select>";
 }
 
+function manage_inv($part, $row, $edit)
+{
+   global $par_stat_void;
+   global $par_stat_yes;
+   global $par_stat;
+
+   echo "<td align=center>";
+
+   if ($edit)
+   {
+      echo "<input type=checkbox name=stat_inv:$row";
+      if ($part[stat_inv] == $par_stat_yes)
+         echo " checked";
+      echo " value=$par_stat_yes>";
+      echo "<input type=hidden name=comment_inv:$row value=\"\">";
+   //   echo "<input type=text name=comment_inv:$row size=20 value=\"$part[comment_inv]\">";
+   } else
+   {
+      if ($part != null || $part[stat_inv] != $par_stat_void)
+      {
+         if ($part[stat_inv] == $par_stat_yes)
+            echo "<img border=0 src=\"images/tick2.gif\" title=\"" . $par_stat[$part[stat_inv]] . "\">\n";
+   //      if ($part[stat_inv])
+   //         echo "<i>" . date('j.M', $part[ts_inv]) . "</i>";
+         echo "<br>" . str_replace("\n", "<br>\n", $part[comment_inv]);
+      }
+   }
+   echo "</td>";
+}
+
 function manage_self($part, $row, $edit)
 {
    global $par_stat_void;
@@ -209,6 +239,9 @@ if ($action == 'update')
    {
       $id_instruments = $_REQUEST["id_instruments:$no"];
 
+      $stat_inv = $_REQUEST["stat_inv:$no"];
+      update_cell($no, "inv", $stat_inv, null, $id_instruments);
+
       $stat_req = $_REQUEST["stat_req:$no"];
       $comment_req = $_REQUEST["comment_req:$no"];
       update_cell($no, "req", $stat_req, $comment_req, $id_instruments);
@@ -257,6 +290,9 @@ echo date('j.M.y', $prj[deadline]) . "</h2>
       <th bgcolor=#A6CAF0>Navn</th>
       <th bgcolor=#A6CAF0>Status</th>
       <th bgcolor=#A6CAF0>Instrument</th>
+      <th bgcolor=#A6CAF0>";
+manage_col("inv");
+echo "Bes</th>
       <th bgcolor=#A6CAF0>Egen</th>
       <th bgcolor=#A6CAF0>";
 manage_col("reg");
@@ -299,6 +335,7 @@ foreach ($stmt as $row)
    $part = get_participant($row[id]);
    $id_instruments = ($part[id_instruments] == null) ? $row[id_instruments] : $part[id_instruments];
    manage_instrument($id_instruments, $row[id], $row[id] == $no || $_REQUEST[col] != null);
+   manage_inv($part, $row[id], $row[id] == $no || $_REQUEST[col] == "inv");
    manage_self($part, $row[id], false);
    manage_reg($part, $row[id], $row[id] == $no || $_REQUEST[col] == "reg", $prj[valid_par_stat]);
    manage_req($part, $row[id], $row[id] == $no || $_REQUEST[col] == "req");

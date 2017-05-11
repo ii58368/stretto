@@ -170,7 +170,7 @@ foreach ($stmt as $row)
         <td><center>
             <a href=\"{$php_self}?_sort={$sort}&from=$sel_year&_action=view&_no={$row[id]}\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
              </center></td>" .
-      "<td><a href=\"plan.php?id_project={$row[id]}\" target=content>{$row[name]}</a></td>" .
+      "<td><a href=\"plan.php?id_project={$row[id]}\">{$row[name]}</a></td>" .
       "<td>{$row[semester]} " .
       "    {$row[year]}</td>" .
       "<td>" . $prj_stat[$row[status]] . "</td>" .

@@ -13,13 +13,8 @@ echo "
     <h1>$prj[name] $prj[semester]-$prj[year]</h1>\n";
 echo str_replace("\n", "<br>\n", $prj[info]) . "\n";
 
-echo "<h2>Verk</h2>
-    <table border=0>
-    <tr>
-      <th bgcolor=#A6CAF0>Komponist</th>
-      <th bgcolor=#A6CAF0>Verk</th>
-      <th bgcolor=#A6CAF0>Fra</th>
-    </tr>";
+echo "<h2>Repertoar</h2>
+    <table border=0>\n";
 
 $query = "SELECT title, work, firstname, lastname"
         . " from repository, music"
@@ -31,7 +26,10 @@ $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
-   echo "<tr><td>$row[firstname] $row[lastname]</td><td>$row[title]</td><td>$row[work]</td></tr>\n";
+   echo "<tr><td>$row[firstname] $row[lastname]:</td><td>$row[title]</td>";
+   if (strlen($row[work]) > 0)
+      echo "<td>fra $row[work]</td>";
+   echo "</tr>\n";
 }
 echo "</table><p>\n";
 
@@ -79,7 +77,7 @@ echo "<h2>Musikere</h2>\n";
 $query = "select firstname, lastname, instrument"
         . " from person, instruments, participant"
         . " where participant.id_project=$_REQUEST[id]"
-        . " and person.id_instruments = instruments.id"
+        . " and participant.id_instruments = instruments.id"
         . " and participant.id_person = person.id"
         . " order by instruments.list_order, participant.position";
 $stmt = $db->query($query);
@@ -90,6 +88,7 @@ foreach ($stmt as $e)
    if ($last_instrument != $e[instrument])
       echo "</ul><p><b>$e[instrument]</b><ul>\n";
    echo "<li>$e[firstname] $e[lastname]</li>\n";
+   $last_instrument = $e[instrument];
 }
 echo "</ul>";
 
