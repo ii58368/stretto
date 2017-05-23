@@ -74,7 +74,7 @@
                                 <ul class=\"dl-submenu\">";
                            $pid = $e[id];
                            auth_li("Prosjektinfo", "prjInfo.php?id=$pid");
-                           auth_li("Gruppeoppsett", "seating.php?id=$pid");
+                           auth_li("Gruppeoppsett", "seating.php?id_project=$pid");
                            auth_li("Program", "program.php?id=$pid");
                            auth_li("Musikere", "person.php?id=$pid");
                            auth_li("Noter", "document.php?path=project/$pid/sheet");
