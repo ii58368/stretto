@@ -13,13 +13,13 @@ function list_group($id)
 
    global $per_dir_nocarry;
 
-   $q = "SELECT firstname, lastname, status_dir, instrument, shift.status as status, " .
-           "shift.comment as shift_comment " .
-           "FROM person, instruments, shift " .
-           "where person.id = shift.id_person " .
-           "and id_instruments = instruments.id " .
-           "and shift.id_project = ${id} " .
-           "and (shift.status >= $shi_stat_tentative and shift.status <= $shi_stat_failed) " .
+   $q = "SELECT firstname, lastname, status_dir, instrument, participant.stat_dir as status, " .
+           "participant.comment_dir as shift_comment " .
+           "FROM person, instruments, participant " .
+           "where person.id = participant.id_person " .
+           "and person.id_instruments = instruments.id " .
+           "and participant.id_project = ${id} " .
+           "and (participant.stat_dir >= $shi_stat_tentative and participant.stat_dir <= $shi_stat_failed) " .
            "order by list_order, lastname, firstname";
 
    $s = $db->query($q);
@@ -72,10 +72,10 @@ function mail2dir($id_project)
    $e = $s->fetch(PDO::FETCH_ASSOC);
    $project_name = $e[name];
 
-   $q = "select email, phone1 from person, shift " .
-           "where person.id = shift.id_person " .
-           "and shift.id_project = ${id_project} " .
-           "and (shift.status = ${shi_stat_tentative} or shift.status = ${shi_stat_confirmed})";
+   $q = "select email, phone1 from person, participant " .
+           "where person.id = participant.id_person " .
+           "and participant.id_project = ${id_project} " .
+           "and (participant.stat_dir = ${shi_stat_tentative} or participant.stat_dir = ${shi_stat_confirmed})";
    $s = $db->query($q);
    $r = $s->fetchAll(PDO::FETCH_ASSOC);
 
@@ -118,18 +118,17 @@ if ($action == 'update')
            "id_person = '$_POST[id_person]'," .
            "info_dir = '$_POST[info_dir]' " .
            "where id = $no";
-   $query2 = "delete from shift " .
+   $query2 = "update participant set stat_dir = $shi_stat_free "
+           . "where stat_dir = $shi_stat_responsible "
+           . "and id_project = $no";
+   $db->query($query2);
+   $query2 = "update participant set stat_dir = ${shi_stat_responsible} " .
            "where id_person = $_POST[id_person] " .
            "and id_project = $no";
    $db->query($query2);
-   $query2 = "insert into shift (id_person, id_project, status) " .
-           "values ($_POST[id_person], $no, ${shi_stat_responsible})";
-   $db->query($query2);
-   $query2 = "update shift set status = ${shi_stat_responsible} " .
-           "where id_person = $_POST[id_person] " .
-           "and id_project = $no";
-   $no = NULL;
    $db->query($query);
+   
+   $no = NULL;
 }
 
 $query = "SELECT project.id as id, name, semester, year, id_person, project.status as status, " .

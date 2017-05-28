@@ -21,7 +21,7 @@ function get_groups()
    $query = "select groups.id as id, groups.name as name "
            . "from participant, instruments, groups, person "
            . "where participant.id_person = person.id "
-           . "and person.email = '$whoami' "
+           . "and person.uid = '$whoami' "
            . "and participant.id_project = $_REQUEST[id_project] "
            . "and participant.id_instruments = instruments.id "
            . "and instruments.id_groups = groups.id";
@@ -65,7 +65,7 @@ function update_seating($id_groups, $template)
    global $whoami;
    global $db;
 
-   $s = $db->query("select id from person where email = '$whoami'");
+   $s = $db->query("select id from person where uid = '$whoami'");
    $person = $s->fetch(PDO::FETCH_ASSOC);
 
    $ts = strtotime("now");
@@ -182,11 +182,10 @@ echo "
 </table>
 </form>";
 
+echo "<img src=\"map.php?id_groups=$grp[id]&id_project=$_REQUEST[id_project]&template=$seat[template]\"><br>\n";
+
 if ($seat != null)
    echo "$seat[firstname]/" . date('j.M y', $seat[ts]) . "\n";
-
-echo "<img src=\"map.php?id_groups=$grp[id]&id_project=$_REQUEST[id_project]&template=$seat[template]\">";
-echo "map.php?id_groups=$grp[id]&id_project=$_REQUEST[id_project]&template=$seat[template]";
 
 require 'framework_end.php';
 ?>

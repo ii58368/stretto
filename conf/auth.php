@@ -133,7 +133,7 @@ function auth_access_uid($uid, $auth)
    $query = "select access from person, auth_person, view " .
            "where person.id = auth_person.id_person " .
            "and auth_person.id_view = view.id " .
-           "and person.email = '$uid'";
+           "and person.uid = '$uid'";
 
    $stmt = $db->query($query);
 
@@ -160,7 +160,7 @@ function auth_access($auth)
       $access = auth_access_uid($_SERVER[PHP_AUTH_USER], $auth);
 
       if ($access & $auth & (1 << $auth_su))
-         return true;  // Yes, the actual user has super permision
+         return true;  // Yes, the actual user has super permisions
 
       if ($whoami != $_SERVER[PHP_AUTH_USER])
       {
@@ -186,7 +186,7 @@ function auth_select_person($selected)
    global $db;
    global $per_stat_quited;
 
-   $q = "SELECT email, firstname, lastname, instrument "
+   $q = "SELECT uid, firstname, lastname, instrument "
            . "FROM person, instruments "
            . "where not person.status = $per_stat_quited "
            . "and person.id_instruments = instruments.id "
@@ -195,8 +195,8 @@ function auth_select_person($selected)
 
    foreach($s as $e)
    {
-      echo "<option value=\"" . $e[email] . "\"";
-      if ($e[email] == $selected)
+      echo "<option value=\"" . $e[uid] . "\"";
+      if ($e[uid] == $selected)
          echo " selected";
       echo ">$e[firstname] $e[lastname] ($e[instrument])\n";
    }
@@ -266,7 +266,7 @@ function auth_whoami()
       $query = "select firstname, lastname, instrument "
               . "from person, instruments "
               . "where person.id_instruments = instruments.id "
-              . "and email = '$whoami'";
+              . "and uid = '$whoami'";
       $stmt = $db->query($query);
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
 

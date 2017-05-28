@@ -15,15 +15,18 @@ if ($action == 'delete')
    $db->query($query);
 }   
 
+$sort_view = "view.name,view.id";
+if ($sort == NULL)
+  $sort = "list_order, lastname, firstname, $sort_view";
 
 echo "
     <h1>Tilgang</h1>
     <table border=1>
     <tr>
-      <th bgcolor=#A6CAF0><a href=$php_self?_sort=firstname,lastname title=\"Sorter p&aring; fornavn\">Fornavn</a>/
-                          <a href=$php_self?_sort=lastname,firstname title=\"Sorter p&aring; etternavn\">Etternavn</a></th>
-      <th bgcolor=#A6CAF0><a href=$php_self?_sort=list_order,lastname,firstname title=\"Sorter p&aring; instrumentgruppe\">Instrument</a></th>
-      <th bgcolor=#A6CAF0><a href=$php_self?_sort=status,list_order,lastname,firstname title=\"Sorter p&aring; status\">Status</a></th>";
+      <th bgcolor=#A6CAF0><a href=$php_self?_sort=firstname,lastname,$sort_view title=\"Sorter p&aring; fornavn\">Fornavn</a>/
+                          <a href=$php_self?_sort=lastname,firstname,$sort_view title=\"Sorter p&aring; etternavn\">Etternavn</a></th>
+      <th bgcolor=#A6CAF0><a href=$php_self?_sort=list_order,lastname,firstname,$sort_view title=\"Sorter p&aring; instrumentgruppe\">Instrument</a></th>
+      <th bgcolor=#A6CAF0><a href=$php_self?_sort=status,list_order,lastname,firstname,$sort_view title=\"Sorter p&aring; status\">Status</a></th>";
  
 $query  = "SELECT name " .
           "FROM view " .
@@ -33,9 +36,6 @@ $stmt = $db->query($query);
 foreach($stmt as $row)
   echo "<th bgcolor=#A6CAF0>$row[name]</td>";
 echo "</tr><tr>";
-
-if ($sort == NULL)
-  $sort = "list_order, lastname, firstname";
 
 $query  = "SELECT person.id as person_id, " .
           "view.id as view_id,  " .

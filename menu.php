@@ -13,7 +13,7 @@
                     <a href="#">Mine sider</a>
                     <ul class="dl-submenu">
                         <?php
-                        $s = $db->query("select id from person where email='$whoami'");
+                        $s = $db->query("select id from person where uid='$whoami'");
                         $pers = $s->fetch(PDO::FETCH_ASSOC);
                         auth_li("Mine prosjekter", "participant_1x.php?id=$pers[id]");
                         auth_li("Min prøveplan", "myPlan.php");

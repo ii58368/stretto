@@ -158,12 +158,12 @@ function direction_list($id_plan)
    global $shi_stat_failed;
    global $per_dir_nocarry;
 
-   $q = "SELECT firstname, lastname, status_dir, instrument, direction.status as status, shift.status as shift_status " .
-           "FROM person, instruments, direction, shift, project, plan " .
+   $q = "SELECT firstname, lastname, status_dir, instrument, direction.status as status, participant.stat_dir as shift_status " .
+           "FROM person, instruments, direction, participant, project, plan " .
            "where person.id = direction.id_person " .
-           "and id_instruments = instruments.id " .
-           "and shift.id_person = person.id " .
-           "and shift.id_project = project.id " .
+           "and person.id_instruments = instruments.id " .
+           "and participant.id_person = person.id " .
+           "and participant.id_project = project.id " .
            "and project.id = plan.id_project " .
            "and plan.id = direction.id_plan " .
            "and direction.id_plan = ${id_plan} " .
@@ -290,10 +290,10 @@ if ($action == 'update')
 
 if ($action == 'add')
 {
-   $query = "select shift.id_person as id_person " .
-           "from shift, project " .
-           "where shift.id_project = project.id " .
-           "and shift.status = $shi_stat_confirmed " .
+   $query = "select participant.id_person as id_person " .
+           "from participant, project " .
+           "where participant.id_project = project.id " .
+           "and participant.stat_dir = $shi_stat_confirmed " .
            "and project.id = $_REQUEST[id_project] ";
 
    $stmt = $db->query($query);

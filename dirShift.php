@@ -1,20 +1,15 @@
 <?php
 require 'framework.php';
 
-if ($action == 'insert')
-{
-   $query = "insert into shift (id_person, id_project, status) " .
-           "values ('$_REQUEST[id_person]', '$_REQUEST[id_project]', $shi_stat_tentative)";
-   $db->query($query);
-}
-
 if ($action == 'update')
 {
-   $next_status = intval($_REQUEST[status]) + 1;
+   $next_status = intval($_REQUEST[stat_dir]) + 1;
+   if ($next_status == $shi_stat_leave) // deprecated
+      $next_status++;
    if ($next_status > 4)
       $next_status = 0;
 
-   $query = "update shift set status = $next_status " .
+   $query = "update participant set stat_dir = $next_status " .
            "where id_person = $_REQUEST[id_person] " .
            "and id_project = $_REQUEST[id_project]";
    $db->query($query);
@@ -43,7 +38,7 @@ foreach ($stmt as $row)
 echo "</tr><tr>";
 
 if ($sort == NULL)
-   $sort = "(select IFNULL(max(id_project), 0) from shift where id_person = person.id and status = $shi_stat_confirmed), list_order, lastname, firstname ";
+   $sort = "(select IFNULL(max(id_project), 0) from participant where id_person = person.id and stat_dir = $shi_stat_confirmed), list_order, lastname, firstname ";
 
 $query = "SELECT person.id as person_id, " .
         "person.status_dir as status_dir, " .
@@ -66,7 +61,8 @@ $status_tab = array(
     $shi_stat_confirmed => "Bekreftet",
     $shi_stat_failed => "Ikke godkjent oppm&oslash;te",
     $shi_stat_leave => "Permisjon",
-    $shi_stat_responsible => "Regiansvarlig"
+    $shi_stat_responsible => "Regiansvarlig",
+    $shi_stat_dropout => "Er ikke med på prosjektet"
 );
 
 foreach ($stmt as $row)
@@ -79,20 +75,21 @@ foreach ($stmt as $row)
       echo "</td><td bgcolor=#A6CAF0> $row[instrument] </td>";
       $prev_id = $row[person_id];
    }
-   $query = "SELECT status, comment from shift " .
+   $query = "SELECT stat_dir, stat_final, comment_dir from participant " .
            "where id_project = {$row[project_id]} " .
-           "and id_person = {$row[person_id]}";
+           "and id_person = {$row[person_id]} " .
+           "and (stat_final = $par_stat_yes or not stat_dir = $shi_stat_free)";
    $stmt2 = $db->query($query);
-   $status = $shi_stat_free;
-   $comment = "";
-   $action = "insert";
+   echo "<td align=center>";
    foreach ($stmt2 as $row2)
    {
-      $status = $row2[status];
-      $comment = $row2[comment];
-      $action = "update";
+      $status = $row2[stat_dir];
+      if ($row2[stat_dir] != $shi_stat_free && $row2[stat_final] != $par_stat_yes)
+         $status = 6;
+      $comment = $row2[comment_dir];
+      echo "<a href=\"$_SERVER[PHP_SELF]?_action=update&id_person={$row[person_id]}&id_project={$row[project_id]}&stat_dir={$status}&from=$sel_year&_sort={$sort}\"><img src=\"images/shift_status_{$status}.gif\" border=0 title=\"{$status_tab[$status]} ({$row[project_name]}) {$comment}\"></a>\n";
    }
-   echo "<td align=center><a href=\"$_SERVER[PHP_SELF]?_action={$action}&id_person={$row[person_id]}&id_project={$row[project_id]}&status={$status}&from=$sel_year&_sort={$sort}\"><img src=\"images/shift_status_{$status}.gif\" border=0 title=\"{$status_tab[$status]} ({$row[project_name]}) {$comment}\"></a></td>";
+   echo "</td>";
 }
 ?> 
 </tr>

@@ -61,7 +61,7 @@ function get_txt($part, $pos)
    {
       if ($p[position] == $pos)
       {
-         if ($p[email] == $whoami)
+         if ($p[uid] == $whoami)
             $tag = '*x';
          return $p[firstname] . " " . $p[lastname][0] . $tag;
       }
@@ -76,7 +76,7 @@ function draw_group($img, $lineup)
    if ($lineup == null)
       return;
 
-   $query = "SELECT position, firstname, lastname, email "
+   $query = "SELECT position, firstname, lastname, uid "
            . "FROM person, participant, instruments, groups "
            . "where person.id = participant.id_person "
            . "and participant.id_project = $_REQUEST[id_project] "
@@ -132,7 +132,7 @@ $template = array(
     $v1_15
 );
 
-$img = imagecreatetruecolor(1000, 1000);
+$img = imagecreatetruecolor(600, 600);
 $bgcol = imagecolorAllocate($img, 0xff, 0xfc, 0xf5);
 imagefill($img, 0, 0, $bgcol);
 

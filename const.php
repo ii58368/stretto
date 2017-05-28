@@ -25,6 +25,7 @@
     $shi_stat_failed = 3;
     $shi_stat_leave = 4;
     $shi_stat_responsible = 5;
+    $shi_stat_dropout = 6;
     
 // table: project
     $prj_stat_public = 0;

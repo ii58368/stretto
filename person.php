@@ -62,7 +62,7 @@ echo "
 
 
 
-$query  = "SELECT person.id as id, id_instruments, instrument, firstname, lastname, " .
+$query  = "SELECT person.id as id, id_instruments, instrument, firstname, middlename, lastname, " .
     "address, postcode, city, " .
     "email, phone1, phone2, phone3, status, person.comment as comment " .
     "FROM person, instruments " .
@@ -77,8 +77,7 @@ foreach($stmt as $row)
            <a href=\"{$pedit}?_sort={$sort}&_action=view&_no={$row[id]}\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
           </center></td>" .
          "<td>{$row[instrument]}</td>" .
-         "<td>{$row[firstname]} " .
-         "{$row[lastname]}</td>" . 
+         "<td>{$row[firstname]} {$row[middlename]} {$row[lastname]}</td>" . 
          "<td>{$row[address]}</td>" . 
          "<td>" .
          sprintf("%04d", $row[postcode]) .

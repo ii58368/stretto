@@ -53,12 +53,13 @@ if ($action == 'update_pers')
    {
       if ($no == NULL)
       {
-         $query = "insert into person (id_instruments, firstname, lastname, address, 
-              postcode, city, email,
+         $query = "insert into person (id_instruments, firstname, middlename, lastname, address, 
+              postcode, city, email, uid, password,
               phone1, phone2, phone3, status, comment)
               values ('$_POST[id_instruments]', '$_POST[firstname]', 
-                      '$_POST[lastname]', '$_POST[address]',
+                      '$_POST[middlename]', '$_POST[lastname]', '$_POST[address]',
                       '$_POST[postcode]', '$_POST[city]', '$_POST[email]',
+                      '$_POST[email]', MD5('OSO'),
                       '$_POST[phone1]', '$_POST[phone2]', '$_POST[phone3]', 
                       '$_POST[status]', '$_POST[comment]')";
          $db->query($query);
@@ -74,6 +75,7 @@ if ($action == 'update_pers')
          {
             $query = "update person set id_instruments = '$_POST[id_instruments]'," .
                     "firstname = '$_POST[firstname]'," .
+                    "middlename = '$_POST[middlename]'," .
                     "lastname = '$_POST[lastname]'," .
                     "address = '$_POST[address]'," .
                     "postcode = '$_POST[postcode]'," .
@@ -94,38 +96,62 @@ if ($action == 'update_pers')
    }
 }
 
-
-if ($action == 'update_pwd')
+function update_pwd($no)
 {
-   if ($_POST[pwd1] == $_POST[pwd2])
-   {
-      $query = "update person set password = MD5('$_POST[pwd1]') " .
-              "where id = $no";
-      try
-      {
-         $db->query($query);
-      } catch (PDOExeption $ex)
-      {
-         echo "<font color=red>Failed to update</font>";
-      }
-      $pwd = $_POST[pwd1];
-      $query = "select email from person where id = $no";
-      $stmt = $db->query($query);
-      $row = $stmt->fetch(PDO::FETCH_ASSOC);
+   global $db;
+   global $dbname;
 
-      $ht_cmd = "/usr/sbin/htpasswd -bd /etc/apache2/{$dbname}_user $row[email] $pwd";
-      system($ht_cmd);
-   } else
+   $s = $db->query("select id from person where not id = $no and uid = '$_POST[uid]'");
+   if ($s->rowCount() > 0)
+   {
+      echo "<font color=red>Ikke oppdatert, brukeren finnes fra før!</font>";
+      return;
+   }
+
+   if (strlen($_POST[uid]) < 2)
+   {
+      echo "<font color=red>Ikke oppdatert, brukeren må bestå av minst 2 bokstaver!</font>";
+      return;
+   }
+
+   if ($_POST[pwd1] != $_POST[pwd2])
    {
       echo "<font color=red>Ikke oppdatert, passordene må være like!</font>";
+      return;
    }
+
+   if (strlen($_POST[pwd1]) == 0)
+   {
+      echo "<font color=red>Ikke oppdatert, passord må ha minst 1 bokstav</font>";
+      return;
+   }
+     
+   $query = "update person set uid = '$_POST[uid]' , password = MD5('$_POST[pwd1]')" .
+           "where id = $no";
+   try
+   {
+      $db->query($query);
+   } catch (PDOExeption $ex)
+   {
+      echo "<font color=red>Failed to update</font>";
+   }
+   $pwd = $_POST[pwd1];
+   $stmt = $db->query("select uid from person where id = $no");
+   $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+   $ht_cmd = "/usr/sbin/htpasswd -D /etc/apache2/{$dbname}_user $row[uid] $pwd";
+   system($ht_cmd);
+   $ht_cmd = "/usr/sbin/htpasswd -bd /etc/apache2/{$dbname}_user $_POST[uid] $pwd";
+   system($ht_cmd);
 }
 
+if ($action == 'update_pwd')
+   update_pwd($no);
 
 if ($no != NULL)
 {
-   $query = "SELECT person.id as id, id_instruments, instrument, firstname, lastname, " .
-           "address, postcode, city, " .
+   $query = "SELECT person.id as id, id_instruments, instrument, firstname, middlename, lastname, " .
+           "uid, address, postcode, city, " .
            "email, phone1, phone2, phone3, status, person.comment as comment, " .
            "comment_dir, status_dir " .
            "FROM person, instruments " .
@@ -136,13 +162,13 @@ if ($no != NULL)
    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-$person = ($no == NULL) ? "Ny person" : "$row[firstname] $row[lastname] ($row[instrument])";
+$person = ($no == NULL) ? "Ny person" : "$row[firstname] $row[middlename] $row[lastname]";
 $postcode = sprintf("%04d", $row[postcode]);
 
 echo "
     <h1>$person</h1>
     <table border=0>
-    <tr>
+    <tr bgcolor=#A6CAF0>
       <th>Personalia</th>
       <form action='$php_self' method=post>";
 
@@ -153,13 +179,15 @@ if ($action == 'edit_pers')
         <input type=hidden name=_sort value='$sort'>
         <input type=hidden name=_no value='$no'>
         <input type=hidden name=_action value=update_pers>
-        <input type=submit value=\"Lagre\">
-        <input type=submit name=_delete value=slett title=\"Kan slettes fra medlemsregisteret dersom vedkommende ikke har vært med på noen prosjekter\"> 
-      </th>
+        <input type=submit value=\"Lagre\">\n";
+   if ($no != null)
+      echo "<input type=submit name=_delete value=slett title=\"Kan slettes fra medlemsregisteret dersom vedkommende ikke har vært med på noen prosjekter\">\n";
+   echo "</th>
     </tr>
     <tr>
       <td>Navn:</td>
       <td><input type=text name=firstname size=30 value=\"$row[firstname]\">
+          <input type=text name=middlename size=30 value=\"$row[middlename]\">
           <input type=text name=lastname size=30 value=\"$row[lastname]\"></td>
     </tr>
     <tr>
@@ -210,7 +238,7 @@ if ($action == 'edit_pers')
         <input type=submit value=\"Endre\">
       </th>
     </tr>
-    <tr><td>Navn:</td><td>$row[firstname] $row[lastname]</td></tr>
+    <tr><td>Navn:</td><td>$row[firstname] $row[middlename] $row[lastname]</td></tr>
     <tr><td>Instrument:</td><td>$row[instrument]</td></tr>
     <tr><td>Adresse:</td><td>$row[address]</td></tr>
     <tr><td>Post:</td><td>$postcode $row[city]</td></tr>
@@ -225,22 +253,28 @@ echo "</form>
         </table>";
 
 
-echo "
-    <p>
-    <table border=0>
-    <tr>
-      <th>Passord</th>
-      <form action='$php_self' method=post>";
-
-if ($action == 'edit_pwd')
+if ($no != null)
 {
    echo "
+    <p>
+    <table border=0>
+    <tr bgcolor=#A6CAF0>
+      <th>Innlogging</th>
+      <form action='$php_self' method=post>";
+
+   if ($action == 'edit_pwd')
+   {
+      echo "
       <th>
         <input type=hidden name=_sort value='$sort'>
         <input type=hidden name=_no value='$no'>
         <input type=hidden name=_action value=update_pwd>
         <input type=submit value=\"Lagre\">
       </th>
+    </tr>
+    <tr>
+      <td>Bruker-id:</td>
+      <td><input type=text name=uid size=30 value=\"$row[uid]\"></td>
     </tr>
     <tr>
       <td>Nytt passord:</td>
@@ -250,20 +284,20 @@ if ($action == 'edit_pwd')
       <td>Gjenta passord:</td>
       <td><input type=password name=pwd2 size=20></td>
     </tr>";
-} else
-{
-   echo "
+   } else
+   {
+      echo "
       <th>
         <input type=hidden name=_sort value='$sort'>
         <input type=hidden name=_no value='$no'>
         <input type=hidden name=_action value=edit_pwd>
-        <input type=submit value=\"Nytt passord\">
+        <input type=submit value=\"Endre\">
       </th>
     </tr>
+    <tr><td>Bruker-id:</td><td>$row[uid]</td></tr>
     <tr><td>Passord:</td><td>************</td></tr>";
+   }
 }
-
-
 
 
 
