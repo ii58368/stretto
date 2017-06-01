@@ -1,7 +1,7 @@
 <?php
 require 'framework.php';
 
-if ($sort == NULL)
+if (is_null($sort))
    $sort = 'list_order';
 
 echo "
@@ -59,13 +59,13 @@ if ($action == 'new')
 
 if ($action == 'update')
 {
-   if ($no == NULL)
+   if (is_null($no))
    {
       $query = "insert into instruments (instrument, list_order, id_groups, comment)
               values ('$_POST[instrument]', $_POST[list_order], $_POST[id_groups], '$_POST[comment]')";
    } else
    {
-      if ($delete != NULL)
+      if (!is_null($delete))
       {
          $q = "select count(*) as count from person where id_instruments = {$no}";
          $s = $db->query($q);

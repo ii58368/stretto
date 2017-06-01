@@ -1,7 +1,7 @@
 <?php
 require 'framework.php';
 
-if ($sort == NULL)
+if (is_null($sort))
    $sort = 'name';
 
 list($categoy, $id_project, $variant) = split($_REQUEST[path], '/');
@@ -56,7 +56,7 @@ if ($action == 'new')
 
 if ($action == 'update')
 {
-   if ($no == NULL)
+   if (is_null($no))
    {
       $dst_file = $_REQUEST[path] . "/" . $_FILES[filename][name];
       if ($_FILES[filename][size] > 10 * 1024 * 1024)
@@ -72,7 +72,7 @@ if ($action == 'update')
    } else
    {
       $cur_file = $_REQUEST[path] . "/" . $no;
-      if ($delete != NULL)
+      if (!is_null($delete))
       {
          unlink($cur_file);
       } else

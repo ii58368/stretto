@@ -15,7 +15,7 @@ if ($action == 'update')
    $db->query($query);
 }
 
-$sel_year = ($_REQUEST[from] == NULL) ? date("Y") : intval($_REQUEST[from]);
+$sel_year = is_null($_REQUEST[from]) ? date("Y") : intval($_REQUEST[from]);
 $prev_year = $sel_year - 1;
 
 echo "
@@ -37,7 +37,7 @@ foreach ($stmt as $row)
    echo "<th bgcolor=#A6CAF0><a href=dirPlan.php?_sort=time,date&id_project={$row[id]}>{$row[name]}<br>{$row[semester]}{$row[year]}</a></td>";
 echo "</tr><tr>";
 
-if ($sort == NULL)
+if (is_null($sort))
    $sort = "(select IFNULL(max(id_project), 0) from participant where id_person = person.id and stat_dir = $shi_stat_confirmed), list_order, lastname, firstname ";
 
 $query = "SELECT person.id as person_id, " .

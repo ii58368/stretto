@@ -49,7 +49,7 @@
                         auth_li("Lokale", "location.php");
                         auth_li("Ressurser", "participant_xx.php");
                         auth_li("Dokumenter", "document.php?path=common");
-                        auth_li("Kontigent", "contigent.php");
+                        auth_li("Kontingent", "contingent.php");
                         auth_li("Om $prj_name", "about.php");
                         ?>
                     </ul>

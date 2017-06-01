@@ -155,7 +155,7 @@ function auth_access($auth)
 
    static $access = null;
 
-   if ($access == null)
+   if (is_null($access))
    {
       $access = auth_access_uid($_SERVER[PHP_AUTH_USER], $auth);
 
@@ -206,10 +206,10 @@ function auth_page($auth_list, $page = NULL)
 {
    global $php_self;
 
-   if ($page == NULL)
+   if (is_null($page))
       $page = $php_self;
 
-   if (($acc = $auth_list[$page]) == NULL)
+   if (is_null($acc = $auth_list[$page]))
       return false;
 
    if (!auth_access($acc))

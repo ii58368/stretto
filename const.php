@@ -55,3 +55,12 @@
     $par_stat_yes = 4;
     
     $par_stat = array("Udefinert", "Nei", "Tentativt", "Kan hvis behov", "Ja");
+    
+// table: contigent
+    $con_stat_unknown = 0;
+    $con_stat_unpayed = 1;
+    $con_stat_press = 2;
+    $con_stat_payed = 3;
+    $con_stat_part = 4;
+    
+    $con_stat = array("Undefinert", "Ikke betalt", "Purret", "Betalt", "Delvis betalt");

@@ -16,7 +16,7 @@ if ($action == 'delete')
 }   
 
 $sort_view = "view.name,view.id";
-if ($sort == NULL)
+if (is_null($sort))
   $sort = "list_order, lastname, firstname, $sort_view";
 
 echo "

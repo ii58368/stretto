@@ -2,7 +2,7 @@
 
 require 'framework.php';
 
-if ($sort == NULL)
+if (is_null($sort))
    $sort = 'groups.name';
 
 echo "
@@ -115,7 +115,7 @@ function member_update($id_groups)
    $query = "delete from member where id_groups = $id_groups";
    $db->query($query);
 
-   if ($_POST[id_persons] != null)
+   if (!is_null($_POST[id_persons]))
    {
       foreach ($_POST[id_persons] as $id_person)
       {
@@ -148,10 +148,10 @@ if ($action == 'new')
 if ($action == 'update')
 {
    $id_person = $_POST[id_person];
-   if ($id_person == NULL)
+   if (is_null($id_person))
       $id_person = 0;
 
-   if ($no == NULL)
+   if (is_null($no))
    {
       $query = "insert into groups (name, id_person, comment) " .
               "values ('$_POST[name]', $id_person, '$_POST[comment]')";
@@ -159,7 +159,7 @@ if ($action == 'update')
       $no = $db->lastInsertId();
    } else
    {
-      if ($delete != NULL)
+      if (!is_null($delete))
       {
          $q = "select count(*) as count from instruments where id_groups = {$no}";
          $s = $db->query($q);

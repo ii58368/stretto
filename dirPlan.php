@@ -90,7 +90,7 @@ function direction_update($id_plan)
    $query = "update direction set status = $dir_stat_free where id_plan = $id_plan";
    $db->query($query);
 
-   if ($_POST[id_persons] != null)
+   if (!is_null($_POST[id_persons]))
    {
       foreach ($_POST[id_persons] as $id_person)
       {
@@ -248,7 +248,7 @@ if ($action == 'update')
       echo "<font color=red>Illegal time format: " . $_POST[date] . "</font>";
    else
    {
-      if ($no == NULL)
+      if (is_null($no))
       {
          $query2 = "select id_person from project where id = $_POST[id_project]";
          $stmt = $db->query($query2);
@@ -261,7 +261,7 @@ if ($action == 'update')
                  "'Regikomité', '$_POST[comment]', $plan_evt_direction)";
       } else
       {
-         if ($delete != NULL)
+         if (!is_null($delete))
          {
             $query = "DELETE FROM plan WHERE id = $no";
             $query2 = "delete from direction where id_plan = $no";

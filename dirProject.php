@@ -1,7 +1,7 @@
 <?php
 require 'framework.php';
 
-if ($sort == NULL)
+if (is_null($sort))
    $sort = 'year,semester DESC';
 
 function list_group($id)
@@ -93,7 +93,7 @@ function mail2dir($id_project)
    echo "&body=OSO Regikomit&eacute:\"><image border=0 src=images/sms.png hspace=20 title=\"Send SMS til alle i regikomit&eacute;en\"></a>";
 }
 
-$sel_year = ($_REQUEST[from] == NULL) ? date("Y") : intval($_REQUEST[from]);
+$sel_year = is_null($_REQUEST[from]) ? date("Y") : intval($_REQUEST[from]);
 $prev_year = $sel_year - 1;
 
 echo "

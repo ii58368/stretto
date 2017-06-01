@@ -1,7 +1,7 @@
 <?php
 include 'framework.php';
 
-if ($sort == NULL)
+if (is_null($sort))
    $sort = 'list_order,lastname,firstname';
 
 function mail2all()
