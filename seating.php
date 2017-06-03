@@ -38,6 +38,7 @@ function get_seating($id_groups)
            . "where seating.id_person = person.id "
            . "and id_project=$_REQUEST[id_project] "
            . "and id_groups=$id_groups";
+
    $stmt = $db->query($query);
    return $stmt->fetch(PDO::FETCH_ASSOC);
 }
@@ -70,13 +71,13 @@ function update_seating($id_groups, $template)
 
    $ts = strtotime("now");
 
-   if (($seat = get_seating($id_groups)) == null)
+   if (is_null($seat = get_seating($id_groups)))
    {
       $query = "insert into seating (id_groups, id_project, template, id_person, ts) "
               . "values ($id_groups, $_POST[id_project], $template, $person[id], $ts)";
    } else
    {
-      if ($template == null)
+      if (is_null($template))
          $template = $seat[template];
 
       $query = "update seating set template = $template,"
@@ -96,12 +97,12 @@ if ($action == 'template')
 }
 
 
-if ($sort == NULL)
+if (is_null($sort))
    $sort = 'position,list_order,firstname,lastname';
 
 if ($action == 'update')
 {
-   $position = ($_POST[position] == null) ? 'NULL' : $_POST[position];
+   $position = is_null($_POST[position]) ? 'NULL' : $_POST[position];
    $query = "update participant set position = $position," .
            "comment_pos = '$_POST[comment_pos]' " .
            "where id_person = $no " .
@@ -109,7 +110,7 @@ if ($action == 'update')
    $db->query($query);
    $no = NULL;
 
-   update_seating($grp[id], 0);
+   update_seating($grp[id], null);
 }
 
 $prj = get_project();
@@ -184,7 +185,7 @@ echo "
 
 echo "<img src=\"map.php?id_groups=$grp[id]&id_project=$_REQUEST[id_project]&template=$seat[template]\"><br>\n";
 
-if ($seat != null)
+if (!is_null($seat))
    echo "$seat[firstname]/" . date('j.M y', $seat[ts]) . "\n";
 
 require 'framework_end.php';

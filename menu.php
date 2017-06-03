@@ -83,7 +83,7 @@
                            auth_li("Regikomité", "direction.php?id_project=$pid");
                            auth_li(($e[orchestration] == $prj_orch_tutti) ? "Permisjonssøknad" : "Påmelding", "participant_11.php?id_project=$pid&id_person=$pers[id]");
                            auth_li("Tilbakemelding", "feedback?id=$pid");
-                           auth_li("Fravær", "absence.php?id=$pid");
+                           auth_li("Fravær", "absence.php?id_project=$pid");
                            auth_li("Prosjektressurser", "participant_x1.php?id=$pid");
                            auth_li("Konsertkalender", "consert?id=$pid");
                            echo "

@@ -64,3 +64,13 @@
     $con_stat_part = 4;
     
     $con_stat = array("Undefinert", "Ikke betalt", "Purret", "Betalt", "Delvis betalt");
+    
+// table: absence
+    $abs_stat_undef = 0;
+    $abs_stat_sick = 1;
+    $abs_stat_busy = 2;
+    $abs_stat_away = 3;
+    $abs_stat_part = 4;
+    $abs_stat_in = 5;
+    
+    $abs_stat = array("Udefinert", "Syk", "Opptatt", "skulk", "Delvis vekke", "Tilstede");
