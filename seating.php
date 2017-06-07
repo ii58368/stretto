@@ -71,7 +71,7 @@ function update_seating($id_groups, $template)
 
    $ts = strtotime("now");
 
-   if (is_null($seat = get_seating($id_groups)))
+   if (!($seat = get_seating($id_groups)))
    {
       $query = "insert into seating (id_groups, id_project, template, id_person, ts) "
               . "values ($id_groups, $_POST[id_project], $template, $person[id], $ts)";

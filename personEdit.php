@@ -31,7 +31,7 @@ function select_status($selected)
    global $per_stat;
    global $per_stat_standin;
 
-   if ($selected == NULL)
+   if (is_null($selected))
       $selected = $per_stat_standin;
 
    echo "<select name=status>";

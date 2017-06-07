@@ -74,3 +74,15 @@
     $abs_stat_in = 5;
     
     $abs_stat = array("Udefinert", "Syk", "Opptatt", "skulk", "Delvis vekke", "Tilstede");
+    
+// table: event
+    $evt_importance_low = 0;
+    $evt_inportance_norm = 1;
+    $evt_importance_high = 2;
+    
+    $evt_importance = array("Lav", "<b>Normal</b>", "<font color=red>Høy</font>");
+    
+    $evt_status_draft = 0;
+    $evt_status_public = 1;
+    
+    $evt_status = array("Draft", "Public");

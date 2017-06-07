@@ -61,7 +61,7 @@ if ($action == 'update')
    {
       try
       {
-         if (is_null($no))
+         if ($no == null)
          {
             $query = "insert into contingent (ts, amount, year, comment, id_person, status, archive)
               values ('$ts', '$_POST[amount]', 
@@ -69,6 +69,8 @@ if ($action == 'update')
                       '$_POST[status]', '$_POST[archive]')";
             $db->query($query);
             $no = $db->lastInsertId();
+
+            $style = "style=\"background-color:lightgreen\"";
          } else
          {
             if (!is_null($delete))
@@ -87,11 +89,13 @@ if ($action == 'update')
                        "archive = '$_POST[archive]' " .
                        "where id = $no";
                $db->query($query);
+
+               $style = "style=\"background-color:lightgreen\"";
             }
          }
       } catch (PDOException $ex)
       {
-         echo "<font color=red>Failed to update</font>";
+         $style = "style=\"background-color:lightred\"";
       }
    }
 }
@@ -104,7 +108,7 @@ $query = "select firstname, middlename, lastname, instrument "
 $stmt = $db->query($query);
 $per = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!is_null($no))
+if ($no != null)
 {
    $stmt = $db->query("select * from contingent where id = $no");
    $con = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -124,14 +128,17 @@ echo "
         <input type=hidden name=id_person value=$_REQUEST[id_person]>
         <input type=hidden name=year value=$_REQUEST[year]>
         <input type=hidden name=_action value=update>\n";
-if (!is_null($no))
+if (!is_null($no) || !is_null($delete))
    echo "<input type=button value=Ny onClick=\"location.href='$php_self?id_person=$_REQUEST[id_person]&year=$_REQUEST[year]';\">";
-echo "<input type=submit value=\"Lagre\">\n";
+if (is_null($delete))
+   echo "<input type=submit value=Lagre $style>\n";
 if (!is_null($con))
    echo "<input type=submit name=_delete value=slett>\n";
 echo "</th>
-    </tr>
-    <tr>
+    </tr>\n";
+if (is_null($delete))
+{
+   echo "<tr>
       <td>Dato:</td>
       <td><input type=text name=date size=10 value=\"" . date('j.M y', $ts) . "\"></td>
     </tr>
@@ -142,8 +149,8 @@ echo "</th>
     <tr>
        <td>Status:</td>
        <td>";
-select_status($con[status]);
-echo "</td>
+   select_status($con[status]);
+   echo "</td>
     </tr>
     <tr>
       <td>Billag:</td>
@@ -152,8 +159,9 @@ echo "</td>
    <tr>
       <td>Kommentar:</td>
       <td><input type=text name=comment size=50 value=\"$con[comment]\"></td>
-    </tr>
-    </form>
+    </tr>\n";
+}
+echo "</form>
 </table>";
 
 include 'framework_end.php';

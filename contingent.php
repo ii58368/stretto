@@ -39,7 +39,7 @@ foreach ($stmt as $row)
    {
       echo "<td align=center>";
 
-      $q = "select id, status from contingent where id_person = $row[id_person] and year = $i order by ts";
+      $q = "select id, status, amount from contingent where id_person = $row[id_person] and year = $i order by ts";
       $s = $db->query($q);
 
       $icon = "images/ball_red.gif";
@@ -59,7 +59,7 @@ foreach ($stmt as $row)
 
          echo "<a href=\"contingentEdit.php?id_person=$row[id_person]&year=$i&_no=$e[id]\">"
          . "<img src=\"$icon\" "
-         . "border=0 title=\"$con_stat[$status]\"></a>";
+         . "border=0 title=\"$con_stat[$status]: $e[amount]\"></a>";
       }
       if (is_null($status))
          echo "<a href=\"contingentEdit.php?id_person=$row[id_person]&year=$i\">"
