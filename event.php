@@ -75,12 +75,12 @@ if ($action != 'new')
     </form>\n";
 }
 
-echo "<form action='$php_self' method=post>
-    <table border=0>\n";
+echo "<form action='$php_self' method=post>\n";
 
 if ($action == 'new')
 {
-   echo "  <tr>
+   echo "<table border=0>
+    <tr>
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
     <td><input type=submit value=Registrer></td>
@@ -98,9 +98,9 @@ if ($action == 'new')
      <td><i>Status:</i></td><td>";
    select_status(null);
    echo "</td>
-     </tr><tr>
-    <td colspan=2><textarea cols=60 rows=15 wrap=virtual name=body></textarea></th>
-  </tr>";
+     </tr></table>
+    <textarea cols=60 rows=15 wrap=virtual name=body></textarea>
+    <p>";
 }
 
 if ($action == 'update')
@@ -115,7 +115,7 @@ if ($action == 'update')
       $query = "insert into event (subject, ts_create, ts_update, importance, body, "
               . "id_person, id_project, status) "
               . "values ('$_POST[subject]', $ts, $ts, "
-              . "$_POST[importance], '$_POST[body]', $person[id], "
+              . "$_POST[importance], " . $db->quote($_POST[body]) . ", $person[id], "
               . "$_POST[id_project], $_POST[status])";
    } else
    {
@@ -127,7 +127,7 @@ if ($action == 'update')
          $query = "update event set subject = '$_POST[subject]'," .
                  "ts_update = $ts," .
                  "importance = $_POST[importance]," .
-                 "body = '$_POST[body]'," .
+                 "body = " . $db->quote($_POST[body])  . "," .
                  "id_project = $_POST[id_project]," .
                  "id_person = $person[id]," .
                  "id_project = $_POST[id_project]," .
@@ -141,18 +141,18 @@ if ($action == 'update')
 
 $query = "select event.id as id, subject, ts_create, ts_update, importance, body, "
         . "person.uid as uid, event.id_project as id_project, "
-        . "event.status as status, firstname, middlename, lastname, instrument "
+        . "event.status as status, firstname, lastname, instrument "
         . "from event, person, instruments "
         . "where person.id = event.id_person "
         . "and person.id_instruments = instruments.id "
-        . "order by ts_update";
+        . "order by ts_update desc";
 $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
    if ($row[id] == $no)
    {
-      echo "  <tr>
+      echo "<table border=0><tr>
     <td align=left><input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
     <input type=hidden name=_no value=$no>
@@ -161,7 +161,7 @@ foreach ($stmt as $row)
     </tr><tr>
     <td><i>Subjekt:</i></td><td><input type=text size=60 name=subject value=\"$row[subject]\"></td>
     </tr><tr>
-    <td><i>Fra:</i></td><td>$row[firstname] $row[middlename] $row[lastname]</td>
+    <td><i>Fra:</i></td><td>$row[firstname] $row[lastname]</td>
     </tr><tr>
     <td><i>Opprettet:</i></td><td>" . date('j.M y', $row[ts_create]) . "</td>
     </tr><tr>
@@ -176,21 +176,18 @@ foreach ($stmt as $row)
      <td><i>Status:</i></td><td>";
       select_status($row[status]);
       echo "</td>
-     </tr><tr>
-    <td colspan=2><textarea cols=60 rows=15 wrap=virtual name=body>$row[body]</textarea></th>
-  </tr>";
+     </tr></table>
+    <textarea cols=60 rows=15 wrap=virtual name=body>$row[body]</textarea>\n";
    } else
    {
       if ($row[uid] == $whoami)
       {
-         echo "<tr><td>"
-         . "<input type=button value=Endre onClick=\"location.href='$php_self?_sort=$sort&_action=view&_no=$row[id]';\">"
-         . "</td></tr>\n";
+         echo "<input type=button value=Endre onClick=\"location.href='$php_self?_sort=$sort&_action=view&_no=$row[id]';\">";
       }
       echo "  <tr>
-    <td colspan=2><font size=+2><b>$row[subject]</b></font></td>
-    </tr><tr>
-    <td><i>Fra:</i></td><td>$row[firstname] $row[middlename] $row[lastname]</td>
+    <font size=+2><b>$row[subject]</b></font>
+    <table border=0><tr>
+    <td><i>Fra:</i></td><td>$row[firstname] $row[lastname]</td>
     </tr><tr>
     <td><i>Dato:</i></td><td>" . date('j.M y', $row[ts_update]) . "</td>
     </tr><tr>
@@ -208,17 +205,14 @@ foreach ($stmt as $row)
       $evt_importance[$row[importance]] .
       "</td>
      </tr>
-     <tr><td colspan=2>";
+     </table>";
       $body = str_replace("\n", "<br>\n", $row[body]);
       echo ($row[status] == $evt_status_draft) ? "<font color=grey>$body</font>" : $body;
-     echo "</td>
-  </tr>\n";
    }
-   echo "<tr></tr>";
+   echo "<p>";
 }
 ?> 
 
-</table>
 </form>
 
 <?php

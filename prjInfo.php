@@ -10,7 +10,7 @@ $stmt = $db->query($query);
 $prj = $stmt->fetch(PDO::FETCH_ASSOC);
 
 echo "
-    <h1>$prj[name] $prj[semester]-$prj[year]</h1>\n";
+    <h1>$prj[name] $prj[semester]-$prj[year] <a href=prjinfo_pdf.php?id=$_REQUEST[id] title\"PDF versjon\"><img src=images/pdf.jpeg height=30></a></h1>\n";
 echo str_replace("\n", "<br>\n", $prj[info]) . "\n";
 
 echo "<h2>Repertoar</h2>
@@ -74,11 +74,12 @@ echo "</table><p>\n";
 
 echo "<h2>Musikere</h2>\n";
 
-$query = "select firstname, lastname, instrument"
+$query = "select firstname, lastname, instrument, stat_inv, stat_final"
         . " from person, instruments, participant"
         . " where participant.id_project=$_REQUEST[id]"
         . " and participant.id_instruments = instruments.id"
         . " and participant.id_person = person.id"
+        . " and participant.stat_inv = $par_stat_yes"
         . " order by instruments.list_order, participant.position";
 $stmt = $db->query($query);
 
@@ -87,7 +88,8 @@ foreach ($stmt as $e)
 {
    if ($last_instrument != $e[instrument])
       echo "</ul><p><b>$e[instrument]</b><ul>\n";
-   echo "<li>$e[firstname] $e[lastname]</li>\n";
+   $name = ($e[stat_final] == $par_stat_yes) ? "$e[firstname] $e[lastname]" : "&lt;uavklart&gt;";
+   echo "<li>$name</li>\n";
    $last_instrument = $e[instrument];
 }
 echo "</ul>";

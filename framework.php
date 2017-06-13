@@ -32,7 +32,6 @@ $prj_name = 'Stretto';
         <div class="container demo-1">	
 
             <?php
-            date_default_timezone_set('Europe/Paris');
 
             require_once 'const.php';
             require_once 'request.php';
