@@ -36,13 +36,12 @@ function select_location($selected)
 function select_person($selected)
 {
    global $db;
-   global $per_stat_member;
 
    echo "<select name=id_responsible title=\"Hovedansvarlig\">";
 
    $q = "SELECT person.id as id, firstname, lastname, instrument FROM person, instruments " .
            "where id_instruments = instruments.id " .
-           "and person.status = $per_stat_member " .
+           "and person.status = $db->per_stat_member " .
            "order by list_order, lastname, firstname";
 
    $s = $db->query($q);
@@ -83,11 +82,9 @@ function select_project($selected)
 function direction_update($id_plan)
 {
    global $db;
-   global $dir_stat_free;
-   global $dir_stat_allocated;
 
    // Resources from shift list
-   $query = "update direction set status = $dir_stat_free where id_plan = $id_plan";
+   $query = "update direction set status = $db->dir_stat_free where id_plan = $id_plan";
    $db->query($query);
 
    if (!is_null($_POST[id_persons]))
@@ -98,10 +95,10 @@ function direction_update($id_plan)
          if ($stmt->rowCount() == 0)
          {
             $query = "insert into direction (id_person, id_plan, status) " .
-                    "values ('$id_person', '$id_plan', '$dir_stat_allocated')";
+                    "values ($id_person, $id_plan, $db->dir_stat_allocated)";
          } else
          {
-            $query = "update direction set status = $dir_stat_allocated " .
+            $query = "update direction set status = $db->dir_stat_allocated " .
                     "where id_plan = $id_plan " .
                     "and id_person = $id_person";
          }
@@ -115,23 +112,26 @@ function direction_select($id_plan)
    // Resources from the shift list
 
    global $db;
-   global $shi_stat_tentative;
-   global $shi_stat_confirmed;
-   global $dir_stat_allocated;
 
-   echo "<select name=\"id_persons[]\" multiple title=\"Medlemmer i regikomit&eacute;en\nCtrl-click to select/unselect single\">";
-
-   $q = "SELECT id_person, firstname, lastname, instrument, shift.status as status " .
-           "FROM person, instruments, shift, plan " .
+   $q = "SELECT id_person, firstname, lastname, instrument, stat_dir as status " .
+           "FROM person, instruments, participant, plan " .
            "where instruments.id = person.id_instruments " .
-           "and person.id = shift.id_person " .
-           "and shift.id_project = plan.id_project " .
+           "and person.id = participant.id_person " .
+           "and participant.id_project = plan.id_project " .
            "and plan.id = $id_plan " .
-           "and (shift.status = $shi_stat_tentative or shift.status = $shi_stat_confirmed) " .
+           "and (stat_dir = $db->shi_stat_tentative or stat_dir = $db->shi_stat_confirmed) " .
            "order by instruments.list_order, lastname, firstname";
    $s = $db->query($q);
 
-   $q2 = "SELECT id_person FROM direction where id_plan = $id_plan and status = $dir_stat_allocated";
+   if (($size = $s->rowCount()) == 0)
+      return;
+   
+   if ($size > 5)
+      $size = 5;
+   
+   echo "<select name=\"id_persons[]\" multiple size=$size title=\"Medlemmer i regikomit&eacute;en\nCtrl-click to select/unselect single\">";
+
+   $q2 = "SELECT id_person FROM direction where id_plan = $id_plan and status = $db->dir_stat_allocated";
    $s2 = $db->query($q2);
    $r2 = $s2->fetchAll(PDO::FETCH_ASSOC);
 
@@ -143,7 +143,7 @@ function direction_select($id_plan)
          if ($e[id_person] == $e2[id_person])
             echo " selected";
       echo ">$e[firstname] $e[lastname]";
-      if ($e[status] == $shi_stat_tentative)
+      if ($e[status] == $db->shi_stat_tentative)
          echo "*";
       echo " ($e[instrument])";
    }
@@ -153,10 +153,6 @@ function direction_select($id_plan)
 function direction_list($id_plan)
 {
    global $db;
-   global $dir_stat_allocated;
-   global $shi_stat_tentative;
-   global $shi_stat_failed;
-   global $per_dir_nocarry;
 
    $q = "SELECT firstname, lastname, status_dir, instrument, direction.status as status, participant.stat_dir as shift_status " .
            "FROM person, instruments, direction, participant, project, plan " .
@@ -166,24 +162,24 @@ function direction_list($id_plan)
            "and participant.id_project = project.id " .
            "and project.id = plan.id_project " .
            "and plan.id = direction.id_plan " .
-           "and direction.id_plan = ${id_plan} " .
-           "and direction.status = $dir_stat_allocated " .
+           "and direction.id_plan = $id_plan " .
+           "and direction.status = $db->dir_stat_allocated " .
            "order by lastname, firstname";
 
    $s = $db->query($q);
 
    foreach ($s as $e)
    {
-      if ($e[shift_status] == $shi_stat_tentative)
+      if ($e[shift_status] == $db->shi_stat_tentative)
          echo "<font color=grey>";
-      if ($e[shift_status] == $shi_stat_failed)
+      if ($e[shift_status] == $db->shi_stat_failed)
          echo "<strike>";
       echo $e[firstname] . " " . $e[lastname] . " (" . $e[instrument] . ")";
-      if ($e[shift_status] == $shi_stat_tentative)
+      if ($e[shift_status] == $db->shi_stat_tentative)
          echo "</font>";
-      if ($e[shift_status] == $shi_stat_failed)
+      if ($e[shift_status] == $db->shi_stat_failed)
          echo "</strike>";
-      if ($e[status_dir] == $per_dir_nocarry)
+      if ($e[status_dir] == $db->per_dir_nocarry)
          echo "<image src=images/chair-minus-icon.png border=0 title=\"Kan ikke l&oslash;fte bord\">";
       echo "<br>";
    }
@@ -258,7 +254,7 @@ if ($action == 'update')
                  "id_responsible, responsible, comment, event_type) " .
                  "values ('$ts', '$_POST[tsort]', '$_POST[time]', " .
                  "'$_POST[id_location]', '$_POST[location]', '$_POST[id_project]', '$row[id_person]', " .
-                 "'Regikomité', '$_POST[comment]', $plan_evt_direction)";
+                 "'Regikomité', '$_POST[comment]', $db->plan_evt_direction)";
       } else
       {
          if (!is_null($delete))
@@ -277,7 +273,7 @@ if ($action == 'update')
                     "id_responsible = '$_POST[id_responsible]'," .
                     "responsible = '$_POST[responsible]'," .
                     "comment = '$_POST[comment]'," .
-                    "event_type = $plan_evt_direction " .
+                    "event_type = $db->plan_evt_direction " .
                     "where id = $no";
             direction_update($no);
          }
@@ -293,7 +289,7 @@ if ($action == 'add')
    $query = "select participant.id_person as id_person " .
            "from participant, project " .
            "where participant.id_project = project.id " .
-           "and participant.stat_dir = $shi_stat_confirmed " .
+           "and participant.stat_dir = $db->shi_stat_confirmed " .
            "and project.id = $_REQUEST[id_project] ";
 
    $stmt = $db->query($query);
@@ -303,10 +299,10 @@ if ($action == 'add')
       if ($s->rowCount() == 0)
       {
          $query = "insert into direction (id_person, id_plan, status) " .
-                 "values ($row[id_person], $no, $dir_stat_allocated) ";
+                 "values ($row[id_person], $no, $db->dir_stat_allocated) ";
       } else
       {
-         $query = "update direction set status = $dir_stat_allocated " .
+         $query = "update direction set status = $db->dir_stat_allocated " .
                  "where id_plan = $no " .
                  "and id_person = $row[id_person]";
       }
@@ -315,7 +311,7 @@ if ($action == 'add')
 }
 
 $cur_year = ($_REQUEST[id_project] == '%') ? date("Y") : 0;
-$event_type = $_REQUEST[rehearsal] ? "" : "and plan.event_type = $plan_evt_direction ";
+$event_type = $_REQUEST[rehearsal] ? "" : "and plan.event_type = $db->plan_evt_direction ";
 
 $query = "SELECT plan.id as id, date, time, tsort, id_project, event_type, " .
         "id_location, plan.location as location, location.name as lname, " .
@@ -339,7 +335,7 @@ foreach($stmt as $row)
       $reh = $_REQUEST[rehearsal] ? "&rehearsal=true" : "";
       echo "<tr>
         <td><center>";
-      if ($row[event_type] == $plan_evt_direction)
+      if ($row[event_type] == $db->plan_evt_direction)
          echo "
             <a href=\"{$php_self}?_action=view&_no={$row[id]}&id_project=$_REQUEST[id_project]$reh\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>";
       echo "</center></td>" .
@@ -351,7 +347,7 @@ foreach($stmt as $row)
          echo $row[lname];
       echo $row[location];
       echo "</td><td>{$row[pname]}</td><td nowrap>";
-      if ($row[event_type] == $plan_evt_direction)
+      if ($row[event_type] == $db->plan_evt_direction)
       {
          echo "<b>{$row[firstname]} {$row[lastname]}</b><a href=\"{$php_self}?_action=add&_no={$row[id]}&id_project=$_REQUEST[id_project]\"><img src=\"images/user_male_add2.png\" border=0 title=\"Legg til regigruppen\"></a><br>";
          direction_list($row[id]);

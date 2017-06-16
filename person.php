@@ -12,7 +12,7 @@ function mail2all()
    global $db;
    
   $q = "select email from person " .
-       "where (status = '$per_stat_member' or status = '$per_stat_eng')";
+       "where (status = $db->per_stat_member or status = $db->per_stat_eng)";
   $s = $db->query($q);
 
   echo "<a href=\"mailto:?bcc=";

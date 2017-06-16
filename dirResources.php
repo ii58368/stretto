@@ -9,7 +9,7 @@ function mail2all()
    global $db;
    
    $q = "select email from person " .
-           "where (status = '$per_stat_member' or status = '$per_stat_eng')";
+           "where (status = $db->per_stat_member or status = $db->per_stat_eng)";
    $s = $db->query($q);
 
    echo "<a href=\"mailto:?bcc=";
@@ -40,16 +40,16 @@ function select_instrument($selected)
 
 function select_status($selected)
 {
-   global $per_dir;
+   global $db;
 
    echo "<select name=status_dir>";
    
-   for ($i = 0; $i < count($per_dir); $i++)
+   for ($i = 0; $i < count($db->per_dir); $i++)
    {
       echo "<option value=$i";
       if ($selected == $i)
          echo " selected";
-      echo ">$per_dir[$i]</option>\n";
+      echo ">" . $db->per_dir[$i] . "</option>\n";
    }
    
    echo "</select>";
@@ -116,14 +116,14 @@ foreach ($stmt as $row)
       "{$row[lastname]}</a></td>" .
       "<td><a href=\"mailto:{$row[email]}?subject=$concept - $project\">{$row[email]}</a></td>" .
       "<td nowrap>" . format_phone($row[phone1]) . "</a></td>" .
-      "<td>" . $per_stat[$row[status]] . "</td>" .
+      "<td>" . $db->per_stat[$row[status]] . "</td>" .
       "<td>";
-      if ($row[status_dir] == $per_dir_avail)
-         echo "<center><img src=\"images/happy.gif\" border=0 title=\"" . $per_dir[$per_dir_avail] . "\"></center>";
-      if ($row[status_dir] == $per_dir_nocarry)
-         echo "<center><img src=\"images/chair-minus-icon.png\" border=0 title=\"" . $per_dir[$per_dir_nocarry] . "\"></center>";
-      if ($row[status_dir] == $per_dir_exempt)
-         echo "<center><img src=\"images/answer_empty.gif\" border=0 title=\"" . $per_dir[$per_dir_exempt] . "\"></center>";
+      if ($row[status_dir] == $db->per_dir_avail)
+         echo "<center><img src=\"images/happy.gif\" border=0 title=\"" . $db->per_dir[$per_dir_avail] . "\"></center>";
+      if ($row[status_dir] == $db->per_dir_nocarry)
+         echo "<center><img src=\"images/chair-minus-icon.png\" border=0 title=\"" . $db->per_dir[$per_dir_nocarry] . "\"></center>";
+      if ($row[status_dir] == $db->per_dir_exempt)
+         echo "<center><img src=\"images/answer_empty.gif\" border=0 title=\"" . $db->per_dir[$per_dir_exempt] . "\"></center>";
       echo "</td>" .
       "<td>{$row[comment_dir]}</td>" .
       "</tr>";
@@ -135,11 +135,11 @@ foreach ($stmt as $row)
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
     <th nowrap><input type=submit value=ok></th>
-    <td>{$row[instrument]}</td>
+    <td>$row[instrument]</td>
     <th nowrap>$row[firstname] $row[lastname]</th>
     <th align=left>$row[email]</th>
     <th>$row[phone1]</th>
-    <td>" . $per_stat[$row[status]] . "</td>
+    <td>" . $db->per_stat[$row[status]] . "</td>
     <th>";
       select_status($row[status_dir]);
       echo "</th>

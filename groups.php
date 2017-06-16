@@ -25,12 +25,11 @@ echo "
 function member_select($id_groups)
 {
    global $db;
-   global $per_stat_quited;
 
    $q = "SELECT person.id as id, firstname, lastname, instrument " .
            "FROM person, instruments " .
            "where instruments.id = person.id_instruments " .
-           "and not person.status = $per_stat_quited " .
+           "and not person.status = $db->per_stat_quited " .
            "order by instruments.list_order, lastname, firstname";
    $s = $db->query($q);
 
@@ -55,7 +54,6 @@ function member_select($id_groups)
 function member_list($id_groups)
 {
    global $db;
-   global $per_stat_quited;
 
    $q = "SELECT firstname, lastname, instrument " .
            "FROM person, instruments, member, groups " .

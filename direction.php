@@ -6,21 +6,19 @@ require 'framework.php';
 function resources_list($id_plan)
 {
    global $db;
-   global $shi_stat_tentative;
-   global $shi_stat_confirmed;
-   global $dir_stat_allocated;
    
   $q  = "SELECT firstname, lastname, instrument " .
-   "FROM person, instruments, direction, shift, project, plan " .
+   "FROM person, instruments, direction, participant, project, plan " .
    "where person.id = direction.id_person " .
-   "and id_instruments = instruments.id " .
-   "and shift.id_person = person.id " .
-   "and shift.id_project = project.id " .
+   "and person.id_instruments = instruments.id " .
+   "and participant.id_person = person.id " .
+   "and participant.id_project = project.id " .
    "and project.id = plan.id_project " .
    "and plan.id = direction.id_plan " .
-   "and (shift.status = $shi_stat_tentative or shift.status = $shi_stat_confirmed) " .
-   "and direction.id_plan = ${id_plan} " .
-   "and direction.status = $dir_stat_allocated " .
+   "and (participant.stat_dir = $db->shi_stat_tentative " .
+   "or participant.stat_dir = $db->shi_stat_confirmed) " .
+   "and direction.id_plan = $id_plan " .
+   "and direction.status = $db->dir_stat_allocated " .
    "order by lastname, firstname";
 
   $s = $db->query($q);
@@ -43,8 +41,6 @@ function format_phone($ph)
 function shift_list()
 {
    global $db;
-   global $shi_stat_tentative;
-   global $shi_stat_confirmed;
 
    echo "
     <table border=1>
@@ -57,16 +53,17 @@ function shift_list()
 
   $q[0] = "SELECT firstname, lastname, instrument, phone1 " .
    "FROM person, instruments, project " .
-   "where id_instruments = instruments.id " .
+   "where person.id_instruments = instruments.id " .
    "and project.id = $_REQUEST[id_project] " .
    "and person.id = project.id_person";
 
   $q[1] = "SELECT firstname, lastname, instrument, phone1 " .
-   "FROM person, instruments, shift " .
-   "where person.id = shift.id_person " .
-   "and id_instruments = instruments.id " .
-   "and shift.id_project = $_REQUEST[id_project] " .
-   "and (shift.status = $shi_stat_tentative or shift.status = $shi_stat_confirmed) " .
+   "FROM person, instruments, participant " .
+   "where person.id = participant.id_person " .
+   "and person.id_instruments = instruments.id " .
+   "and participant.id_project = $_REQUEST[id_project] " .
+   "and (participant.stat_dir = $db->shi_stat_tentative " .
+   "or participant.stat_dir = $db->shi_stat_confirmed) " .
    "order by list_order, lastname, firstname";
 
   $bf = array("<b>", "");

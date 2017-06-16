@@ -5,7 +5,6 @@ include 'framework.php';
 function select_person($selected)
 {
    global $db;
-   global $per_stat_member;
    global $php_self;
    global $no;
 
@@ -16,7 +15,7 @@ function select_person($selected)
 
    $q = "SELECT person.id as id, firstname, lastname, instrument "
            . "FROM person, instruments "
-           . "where status = $per_stat_member "
+           . "where status = $db->per_stat_member "
            . "and person.id_instruments = instruments.id "
            . "order by list_order, lastname, firstname";
    $s = $db->query($q);
@@ -34,20 +33,19 @@ function select_person($selected)
 
 function select_status($selected)
 {
-   global $con_stat;
-   global $con_stat_payed;
+   global $db;
 
    if (is_null($selected))
-      $selected = $con_stat_payed;
+      $selected = $db->con_stat_payed;
 
    echo "<select name=status>";
 
-   for ($i = 0; $i < count($con_stat); $i++)
+   for ($i = 0; $i < count($db->con_stat); $i++)
    {
       echo "<option value=$i";
       if ($selected == $i)
          echo " selected";
-      echo ">$con_stat[$i]</option>\n";
+      echo ">" . $db->con_stat[$i] . "</option>\n";
    }
 
    echo "</select>";

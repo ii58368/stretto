@@ -28,16 +28,16 @@ function select_project($selected)
 
 function select_importance($selected)
 {
-   global $evt_importance;
+   global $db;
 
    echo "<select name=importance>";
 
-   for ($i = 0; $i < count($evt_importance); $i++)
+   for ($i = 0; $i < count($db->evt_importance); $i++)
    {
       echo "<option value=$i";
       if ($selected == $i)
          echo " selected";
-      echo ">$evt_importance[$i]</option>\n";
+      echo ">" . $db->evt_importance[$i] . "</option>\n";
    }
 
    echo "</select>";
@@ -45,16 +45,16 @@ function select_importance($selected)
 
 function select_status($selected)
 {
-   global $evt_status;
+   global $db;
 
    echo "<select name=status>";
 
-   for ($i = 0; $i < count($evt_status); $i++)
+   for ($i = 0; $i < count($db->evt_status); $i++)
    {
       echo "<option value=$i";
       if ($selected == $i)
          echo " selected";
-      echo ">$evt_status[$i]</option>\n";
+      echo ">" . $db->evt_status[$i] . "</option>\n";
    }
 
    echo "</select>";
@@ -202,12 +202,12 @@ foreach ($stmt as $row)
       echo "</td>
      </tr><tr>
      <td><i>Viktighetsgrad:</i></td><td>" .
-      $evt_importance[$row[importance]] .
+      $db->evt_importance[$row[importance]] .
       "</td>
      </tr>
      </table>";
       $body = str_replace("\n", "<br>\n", $row[body]);
-      echo ($row[status] == $evt_status_draft) ? "<font color=grey>$body</font>" : $body;
+      echo ($row[status] == $db->evt_status_draft) ? "<font color=grey>$body</font>" : $body;
    }
    echo "<p>";
 }

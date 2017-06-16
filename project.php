@@ -22,20 +22,19 @@ function select_semester($selected)
 
 function select_status($selected)
 {
-   global $prj_stat;
-   global $prj_stat_draft;
-
+   global $db;
+   
    if ($selected == NULL)
-      $selected = $prj_stat_draft;
+      $selected = $db->prj_stat_draft;
 
    echo "<select name=status>";
 
-   for ($i = 0; $i < count($prj_stat); $i++)
+   for ($i = 0; $i < count($db->prj_stat); $i++)
    {
       echo "<option value=$i";
       if ($selected == $i)
          echo " selected";
-      echo ">$prj_stat[$i]</option>\n";
+      echo ">" . $db->prj_stat[$i] . "</option>\n";
    }
 
    echo "</select>";
@@ -43,16 +42,16 @@ function select_status($selected)
 
 function select_valid_par_stat($valid_par_stat)
 {
-   global $par_stat;
+   global $db;
+   
+   echo "<select size=" . sizeof($db->par_stat) . " name=\"valid_par_stat[]\" multiple title=\"Ctrl-click to select/unselect single\">";
 
-   echo "<select size=" . sizeof($par_stat) . " name=\"valid_par_stat[]\" multiple title=\"Ctrl-click to select/unselect single\">";
-
-   for ($i = 0; $i < sizeof($par_stat); $i++)
+   for ($i = 0; $i < sizeof($db->par_stat); $i++)
    {
       echo "<option value=\"" . $i . "\"";
       if ($valid_par_stat & (1 << $i))
          echo " selected";
-      echo ">$par_stat[$i]";
+      echo ">" . $db->par_stat[$i];
    }
    echo "</select>";
 }
@@ -102,7 +101,7 @@ if ($action == 'new')
     "\" title=\"Format: <dato>. <mnd> [<&aring;r>] Merk: M&aring;ned p&aring; engelsk. Eksempel: 12. dec\"></th>
     <th><input type=checkbox name=orchestration></th>
     <th>";
-   select_valid_par_stat((1 << $par_stat_no) | (1 << $par_stat_yes));
+   select_valid_par_stat((1 << $db->par_stat_no) | (1 << $db->par_stat_yes));
    echo "</td>
      <th><textarea cols=44 rows=10 wrap=virtual name=info></textarea></th>
   </tr>";
@@ -110,7 +109,7 @@ if ($action == 'new')
 
 if ($action == 'update')
 {
-   $orchestration = ($_POST[orchestration] == null) ? $prj_orch_reduced : $prj_orch_tutti;
+   $orchestration = ($_POST[orchestration] == null) ? $db->prj_orch_reduced : $db->prj_orch_tutti;
 
    $valid_par_stat = 0;
    if ($_POST[valid_par_stat] != null)
@@ -173,15 +172,15 @@ foreach ($stmt as $row)
       "<td><a href=\"plan.php?id_project={$row[id]}\">{$row[name]}</a></td>" .
       "<td>{$row[semester]} " .
       "    {$row[year]}</td>" .
-      "<td>" . $prj_stat[$row[status]] . "</td>" .
+      "<td>" . $db->prj_stat[$row[status]] . "</td>" .
       "<td>" . date('D j.M y', $row[deadline]) . "</td>" .
       "<td>";
-      if ($row[orchestration] == $prj_orch_tutti)
+      if ($row[orchestration] == $db->prj_orch_tutti)
          echo "<center><img src=\"images/tick2.gif\" border=0></center>";
       echo "</td><td>";
-      for ($i = 0; $i < sizeof($par_stat); $i++)
+      for ($i = 0; $i < sizeof($db->par_stat); $i++)
          if ($row[valid_par_stat] & (1 << $i))
-            echo $par_stat[$i] . "<br>\n";
+            echo $db->par_stat[$i] . "<br>\n";
       echo "</td><td>";
       echo str_replace("\n", "<br>\n", $row[info]);
       echo "</td>" .
@@ -205,7 +204,7 @@ foreach ($stmt as $row)
       echo "</th>";
       echo "<td><input type=text size=10 name=deadline value=\"" . date('j.M.y', $row[deadline]) . "\"></td>";
       echo "<th><input type=checkbox name=orchestration";
-      if ($row[orchestration] == $prj_orch_tutti)
+      if ($row[orchestration] == $db->prj_orch_tutti)
          echo " checked";
       echo "></th>\<td>";
       select_valid_par_stat($row[valid_par_stat]);

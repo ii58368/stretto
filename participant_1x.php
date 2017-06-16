@@ -36,8 +36,8 @@ $query = "SELECT project.id as id, name, semester, year, status, " .
         "deadline, orchestration " .
         "FROM project " .
         "where project.year >= $sel_year " .
-        "and status = $prj_stat_public " .
-        "or status = $prj_stat_tentative " .
+        "and status = $db->prj_stat_public " .
+        "or status = $db->prj_stat_tentative " .
         "order by $sort";
 
 $stmt = $db->query($query);
@@ -56,7 +56,7 @@ foreach ($stmt as $row)
    "<td>{$row[semester]} " .
    "    {$row[year]}</td>" .
    "<td align=center>";
-   if ($row[status] == $prj_stat_public)
+   if ($row[status] == $db->prj_stat_public)
       echo "<img src=\"images/part_stat_$status$blink.gif\" border=0>";
    echo "</td>\n";
    echo "<td>" . date('D j.M y', $row[deadline]) . "</td>" .

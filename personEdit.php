@@ -28,20 +28,19 @@ function select_instrument($selected)
 
 function select_status($selected)
 {
-   global $per_stat;
-   global $per_stat_standin;
-
+   global $db;
+   
    if (is_null($selected))
-      $selected = $per_stat_standin;
+      $selected = $db->per_stat_standin;
 
    echo "<select name=status>";
 
-   for ($i = 0; $i < count($per_stat); $i++)
+   for ($i = 0; $i < count($db->per_stat); $i++)
    {
       echo "<option value=$i";
       if ($selected == $i)
          echo " selected";
-      echo ">$per_stat[$i]</option>\n";
+      echo ">" . $db->per_stat[$i] . "</option>\n";
    }
 
    echo "</select>";

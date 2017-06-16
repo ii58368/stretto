@@ -12,19 +12,19 @@ class PDF_util extends FPDF
    private $line;
 
    // Page header
-function Header()
-{
-    // Logo
-    $this->Image('images/osologo.png',10,6,10);
-    // Arial bold 15
-    $this->SetFont('Arial','',10);
-    // Move to the right
-    $this->Cell(80);
-    // Title
-    $this->Cell(30,10,'Oslo Symfoniorkester ' . date('d.m.y'),0,0,'C');
-    // Line break
-    $this->Ln(20);
-}
+   function Header()
+   {
+      // Logo
+      $this->Image('images/osologo.png', 10, 6, 10);
+      // Arial bold 15
+      $this->SetFont('Arial', '', 10);
+      // Move to the right
+      $this->Cell(80);
+      // Title
+      $this->Cell(30, 10, 'Oslo Symfoniorkester ' . date('d.m.y'), 0, 0, 'C');
+      // Line break
+      $this->Ln(20);
+   }
 
    // Page footer
    function Footer()

@@ -1,4 +1,3 @@
-
 <!-- Codrops top bar -->
 <div class="codrops-top clearfix">
     <?php echo $prj_name; ?>
@@ -60,8 +59,8 @@
                         <?php
                         $q = "select id, name, semester, year, orchestration "
                                 . "from project "
-                                . "where (status = $prj_stat_public "
-                                . "or status = $prj_stat_tentative) "
+                                . "where (status = $db->prj_stat_public "
+                                . "or status = $db->prj_stat_tentative) "
                                 . "and year >= " . date("Y") . " "
                                 . "order by year,semester DESC";
                         $s = $db->query($q);

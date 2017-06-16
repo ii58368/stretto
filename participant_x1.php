@@ -46,18 +46,18 @@ function manage_instrument($selected, $row, $edit)
 
 function stat_select($name, $selected, $valid_par_stat)
 {
-   global $par_stat;
+   global $db;
 
    echo "<select name=$name>";
 
-   for ($i = 0; $i < count($par_stat); $i++)
+   for ($i = 0; $i < count($db->par_stat); $i++)
    {
       if ($valid_par_stat & (1 << $i))
       {
          echo "<option value=$i";
          if ($selected == $i)
             echo " selected";
-         echo ">$par_stat[$i]</option>\n";
+         echo ">" . $db->par_stat[$i] . "</option>\n";
       }
    }
    echo "</select>";
@@ -65,26 +65,24 @@ function stat_select($name, $selected, $valid_par_stat)
 
 function manage_inv($part, $row, $edit)
 {
-   global $par_stat_void;
-   global $par_stat_yes;
-   global $par_stat;
-
+   global $db;
+   
    echo "<td align=center>";
 
    if ($edit)
    {
       echo "<input type=checkbox name=stat_inv:$row";
-      if ($part[stat_inv] == $par_stat_yes)
+      if ($part[stat_inv] == $db->par_stat_yes)
          echo " checked";
-      echo " value=$par_stat_yes>";
+      echo " value=$db->par_stat_yes>";
       echo "<input type=hidden name=comment_inv:$row value=\"\">";
    //   echo "<input type=text name=comment_inv:$row size=20 value=\"$part[comment_inv]\">";
    } else
    {
-      if ($part != null || $part[stat_inv] != $par_stat_void)
+      if ($part != null || $part[stat_inv] != $db->par_stat_void)
       {
-         if ($part[stat_inv] == $par_stat_yes)
-            echo "<img border=0 src=\"images/tick2.gif\" title=\"" . $par_stat[$part[stat_inv]] . "\">\n";
+         if ($part[stat_inv] == $db->par_stat_yes)
+            echo "<img border=0 src=\"images/tick2.gif\" title=\"" . $db->par_stat[$part[stat_inv]] . "\">\n";
    //      if ($part[stat_inv])
    //         echo "<i>" . date('j.M', $part[ts_inv]) . "</i>";
          echo "<br>" . str_replace("\n", "<br>\n", $part[comment_inv]);
@@ -95,13 +93,12 @@ function manage_inv($part, $row, $edit)
 
 function manage_self($part, $row, $edit)
 {
-   global $par_stat_void;
-   global $par_stat;
-
+   global $db;
+   
    echo "<td>";
-   if ($part != null || $part[stat_self] != $par_stat_void)
+   if ($part != null || $part[stat_self] != $db->par_stat_void)
    {
-      echo "<img border=0 src=\"images/part_stat_$part[stat_self].gif\" title=\"" . $par_stat[$part[stat_self]] . "\">\n";
+      echo "<img border=0 src=\"images/part_stat_$part[stat_self].gif\" title=\"" . $db->par_stat[$part[stat_self]] . "\">\n";
       if ($part[stat_self])
          echo "<i>" . date('j.M', $part[ts_self]) . "</i>";
       echo "<br>" . str_replace("\n", "<br>\n", $part[comment_self]);
@@ -111,9 +108,8 @@ function manage_self($part, $row, $edit)
 
 function manage_reg($part, $row, $edit, $valid_par_stat)
 {
-   global $par_stat_void;
-   global $par_stat;
-
+   global $db;
+   
    echo "<td>";
 
    if ($edit)
@@ -122,9 +118,9 @@ function manage_reg($part, $row, $edit, $valid_par_stat)
       echo "<input type=text name=comment_reg:$row size=20 value=\"$part[comment_reg]\">";
    } else
    {
-      if ($part != null || $part[stat_reg] != $par_stat_void)
+      if ($part != null || $part[stat_reg] != $db->par_stat_void)
       {
-         echo "<img border=0 src=\"images/part_stat_$part[stat_reg].gif\" title=\"" . $par_stat[$part[stat_reg]] . "\">\n";
+         echo "<img border=0 src=\"images/part_stat_$part[stat_reg].gif\" title=\"" . $db->par_stat[$part[stat_reg]] . "\">\n";
          if ($part[stat_reg])
             echo "<i>" . date('j.M', $part[ts_reg]) . "</i>";
          echo "<br>" . str_replace("\n", "<br>\n", $part[comment_reg]);
@@ -135,9 +131,8 @@ function manage_reg($part, $row, $edit, $valid_par_stat)
 
 function manage_req($part, $row, $edit)
 {
-   global $par_stat_void;
-   global $par_stat;
-
+   global $db;
+   
    echo "<td>";
 
    if ($edit)
@@ -146,9 +141,9 @@ function manage_req($part, $row, $edit)
       echo "<input type=text name=comment_req:$row size=20 value=\"$part[comment_req]\">";
    } else
    {
-      if ($part != null || $part[stat_req] != $par_stat_void)
+      if ($part != null || $part[stat_req] != $db->par_stat_void)
       {
-         echo "<img border=0 src=\"images/part_stat_$part[stat_req].gif\" title=\"" . $par_stat[$part[stat_req]] . "\">\n";
+         echo "<img border=0 src=\"images/part_stat_$part[stat_req].gif\" title=\"" . $db->par_stat[$part[stat_req]] . "\">\n";
          if ($part[stat_req])
             echo "<i>" . date('j.M', $part[ts_req]) . "</i>";
          echo "<br>" . str_replace("\n", "<br>\n", $part[comment_req]);
@@ -159,24 +154,22 @@ function manage_req($part, $row, $edit)
 
 function manage_final($part, $row, $edit)
 {
-   global $par_stat_void;
-   global $par_stat_yes;
-   global $par_stat;
-
+   global $db;
+   
    echo "<td>";
 
    if ($edit)
    {
       echo "<input type=checkbox name=stat_final:$row";
-      if ($part[stat_final] == $par_stat_yes)
+      if ($part[stat_final] == $db->par_stat_yes)
          echo " checked";
-      echo " value=$par_stat_yes>";
+      echo " value=" . $db->par_stat_yes . ">";
       echo "<input type=text name=comment_final:$row size=20 value=\"$part[comment_final]\">";
    } else
    {
-      if ($part != null || $part[stat_final] != $par_stat_void)
+      if ($part != null || $part[stat_final] != $db->par_stat_void)
       {
-         echo "<img border=0 src=\"images/part_stat_$part[stat_final].gif\" title=\"" . $par_stat[$part[stat_final]] . "\">\n";
+         echo "<img border=0 src=\"images/part_stat_$part[stat_final].gif\" title=\"" . $db->par_stat[$part[stat_final]] . "\">\n";
          if ($part[stat_final])
             echo "<i>" . date('j.M', $part[ts_final]) . "</i>";
          echo "<br>" . str_replace("\n", "<br>\n", $part[comment_final]);
@@ -200,20 +193,18 @@ function manage_col($col)
 function update_cell($id_person, $col, $status, $comment, $id_instruments)
 {
    global $db;
-   global $par_stat_void;
-   global $par_stat_no;
 
    $id_project = $_REQUEST[id];
    $ts = strtotime("now");
 
    if ($status == null)
-      $status = $par_stat_no;
+      $status = $db->par_stat_no;
 
    $q = "select * from participant where id_project=$id_project and id_person=$id_person";
    $stmt = $db->query($q);
    if ($stmt->rowCount() == 0)
    {
-      if ($status == $par_stat_void)
+      if ($status == $db->par_stat_void)
          return;
       $query = "insert into participant (id_person, id_project, stat_$col, ts_$col, comment_$col, id_instruments) " .
               "values ($id_person, $id_project, $status, $ts, '$comment', $id_instruments)";
@@ -310,7 +301,7 @@ echo "Styret</th>
 $query = "SELECT person.id as id, firstname, lastname, status, id_instruments " .
         "FROM person, instruments " .
         "where id_instruments = instruments.id " .
-        "and not status = $per_stat_quited " .
+        "and not status = $db->per_stat_quited " .
         "order by {$sort}";
 
 $stmt = $db->query($query);

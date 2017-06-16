@@ -25,9 +25,10 @@ if (is_null($sort))
 $query = "SELECT person.id as id_person, " .
         "firstname, middlename, lastname, instrument " .
         "FROM person, instruments " .
-        "where instruments.id = id_instruments " .
-        "and person.status = $per_stat_member " .
+        "where instruments.id = person.id_instruments " .
+        "and person.status = $db->per_stat_member " .
         "order by $sort";
+
 $stmt = $db->query($query);
 
 foreach ($stmt as $row)

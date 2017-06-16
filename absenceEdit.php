@@ -69,8 +69,8 @@ echo "
       <th bgcolor=#A6CAF0><a href=\"$php_self?id_plan=$_REQUEST[id_plan]&_sort=firstname,lastname\">Navn</a></th>
       <th bgcolor=#A6CAF0><a href=\"$php_self?id_plan=$_REQUEST[id_plan]&_sort=list_order,firstname,lastname\">Instrument</a></th>\n";
 
-for ($i = 0; $i < sizeof($abs_stat); $i++)
-   echo "<th bgcolor=#A6CAF0>$abs_stat[$i]</th>\n";
+for ($i = 0; $i < sizeof($db->abs_stat); $i++)
+   echo "<th bgcolor=#A6CAF0>" . $db->abs_stat[$i] . "</th>\n";
 
 echo "<th bgcolor=#A6CAF0>Kommentar</th>\n</tr>\n";
 
@@ -81,7 +81,7 @@ $query = "SELECT participant.id_person as id_person, firstname, lastname, "
         . "and instruments.id_groups = groups.id "
         . "and participant.id_instruments = instruments.id "
         . "and participant.id_project = plan.id_project "
-        . "and participant.stat_final = $par_stat_yes "
+        . "and participant.stat_final = $db->par_stat_yes "
         . "and person.id = participant.id_person "
         . "and plan.id = $_REQUEST[id_plan] "
         . "order by $sort";
@@ -100,7 +100,7 @@ foreach ($stmt as $row)
    $s = $db->query($q);
    $e = $s->fetch(PDO::FETCH_ASSOC);
 
-   for ($i = 0; $i < sizeof($abs_stat); $i++)
+   for ($i = 0; $i < sizeof($db->abs_stat); $i++)
    {
       echo "<td align=center><input type=radio name=\"status:$row[id_person]\" value=$i";
       if ($e && $e[status] == $i)

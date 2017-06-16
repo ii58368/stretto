@@ -33,7 +33,7 @@ $query = "SELECT person.id as person_id, " .
         "firstname, lastname, instrument " .
         "FROM person, instruments, project " .
         "where instruments.id = id_instruments " .
-        "and not person.status = $per_stat_quited " .
+        "and not person.status = $db->per_stat_quited " .
         "and project.year >= $sel_year " .
         "order by $sort, year, semester DESC, project.id";
 $stmt = $db->query($query);
@@ -52,7 +52,7 @@ foreach ($stmt as $row)
    list($status, $blink) = participant_status($row[person_id], $row[project_id]);
    echo "<td align=center><a href=\"participant_11.php?id_person=$row[person_id]&id_project=$row[project_id]\">"
       . "<img src=\"images/part_stat_$status$blink.gif\" "
-      . "border=0 title=\"$par_stat[$status]\"></a></td>\n";
+      . "border=0 title=\"$db->par_stat[$status]\"></a></td>\n";
 }
 ?>  
 </tr>

@@ -67,7 +67,7 @@ $query = "SELECT date, time, " .
         "where id_location = location.id " .
         "and id_project = project.id " .
         "and plan.id_project = $_REQUEST[id_project] " .
-        "and plan.event_type = $plan_evt_rehearsal " .
+        "and plan.event_type = $db->plan_evt_rehearsal " .
         "order by date,tsort,time";
 
 $stmt = $db->query($query);
@@ -116,14 +116,14 @@ echo "</td></tr>\n";
 if ($prj[deadline] > time())
 {
    echo "<tr><td>Ønsker å være med:</td><td>";
-   for ($i = 0; $i < count($par_stat); $i++)
+   for ($i = 0; $i < count($db->par_stat); $i++)
    {
       if ($prj[valid_par_stat] & (1 << $i))
       {
          echo "<input type=radio name=stat_self value=$i";
          if ($part[stat_self] == $i)
             echo " checked";
-         echo ">$par_stat[$i]<br>\n";
+         echo ">" . $db->par_stat[$i] . "<br>\n";
       }
    }
    echo "</td></tr>\n";
@@ -132,7 +132,7 @@ if ($prj[deadline] > time())
 }
 else
 {
-   echo "<tr><td>Registrert svar:</td><td><b>" . $par_stat[$part[stat_self]] . "</b></td></tr>\n";
+   echo "<tr><td>Registrert svar:</td><td><b>" . $db->par_stat[$part[stat_self]] . "</b></td></tr>\n";
    echo "<tr><td>Kommentar:</td><td><b>" . str_replace("\n", "<br>\n", $part[comment_self]) . "</b></td></tr>\n";
 }
 echo "</table>";

@@ -16,9 +16,10 @@ echo str_replace("\n", "<br>\n", $prj[info]) . "\n";
 echo "<h2>Repertoar</h2>
     <table border=0>\n";
 
-$query = "SELECT title, work, firstname, lastname"
+$query = "SELECT title, work, firstname, lastname, music.comment as comment"
         . " from repository, music"
         . " where repository.id = music.id_repository"
+        . " and music.status = $db->mus_stat_yes"
         . " and music.id_project = $_REQUEST[id] "
         . " order by lastname, firstname, work";
 
@@ -29,6 +30,7 @@ foreach ($stmt as $row)
    echo "<tr><td>$row[firstname] $row[lastname]:</td><td>$row[title]</td>";
    if (strlen($row[work]) > 0)
       echo "<td>fra $row[work]</td>";
+   echo "<td>$row[comment]</td>\n";
    echo "</tr>\n";
 }
 echo "</table><p>\n";
@@ -50,7 +52,7 @@ $query = "SELECT date, time, " .
         "where id_location = location.id " .
         "and id_project = project.id " .
         "and plan.id_project = $_REQUEST[id] " .
-        "and plan.event_type = $plan_evt_rehearsal " .
+        "and plan.event_type = $db->plan_evt_rehearsal " .
         "order by date,tsort,time";
 
 $stmt = $db->query($query);
@@ -79,7 +81,7 @@ $query = "select firstname, lastname, instrument, stat_inv, stat_final"
         . " where participant.id_project=$_REQUEST[id]"
         . " and participant.id_instruments = instruments.id"
         . " and participant.id_person = person.id"
-        . " and participant.stat_inv = $par_stat_yes"
+        . " and participant.stat_inv = $db->par_stat_yes"
         . " order by instruments.list_order, participant.position";
 $stmt = $db->query($query);
 
@@ -88,7 +90,7 @@ foreach ($stmt as $e)
 {
    if ($last_instrument != $e[instrument])
       echo "</ul><p><b>$e[instrument]</b><ul>\n";
-   $name = ($e[stat_final] == $par_stat_yes) ? "$e[firstname] $e[lastname]" : "&lt;uavklart&gt;";
+   $name = ($e[stat_final] == $db->par_stat_yes) ? "$e[firstname] $e[lastname]" : "&lt;uavklart&gt;";
    echo "<li>$name</li>\n";
    $last_instrument = $e[instrument];
 }

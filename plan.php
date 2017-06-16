@@ -37,7 +37,6 @@ function select_location($selected)
 function select_project($selected)
 {
    global $db;
-   global $prj_orch_reduced;
    
    echo "<select name=id_project>";
 
@@ -54,7 +53,7 @@ function select_project($selected)
       if ($e[id] == $selected)
          echo " selected";
       echo ">" . $e[name] . " (" . $e[semester], $e[year] . ")";
-      if ($e[orchestration] == $prj_orch_reduced)
+      if ($e[orchestration] == $db->prj_orch_reduced)
          echo '*';
    }
    echo "</select>";
@@ -133,7 +132,7 @@ if ($action == 'update')
                     "location = '$_POST[location]'," .
                     "id_project = '$_POST[id_project]'," .
                     "comment = '$_POST[comment]'," .
-                    "event_type = $plan_evt_rehearsal " .
+                    "event_type = $db->plan_evt_rehearsal " .
                     "where id = $no";
          }
          $no = NULL;
@@ -154,7 +153,7 @@ $query = "SELECT plan.id as id, date, time, tsort, id_project, " .
         "where id_location = location.id " .
         "and id_project = project.id " .
         "and plan.id_project like '$_REQUEST[id_project]' " .
-        "and plan.event_type = $plan_evt_rehearsal " .
+        "and plan.event_type = $db->plan_evt_rehearsal " .
         "and project.year >= $cur_year " .
         "order by date,tsort,time";
 
@@ -176,7 +175,7 @@ foreach($stmt as $row)
          echo $row[lname];
       echo $row[location];
       echo "</td><td>$row[pname]";
-      if ($row[orchestration] == $prj_orch_reduced)
+      if ($row[orchestration] == $db->prj_orch_reduced)
          echo '*';
       echo "</td><td>";
       echo str_replace("\n", "<br>\n", $row[comment]);

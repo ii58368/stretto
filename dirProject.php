@@ -44,10 +44,9 @@ function list_group($id)
 function select_person($selected)
 {
    global $db;
-   global $per_stat_member;
 
    $q = "SELECT person.id as id, firstname, lastname, instrument FROM person, instruments " .
-           "where status = ${per_stat_member} and id_instruments = instruments.id " .
+           "where status = $db->per_stat_member and id_instruments = instruments.id " .
            "order by list_order, lastname, firstname";
 
    $s = $db->query($q);
@@ -64,8 +63,6 @@ function select_person($selected)
 function mail2dir($id_project)
 {
    global $db;
-   global $shi_stat_tentative;
-   global $shi_stat_confirmed;
 
    $q = "select name from project where id = ${id_project}";
    $s = $db->query($q);
@@ -75,7 +72,7 @@ function mail2dir($id_project)
    $q = "select email, phone1 from person, participant " .
            "where person.id = participant.id_person " .
            "and participant.id_project = ${id_project} " .
-           "and (participant.stat_dir = ${shi_stat_tentative} or participant.stat_dir = ${shi_stat_confirmed})";
+           "and (participant.stat_dir = $db->shi_stat_tentative or participant.stat_dir = $db->shi_stat_confirmed)";
    $s = $db->query($q);
    $r = $s->fetchAll(PDO::FETCH_ASSOC);
 
@@ -118,11 +115,11 @@ if ($action == 'update')
            "id_person = '$_POST[id_person]'," .
            "info_dir = '$_POST[info_dir]' " .
            "where id = $no";
-   $query2 = "update participant set stat_dir = $shi_stat_free "
-           . "where stat_dir = $shi_stat_responsible "
+   $query2 = "update participant set stat_dir = $db->shi_stat_free "
+           . "where stat_dir = $db->shi_stat_responsible "
            . "and id_project = $no";
    $db->query($query2);
-   $query2 = "update participant set stat_dir = ${shi_stat_responsible} " .
+   $query2 = "update participant set stat_dir = $db->shi_stat_responsible " .
            "where id_person = $_POST[id_person] " .
            "and id_project = $no";
    $db->query($query2);

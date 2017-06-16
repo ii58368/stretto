@@ -44,7 +44,7 @@ $query  = "SELECT person.id as person_id, " .
           "view.comment as view_comment " .
           "FROM person, instruments, view " .
           "where instruments.id = id_instruments " .
-          "and not person.status = $per_stat_quited " .
+          "and not person.status = $db->per_stat_quited " .
           "order by $sort";
 $stmt = $db->query($query);
 
@@ -56,7 +56,7 @@ foreach($stmt as $row)
   {
     echo "</tr><tr><td bgcolor=#A6CAF0>$row[firstname] $row[lastname]";   
     echo "</td><td bgcolor=#A6CAF0> $row[instrument] </td>";
-    echo "</td><td bgcolor=#A6CAF0>" . $per_stat[$row[status]] . "</td>";
+    echo "</td><td bgcolor=#A6CAF0>" . $db->per_stat[$row[status]] . "</td>";
     $prev_id = $row[person_id];
   }
   $query  = "SELECT comment from auth_person " .

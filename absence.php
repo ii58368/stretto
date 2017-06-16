@@ -46,7 +46,7 @@ echo "
 
 $query = "select id, date from plan "
         . "where id_project = $_REQUEST[id_project] "
-        . "and event_type = $plan_evt_rehearsal "
+        . "and event_type = $db->plan_evt_rehearsal "
         . "order by date";
 $stmt = $db->query($query);
 
@@ -62,10 +62,10 @@ $query = "SELECT participant.id_person as id_person, firstname, lastname, "
         . "and instruments.id_groups = groups.id "
         . "and participant.id_instruments = instruments.id "
         . "and participant.id_project = $_REQUEST[id_project] "
-        . "and participant.stat_final = $par_stat_yes "
+        . "and participant.stat_final = $db->par_stat_yes "
         . "and person.id = participant.id_person "
         . "and plan.id_project = $_REQUEST[id_project] "
-        . "and plan.event_type = $plan_evt_rehearsal "
+        . "and plan.event_type = $db->plan_evt_rehearsal "
         . "order by $sort,plan.date";
 
 $stmt = $db->query($query);
@@ -90,7 +90,7 @@ foreach ($stmt as $row)
    $e = $s->fetch(PDO::FETCH_ASSOC);
    echo "<td align=center>";
    if ($e)
-      echo "<img src=\"images/abs_stat_$e[status].gif\" title=\"" . $abs_stat[$e[status]] . ": $e[comment]\">";
+      echo "<img src=\"images/abs_stat_$e[status].gif\" title=\"" . $db->abs_stat[$e[status]] . ": $e[comment]\">";
    echo "</td>";
 }
 
