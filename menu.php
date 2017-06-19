@@ -1,7 +1,7 @@
 <!-- Codrops top bar -->
 <div class="codrops-top clearfix">
     <?php echo $prj_name; ?>
-    <span class="right"><strong><?php echo auth_whoami(); ?></strong></span>
+    <span class="right"><strong><?php echo $auth->whoami(); ?></strong></span>
 </div><!--/ Codrops top bar -->
 <div class="main clearfix">
     <div class="column">
@@ -14,10 +14,10 @@
                         <?php
                         $s = $db->query("select id from person where uid='$whoami'");
                         $pers = $s->fetch(PDO::FETCH_ASSOC);
-                        auth_li("Mine prosjekter", "participant_1x.php?id=$pers[id]");
-                        auth_li("Min prøveplan", "myPlan.php");
-                        auth_li("Min regi", "myDirection.php");
-                        auth_li("Mine personopplysninger", "personEdit.php?_no=$pers[id]");
+                        $auth->li("Mine prosjekter", "participant_1x.php?id=$pers[id]");
+                        $auth->li("Min prøveplan", "myPlan.php");
+                        $auth->li("Min regi", "myDirection.php");
+                        $auth->li("Mine personopplysninger", "personEdit.php?_no=$pers[id]");
                         ?>  
                     </ul>
                 </li>
@@ -25,10 +25,10 @@
                     <a href="#">Regi</a>
                     <ul class="dl-submenu">
                         <?php
-                        auth_li("Ressurser", "dirResources.php");
-                        auth_li("Turnus", "dirShift.php");
-                        auth_li("Prosjekt", "dirProject.php");
-                        auth_li("Regiplan", "dirPlan.php?id_project=%");
+                        $auth->li("Ressurser", "dirResources.php");
+                        $auth->li("Turnus", "dirShift.php");
+                        $auth->li("Prosjekt", "dirProject.php");
+                        $auth->li("Regiplan", "dirPlan.php?id_project=%");
                         ?>
                     </ul>
                 </li>
@@ -36,20 +36,20 @@
                     <a href="#">Admin</a>
                     <ul class="dl-submenu">
                         <?php
-                        auth_li("Medlemsliste", "person.php");
-                        auth_li("Prøveplan", "plan.php?id_project=%");
-                        auth_li("Grupper", "groups.php");
-                        auth_li("Instrumenter", "instruments.php");
-                        auth_li("Tilgang", "access.php");
-                        auth_li("Tilgangsgrupper", "view.php");
-                        auth_li("Notearkiv", "repository.php");
-                        auth_li("Prosjekter", "project.php");
-                        auth_li("Tilbakemeldinger", "feedback.php");
-                        auth_li("Lokale", "location.php");
-                        auth_li("Ressurser", "participant_xx.php");
-                        auth_li("Dokumenter", "document.php?path=common");
-                        auth_li("Kontingent", "contingent.php");
-                        auth_li("Om $prj_name", "about.php");
+                        $auth->li("Medlemsliste", "person.php");
+                        $auth->li("Prøveplan", "plan.php?id_project=%");
+                        $auth->li("Grupper", "groups.php");
+                        $auth->li("Instrumenter", "instruments.php");
+                        $auth->li("Tilgang", "access.php");
+                        $auth->li("Tilgangsgrupper", "view.php");
+                        $auth->li("Notearkiv", "repository.php");
+                        $auth->li("Prosjekter", "project.php");
+                        $auth->li("Tilbakemeldinger", "feedback.php");
+                        $auth->li("Lokale", "location.php");
+                        $auth->li("Ressurser", "participant_xx.php");
+                        $auth->li("Dokumenter", "document.php?path=common");
+                        $auth->li("Kontingent", "contingent.php");
+                        $auth->li("Om $prj_name", "about.php");
                         ?>
                     </ul>
                 </li>
@@ -72,19 +72,19 @@
                                 <a href=\"#\">$e[name] ($e[semester]$e[year])</a>
                                 <ul class=\"dl-submenu\">";
                            $pid = $e[id];
-                           auth_li("Prosjektinfo", "prjInfo.php?id=$pid");
-                           auth_li("Gruppeoppsett", "seating.php?id_project=$pid");
-                           auth_li("Program", "program.php?id=$pid");
-                           auth_li("Musikere", "person.php?id=$pid");
-                           auth_li("Noter", "document.php?path=project/$pid/sheet");
-                           auth_li("Innspilling", "document.php?path=project/$pid/rec");
-                           auth_li("Dokumenter", "document.php?path=project/$pid/doc");
-                           auth_li("Regikomité", "direction.php?id_project=$pid");
-                           auth_li(($e[orchestration] == $prj_orch_tutti) ? "Permisjonssøknad" : "Påmelding", "participant_11.php?id_project=$pid&id_person=$pers[id]");
-                           auth_li("Tilbakemelding", "feedback?id=$pid");
-                           auth_li("Fravær", "absence.php?id_project=$pid");
-                           auth_li("Prosjektressurser", "participant_x1.php?id=$pid");
-                           auth_li("Konsertkalender", "consert?id=$pid");
+                           $auth->li("Prosjektinfo", "prjInfo.php?id=$pid");
+                           $auth->li("Gruppeoppsett", "seating.php?id_project=$pid");
+                           $auth->li("Program", "program.php?id=$pid");
+                           $auth->li("Musikere", "person.php?id=$pid");
+                           $auth->li("Noter", "document.php?path=project/$pid/sheet");
+                           $auth->li("Innspilling", "document.php?path=project/$pid/rec");
+                           $auth->li("Dokumenter", "document.php?path=project/$pid/doc");
+                           $auth->li("Regikomité", "direction.php?id_project=$pid");
+                           $auth->li(($e[orchestration] == $prj_orch_tutti) ? "Permisjonssøknad" : "Påmelding", "participant_11.php?id_project=$pid&id_person=$pers[id]");
+                           $auth->li("Tilbakemelding", "feedback?id=$pid");
+                           $auth->li("Fravær", "absence.php?id_project=$pid");
+                           $auth->li("Prosjektressurser", "participant_x1.php?id=$pid");
+                           $auth->li("Konsertkalender", "consert?id=$pid");
                            echo "
                                 </ul>
                             </li>";
@@ -93,7 +93,7 @@
                     </ul>
                 </li>
                 <?php
-                auth_li("Hva skjer?", "event.php");
+                $auth->li("Hva skjer?", "event.php");
                 ?>
             </ul>
         </div><!-- /dl-menuwrapper -->

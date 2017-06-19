@@ -2,273 +2,268 @@
 
 require_once 'conf/opendb.php';
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-
-$auth_su = 0; // Super-user.
-$auth_myprj = 1; // My projects
-$auth_prj_ro = 2; // Projects, r/o
-$auth_myplan = 3; // My rehearsal plan, r/o
-$uath_mydir = 4; // My direction
-$auth_pers = 5; // My personal information
-$auth_board_ro = 6; // General board information, r/o
-$auth_dir_rw = 7; // read/write access for director
-$auth_memb_ro = 8; // List of members, r/o
-$auth_memb_rw = 9; // List of members, r/w
-$auth_plan_ro = 10; // Rehearsal plan for all projects, r/o
-$auth_plan_rw = 11; // Rehearsal plan for all projects, r/w
-$auth_grp = 12; // List of groups, r/w
-$auth_insr = 13; // List of instruments, r/w
-$auth_acc = 14; // List of access, r/w
-$auth_accgrp = 15; // List of access grpoups, r/w
-$auth_rep = 16; // Music repository, r/w
-$auth_prj = 17; // Projects, r/w
-$auth_abs_ro = 18; // Absence register, r/o
-$auth_loc = 19; // Location, r/w
-$auth_doc_ro = 20; // Documents in general, r/o
-$auth_doc_rw = 21; // Documents in general, r/w
-$auth_cont_ro = 22; // Contigent, r/o
-$auth_cont_rw = 23; // Contigent, r/w
-$auth_prim = 24; // Information about all projects, r/o
-$auth_seat = 25; // Seating, r/w
-$auth_prog = 26; // Concert program, r/w
-$auth_prjdoc = 27; // Download of optional sheet music, recordings and project documents
-$auth_dir_ro = 28; // Committee of direction, r/o
-$auth_abs_rw = 29; // paticipant, absence, r/w
-$auth_res = 30; // Resources available, r/o
-$auth_res_self = 31; // Resources available, self register, r/w
-$auth_res_reg = 32; // Resources available, registered by secretary, r/w
-$auth_res_req = 33; // Resources available, recommended by MR, r/w
-$auth_res_fin = 34; // Resources available, decided, r/w
-$auth_fback = 35; // Feedback, r/w
-$auth_abs_grp = 36; // Absence per group, r/w
-$auth_abs_all = 37; // Absence, all members, r/w
-$auth_cons = 38; // concert schedule, r/w
-$auth_event = 39; // What´s on?
-$auth_all = 0x7fffffffffffffff;
-
-$auth_list_ro = array(
-    "myProject.php" => auth_bit($auth_myprj),
-    "project1x.php" => auth_bit($auth_myprj),
-    "myPlan.php" => auth_bit($auth_myplan),
-    "myDirection.php" => auth_bit($auth_mydir),
-    "personal.php" => auth_bit($auth_pers),
-    "dirResources.php" => auth_bit($auth_board_ro),
-    "dirShift.php" => auth_bit($auth_board_ro),
-    "dirProject.php" => auth_bit($auth_board_ro),
-    "dirPlan.php" => auth_bit($auth_board_ro),
-    "person.php" => auth_bit($auth_memb_ro),
-    "plan.php" => auth_bit($auth_plan_ro),
-    "group.php" => auth_bit($auth_board_ro),
-    "instruments.php" => auth_bit($auth_board_ro),
-    "access.php" => auth_bit($auth_board_ro),
-    "view.php" => auth_bit($auth_board_ro),
-    "repository.php" => auth_bit($auth_board_ro),
-    "projectxx.php" => auth_bit($auth_board_ro),
-    "feedback.php" => auth_bit($auth_board_ro),
-    "location.php" => auth_bit($auth_board_ro),
-    "participant.php" => auth_bit($auth_abs_ro),
-    "document.php" => auth_bit($auth_doc_ro, $auth_prjm),
-    "contigent.php" => auth_bit($auth_cont_ro),
-    "prjInfo.php" => auth_bit($auth_prjm),
-    "seating.php" => auth_bit($auth_prjm),
-    "plan.php" => auth_bit($auth_prjm),
-    "program.php" => auth_bit($auth_prjm),
-    "person.php" => auth_bit($auth_memb_ro),
-    "direction.php" => auth_bit($auth_dir_ro),
-    "register.php" => auth_bit($auth_all),
-    "feedback.php" => auth_bit($auth_prjm),
-    "absence.php" => auth_bit($auth_abs_grp),
-    "resources.php" => auth_bit($auth_all),
-    //   "concert.php" => auth_bit($auth_conc),
-    "event.php" => auth_bit($auth_prjm)
-);
-
-
-$auth_list_rw = array(
-    "myProject.php" => auth_bit($auth_myprj),
-    "project.php" => auth_bit($auth_myprj),
-    "myPlan.php" => auth_bit($auth_myplan),
-    "myDirection.php" => auth_bit($auth_mydir),
-    "personal.php" => auth_bit($auth_pers),
-    "dirResources.php" => auth_bit($auth_dir_rw),
-    "dirShift.php" => auth_bit($auth_dir_rw),
-    "dirProject.php" => auth_bit($auth_dir_rw),
-    "dirPlan.php" => auth_bit($auth_dir_rw),
-    "person.php" => auth_bit($auth_memb_rw),
-    "plan.php" => auth_bit($auth_plan_rw),
-    "group.php" => auth_bit($auth_grp),
-    "instruments.php" => auth_bit($auth_instr),
-    "access.php" => auth_bit($auth_acc),
-    "view.php" => auth_bit($auth_accgrp),
-    "repository.php" => auth_bit($auth_rep),
-    "project.php" => auth_bit($auth_prj), // TBD: occurs twice
-    "feedback.php" => auth_bit($auth_fback),
-    "location.php" => auth_bit($auth_loc),
-//    "participant.php" => auth_bit($auth_abs_ro),
-    "document.php" => auth_bit($auth_doc_rw, $auth_prjdoc),
-    "contigent.php" => auth_bit($auth_cont_rw),
-//    "prjInfo.php" => auth_bit($auth_prjm),
-    "seating.php" => auth_bit($auth_seat),
-    "plan.php" => auth_bit($auth_prjm),
-    "program.php" => auth_bit($auth_prj),
-    "person.php" => auth_bit($auth_memb_rw),
-//    "direction.php" => auth_bit($auth_dir_ro),
-    "register.php" => auth_bit($auth_all),
-    "feedback.php" => auth_bit($auth_prjm),
-    "absence.php" => auth_bit($auth_abs_grp),
-    "resources.php" => auth_bit($auth_all), // TBD
-    "concert.php" => auth_bit($auth_conc),
-    "event.php" => auth_bit($auth_event)
-);
-
-function auth_access_uid($uid, $auth)
+class AUTH
 {
-   global $db;
-   
-   $query = "select access from person, auth_person, view " .
-           "where person.id = auth_person.id_person " .
-           "and auth_person.id_view = view.id " .
-           "and person.uid = '$uid'";
 
-   $stmt = $db->query($query);
+   const su = 0; // Super-user.
+   const myprj = 1; // My projects
+   const prj_ro = 2; // Projects, r/o
+   const myplan = 3; // My rehearsal plan, r/o
+   const mydir = 4; // My direction
+   const pers = 5; // My personal information
+   const board_ro = 6; // General board information, r/o
+   const dir_rw = 7; // read/write access for director
+   const memb_ro = 8; // List of members, r/o
+   const memb_rw = 9; // List of members, r/w
+   const plan_ro = 10; // Rehearsal plan for all projects, r/o
+   const plan_rw = 11; // Rehearsal plan for all projects, r/w
+   const grp = 12; // List of groups, r/w
+   const instr = 13; // List of instruments, r/w
+   const acc = 14; // List of access, r/w
+   const accgrp = 15; // List of access grpoups, r/w
+   const rep = 16; // Music repository, r/w
+   const prj = 17; // Projects, r/w
+   const abs_ro = 18; // Absence register, r/o
+   const loc = 19; // Location, r/w
+   const doc_ro = 20; // Documents in general, r/o
+   const doc_rw = 21; // Documents in general, r/w
+   const cont_ro = 22; // Contigent, r/o
+   const cont_rw = 23; // Contigent, r/w
+   const prjm = 24; // Information about all projects, r/o
+   const seat = 25; // Seating, r/w
+   const prog = 26; // Concert program, r/w
+   const prjdoc = 27; // Download of optional sheet music, recordings and project documents
+   const dir_ro = 28; // Committee of direction, r/o
+   const abs_rw = 29; // paticipant, absence, r/w
+   const res = 30; // Resources available, r/o
+   const res_self = 31; // Resources available, self register, r/w
+   const res_reg = 32; // Resources available, registered by secretary, r/w
+   const res_req = 33; // Resources available, recommended by MR, r/w
+   const res_fin = 34; // Resources available, decided, r/w
+   const fback = 35; // Feedback, r/w
+   const abs_grp = 36; // Absence per group, r/w
+   const abs_all = 37; // Absence, all members, r/w
+   const cons = 38; // concert schedule, r/w
+   const event = 39; // What´s on?
+   const all = 0x7fffffffffffffff;
 
-   foreach($stmt as $row)
+   private $list_ro = array();
+   private $list_rw = array();
+
+   function __construct()
    {
-      $access |= $row[access];
+      $list_ro["myProject.php"] = $this->bit(self::myprj);
+      $list_ro["project1x.php"] = $this->bit(self::myprj);
+      $list_ro["myPlan.php"] = $this->bit(self::myplan);
+      $list_ro["myDirection.php"] = $this->bit(self::mydir);
+      $list_ro["personal.php"] = $this->bit(self::pers);
+      $list_ro["dirResources.php"] = $this->bit(self::board_ro);
+      $list_ro["dirShift.php"] = $this->bit(self::board_ro);
+      $list_ro["dirProject.php"] = $this->bit(self::board_ro);
+      $list_ro["dirPlan.php"] = $this->bit(self::board_ro);
+      $list_ro["person.php"] = $this->bit(self::memb_ro);
+      $list_ro["plan.php"] = $this->bit(self::plan_ro);
+      $list_ro["group.php"] = $this->bit(self::board_ro);
+      $list_ro["instruments.php"] = $this->bit(self::board_ro);
+      $list_ro["access.php"] = $this->bit(self::board_ro);
+      $list_ro["view.php"] = $this->bit(self::board_ro);
+      $list_ro["repository.php"] = $this->bit(self::board_ro);
+      $list_ro["projectxx.php"] = $this->bit(self::board_ro);
+      $list_ro["feedback.php"] = $this->bit(self::board_ro);
+      $list_ro["location.php"] = $this->bit(self::board_ro);
+      $list_ro["participant.php"] = $this->bit(self::abs_ro);
+      $list_ro["document.php"] = $this->bit(self::doc_ro, self::prjm);
+      $list_ro["contigent.php"] = $this->bit(self::cont_ro);
+      $list_ro["prjInfo.php"] = $this->bit(self::prjm);
+      $list_ro["seating.php"] = $this->bit(self::prjm);
+      $list_ro["plan.php"] = $this->bit(self::prjm);
+      $list_ro["program.php"] = $this->bit(self::prjm);
+      $list_ro["person.php"] = $this->bit(self::memb_ro);
+      $list_ro["direction.php"] = $this->bit(self::dir_ro);
+      $list_ro["register.php"] = $this->bit(self::all);
+      $list_ro["feedback.php"] = $this->bit(self::prjm);
+      $list_ro["absence.php"] = $this->bit(self::abs_grp);
+      $list_ro["resources.php"] = $this->bit(self::all);
+      //   $list_ro["concert.php"] = $this->bit(self::conc);
+      $list_ro["event.php"] = $this->bit(self::prjm);
+
+      $list_rw["myProject.php"] = $this->bit(self::myprj);
+      $list_rw["project.php"] = $this->bit(self::myprj);
+      $list_rw["myPlan.php"] = $this->bit(self::myplan);
+      $list_rw["myDirection.php"] = $this->bit(self::mydir);
+      $list_rw["personal.php"] = $this->bit(self::pers);
+      $list_rw["dirResources.php"] = $this->bit(self::dir_rw);
+      $list_rw["dirShift.php"] = $this->bit(self::dir_rw);
+      $list_rw["dirProject.php"] = $this->bit(self::dir_rw);
+      $list_rw["dirPlan.php"] = $this->bit(self::dir_rw);
+      $list_rw["person.php"] = $this->bit(self::memb_rw);
+      $list_rw["plan.php"] = $this->bit(self::plan_rw);
+      $list_rw["group.php"] = $this->bit(self::grp);
+      $list_rw["instruments.php"] = $this->bit(self::instr);
+      $list_rw["access.php"] = $this->bit(self::acc);
+      $list_rw["view.php"] = $this->bit(self::accgrp);
+      $list_rw["repository.php"] = $this->bit(self::rep);
+      $list_rw["project.php"] = $this->bit(self::prj); // TBD: occurs twice
+      $list_rw["feedback.php"] = $this->bit(self::fback);
+      $list_rw["location.php"] = $this->bit(self::loc);
+//    $list_rw["participant.php"] = $this->bit(self::abs_ro);
+      $list_rw["document.php"] = $this->bit(self::doc_rw, self::prjdoc);
+      $list_rw["contigent.php"] = $this->bit(self::cont_rw);
+//    $list_rw["prjInfo.php"] = $this->bit(self::prjm);
+      $list_rw["seating.php"] = $this->bit(self::seat);
+      $list_rw["plan.php"] = $this->bit(self::prjm);
+      $list_rw["program.php"] = $this->bit(self::prj);
+      $list_rw["person.php"] = $this->bit(self::memb_rw);
+//    $list_rw["direction.php"] = $this->bit(self::dir_ro);
+      $list_rw["register.php"] = $this->bit(self::all);
+      $list_rw["feedback.php"] = $this->bit(self::prjm);
+      $list_rw["absence.php"] = $this->bit(self::abs_grp);
+      $list_rw["resources.php"] = $this->bit(self::all); // TBD
+      $list_rw["concert.php"] = $this->bit(self::cons);
+      $list_rw["event.php"] = $this->bit(self::event);
    }
 
-   if ($auth & $access)
-      return true;
-
-   return false;
-}
-
-function auth_access($auth)
-{
-   global $auth_su;
-   global $whoami;
-
-   static $access = null;
-
-   if (is_null($access))
+   private function access_uid($uid, $auth)
    {
-      $access = auth_access_uid($_SERVER[PHP_AUTH_USER], $auth);
+      global $db;
 
-      if ($access & $auth & (1 << $auth_su))
-         return true;  // Yes, the actual user has super permisions
+      $query = "select access from person, auth_person, view " .
+              "where person.id = auth_person.id_person " .
+              "and auth_person.id_view = view.id " .
+              "and person.uid = '$uid'";
 
-      if ($whoami != $_SERVER[PHP_AUTH_USER])
+      $stmt = $db->query($query);
+
+      foreach ($stmt as $row)
       {
-         $access = auth_access_uid($whoami, $auth);
+         $access |= $row[access];
+      }
+
+      if ($auth & $access)
+         return true;
+
+      return false;
+   }
+
+   public function access($auth)
+   {
+      global $whoami;
+
+      static $access = null;
+
+      if (is_null($access))
+      {
+         $access = $this->access_uid($_SERVER[PHP_AUTH_USER], $auth);
+
+         if ($access & $auth & (1 << self::su))
+            return true;  // Yes, the actual user has super permisions
+
+         if ($whoami != $_SERVER[PHP_AUTH_USER])
+         {
+            $access = $this->access_uid($whoami, $auth);
+         }
+      }
+
+      return $access;
+   }
+
+   private function bit(...$auth)
+   {
+      $acc = 0;
+      foreach ($auth as $a)
+      {
+         $acc |= (1 << $a);
+      }
+      return $acc;
+   }
+
+   public function select_person($selected)
+   {
+      global $db;
+
+      $q = "SELECT uid, firstname, lastname, instrument "
+              . "FROM person, instruments "
+              . "where not person.status = $db->per_stat_quited "
+              . "and person.id_instruments = instruments.id "
+              . "order by list_order, lastname, firstname";
+      $s = $db->query($q);
+
+      foreach ($s as $e)
+      {
+         echo "<option value=\"" . $e[uid] . "\"";
+         if ($e[uid] == $selected)
+            echo " selected";
+         echo ">$e[firstname] $e[lastname] ($e[instrument])\n";
       }
    }
 
-   return $access;
-}
-
-function auth_bit(...$auth)
-{
-   $acc = 0;
-   foreach ($auth as $a)
+   private function page($auth_list, $page = NULL)
    {
-      $acc |= (1 << $a);
+      global $php_self;
+
+      if (is_null($page))
+         $page = $php_self;
+
+      if (is_null($acc = $auth_list[$page]))
+         return false;
+
+      if (!$this->access($acc))
+         return false;
+
+      return true;
    }
-   return $acc;
-}
 
-function auth_select_person($selected)
-{
-   global $db;
-
-   $q = "SELECT uid, firstname, lastname, instrument "
-           . "FROM person, instruments "
-           . "where not person.status = $db->per_stat_quited "
-           . "and person.id_instruments = instruments.id "
-           . "order by list_order, lastname, firstname";
-   $s = $db->query($q);
-
-   foreach($s as $e)
+   public function page_ro($page = NULL)
    {
-      echo "<option value=\"" . $e[uid] . "\"";
-      if ($e[uid] == $selected)
-         echo " selected";
-      echo ">$e[firstname] $e[lastname] ($e[instrument])\n";
+      return $this->access(self::list_ro, $page);
    }
-}
 
-function auth_page($auth_list, $page = NULL)
-{
-   global $php_self;
-
-   if (is_null($page))
-      $page = $php_self;
-
-   if (is_null($acc = $auth_list[$page]))
-      return false;
-
-   if (!auth_access($acc))
-      return false;
-
-   return true;
-}
-
-function auth_page_ro($page = NULL)
-{
-   global $auth_list_ro;
-
-   return auth_access($auth_list_ro, $page);
-}
-
-function auth_page_rw($page = NULL)
-{
-   global $auth_list_rw;
-
-   return auth_page($auth_list_rw, $page);
-}
-
-function auth_page_deny()
-{
-   if (auth_page_ro())
-      return;
-
-   echo "<h1>Permission denied</h1>";
-   exit(0);
-}
-
-function auth_li($li, $page)
-{
-   //  if (auth_page_ro($page) || auth_page_rw($page))
-   echo "<li><a href=\"$page\">$li</a></li>";
-}
-
-function auth_whoami()
-{
-   global $db;
-   global $whoami;
-   global $php_self;
-   global $auth_su;
-
-   if (auth_access(auth_bit($auth_su)))
+   public function page_rw($page = NULL)
    {
-      echo "<form action=\"$php_self\" method=post>
+      return $this->page(self::list_rw, $page);
+   }
+
+   function page_deny()
+   {
+      if ($this->page_ro())
+         return;
+
+      echo "<h1>Permission denied</h1>";
+      exit(0);
+   }
+
+   public function li($li, $page)
+   {
+//  if (auth_page_ro($page) || auth_page_rw($page))
+      echo "<li><a href=\"$page\">$li</a></li>";
+   }
+
+   public function whoami()
+   {
+      global $db;
+      global $whoami;
+      global $php_self;
+
+      if ($this->access($this->bit(self::su)))
+      {
+         echo "<form action=\"$php_self\" method=post>
          <select name=set_eff_uid onChange=\"set_cookie('uid', this.form.set_eff_uid.value); submit();\">\n";
-      auth_select_person($whoami);
-      echo "</select>
+         $this->select_person($whoami);
+         echo "</select>
       </form>";
-   } else
-   {
-      $query = "select firstname, lastname, instrument "
-              . "from person, instruments "
-              . "where person.id_instruments = instruments.id "
-              . "and uid = '$whoami'";
-      $stmt = $db->query($query);
-      $row = $stmt->fetch(PDO::FETCH_ASSOC);
+      } else
+      {
+         $query = "select firstname, lastname, instrument "
+                 . "from person, instruments "
+                 . "where person.id_instruments = instruments.id "
+                 . "and uid = '$whoami'";
+         $stmt = $db->query($query);
+         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-      echo "$row[firstname] $row[lastname] ($row[instrument])";
+         echo "$row[firstname] $row[lastname] ($row[instrument])";
+      }
    }
+
 }
+
+$auth = new AUTH();
