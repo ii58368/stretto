@@ -215,12 +215,12 @@ class AUTH
 
    public function page_ro($page = NULL)
    {
-      return $this->access(self::list_ro, $page);
+      return $this->page($this->list_ro, $page);
    }
 
    public function page_rw($page = NULL)
    {
-      return $this->page(self::list_rw, $page);
+      return $this->page($this->list_rw, $page);
    }
 
    function page_deny()
@@ -234,7 +234,7 @@ class AUTH
 
    public function li($li, $page)
    {
-//  if (auth_page_ro($page) || auth_page_rw($page))
+//  if ($this->page_ro($page) || $this->page_rw($page))
       echo "<li><a href=\"$page\">$li</a></li>";
    }
 

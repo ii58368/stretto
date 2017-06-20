@@ -55,16 +55,6 @@ $stmt = $db->query($query);
 
 $prev_id = 0;
 
-$status_tab = array(
-    $db->shi_stat_free => "Klikk for &aring; bli valgt inn i regikomiteen",
-    $db->shi_stat_tentative => "Tentativt",
-    $db->shi_stat_confirmed => "Bekreftet",
-    $db->shi_stat_failed => "Ikke godkjent oppm&oslash;te",
-    $db->shi_stat_leave => "Permisjon",
-    $db->shi_stat_responsible => "Regiansvarlig",
-    $db->shi_stat_dropout => "Er ikke med på prosjektet"
-);
-
 foreach ($stmt as $row)
 {
    if ($row[person_id] != $prev_id)
@@ -87,7 +77,7 @@ foreach ($stmt as $row)
       if ($row2[stat_dir] != $db->shi_stat_free && $row2[stat_final] != $db->par_stat_yes)
          $status = 6;
       $comment = $row2[comment_dir];
-      echo "<a href=\"$_SERVER[PHP_SELF]?_action=update&id_person={$row[person_id]}&id_project={$row[project_id]}&stat_dir={$status}&from=$sel_year&_sort={$sort}\"><img src=\"images/shift_status_{$status}.gif\" border=0 title=\"{$status_tab[$status]} ({$row[project_name]}) {$comment}\"></a>\n";
+      echo "<a href=\"$_SERVER[PHP_SELF]?_action=update&id_person={$row[person_id]}&id_project={$row[project_id]}&stat_dir={$status}&from=$sel_year&_sort={$sort}\"><img src=\"images/shift_status_{$status}.gif\" border=0 title=\"{$db->shi_stat[$status]} ({$row[project_name]}) {$comment}\"></a>\n";
    }
    echo "</td>";
 }

@@ -122,8 +122,178 @@ foreach($stmt as $row)
     </table>
     </form>
 
+ 
 <?php
-  require 'framework_end.php';
+  function tline($c2, $c3)
+  {
+     static $i = 0;
+     
+     echo "<tr>";
+     echo "<td>$i</td>";
+     echo "<td>$c2</td>";
+     echo "<td>$c3</td>";
+     echo  "</tr>\n";  
+     $i++;
+  }
+  
+  echo "<table border=0>\n";
+  
+  tline("", "Super-user. Mulighet for å utgi seg for å være en  annen bruker");
+  tline("r", "Mine prosjekter (permisjon/deltagelse, alle prosjekter)");
+  tline("r", "Prosjekter (alle medlemmer, alle prosjekter)");
+  tline("r", "Min prøveplan");
+  tline("r", "Min regi");
+  tline("w", "Mine personopplysninger, mulighet for editering");
+  tline("r", "Regi, all medlemsinfo, grupper, tilgang, noter, lokale, prosjekter. For alle i styret");
+  tline("w", "Regi");
+  tline("r", "Medlemsliste");
+ tline("r", "Prøveplan, alle prosjekter");
+ tline("w", "Prøveplan, alle prosjekter");
+ tline("w", "Redigering av administrasjonsgrupper. (Styret, gruppeledere, o.l.");
+ tline("w", "Editering av instrumentgrupper");
+ tline("w", "Editere autorisasjonsgrupper");
+ tline("w", "Editere autorisasjon pr. bruker");
+ tline("w", "Ajourhold av notearkiv.");
+ tline("w", "Endre/definere nye prosjekter");
+ 
+ 13  
+auth_instr
+
+x
+Instrumenter
+ 14  
+auth_acc
+
+x
+Tilgang
+ 15  
+auth_accgrp
+
+x
+Tilgangsgrupper
+ 16  
+auth_rep
+
+x
+Notearkiv
+ 17  
+auth_prj
+
+x
+Prosjekter
+ 18  
+auth_abs_ro
+x
+
+Permisjon/Deltagelse (pr. Medlem, alle prosjekter)
+ 19  
+auth_loc
+
+x
+Lokale
+ 20  
+auth_doc_ro
+x
+
+Lesetilgang for generelle dokumenter
+ 21  
+auth_doc_rw
+
+x
+Tilgang for opplasting av generelle dokumenter
+ 22  
+auth_cont_ro
+x
+
+Kontigent
+ 23  
+auth_cont_rw
+
+x
+Kontigent
+ 24  
+auth_prjm
+x
+
+Info alle prosjekter, prosjektinfo, gruppeoppsett, prøveplan
+ 25  
+auth_seat
+
+x
+Gruppeoppsett, plassering av musikere
+ 26  
+auth_prog
+
+x
+Program
+ 27  
+auth_prjdoc 
+
+x
+Opplasting av noter, opptak, prosjektdokumenter
+ 28  
+auth_dir_ro
+x
+
+Regikomité
+ 29  
+auth_abs_rw
+
+x
+Påmelding/permisjonssøknad
+ 30  
+auth_res
+x
+
+Ressurser
+ 31  
+auth_res_self
+
+x
+Ressurser – self. Medlem 
+ 32  
+auth_res_reg
+
+x
+Sekretær. registrering
+ 33  
+auth_res_req
+
+x
+Ressurser, recommended. MR
+ 34  
+auth_res_fin
+
+x
+Ressurser, final. Styret
+ 35  
+auth_fback
+
+x
+Tilbakemelding. Ris og ros
+ 36  
+auth_abs_grp
+
+x
+Fravær, pr gruppe
+ 37  
+auth_abs_all
+
+x
+Fravær alle medlemmer
+ 38  
+auth_cons
+
+x
+Konsertkalender
+ 39  
+auth_event
+
+x
+Hva skjer
+
+  
+  echo "</table>";
 ?>
 
 

@@ -38,6 +38,8 @@ class DB extends PDO
    public $shi_stat_leave = 4;
    public $shi_stat_responsible = 5;
    public $shi_stat_dropout = 6;
+   public $shi_stat = array("Ledig", "Tentativt", "Bekreftet", "Ikke godkjent oppmøte", 
+       "Permisjon", "Regiansvarlig", "Er ikke med på prosjektet");
 // table: project
    public $prj_stat_public = 0;
    public $prj_stat_internal = 1;

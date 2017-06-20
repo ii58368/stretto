@@ -39,7 +39,7 @@ $prj_name = 'Stretto';
             require_once 'conf/auth.php';
             require_once 'menu.php';
 
-//        auth_page_deny();
+//            $auth->page_deny();
             ?>
 
 
