@@ -15,7 +15,7 @@
                         $s = $db->query("select id from person where uid='$whoami'");
                         $pers = $s->fetch(PDO::FETCH_ASSOC);
                         $auth->li("Mine prosjekter", "participant_1x.php?id=$pers[id]");
-                        $auth->li("Min prøveplan", "myPlan.php");
+                        $auth->li("Min prøveplan", "plan.php?id_person=$pers[id]");
                         $auth->li("Min regi", "myDirection.php?id_person=$pers[id]");
                         $auth->li("Mine personopplysninger", "personEdit.php?_no=$pers[id]");
                         ?>  

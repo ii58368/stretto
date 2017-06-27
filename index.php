@@ -1,8 +1,8 @@
 <?php
 
-include 'conf/auth.php';
+require 'conf/auth.php';
 
-if (auth_access(auth_event))
+if ($auth->access(AUTH::PRJM))
 {
     include 'event.php';
 }
@@ -11,4 +11,3 @@ else
     include 'about.php';
 }
 
-?>

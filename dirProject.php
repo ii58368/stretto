@@ -7,11 +7,6 @@ if (is_null($sort))
 function list_group($id)
 {
    global $db;
-   global $shi_stat_tentative;
-   global $shi_stat_confirmed;
-   global $shi_stat_failed;
-
-   global $per_dir_nocarry;
 
    $q = "SELECT firstname, lastname, status_dir, instrument, participant.stat_dir as status, " .
            "participant.comment_dir as shift_comment " .
@@ -19,23 +14,23 @@ function list_group($id)
            "where person.id = participant.id_person " .
            "and person.id_instruments = instruments.id " .
            "and participant.id_project = ${id} " .
-           "and (participant.stat_dir >= $shi_stat_tentative and participant.stat_dir <= $shi_stat_failed) " .
+           "and (participant.stat_dir >= $db->shi_stat_tentative and participant.stat_dir <= $db->shi_stat_failed) " .
            "order by list_order, lastname, firstname";
 
    $s = $db->query($q);
 
    foreach($s as $e)
    {
-      if ($e[status] == $shi_stat_tentative)
+      if ($e[status] == $db->shi_stat_tentative)
          echo "<font color=grey>";
-      if ($e[status] == $shi_stat_failed)
+      if ($e[status] == $db->shi_stat_failed)
          echo "<strike>";
       echo $e[firstname] . " " . $e[lastname] . " (" . $e[instrument] . ")";
-      if ($e[status] == $shi_stat_failed)
+      if ($e[status] == $db->shi_stat_failed)
          echo "</font>";
-      if ($e[status] == $shi_stat_tentative)
+      if ($e[status] == $db->shi_stat_tentative)
          echo "</strike>";
-      if ($e[status_dir] == $per_dir_nocarry)
+      if ($e[status_dir] == $db->per_dir_nocarry)
          echo "<image src=images/chair-minus-icon.png border=0 title=\"Kan ikke l&oslash;fte bord\">";
       echo "<br>";
    }

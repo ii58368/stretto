@@ -12,7 +12,7 @@ if ($action == 'update')
    $no = NULL;
 }   
 
-$query = "SELECT firstname, middlename, lastname, status_dir, person.comment as comment, instrument " .
+$query = "SELECT firstname, middlename, lastname, status_dir, person.comment_dir as comment, instrument " .
          "from person, instruments " .
          "where person.id_instruments = instruments.id " .
          "and person.id = $_REQUEST[id_person]";
