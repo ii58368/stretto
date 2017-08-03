@@ -1,4 +1,5 @@
 <?php
+
 include 'framework.php';
 
 function select_tsort($selected)
@@ -17,13 +18,13 @@ function select_tsort($selected)
 function select_location($selected)
 {
    global $db;
-   
+
    echo "<select name=id_location>";
 
    $q = "SELECT id, name FROM location order by name";
    $s = $db->query($q);
 
-   foreach($s as $e)
+   foreach ($s as $e)
    {
       echo "<option value=\"" . $e[id] . "\"";
       if ($e[id] == $selected)
@@ -33,11 +34,10 @@ function select_location($selected)
    echo "</select>";
 }
 
-
 function select_project($selected)
 {
    global $db;
-   
+
    echo "<select name=id_project>";
 
    $year = date("Y");
@@ -47,7 +47,7 @@ function select_project($selected)
            "order by year, semester DESC";
    $s = $db->query($q);
 
-   foreach($s as $e)
+   foreach ($s as $e)
    {
       echo "<option value=\"" . $e[id] . "\"";
       if ($e[id] == $selected)
@@ -59,19 +59,25 @@ function select_project($selected)
    echo "</select>";
 }
 
-
 echo "
     <h1>Prøveplan</h1>";
-echo "
+if ($access->auth(AUTH::PLAN_RW))
+{
+   echo "
     <form action='$php_self' method=post>
       <input type=hidden name=_action value=new>
       <input type=hidden name=id_project value='$_REQUEST[id_project]'>
       <input type=submit value=\"Ny prøve\">
-    </form>
+    </form>";
+}
+echo "
     <form action='{$php_self}' method=post>
     <table border=1>
-    <tr>
-      <th bgcolor=#A6CAF0>Edit</th>
+    <tr>";
+if ($access->auth(AUTH::PLAN_RW))
+   echo "
+      <th bgcolor=#A6CAF0>Edit</th>";
+echo "
       <th bgcolor=#A6CAF0>Dato</th>
       <th bgcolor=#A6CAF0>Prøvetid</th>
       <th bgcolor=#A6CAF0>Lokale</th>
@@ -101,7 +107,7 @@ if ($action == 'new')
   </tr>";
 }
 
-if ($action == 'update')
+if ($action == 'update' && $access->auth(AUTH::PLAN_RW))
 {
    if (($ts = strtotime($_POST[date])) == false)
       echo "<font color=red>Illegal time format: " . $_POST[date] . "</font>";
@@ -137,7 +143,7 @@ if ($action == 'update')
          }
          $no = NULL;
       }
-      
+
       $db->query($query);
    }
 }
@@ -159,15 +165,16 @@ $query = "SELECT plan.id as id, date, time, tsort, id_project, " .
 
 $stmt = $db->query($query);
 
-foreach($stmt as $row)
+foreach ($stmt as $row)
 {
    if ($row[id] != $no || $action != 'view')
    {
-      echo "<tr>
+      if ($access->auth(AUTH::PLAN_RW))
+         echo "<tr>
         <td><center>
             <a href=\"{$php_self}?_action=view&_no={$row[id]}&id_project=$_REQUEST[id_project]\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
-             </center></td>" .
-      "<td>" . date('D j.M y', $row[date]) . "</td>" .
+             </center></td>";
+      echo "<td>" . date('D j.M y', $row[date]) . "</td>" .
       "<td>{$row[time]}</td><td>";
       if (strlen($row[url]) > 0)
          echo "<a href=\"{$row[url]}\">{$row[lname]}</a>";
@@ -205,11 +212,5 @@ foreach($stmt as $row)
    }
 }
 
-include 'framework_end.php';
-?> 
-
-</table>
-</form>
-</body>
-</html>
-
+echo "</table>
+</form>";

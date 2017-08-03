@@ -5,6 +5,7 @@ require_once 'request.php';
 
 class AUTH
 {
+
    const SU = 0; // Super-user.
    const MYPRJ = 1; // My projects
    const PRJ_RO = 2; // Projects, r/o
@@ -46,86 +47,34 @@ class AUTH
    const CONS = 38; // concert schedule, r/w
    const EVENT = 39; // What´s on?
    const ALL = 0x7fffffffffffffff;
-   
-   const NO_VIEWS = 39;
+   const NO_VIEWS = 40;
 
-   private $list_ro = array();
-   private $list_rw = array();
+   private $access;
 
    function __construct()
    {
-      $list_ro["myProject.php"] = $this->bit(self::MYPRJ);
-      $list_ro["project1x.php"] = $this->bit(self::MYPRJ);
-      $list_ro["myPlan.php"] = $this->bit(self::MYPLAN);
-      $list_ro["myDirection.php"] = $this->bit(self::MYDIR);
-      $list_ro["personal.php"] = $this->bit(self::PERS);
-      $list_ro["dirResources.php"] = $this->bit(self::BOARD_RO);
-      $list_ro["dirShift.php"] = $this->bit(self::BOARD_RO);
-      $list_ro["dirProject.php"] = $this->bit(self::BOARD_RO);
-      $list_ro["dirPlan.php"] = $this->bit(self::BOARD_RO);
-      $list_ro["person.php"] = $this->bit(self::MEMB_RO);
-      $list_ro["plan.php"] = $this->bit(self::PLAN_RO);
-      $list_ro["group.php"] = $this->bit(self::BOARD_RO);
-      $list_ro["instruments.php"] = $this->bit(self::BOARD_RO);
-      $list_ro["access.php"] = $this->bit(self::BOARD_RO);
-      $list_ro["view.php"] = $this->bit(self::BOARD_RO);
-      $list_ro["repository.php"] = $this->bit(self::BOARD_RO);
-      $list_ro["projectxx.php"] = $this->bit(self::BOARD_RO);
-      $list_ro["feedback.php"] = $this->bit(self::BOARD_RO);
-      $list_ro["location.php"] = $this->bit(self::BOARD_RO);
-      $list_ro["participant.php"] = $this->bit(self::ABS_RO);
-      $list_ro["document.php"] = $this->bit(self::DOC_RO, self::PRJM);
-      $list_ro["contigent.php"] = $this->bit(self::CONT_RO);
-      $list_ro["prjInfo.php"] = $this->bit(self::PRJM);
-      $list_ro["seating.php"] = $this->bit(self::PRJM);
-      $list_ro["plan.php"] = $this->bit(self::PRJM);
-      $list_ro["program.php"] = $this->bit(self::PRJM);
-      $list_ro["person.php"] = $this->bit(self::MEMB_RO);
-      $list_ro["direction.php"] = $this->bit(self::DIR_RO);
-      $list_ro["register.php"] = $this->bit(self::ALL);
-      $list_ro["feedback.php"] = $this->bit(self::PRJM);
-      $list_ro["absence.php"] = $this->bit(self::ABS_GRP);
-      $list_ro["resources.php"] = $this->bit(self::ALL);
-      //   $list_ro["concert.php"] = $this->bit(self::CONC);
-      $list_ro["event.php"] = $this->bit(self::PRJM);
+      global $whoami;
 
-      $list_rw["myProject.php"] = $this->bit(self::MYPRJ);
-      $list_rw["project.php"] = $this->bit(self::MYPRJ);
-      $list_rw["myPlan.php"] = $this->bit(self::MYPLAN);
-      $list_rw["myDirection.php"] = $this->bit(self::MYDIR);
-      $list_rw["personal.php"] = $this->bit(self::PERS);
-      $list_rw["dirResources.php"] = $this->bit(self::DIR_RW);
-      $list_rw["dirShift.php"] = $this->bit(self::DIR_RW);
-      $list_rw["dirProject.php"] = $this->bit(self::DIR_RW);
-      $list_rw["dirPlan.php"] = $this->bit(self::DIR_RW);
-      $list_rw["person.php"] = $this->bit(self::MEMB_RW);
-      $list_rw["plan.php"] = $this->bit(self::PLAN_RW);
-      $list_rw["group.php"] = $this->bit(self::GRP);
-      $list_rw["instruments.php"] = $this->bit(self::INSTR);
-      $list_rw["access.php"] = $this->bit(self::ACC);
-      $list_rw["view.php"] = $this->bit(self::ACCGRP);
-      $list_rw["repository.php"] = $this->bit(self::REP);
-      $list_rw["project.php"] = $this->bit(self::PRJ); // TBD: occurs twice
-      $list_rw["feedback.php"] = $this->bit(self::FBACK);
-      $list_rw["location.php"] = $this->bit(self::LOC);
-//    $list_rw["participant.php"] = $this->bit(self::ABS_RO);
-      $list_rw["document.php"] = $this->bit(self::DOC_RW, self::PRJDOC);
-      $list_rw["contigent.php"] = $this->bit(self::CONT_RW);
-//    $list_rw["prjInfo.php"] = $this->bit(self::PRJM);
-      $list_rw["seating.php"] = $this->bit(self::SEAT);
-      $list_rw["plan.php"] = $this->bit(self::PRJM);
-      $list_rw["program.php"] = $this->bit(self::PRJ);
-      $list_rw["person.php"] = $this->bit(self::MEMB_RW);
-//    $list_rw["direction.php"] = $this->bit(self::DIR_RO);
-      $list_rw["register.php"] = $this->bit(self::ALL);
-      $list_rw["feedback.php"] = $this->bit(self::PRJM);
-      $list_rw["absence.php"] = $this->bit(self::ABS_GRP);
-      $list_rw["resources.php"] = $this->bit(self::ALL); // TBD
-      $list_rw["concert.php"] = $this->bit(self::CONS);
-      $list_rw["event.php"] = $this->bit(self::EVENT);
+      $this->access = $this->auth_uid($_SERVER[PHP_AUTH_USER]);
+
+      $su_bit = $this->bit(self::SU);
+
+      if ($whoami != $_SERVER[PHP_AUTH_USER])
+      {
+         $this->access = ($this->access & $su_bit) | ($this->auth_uid($whoami) & ~$su_bit);
+      }
    }
 
-   private function access_uid($uid)
+   protected function bit(...$auth)
+   {
+      $acc = 0;
+      foreach ($auth as $a)
+         $acc |= (1 << $a);
+
+      return $acc;
+   }
+
+   private function auth_uid($uid)
    {
       global $db;
 
@@ -144,162 +93,65 @@ class AUTH
       return $access;
    }
 
-   /*
-   public function access(...$auths)
+   public function auth_bit($auth)
    {
-      global $whoami;
-
-      $auth = 0;
-      foreach ($auths as $a)
-      {
-         $auth |= (1 << $a);
-      }
-   
-      static $access = null;
-
-      if (is_null($access))
-      {
-         $access = $this->access_uid($_SERVER[PHP_AUTH_USER]);
-
-         if ($access & $auth & (1 << self::SU))
-            return true;  // Yes, the real user has super permisions
-
-         if ($whoami != $_SERVER[PHP_AUTH_USER])
-         {
-            $access = $this->access_uid($whoami);
-         }
-      }
-
-      return ($access & auth);
-   }
-   */
-   private function access_bit($auth)
-   {
-      global $whoami;
-
-      static $access = null;
-
-      if (is_null($access))
-      {
-         $access = $this->access_uid($_SERVER[PHP_AUTH_USER]);
-         
-         $su_bit = $this->bit(self::SU);
-         
-         if ($whoami != $_SERVER[PHP_AUTH_USER])
-         {
-            $access = ($access & $su_bit) | ($this->access_uid($whoami) & ~$su_bit);
-         }
-      }
-
-      return ($access & $auth);
+   //   printf("%x %x", $auth, $this->access);
+      return ($this->access & $auth);
    }
 
-   public function access(...$auths)
+   public function auth(...$auths)
    {
       $auth = 0;
-      
+
       foreach ($auths as $a)
          $auth |= (1 << $a);
-      
-      return $this->access_bit($auth);
+
+      return $this->auth_bit($auth);
    }
-    
-   private function bit(...$auth)
+
+}
+
+class ACCESS extends AUTH
+{
+
+   private $list_ro = array();
+
+   public function page_add($filename, $acc)
    {
-      $acc = 0;
-      foreach ($auth as $a)
-         $acc |= (1 << $a);
-
-      return $acc;
+      $this->list_ro[$filename] |= $acc;
    }
 
-   public function select_person($selected)
-   {
-      global $db;
-
-      $q = "SELECT uid, firstname, lastname, instrument "
-              . "FROM person, instruments "
-              . "where not person.status = $db->per_stat_quited "
-              . "and person.id_instruments = instruments.id "
-              . "order by list_order, lastname, firstname";
-      $s = $db->query($q);
-
-      foreach ($s as $e)
-      {
-         echo "<option value=\"" . $e[uid] . "\"";
-         if ($e[uid] == $selected)
-            echo " selected";
-         echo ">$e[firstname] $e[lastname] ($e[instrument])\n";
-      }
-   }
-
-   private function page($auth_list, $page = NULL)
+   private function page_access($page = NULL)
    {
       global $php_self;
 
       if (is_null($page))
-         $page = $php_self;
+      {
+         $e = explode('/', $php_self);
+         $page = array_pop($e); // Pick the last element in the array
+      }
 
-      if (is_null($acc = $auth_list[$page]))
+      if (is_null($acc = $this->list_ro[$page]))
          return false;
 
-      if (!$this->access_bit($acc))
+      if (!$this->auth_bit($acc))
          return false;
 
       return true;
    }
 
-   public function page_ro($page = NULL)
+   public function page_deny()
    {
-      return $this->page($this->list_ro, $page);
-   }
-
-   public function page_rw($page = NULL)
-   {
-      return $this->page($this->list_rw, $page);
-   }
-
-   function page_deny()
-   {
-      if ($this->page_ro())
+      if ($this->page_access())
          return;
 
       echo "<h1>Permission denied</h1>";
+      
+      foreach ($this->list_ro as $key => $value)
+         printf("%s %x<br>", $key, $value);
       exit(0);
-   }
-
-   public function li($li, $page)
-   {
-//  if ($this->page_ro($page) || $this->page_rw($page))
-      echo "<li><a href=\"$page\">$li</a></li>";
-   }
-
-   public function whoami()
-   {
-      global $db;
-      global $whoami;
-      global $php_self;
-
-      if ($this->access(self::SU))
-      {
-         echo "<form action=\"$php_self\" method=post>
-         <select name=set_eff_uid onChange=\"set_cookie('uid', this.form.set_eff_uid.value); submit();\">\n";
-         $this->select_person($whoami);
-         echo "</select>
-      </form>";
-      } else
-      {
-         $query = "select firstname, lastname, instrument "
-                 . "from person, instruments "
-                 . "where person.id_instruments = instruments.id "
-                 . "and uid = '$whoami'";
-         $stmt = $db->query($query);
-         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-         echo "$row[firstname] $row[lastname] ($row[instrument])";
-      }
    }
 
 }
 
-$auth = new AUTH();
+$access = new ACCESS();

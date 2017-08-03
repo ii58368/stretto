@@ -24,7 +24,7 @@ function select_status($selected)
 {
    global $db;
    
-   if ($selected == NULL)
+   if (is_null($selected))
       $selected = $db->prj_stat_draft;
 
    echo "<select name=status>";

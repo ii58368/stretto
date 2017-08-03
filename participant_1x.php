@@ -13,7 +13,7 @@ $prev_year = $sel_year - 1;
 $query = "select person.id as id, firstname, lastname, instrument"
         . " from person, instruments"
         . " where person.id=$_REQUEST[id]"
-        . " and id_instruments = instruments.id";
+        . " and person.id_instruments = instruments.id";
 $stmt = $db->query($query);
 $pers = $stmt->fetch(PDO::FETCH_ASSOC);
 

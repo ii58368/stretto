@@ -144,7 +144,7 @@ add_li("Meny", 1);
       add_li("Min regi", 0, AUTH::MYDIR, false, "Oversikt over egne regioppgaver");
       add_li("Mine personopplysninger", -1, AUTH::BOARD_RO, AUTH::PERS);
    }
-   add_li("Regi", 1, AUTH::BOARD_RO, AUTH::DIR_RW);
+   add_li("Regi", 1, AUTH::BOARD_RO);
    {
       add_li("Ressurser", 0, AUTH::BOARD_RO, AUTH::DIR_RW, "Oversikt over- og tilleggsopplysninger om regiressurser");
       add_li("Turnus", 0, AUTH::BOARD_RO, AUTH::DIR_RW, "Turnusliste for regi");
@@ -181,7 +181,7 @@ add_li("Meny", 1);
          add_li("Innspilling", 0, false, AUTH::PRJDOC, "Oversikt/administrajon av egne opptak og andre innspillinger");
          add_li("Dokumenter", 0, false, AUTH::PRJDOC, "Oversikt/administrajon av prosjektdokumenter");
          add_li("Regikomité", 0, AUTH::DIR_RO, false, "Full oversikt over gjeldende regiprosjekt");
-         add_li("Permisjonssøknad", 0, false, AUTH::RES_SELF, "Registrere påmelding eller søke om persmisjon for gjeldende prosjekt");
+         add_li("Permisjonssøknad/Påmelding", 0, AUTH::RES_SELF, AUTH::RES_SELF, "Registrere påmelding eller søke om persmisjon for gjeldende prosjekt");
          add_li("Tilbakemelding", 0, false, AUTH::FBACK, "Mulighet for å tilbakemelding på et prosjekt");
          add_li("Fravær", 0, AUTH::ABS_ALL, AUTH::ABS_GRP, "Oversikt over fravær for alle ressurser for et prosjekt og registrering av fravær pr. gruppe ");
          add_li("Prosjektressurser", 0, AUTH::RES, "Sekretær: " . AUTH::RES_REG . ", MR: " . AUTH::RES_REQ . ", Styret: " . AUTH::RES_FIN, "Registrering av prosjektressurser");

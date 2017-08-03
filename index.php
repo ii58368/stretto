@@ -2,7 +2,7 @@
 
 require 'conf/auth.php';
 
-if ($auth->access(AUTH::PRJM))
+if ($access->auth(AUTH::PRJM))
 {
     include 'event.php';
 }
