@@ -52,21 +52,42 @@ $stmt = $db->query($query);
 
 foreach ($stmt as $e)
 {
-   echo "<th bgcolor=#A6CAF0><a href=\"absenceEdit.php?id_plan=$e[id]\">" . date('D j.M', $e[date]) . "</a></th>";
+   $rehersal = date('D j.M', $e[date]);
+   if ($access->auth(AUTH::ABS_RW))
+      echo "<th bgcolor=#A6CAF0><a href=\"absenceEdit.php?id_plan=$e[id]\" title=\"Klikk for å registrere fravær...\">$rehersal</a></th>";
+   else
+      echo "<th bgcolor=#A6CAF0>$rehersal</th>";
 }
 
-$query = "SELECT participant.id_person as id_person, firstname, lastname, "
-        . "person.status as status, instrument, plan.id as id_plan "
-        . "FROM person, participant, instruments, groups, plan "
-        . "where groups.id = $grp[id] "
-        . "and instruments.id_groups = groups.id "
-        . "and participant.id_instruments = instruments.id "
-        . "and participant.id_project = $_REQUEST[id_project] "
-        . "and participant.stat_final = $db->par_stat_yes "
-        . "and person.id = participant.id_person "
-        . "and plan.id_project = $_REQUEST[id_project] "
-        . "and plan.event_type = $db->plan_evt_rehearsal "
-        . "order by $sort,plan.date";
+if ($access->auth(AUTH::ABS_ALL))
+{
+   $query = "SELECT participant.id_person as id_person, firstname, lastname, "
+           . "person.status as status, instrument, plan.id as id_plan "
+           . "FROM person, participant, instruments, plan "
+           . "where participant.id_project = $_REQUEST[id_project] "
+           . "and person.id_instruments = instruments.id "
+           . "and participant.stat_final = $db->par_stat_yes "
+           . "and person.id = participant.id_person "
+           . "and plan.id_project = $_REQUEST[id_project] "
+           . "and plan.event_type = $db->plan_evt_rehearsal "
+           . "order by $sort,plan.date";
+}
+else
+{
+   $query = "SELECT participant.id_person as id_person, firstname, lastname, "
+           . "person.status as status, instrument, plan.id as id_plan "
+           . "FROM person, participant, instruments, groups, plan "
+           . "where groups.id = $grp[id] "
+           . "and instruments.id_groups = groups.id "
+           . "and participant.id_instruments = instruments.id "
+           . "and participant.id_project = $_REQUEST[id_project] "
+           . "and participant.stat_final = $db->par_stat_yes "
+           . "and person.id = participant.id_person "
+           . "and plan.id_project = $_REQUEST[id_project] "
+           . "and plan.event_type = $db->plan_evt_rehearsal "
+           . "order by $sort,plan.date";
+
+}
 
 $stmt = $db->query($query);
 

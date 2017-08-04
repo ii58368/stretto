@@ -2,8 +2,7 @@
 
 require 'framework.php';
 
-
-if ($action == 'update')
+if ($action == 'update' && $access->auth(AUTH::DIR_RW))
 {
    $query = "update participant set comment_dir = '$_REQUEST[comment]' " .
              "where id_person = $_REQUEST[id_person] " .
@@ -48,11 +47,13 @@ $row = $stmt->fetch(PDO::FETCH_ASSOC);
   foreach ($stmt as $row)
   {
     echo "<tr>\n";
-    echo "<td align=center><a href=\"$_SERVER[PHP_SELF]?_action=edit&id_person={$row[id_person]}&_no={$row[id_project]}\"><img src=\"images/shift_status_{$row[status]}.gif\" border=0 title=\"{$db->shi_stat[$row[status]]}\"></a></td>\n";
+    if ($access->auth(AUTH::DIR_RW))
+       $help_txt = ". Klikk for å legge inn kommentar..."; 
+    echo "<td align=center><a href=\"$_SERVER[PHP_SELF]?_action=edit&id_person={$row[id_person]}&_no={$row[id_project]}\"><img src=\"images/shift_status_{$row[status]}.gif\" border=0 title=\"{$db->shi_stat[$row[status]]}$help_txt\"></a></td>\n";
   
     echo "<td>$row[semester]-$row[year]</td>\n";
     echo "<td><a href=direction.php?id_project=$row[id_project]>$row[name]</a></td>\n";
-    if ($row[id_project] == $no)
+    if ($row[id_project] == $no && $access->auth(AUTH::DIR_RW))
     {
       echo "<form action='{$php_self}' method=post><td>\n";
       echo "<textarea cols=30 rows=3 wrap=auto name=comment>$row[comment]</textarea>\n";

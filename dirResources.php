@@ -71,8 +71,11 @@ echo "
     </form>
     <form action='$php_self' method=post>
     <table border=1>
-    <tr>
-      <th bgcolor=#A6CAF0>Edit</th>
+    <tr>";
+if ($access->auth(AUTH::DIR_RW))
+   echo "
+      <th bgcolor=#A6CAF0>Edit</th>";
+echo "
       <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=list_order,lastname,firstname\">Instrument</a></th>
       <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=firstname,lastname\">For</a>/
                           <a href=\"$php_self?_sort=lastname,firstname\">Etternavn</a></th>
@@ -86,7 +89,7 @@ echo "</th>
 
 
 
-if ($action == 'update')
+if ($action == 'update' && $access->auth(AUTH::DIR_RW))
 {
    $query = "update person set status_dir = '$_POST[status_dir]'," .
            "comment_dir = '$_POST[comment_dir]' " .
@@ -107,11 +110,12 @@ foreach ($stmt as $row)
 {
    if ($row[id] != $no)
    {
-      echo "<tr>
+      if ($access->auth(AUTH::DIR_RW))
+         echo "<tr>
          <td><center>
            <a href=\"{$php_self}?_sort={$sort}&_action=view&_no={$row[id]}\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
-             </center></td>" .
-      "<td>{$row[instrument]}</td>" .
+             </center></td>";
+      echo "<td>{$row[instrument]}</td>" .
       "<td><a href=history.php?id_person=$row[id]>{$row[firstname]} " .
       "{$row[lastname]}</a></td>" .
       "<td><a href=\"mailto:{$row[email]}?subject=$concept - $project\">{$row[email]}</a></td>" .
@@ -151,7 +155,3 @@ foreach ($stmt as $row)
 
 </table>
 </form>
-
-<?php
-include 'framework_end.php';
-?>

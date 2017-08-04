@@ -24,7 +24,7 @@ class AUTH
    const ACCGRP = 15; // List of access groups, r/w
    const REP = 16; // Music repository, r/w
    const PRJ = 17; // Projects, r/w
-   const ABS_RO = 18; // Absence register, r/o
+   const ABS_RO = 18; // Absence, r/o
    const LOC = 19; // Location, r/w
    const DOC_RO = 20; // Documents in general, r/o
    const DOC_RW = 21; // Documents in general, r/w
@@ -42,12 +42,14 @@ class AUTH
    const RES_REQ = 33; // Resources available, recommended by MR, r/w
    const RES_FIN = 34; // Resources available, decided, r/w
    const FBACK = 35; // Feedback, r/w
-   const ABS_GRP = 36; // Absence per group, r/w
-   const ABS_ALL = 37; // Absence, all members, r/w
+   const ABS_ALL = 36; // Absence, for all participants, not only for a group e.g. violin 1
+   //const free = 37; // not in use
    const CONS = 38; // concert schedule, r/w
    const EVENT = 39; // What´s on?
-   const ALL = 0x7fffffffffffffff;
-   const NO_VIEWS = 40;
+   const RES_INV = 40; // Resources line-up, registered by art director r/w
+   
+   const ALL = 0x7fffffffffffffff; // 63 bits enabled
+   const NO_VIEWS = 41;
 
    private $access;
 

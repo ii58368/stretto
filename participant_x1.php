@@ -15,10 +15,11 @@ function get_participant($id_person)
 function manage_instrument($selected, $row, $edit)
 {
    global $db;
+   global $access;
 
    echo "<td>";
 
-   if ($edit)
+   if ($edit && $access->auth(AUTH::RES_INV))
    {
       echo "<select name=id_instruments:$row>";
 
@@ -66,25 +67,26 @@ function stat_select($name, $selected, $valid_par_stat)
 function manage_inv($part, $row, $edit)
 {
    global $db;
-   
+   global $access;
+
    echo "<td align=center>";
 
-   if ($edit)
+   if ($edit && $access->auth(AUTH::RES_INV))
    {
       echo "<input type=checkbox name=stat_inv:$row";
       if ($part[stat_inv] == $db->par_stat_yes)
          echo " checked";
       echo " value=$db->par_stat_yes>";
       echo "<input type=hidden name=comment_inv:$row value=\"\">";
-   //   echo "<input type=text name=comment_inv:$row size=20 value=\"$part[comment_inv]\">";
+      //   echo "<input type=text name=comment_inv:$row size=20 value=\"$part[comment_inv]\">";
    } else
    {
       if ($part != null || $part[stat_inv] != $db->par_stat_void)
       {
          if ($part[stat_inv] == $db->par_stat_yes)
             echo "<img border=0 src=\"images/tick2.gif\" title=\"" . $db->par_stat[$part[stat_inv]] . "\">\n";
-   //      if ($part[stat_inv])
-   //         echo "<i>" . date('j.M', $part[ts_inv]) . "</i>";
+         //      if ($part[stat_inv])
+         //         echo "<i>" . date('j.M', $part[ts_inv]) . "</i>";
          echo "<br>" . str_replace("\n", "<br>\n", $part[comment_inv]);
       }
    }
@@ -94,7 +96,8 @@ function manage_inv($part, $row, $edit)
 function manage_self($part, $row, $edit)
 {
    global $db;
-   
+   global $access;
+
    echo "<td>";
    if ($part != null || $part[stat_self] != $db->par_stat_void)
    {
@@ -109,10 +112,11 @@ function manage_self($part, $row, $edit)
 function manage_reg($part, $row, $edit, $valid_par_stat)
 {
    global $db;
-   
+   global $access;
+
    echo "<td>";
 
-   if ($edit)
+   if ($edit && $access->auth(AUTH::RES_REG))
    {
       stat_select("stat_reg:$row", $part[stat_reg], $valid_par_stat);
       echo "<input type=text name=comment_reg:$row size=20 value=\"$part[comment_reg]\">";
@@ -132,10 +136,11 @@ function manage_reg($part, $row, $edit, $valid_par_stat)
 function manage_req($part, $row, $edit)
 {
    global $db;
-   
+   global $access;
+
    echo "<td>";
 
-   if ($edit)
+   if ($edit && $access->auth(AUTH::RES_REQ))
    {
       stat_select("stat_req:$row", $part[stat_req], 0xff);
       echo "<input type=text name=comment_req:$row size=20 value=\"$part[comment_req]\">";
@@ -155,10 +160,11 @@ function manage_req($part, $row, $edit)
 function manage_final($part, $row, $edit)
 {
    global $db;
-   
+   global $access;
+
    echo "<td>";
 
-   if ($edit)
+   if ($edit && $access->auth(AUTH::RES_FIN))
    {
       echo "<input type=checkbox name=stat_final:$row";
       if ($part[stat_final] == $db->par_stat_yes)
@@ -276,23 +282,30 @@ echo date('j.M.y', $prj[deadline]) . "</h2>
     <input type=hidden name=_action value=update>
     <input type=hidden name=id value=$_REQUEST[id]>
     <table border=1>
-    <tr>
-      <th bgcolor=#A6CAF0>Edit</th>
+    <tr>";
+if ($access->auth(AUTH::RES_INV, AUTH::RES_REG, AUTH::RES_REQ, AUTH::RES_FIN))
+   echo "
+      <th bgcolor=#A6CAF0>Edit</th>";
+echo "
       <th bgcolor=#A6CAF0>Navn</th>
       <th bgcolor=#A6CAF0>Status</th>
       <th bgcolor=#A6CAF0>Instrument</th>
       <th bgcolor=#A6CAF0>";
-manage_col("inv");
+if ($access->auth(AUTH::RES_INV))
+   manage_col("inv");
 echo "Bes</th>
       <th bgcolor=#A6CAF0>Egen</th>
       <th bgcolor=#A6CAF0>";
-manage_col("reg");
+if ($access->auth(AUTH::RES_REG))
+   manage_col("reg");
 echo "Sekretær</th>
       <th bgcolor=#A6CAF0>";
-manage_col("req");
+if ($access->auth(AUTH::RES_REQ))
+   manage_col("req");
 echo "MR</th>
       <th bgcolor=#A6CAF0>";
-manage_col("final");
+if ($access->auth(AUTH::RES_FIN))
+   manage_col("final");
 echo "Styret</th>
       </tr>";
 
@@ -309,17 +322,20 @@ $stmt = $db->query($query);
 foreach ($stmt as $row)
 {
    echo "<tr>";
-   echo "<tr>
+   if ($access->auth(AUTH::RES_INV, AUTH::RES_REG, AUTH::RES_REQ, AUTH::RES_FIN))
+   {
+      echo "
         <td><center>";
-   if ($row[id] == $no)
-   {
-      echo "<input type=submit value = lagre>"
-      . "<input type=hidden name=_no value='$no'>";
-   } else
-   {
-      echo "<a href=\"$php_self?_no=$row[id]&id=$_REQUEST[id]\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>";
+      if ($row[id] == $no)
+      {
+         echo "<input type=submit value = lagre>"
+         . "<input type=hidden name=_no value='$no'>";
+      } else
+      {
+         echo "<a href=\"$php_self?_no=$row[id]&id=$_REQUEST[id]\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>";
+      }
+      echo "</center></td>";
    }
-   echo "</center></td>";
    echo "<td>$row[firstname] $row[lastname]</td>"
    . "<td>" . $per_stat[$row[status]] . "</td>";
 

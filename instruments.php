@@ -5,16 +5,22 @@ if (is_null($sort))
    $sort = 'list_order';
 
 echo "
-<h1>Instrumentgrupper</h1>
+<h1>Instrumentgrupper</h1>";
+if ($access->auth(AUTH::INSTR))
+  echo "
     <form action=\"$php_self\" method=post>
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=_action value=new>
       <input type=submit value=\"Ny gruppe\">
-    </form>
+    </form>";
+echo "
     <form action='$php_self' method=post>
     <table border=1>
-    <tr>
-      <th bgcolor=#A6CAF0>Edit</th>
+    <tr>";
+if ($access->auth(AUTH::INSTR))
+   echo "
+      <th bgcolor=#A6CAF0>Edit</th>";
+echo "
       <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=instrument,list_order\">Instrument</a></th>
       <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=list_order\">Sortering</a></th>
       <th bgcolor=#A6CAF0>Ansvarlig</th>
@@ -57,7 +63,7 @@ if ($action == 'new')
   </tr>";
 }
 
-if ($action == 'update')
+if ($action == 'update' && $access->auth(AUTH::INSTR))
 {
    if (is_null($no))
    {
@@ -99,10 +105,13 @@ foreach ($stmt as $row)
 {
    if ($row[id] != $no)
    {
-      echo "<tr>
+      echo "<tr>";
+      if ($access->auth(AUTH::INSTR))
+         echo "
          <td><center>
            <a href=\"{$_SERVER[PHP_SELF]}?_sort=$sort&_action=view&_no={$row[id]}\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
-             </center></td>" .
+             </center></td>";
+      echo 
       "<td>{$row[instrument]}</td>" .
       "<td>{$row[list_order]}</td>" .
       "<td>{$row[name]}</td>" .

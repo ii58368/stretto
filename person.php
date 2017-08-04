@@ -1,50 +1,54 @@
 <?php
-
 include 'framework.php';
 
 $pedit = "personEdit.php";
 
 if ($sort == NULL)
-    $sort = 'list_order,lastname,firstname';
+   $sort = 'list_order,lastname,firstname';
 
 function mail2all()
 {
    global $db;
-   
-  $q = "select email from person " .
-       "where (status = $db->per_stat_member or status = $db->per_stat_eng)";
-  $s = $db->query($q);
 
-  echo "<a href=\"mailto:?bcc=";
-  foreach($s as $e)
-    echo $e[email] . ",";
-  echo "&subject=OSO: \"><image border=0 src=images/image1.gif hspace=20 title=\"Send mail alle i OSO med status medlem eller engasjert\"></a>";
+   $q = "select email from person " .
+           "where (status = $db->per_stat_member or status = $db->per_stat_eng)";
+   $s = $db->query($q);
+
+   echo "<a href=\"mailto:?bcc=";
+   foreach ($s as $e)
+      echo $e[email] . ",";
+   echo "&subject=OSO: \"><image border=0 src=images/image1.gif hspace=20 title=\"Send mail alle i OSO med status medlem eller engasjert\"></a>";
 }
-
 
 function format_phone($ph)
 {
-  $ph = str_replace(' ', '', $ph);
-  $ph = substr($ph, 0, -5) . " " . substr($ph, -5, 2) . " " . substr($ph, -3);
-  if (strlen($ph) > 9)
-    $ph = substr($ph, 0, -10) . " " . substr($ph, -10);
-  return $ph;
+   $ph = str_replace(' ', '', $ph);
+   $ph = substr($ph, 0, -5) . " " . substr($ph, -5, 2) . " " . substr($ph, -3);
+   if (strlen($ph) > 9)
+      $ph = substr($ph, 0, -10) . " " . substr($ph, -10);
+   return $ph;
 }
 
 echo "
     <h1>Medlemsliste</h1>";
-echo "
+if ($access->auth(AUTH::MEMB_RW))
+{
+   echo "
     <form action='$pedit' method=post>
       <input type=hidden name=_sort value='$sort'>
       <input type=hidden name=_action value=edit_pers>
       <input type=submit value=\"Ny person\">";
-    mail2all();
+   mail2all();
+}
 echo "
     </form>
     <form action='$pedit' method=post>
     <table border=1>
-    <tr>
-      <th bgcolor=#A6CAF0>Edit</th>
+    <tr>";
+if ($access->auth(AUTH::MEMB_RW))
+   echo "
+      <th bgcolor=#A6CAF0>Edit</th>";
+echo "
       <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=list_order,lastname,firstname\">Instrument</a></th>
       <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=firstname,lastname\">For</a>/
                           <a href=\"$php_self?_sort=lastname,firstname\">Etternavn</a></th>
@@ -59,44 +63,42 @@ echo "
       <th bgcolor=#A6CAF0>Kommentar</th>
       </tr>";
 
-
-
-
-$query  = "SELECT person.id as id, id_instruments, instrument, firstname, middlename, lastname, " .
-    "address, postcode, city, " .
-    "email, phone1, phone2, phone3, status, person.comment as comment " .
-    "FROM person, instruments " .
-    "where id_instruments = instruments.id order by $sort";
+$query = "SELECT person.id as id, id_instruments, instrument, firstname, middlename, lastname, " .
+        "address, postcode, city, " .
+        "email, phone1, phone2, phone3, status, person.comment as comment " .
+        "FROM person, instruments " .
+        "where id_instruments = instruments.id order by $sort";
 
 $stmt = $db->query($query);
 
-foreach($stmt as $row)
+foreach ($stmt as $row)
 {
-  echo "<tr>
+   echo "<tr>";
+   if ($access->auth(AUTH::MEMB_RW))
+      echo "
          <td><center>
            <a href=\"{$pedit}?_sort={$sort}&_action=view&_no={$row[id]}\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
-          </center></td>" .
-         "<td>{$row[instrument]}</td>" .
-         "<td>{$row[firstname]} {$row[middlename]} {$row[lastname]}</td>" . 
-         "<td>{$row[address]}</td>" . 
-         "<td>" .
-         sprintf("%04d", $row[postcode]) .
-         "</td>" . 
-         "<td>{$row[city]}</td>" . 
-         "<td><a href=\"mailto:{$row[email]}?subject=OSO:\">{$row[email]}</a></td>" .
-         "<td nowrap>" . format_phone($row[phone1]) . "</td>" .
-         "<td>{$row[phone2]}</td>" . 
-         "<td>{$row[phone3]}</td>" . 
-         "<td>{$per_stat[$row[status]]}</td>" .
-         "<td>{$row[comment]}</td>" .
-         "</tr>";
-} 
-
+          </center></td>";
+   echo "<td>{$row[instrument]}</td>" .
+   "<td>{$row[firstname]} {$row[middlename]} {$row[lastname]}</td>" .
+   "<td>{$row[address]}</td>" .
+   "<td>" .
+   sprintf("%04d", $row[postcode]) .
+   "</td>" .
+   "<td>{$row[city]}</td>" .
+   "<td><a href=\"mailto:{$row[email]}?subject=OSO:\">{$row[email]}</a></td>" .
+   "<td nowrap>" . format_phone($row[phone1]) . "</td>" .
+   "<td>{$row[phone2]}</td>" .
+   "<td>{$row[phone3]}</td>" .
+   "<td>{$per_stat[$row[status]]}</td>" .
+   "<td>{$row[comment]}</td>" .
+   "</tr>";
+}
 ?>
 
 </table>
-    </form>
+</form>
 
 <?php
-  include 'framework_end.php';
+include 'framework_end.php';
 ?>

@@ -1,7 +1,7 @@
 <?php
 require 'framework.php';
 
-if ($action == 'update')
+if ($action == 'update' && $access->auth(AUTH::DIR_RW))
 {
    $next_status = intval($_REQUEST[stat_dir]) + 1;
    if ($next_status == $db->shi_stat_leave) // deprecated
@@ -45,7 +45,7 @@ $query = "SELECT person.id as person_id, " .
         "project.id as project_id,  " .
         "project.name as project_name, " .
         "firstname, lastname, instrument, " .
-        "person.comment as comment " .
+        "person.comment_dir as comment " .
         "FROM person, instruments, project " .
         "where instruments.id = id_instruments " .
         "and person.status = $db->per_stat_member " .
@@ -75,17 +75,17 @@ foreach ($stmt as $row)
    {
       $status = $row2[stat_dir];
       if ($row2[stat_dir] != $db->shi_stat_free && $row2[stat_final] != $db->par_stat_yes)
-         $status = 6;
+         $status = $db->shi_stat_dropout;
       $comment = $row2[comment_dir];
-      echo "<a href=\"$_SERVER[PHP_SELF]?_action=update&id_person={$row[person_id]}&id_project={$row[project_id]}&stat_dir={$status}&from=$sel_year&_sort={$sort}\"><img src=\"images/shift_status_{$status}.gif\" border=0 title=\"{$db->shi_stat[$status]} ({$row[project_name]}) {$comment}\"></a>\n";
+      $img = "<img src=\"images/shift_status_{$status}.gif\" border=0 title=\"{$db->shi_stat[$status]} ({$row[project_name]}) {$comment}\">";
+      if ($access->auth(AUTH::DIR_RW))
+         echo "<a href=\"$_SERVER[PHP_SELF]?_action=update&id_person={$row[person_id]}&id_project={$row[project_id]}&stat_dir={$status}&from=$sel_year&_sort={$sort}\">$img</a>\n";
+      else
+         if ($status != $db->shi_stat_free)
+            echo $img;
    }
    echo "</td>";
 }
 ?> 
 </tr>
 </table>
-
-<?php
-include 'framework_end.php';
-?>
-

@@ -6,16 +6,22 @@ if (is_null($sort))
    $sort = 'groups.name';
 
 echo "
-    <h1>Grupper</h1>
+    <h1>Grupper</h1>";
+if ($access->auth(AUTH::GRP))
+   echo "
     <form action=\"$php_self\" method=post>
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=_action value=new>
       <input type=submit value=\"Ny gruppe\">
-    </form>
+    </form>";
+echo "
     <form action='$php_self' method=post>
     <table border=1>
-    <tr>
-      <th bgcolor=#A6CAF0>Edit</th>
+    <tr>";
+if ($access->auth(AUTH::GRP))
+   echo "
+      <th bgcolor=#A6CAF0>Edit</th>";
+echo "
       <th bgcolor=#A6CAF0>Navn</th>
       <th bgcolor=#A6CAF0>Ansvarlig</th>
       <th bgcolor=#A6CAF0>Medlemmer</th>
@@ -143,7 +149,7 @@ if ($action == 'new')
   </tr>";
 }
 
-if ($action == 'update')
+if ($action == 'update' && $access->auth(AUTH::GRP))
 {
    $id_person = $_POST[id_person];
    if (is_null($id_person))
@@ -195,10 +201,13 @@ foreach ($stmt as $row)
 {
    if ($row[id] != $no)
    {
-      echo "<tr>
+      echo "<tr>";
+      if ($access->auth(AUTH::GRP))
+         echo "
          <td><center>
            <a href=\"$php_self?_sort=$sort&_action=view&_no=$row[id]\"><img src=\"images/cross_re.gif\" border=0></a>
-             </center></td>" .
+             </center></td>";
+      echo 
       "<td>$row[name]</td>" .
       "<td>$row[firstname] $row[lastname] ($row[instrument])</td><td>";
       instruments_list($row[id]);

@@ -187,7 +187,9 @@ function direction_list($id_plan)
 
 echo "
     <h1>Regiplan</h1>";
-echo "
+if ($access->auth(AUTH::DIR_RW))
+{
+   echo "
     <form action='$php_self' method=post>
       <input type=hidden name=rehearsal value=true>
       <input type=hidden name=_action value=new>
@@ -197,14 +199,19 @@ echo "
     <form action='$php_self' method=post>
       <input type=hidden name=id_project value='$_REQUEST[id_project]'>
       <input type=checkbox name=rehearsal title=\"Vis også prøveplan\" onChange=\"submit();\"";
-if ($_REQUEST[rehearsal])
-   echo "checked ";
-echo ">
-    </form>
+   if ($_REQUEST[rehearsal])
+      echo "checked ";
+   echo ">
+    </form>";
+}
+echo "
     <form action='{$php_self}' method=post>
     <table border=1>
-    <tr>
-      <th bgcolor=#A6CAF0>Edit</th>
+    <tr>";
+if ($access->auth(AUTH::DIR_RW))
+   echo "
+      <th bgcolor=#A6CAF0>Edit</th>";
+echo "
       <th bgcolor=#A6CAF0>Dato</th>
       <th bgcolor=#A6CAF0>Tid</th>
       <th bgcolor=#A6CAF0>Sted</th>
@@ -238,7 +245,7 @@ if ($action == 'new')
   </tr>";
 }
 
-if ($action == 'update')
+if ($action == 'update' && $access->auth(AUTH::DIR_RW))
 {
    if (($ts = strtotime($_POST[date])) == false)
       echo "<font color=red>Illegal time format: " . $_POST[date] . "</font>";
@@ -284,7 +291,7 @@ if ($action == 'update')
 }
 
 
-if ($action == 'add')
+if ($action == 'add' && $access->auth(AUTH::DIR_RW))
 {
    $query = "select participant.id_person as id_person " .
            "from participant, project " .
@@ -332,13 +339,17 @@ foreach($stmt as $row)
 {
    if ($row[id] != $no || $action != 'view')
    {
-      $reh = $_REQUEST[rehearsal] ? "&rehearsal=true" : "";
-      echo "<tr>
-        <td><center>";
-      if ($row[event_type] == $db->plan_evt_direction)
-         echo "
-            <a href=\"{$php_self}?_action=view&_no={$row[id]}&id_project=$_REQUEST[id_project]$reh\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>";
-      echo "</center></td>" .
+      echo "<tr>";
+      if ($access->auth(AUTH::DIR_RW))
+      {
+         $reh = $_REQUEST[rehearsal] ? "&rehearsal=true" : "";
+         echo "<td><center>";
+         if ($row[event_type] == $db->plan_evt_direction)
+            echo "
+               <a href=\"{$php_self}?_action=view&_no={$row[id]}&id_project=$_REQUEST[id_project]$reh\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>";
+         echo "</center></td>";
+      }
+      echo 
       "<td>" . date('D j.M y', $row[date]) . "</td>" .
       "<td>{$row[time]}</td><td>";
       if (strlen($row[url]) > 0)
@@ -389,6 +400,3 @@ foreach($stmt as $row)
 }
 
 echo "</table></form>";
-
-include 'framework_end.php';
-?> 

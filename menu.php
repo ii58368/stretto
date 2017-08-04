@@ -108,11 +108,11 @@ class MENU
          $my_pages->add("Mine prosjekter", "participant_1x.php?id=$pers[id]", AUTH::MYPRJ);
          $my_pages->add("Min prøveplan", "plan.php?id_person=$pers[id]", AUTH::MYPLAN);
          $my_pages->add("Min regi", "myDirection.php?id_person=$pers[id]", AUTH::MYDIR);
-         $my_pages->add("Mine personopplysninger", "personEdit.php?_no=$pers[id]", AUTH::PERS);
+         $my_pages->add("Mine personopplysninger", "personEdit.php?_no=$pers[id]", AUTH::PERS, AUTH::MEMB_RW);
       }
       {
          $direction = new SUBMENU("class=\"dl-submenu\"");
-         $menu->add("Regi", $direction, AUTH::BOARD_RO, AUTH::DIR_RW);
+         $menu->add("Regi", $direction, AUTH::BOARD_RO);
          $direction->add("Ressurser", "dirResources.php", AUTH::BOARD_RO);
          $direction->add("Turnus", "dirShift.php", AUTH::BOARD_RO);
          $direction->add("Prosjekt", "dirProject.php", AUTH::BOARD_RO);
@@ -174,10 +174,10 @@ class MENU
             $project->add("Noter", "document.php?path=project/$pid/sheet");
             $project->add("Innspilling", "document.php?path=project/$pid/rec");
             $project->add("Dokumenter", "document.php?path=project/$pid/doc");
-            $project->add("Regikomité", "sdirection.php?id_project=$pid", AUTH::DIR_RO);
+            $project->add("Regikomité", "direction.php?id_project=$pid", AUTH::DIR_RO);
             $project->add(($e[orchestration] == $db->prj_orch_tutti) ? "Permisjonssøknad" : "Påmelding", "participant_11.php?id_project=$pid&id_person=$pers[id]", AUTH::RES_SELF);
             $project->add("Tilbakemelding", "feedback.php?id=$pid");
-            $project->add("Fravær", "absence.php?id_project=$pid", AUTH::ABS_ALL);
+            $project->add("Fravær", "absence.php?id_project=$pid", AUTH::ABS_RO);
             $project->add("Prosjektressurser", "participant_x1.php?id=$pid", AUTH::RES);
             $project->add("Konsertkalender", "consert.php?id=$pid", AUTH::BOARD_RO);
          }
@@ -187,7 +187,11 @@ class MENU
 
       // Pages in use, but not linked to the meu system
       $menu->add(null, "participant_xx.php", AUTH::BOARD_RO);
+      $menu->add(null, "participant_x1.php", AUTH::RES);
+      $menu->add(null, "participant_11.php", AUTH::RES_SELF);
       $menu->add(null, "contingentEdit.php", AUTH::CONT_RW);
+      $menu->add(null, "absenceEdit.php", AUTH::ABS_RW);
+      $menu->add(null, "index.php");
 
       $this->top_menu = $menu;
    }

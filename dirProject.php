@@ -92,8 +92,11 @@ echo "
     <h1>Regiprosjekt</h1>
     <form action='$php_self' method=post>
     <table border=1>
-    <tr>
-      <th bgcolor=#A6CAF0>Edit</th>
+    <tr>";
+if ($access->auth(AUTH::DIR_RW))
+   echo "
+      <th bgcolor=#A6CAF0>Edit</th>";
+echo "
       <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=name,id&from=$sel_year\" title=\"Sorter p&aring; prosjektnavn\">Prosjekt</a></th>
       <th bgcolor=#A6CAF0 nowrap><a href=\"$php_self?_sort=year,semester+DESC,id&from=$sel_year\" title=\"Sorter p&aring; semester\">Sem</a>
            <a href=\"$php_self?from=$prev_year&_sort={$sort}\"><img src=images/arrow_up.png border=0 title=\"Forrige &aring;r...\"></a></th>
@@ -104,7 +107,7 @@ echo "
     </tr>";
 
 
-if ($action == 'update')
+if ($action == 'update' && $access->auth(AUTH::DIR_RW))
 {
    $query = "update project set " .
            "id_person = '$_POST[id_person]'," .
@@ -137,10 +140,13 @@ foreach($stmt as $row)
 {
    if ($row[id] != $no)
    {
-      echo "<tr>
+      echo "<tr>";
+         if ($access->auth(AUTH::DIR_RW))
+            echo "
         <td><center>
             <a href=\"{$php_self}?_sort={$sort}&from=$sel_year&_action=view&_no={$row[id]}\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
-             </center></td>" .
+             </center></td>";
+      echo 
       "<td><a href=\"dirPlan.php?id_project={$row[id]}\">{$row[name]}</a></td>" .
       "<td>{$row[semester]} " .
       "    {$row[year]}</td>" .
@@ -180,8 +186,3 @@ foreach($stmt as $row)
 
 </table>
 </form>
-
-<?php
-require 'framework_end.php';
-?>
-

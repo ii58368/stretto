@@ -7,6 +7,22 @@ $personList = "person.php";
 if ($sort == NULL)
    $sort = 'list_order,lastname,firstname';
 
+if (!$access->auth(AUTH::MEMB_RW))
+{
+   if (is_numeric($no))
+   {
+      $query = "select uid from person where id = $no";
+      $stmt = $db->query($query);
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
+   }
+
+   if ($row[uid] != $whoami)
+   {
+      echo "<h1>Permission denied</h1>";
+      exit(0);
+   }
+}
+
 function select_instrument($selected)
 {
    global $db;
@@ -29,7 +45,7 @@ function select_instrument($selected)
 function select_status($selected)
 {
    global $db;
-   
+
    if (is_null($selected))
       $selected = $db->per_stat_standin;
 
@@ -124,7 +140,7 @@ function update_pwd($no)
       echo "<font color=red>Ikke oppdatert, passord må ha minst 1 bokstav</font>";
       return;
    }
-     
+
    $query = "update person set uid = '$_POST[uid]' , password = MD5('$_POST[pwd1]')" .
            "where id = $no";
    try

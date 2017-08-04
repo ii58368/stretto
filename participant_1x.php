@@ -26,7 +26,7 @@ echo "
       <th bgcolor=#A6CAF0 nowrap>Sem
            <a href=\"$php_self?from=$prev_year&id=$_REQUEST[id]\"><img src=images/arrow_up.png border=0 title=\"Forrige &aring;r...\"></a></th>
       <th bgcolor=#A6CAF0>Status</th>
-      <th bgcolor=#A6CAF0>Deadline</th>
+      <th bgcolor=#A6CAF0>Påmelding-/persmisjonsfrist</th>
       <th bgcolor=#A6CAF0>Tutti</th>
     </tr>";
 
@@ -57,7 +57,7 @@ foreach ($stmt as $row)
    "    {$row[year]}</td>" .
    "<td align=center>";
    if ($row[status] == $db->prj_stat_public)
-      echo "<img src=\"images/part_stat_$status$blink.gif\" border=0>";
+      echo "<img src=\"images/part_stat_$status$blink.gif\" border=0 title=\"{$db->prj_stat[$status]}\">";
    echo "</td>\n";
    echo "<td>" . date('D j.M y', $row[deadline]) . "</td>" .
    "<td>";
