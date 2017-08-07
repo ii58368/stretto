@@ -1,20 +1,26 @@
 <?php
-    require 'framework.php';
-    
-    if ($sort == NULL)
-        $sort = 'name';
-    
-  echo "
-    <h1>Lokale</h1>
+require 'framework.php';
+
+if ($sort == NULL)
+   $sort = 'name';
+
+echo "
+    <h1>Lokale</h1>";
+if ($access->auth(AUTH::LOC))
+   echo "
     <form action=\"$php_self\" method=post>
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=_action value=new>
       <input type=submit value=\"Nytt lokale\">
-    </form>
+    </form>";
+echo "
     <form action='$php_self' method=post>
     <table border=1>
-    <tr>
-      <th bgcolor=#A6CAF0>Edit</th>
+    <tr>";
+if ($access->auth(AUTH::LOC))
+   echo "
+      <th bgcolor=#A6CAF0>Edit</th>";
+echo "
       <th bgcolor=#A6CAF0>Lokale</th>
       <th bgcolor=#A6CAF0>Adresse</th>
       <th bgcolor=#A6CAF0>URL</th>
@@ -24,7 +30,7 @@
 
 if ($action == 'new')
 {
-  echo "  <tr>
+   echo "  <tr>
     <td align=left><input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
     <input type=submit value=ok></td>
@@ -36,63 +42,65 @@ if ($action == 'new')
   </tr>";
 }
 
-if ($action == 'update')
+if ($action == 'update' && $access->auth(AUTH::LOC))
 {
-  if ($no == NULL)
-    $query = "insert into location (name, address, url, contact, comment) " .
-             "values ('$_POST[name]', '$_POST[address]', '$_POST[url]', '$_POST[contact]', '$_POST[comment]')";
-  else
-  {
-    if ($delete != NULL)
-    {
-      $q = "select count(*) as count from plan where id_location = {$no}";
-      $s = $db->query($q);
-      $e = $s->fetch(PDO::FETCH_ASSOC);
-      if ($e[count] == 0)
-        $query = "DELETE FROM location WHERE id = {$no}";
-      else
-        echo "<font color=red>Location in use</font>";
-    }
-    else
-      $query = "update location set name = '$_POST[name]'," .
-                               "address = '$_POST[address]'," .
-                               "url = '$_POST[url]'," .
-                               "contact = '$_POST[contact]'," .
-                               "comment = '$_POST[comment]' " .
-             "where id = $no";
-    $no = NULL;
-  }
-  $db->query($query);
-}   
+   if ($no == NULL)
+      $query = "insert into location (name, address, url, contact, comment) " .
+              "values ('$_POST[name]', '$_POST[address]', '$_POST[url]', '$_POST[contact]', '$_POST[comment]')";
+   else
+   {
+      if ($delete != NULL)
+      {
+         $q = "select count(*) as count from plan where id_location = {$no}";
+         $s = $db->query($q);
+         $e = $s->fetch(PDO::FETCH_ASSOC);
+         if ($e[count] == 0)
+            $query = "DELETE FROM location WHERE id = {$no}";
+         else
+            echo "<font color=red>Location in use</font>";
+      } else
+         $query = "update location set name = '$_POST[name]'," .
+                 "address = '$_POST[address]'," .
+                 "url = '$_POST[url]'," .
+                 "contact = '$_POST[contact]'," .
+                 "comment = '$_POST[comment]' " .
+                 "where id = $no";
+      $no = NULL;
+   }
+   $db->query($query);
+}
 
-$query  = "SELECT id, name, address, url, contact, comment " .
-          "FROM location order by {$sort}";
-       
+$query = "SELECT id, name, address, url, contact, comment " .
+        "FROM location order by {$sort}";
+
 $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
-  if ($row[id] != $no)
-  {
-    echo "<tr>
+   if ($row[id] != $no)
+   {
+      echo "<tr>";
+      if ($access->auth(AUTH::LOC))
+         echo "
          <td><center>
            <a href=\"{$php_self}?_sort={$sort}&_action=view&_no={$row[id]}\"><img src=\"images/cross_re.gif\" border=0></a>
-             </center></td>" .
-         "<td>{$row[name]}</td>" .
-         "<td>{$row[address]}</td>" .
-         "<td>";
-    if (strlen($row[url]) > 0)
-      echo "<a href=\"$row[url]\" title=\"$row[url]\">&lt;link&gt;</a>";
-    echo "</td><td>";
-    echo str_replace("\n", "<br>\n", $row[contact]);
-    echo "</td><td>";
-    echo str_replace("\n", "<br>\n", $row[comment]);
-    echo "</td>" .
-         "</tr>";
-  }
-  else
-  {
-    echo "<tr>
+             </center></td>";
+      echo
+      "<td>{$row[name]}</td>" .
+      "<td>{$row[address]}</td>" .
+      "<td>";
+      if (strlen($row[url]) > 0)
+         echo "<a href = \"$row[url]\" title=\"$row[url]\">&lt;link&gt;</a>";
+      echo "</td><td>";
+      echo str_replace("\n", "<br>\n", $row[contact]);
+      echo "</td><td>";
+      echo str_replace("\n", "<br>\n", $row[comment]);
+      echo "</td>" .
+      "</tr>";
+   }
+   else
+   {
+      echo "<tr>
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
@@ -104,16 +112,9 @@ foreach ($stmt as $row)
     <th><textarea cols=20 rows=7 wrap=virtual name=contact>$row[contact]</textarea></th>
     <th><textarea cols=60 rows=7 wrap=virtual name=comment>$row[comment]</textarea></th>
     </tr>";
-  }
-} 
-
+   }
+}
 ?> 
 
-    </table>
-    </form>
-
-<?php
-  require 'framework_end.php';
-?>
-
-
+</table>
+</form>

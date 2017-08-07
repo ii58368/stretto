@@ -4,8 +4,9 @@ require 'framework.php';
 
 if ($action == 'insert')
 {
-   $query = "insert into auth_person (id_view, id_person) " .
-            "values ('$_REQUEST[id_view]', '$_REQUEST[id_person]')";
+   $ts = strtotime("now");
+   $query = "insert into auth_person (id_view, id_person, ts, uid) " .
+            "values ('$_REQUEST[id_view]', '$_REQUEST[id_person]', $ts, '$whoami')";
    $db->query($query);
 }   
 
@@ -59,7 +60,7 @@ foreach($stmt as $row)
     echo "</td><td bgcolor=#A6CAF0>" . $db->per_stat[$row[status]] . "</td>";
     $prev_id = $row[person_id];
   }
-  $query  = "SELECT comment from auth_person " .
+  $query  = "SELECT ts, uid from auth_person " .
           "where id_view = {$row[view_id]} " .
           "and id_person = {$row[person_id]}"; 
   $stmt2 = $db->query($query);
@@ -68,10 +69,14 @@ foreach($stmt as $row)
   $image = "images/stop_red.gif";
   if ($row2 = $stmt2->fetch(PDO::FETCH_ASSOC))
   {
-    $action = "delete";
-    $image = "images/tick2.gif";
+     $action = "delete";
+     $image = "images/tick2.gif";
+     $ts_txt = "Tilgang gitt:" . date('D j.M y', $row2[ts]) . " av $row2[uid]";
   }
-  echo "<td align=center><a href=\"$_SERVER[PHP_SELF]?_action={$action}&id_person={$row[person_id]}&id_view={$row[view_id]}&_sort={$sort}\"><img src=\"$image\" border=0 title=\"{$row2[comment]}\"></td>";
+  if ($access->auth(AUTH::ACC))
+     echo "<td align=center><a href=\"$_SERVER[PHP_SELF]?_action={$action}&id_person={$row[person_id]}&id_view={$row[view_id]}&_sort={$sort}\"><img src=\"$image\" border=0 title=\"Klikk for å endre tilgang. $ts_txt\"></td>";
+  else
+     echo "<td align=center><img src=\"$image\" border=0 title=\"$ts_txt\"></td>";
 } 
 
 
@@ -79,7 +84,3 @@ foreach($stmt as $row)
     </tr>
     </table>
   
-<?php
-   include 'framework_end.php';
-?>
-

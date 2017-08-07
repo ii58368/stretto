@@ -6,16 +6,22 @@ if ($sort == NULL)
    $sort = 'name';
 
 echo "
-    <h1>Tilgangsgrupper</h1>
+    <h1>Tilgangsgrupper</h1>";
+if ($access->auth(AUTH::ACCGRP))
+   echo "
     <form action=\"$php_self\" method=post>
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=_action value=new>
       <input type=submit value=\"Ny tilgangsgruppe\">
-    </form>
+    </form>";
+echo "
     <form action='$php_self' method=post>
     <table border=1>
-    <tr>
-      <th bgcolor=#A6CAF0>Edit</th>
+    <tr>";
+if ($access->auth(AUTH::ACCGRP))
+   echo "
+      <th bgcolor=#A6CAF0>Edit</th>";
+echo "
       <th bgcolor=#A6CAF0>Navn</th>
       <th bgcolor=#A6CAF0>Kommentar</th>";
 for ($i = 0; $i < AUTH::NO_VIEWS; $i++)
@@ -35,7 +41,7 @@ if ($action == 'new')
    echo "  </tr>";
 }
 
-if ($action == 'update')
+if ($action == 'update' && $access->auth(AUTH::ACCGRP))
 {
    $access = 0;
 
@@ -76,12 +82,15 @@ foreach ($stmt as $row)
 {
    if ($row[id] != $no)
    {
-      echo "<tr>
+      echo "<tr>";
+      if ($access->auth(AUTH::ACCGRP))
+         echo "
          <td><center>
            <a href=\"{$php_self}?_sort={$sort}&_action=view&_no={$row[id]}\"><img src=\"images/cross_re.gif\" border=0></a>
-             </center></td>" .
-      "<td>{$row[name]}</td>" .
-      "<td>{$row[comment]}</td>";
+             </center></td>";
+      echo 
+      "<td><b>$row[name]</b></td>" .
+      "<td>$row[comment]</td>";
       for ($i = 0; $i < AUTH::NO_VIEWS; $i++)
       {
          echo "<td>";

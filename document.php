@@ -4,20 +4,21 @@ require 'framework.php';
 if (is_null($sort))
    $sort = 'name';
 
-list($categoy, $id_project, $variant) = split($_REQUEST[path], '/');
+list($category, $id_project, $variant) = explode('/', $_REQUEST[path]);
 
-if ($categoy == "project")
+if ($category == "project")
 {
    $query = "select name, semester, year from project where id = $id_project";
-   $result = mysql_query($query);
-   $row = mysql_fetch_array($result, MYSQL_ASSOC);
+   $s = $db->query($query);
+   $row = $s->fetch(PDO::FETCH_ASSOC);
 
    $var_arr = array(
        "rec" => "Innspillinger",
        "sheet" => "Noter",
        "doc" => "Dokumenter");
 
-   $heading = "$row[name] ($row[semester]$row[year]]), $var_arr[$variant]";
+   $heading = "$row[name] ($row[semester]$row[year])";
+   $heading2 = $var_arr[$variant];
 }
 
 if ($category == "common")
@@ -25,17 +26,37 @@ if ($category == "common")
    $heading = "Generelle dokumenter";
 }
 
+function this_access_rw()
+{
+   global $access;
+   global $category;
+   
+   if ($category == 'project')
+      return $access->auth(AUTH::PRJDOC);
+   if ($category == 'common')
+      return $access->auth(AUTH::DOC_RW);
+   
+   return false;
+}
+
 echo "
     <h1>$heading</h1>
+    <h2>$heading2</h2>";
+if (this_access_rw())
+   echo "
     <form action=\"$php_self\" method=post>
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=_action value=new>
       <input type=hidden name=path value=\"$_REQUEST[path]\">
       <input type=submit value=\"Nytt dokument\">
-    </form>
+    </form>";
+echo "
     <table border=1>
-    <tr>
-      <th bgcolor=#A6CAF0>Edit</th>
+    <tr>";
+if (this_access_rw())
+   echo "
+      <th bgcolor=#A6CAF0>Edit</th>";
+echo "
       <th bgcolor=#A6CAF0>File</th>
       <th bgcolor=#A6CAF0>Size</th>
       <th bgcolor=#A6CAF0>Last modified</th>
@@ -54,7 +75,7 @@ if ($action == 'new')
   </tr>";
 }
 
-if ($action == 'update')
+if ($action == 'update' && this_access_rw())
 {
    if (is_null($no))
    {
@@ -94,9 +115,11 @@ if ($handle = opendir($_REQUEST[path]))
       echo "<tr>";
       if ($file != $no)
       {
-         echo "<td><center>
+         if (this_access_rw())
+            echo "<td><center>
            <a href=\"{$php_self}?_sort={$sort}&_action=view&_no=" . urlencode($file) . "&path=$_REQUEST[path]\"><img src=\"images/cross_re.gif\" border=0></a>
-             </center></td>
+             </center></td>";
+         echo "
              <td><a href=\"$abs_file\">$file</a></td>";
       } else
       {

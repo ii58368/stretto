@@ -2,7 +2,7 @@
 
 require_once 'conf/opendb.php';
 require_once 'request.php';
-require_once 'conf/auth.php';  //TBD: change to access.php
+require_once 'conf/auth.php';
 
 class ITEM
 {
@@ -125,8 +125,8 @@ class MENU
          $admin->add("Prøveplan", "plan.php?id_project=%", AUTH::PLAN_RO);
          $admin->add("Grupper", "groups.php", AUTH::BOARD_RO);
          $admin->add("Instrumenter", "instruments.php", AUTH::BOARD_RO);
-         $admin->add("Tilgang", "access.php", AUTH::ACC);
-         $admin->add("Tilgangsgrupper", "view.php", AUTH::ACCGRP);
+         $admin->add("Tilgang", "access.php", AUTH::BOARD_RO);
+         $admin->add("Tilgangsgrupper", "view.php", AUTH::BOARD_RO);
          $admin->add("Notearkiv", "repository.php", AUTH::BOARD_RO);
          $admin->add("Prosjekter", "project.php", AUTH::BOARD_RO);
          $admin->add("Tilbakemeldinger", "feedback.php", AUTH::BOARD_RO);
@@ -168,7 +168,7 @@ class MENU
             $project = new SUBMENU("class=\"dl-submenu\"");
             $projects->add("$e[name] ($e[semester]$e[year])", $project);
             $project->add("Prosjektinfo", "prjInfo.php?id=$pid");
-            $project->add("Gruppeoppsett", "seating.php?id=$pid", AUTH::SEAT);
+            $project->add("Gruppeoppsett", "seating.php?id_project=$pid");
             $project->add("Program", "program.php?id=$pid");
             $project->add("Musikere", "person.php?id=$pid");
             $project->add("Noter", "document.php?path=project/$pid/sheet");

@@ -60,21 +60,27 @@ $sel_year = ($_REQUEST[from] == NULL) ? date("Y") : intval($_REQUEST[from]);
 $prev_year = $sel_year - 1;
 
 echo "
-    <h1>Prosjekt</h1>
+    <h1>Prosjekt</h1>";
+if ($access->auth(AUTH::PRJ))
+   echo "
     <form action='$php_self' method=post>
       <input type=hidden name=_sort value='$sort'>
       <input type=hidden name=_action value=new>
       <input type=submit value=\"Nytt prosjekt\" title=\"Definer nytt prosjekt\" >
-    </form>
+    </form>";
+echo "
     <form action='$php_self' method=post>
     <table border=1>
-    <tr>
-      <th bgcolor=#A6CAF0>Edit</th>
+    <tr>";
+if ($access->auth(AUTH::PRJ))
+   echo "
+      <th bgcolor=#A6CAF0>Edit</th>";
+echo "
       <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=name,id&from=$sel_year\" title=\"Sorter p&aring; prosjektnavn\">Prosjekt</a></th>
       <th bgcolor=#A6CAF0 nowrap><a href=\"$php_self?_sort=year,semester+DESC,id&from=$sel_year\" title=\"Sorter p&aring; semester\">Sem</a>
            <a href=\"$php_self?from=$prev_year&_sort={$sort}\"><img src=images/arrow_up.png border=0 title=\"Forrige &aring;r...\"></a></th>
       <th bgcolor=#A6CAF0>Status</th>
-      <th bgcolor=#A6CAF0>Deadline</th>
+      <th bgcolor=#A6CAF0>På-/avm.frist</th>
       <th bgcolor=#A6CAF0>Tutti</th>
       <th bgcolor=#A6CAF0>På-/avmeld.</th>
       <th bgcolor=#A6CAF0>Generell info</th>
@@ -107,7 +113,7 @@ if ($action == 'new')
   </tr>";
 }
 
-if ($action == 'update')
+if ($action == 'update' && $access->auth(AUTH::PRJ))
 {
    $orchestration = ($_POST[orchestration] == null) ? $db->prj_orch_reduced : $db->prj_orch_tutti;
 
@@ -165,10 +171,13 @@ foreach ($stmt as $row)
 {
    if ($row[id] != $no)
    {
-      echo "<tr>
+      echo "<tr>";
+      if ($access->auth(AUTH::PRJ))
+         echo "
         <td><center>
             <a href=\"{$php_self}?_sort={$sort}&from=$sel_year&_action=view&_no={$row[id]}\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
-             </center></td>" .
+             </center></td>";
+      echo
       "<td><a href=\"plan.php?id_project={$row[id]}\">{$row[name]}</a></td>" .
       "<td>{$row[semester]} " .
       "    {$row[year]}</td>" .

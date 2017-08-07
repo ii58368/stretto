@@ -118,13 +118,16 @@ $seat = get_seating($grp[id]);
 
 echo "
     <h1>Gruppeoppsett</h1>
-    <h2>$prj[name] $prj[semester]-$prj[year]</h2>
+    <h2>$prj[name] $prj[semester]-$prj[year]</h2>";
+if ($access->auth(AUTH::SEAT))
+{
+   echo "
     <form action='$php_self' method=post>
        <input type=hidden name=_action value=template>
        <input type=hidden name=_sort value='$sort'>
        <input type=hidden name=id_project value=$_REQUEST[id_project]>\n";
-select_template($seat[template]);
-echo "
+   select_template($seat[template]);
+   echo "
     </form>
     <form action='$php_self' method=post>
     <table border=1>
@@ -137,33 +140,33 @@ echo "
       </tr>";
 
 
-$query = "SELECT participant.id_person as id, firstname, lastname, instrument, position, comment_pos "
-        . "FROM person, participant, instruments, groups "
-        . "where person.id = participant.id_person "
-        . "and participant.id_project = $_REQUEST[id_project] "
-        . "and participant.id_instruments = instruments.id "
-        . "and instruments.id_groups = groups.id "
-        . "and groups.id = $grp[id] "
-        . "order by $sort";
+   $query = "SELECT participant.id_person as id, firstname, lastname, instrument, position, comment_pos "
+           . "FROM person, participant, instruments, groups "
+           . "where person.id = participant.id_person "
+           . "and participant.id_project = $_REQUEST[id_project] "
+           . "and participant.id_instruments = instruments.id "
+           . "and instruments.id_groups = groups.id "
+           . "and groups.id = $grp[id] "
+           . "order by $sort";
 
-$stmt = $db->query($query);
+   $stmt = $db->query($query);
 
-foreach ($stmt as $row)
-{
-   if ($row[id] != $no)
+   foreach ($stmt as $row)
    {
-      echo "<tr>
+      if ($row[id] != $no)
+      {
+         echo "<tr>
          <td><center>
            <a href=\"$php_self?_sort=$sort&_action=view&_no=$row[id]&id_project=$_REQUEST[id_project]\"><img src=\"images/cross_re.gif\" border=0></a>
              </center></td>" .
-      "<td>$row[firstname] $row[lastname]</td>" .
-      "<td>$row[instrument]</td>" .
-      "<td>$row[position]</td>" .
-      "<td>$row[comment_pos]</td>" .
-      "</tr>";
-   } else
-   {
-      echo "<tr>
+         "<td>$row[firstname] $row[lastname]</td>" .
+         "<td>$row[instrument]</td>" .
+         "<td>$row[position]</td>" .
+         "<td>$row[comment_pos]</td>" .
+         "</tr>";
+      } else
+      {
+         echo "<tr>
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
@@ -175,13 +178,14 @@ foreach ($stmt as $row)
     <th><input type=text size=2 name=position value=\"$row[position]\"></th>
     <th><input type=text size=30 name=comment_pos value=\"$row[comment_pos]\"></th>
     </tr>";
+      }
    }
-}
 
 
-echo "
+   echo "
 </table>
 </form>";
+}
 
 echo "<img src=\"map.php?id_groups=$grp[id]&id_project=$_REQUEST[id_project]&template=$seat[template]\"><br>\n";
 

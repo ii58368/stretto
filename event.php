@@ -66,7 +66,7 @@ if ($sort == NULL)
 
 echo "<h1>Hva skjer...?</h1>\n";
 
-if ($action != 'new')
+if ($action != 'new' && $access->auth(AUTH::EVENT))
 {
    echo "<form action=\"$php_self\" method=post>
       <input type=hidden name=_sort value=\"$sort\">
@@ -103,7 +103,7 @@ if ($action == 'new')
     <p>";
 }
 
-if ($action == 'update')
+if ($action == 'update' && $access->auth(AUTH::EVENT))
 {
    $ts = strtotime("now");
 
@@ -180,7 +180,7 @@ foreach ($stmt as $row)
     <textarea cols=60 rows=15 wrap=virtual name=body>$row[body]</textarea>\n";
    } else
    {
-      if ($row[uid] == $whoami)
+      if ($row[uid] == $whoami && $access->auth(AUTH::EVENT))
       {
          echo "<input type=button value=Endre onClick=\"location.href='$php_self?_sort=$sort&_action=view&_no=$row[id]';\">";
       }
@@ -214,9 +214,3 @@ foreach ($stmt as $row)
 ?> 
 
 </form>
-
-<?php
-require 'framework_end.php';
-?>
-
-

@@ -33,24 +33,33 @@ function select_project()
 }
 
 echo "
-    <h1>Notearkiv</h1>
+    <h1>Notearkiv</h1>";
+if ($access->auth(AUTH::REP))
+   echo "
     <form action=\"$php_self\" method=post>
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=id_project value=$_REQUEST[id_project]>
       <input type=hidden name=_action value=new>
       <input type=submit value=\"Nytt verk\">
-    </form>
+    </form>";
+echo "
     <form action='$php_self' method=post>
     <table border=1>
-    <tr>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=id+DESC&id_project=$_REQUEST[id_project]\">Edit</a></th>
+    <tr>";
+if ($access->auth(AUTH::REP))
+   echo "
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=id+DESC&id_project=$_REQUEST[id_project]\">Edit</a></th>";
+echo "
       <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=lastname,firstname,title&id_project=$_REQUEST[id_project]\">Komponist</a></th>
       <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=title,lastname,firstname&id_project=$_REQUEST[id_project]\">Tittle</a></th>
       <th bgcolor=#A6CAF0>Fra</th>
       <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=reference,tag&id_project=$_REQUEST[id_project]\">Arkivref</a></th>
       <th bgcolor=#A6CAF0>Kommentar</th>
       <th bgcolor=#A6CAF0>\n";
-select_project();
+if ($access->auth(AUTH::REP))
+   select_project();
+else
+   echo "Prosjekt";
 echo "</th>
       </tr>";
 
@@ -76,7 +85,7 @@ if ($action == 'new')
   </tr>\n";
 }
 
-if ($action == 'update')
+if ($action == 'update' && $access->auth(AUTH::REP))
 {
    $tag = is_numeric($_POST[tag]) ? $_POST[tag] : 0;
    
@@ -109,7 +118,7 @@ if ($action == 'update')
    $db->query($query);
 }
 
-if ($action == 'toggle_update')
+if ($action == 'toggle_update' && $access->auth(AUTH::REP))
 {
    $q = "select status, comment from music where id_project=$_REQUEST[id_project] and id_repository=$no";
    $s = $db->query($q);
@@ -132,7 +141,7 @@ function toggle_project($cno)
    global $action;
    global $no;
 
-   $q = "select name, semester, year, music.status as status "
+   $q = "select name, semester, year, music.status as status, music.comment as comment "
            . "from project, music "
            . "where music.id_project = project.id "
            . "and music.id_repository = $cno";
@@ -140,7 +149,7 @@ function toggle_project($cno)
 
    foreach ($s as $e)
       if ($e[status] == $db->mus_stat_yes)
-         $title = $title . "$e[name] ($e[semester]-$e[year])\n";
+         $title = $title . "$e[name] ($e[semester]-$e[year]): $e[comment]\n";
 
    echo "<td";
    foreach ($music as $e)
@@ -169,6 +178,25 @@ function toggle_project($cno)
    echo "</td>\n";
 }
 
+function view_project($cno)
+{
+   global $db;
+
+   $q = "select name, semester, year, music.status as status, music.comment as comment "
+           . "from project, music "
+           . "where music.id_project = project.id "
+           . "and music.id_repository = $cno";
+   $s = $db->query($q);
+
+   echo "<td>";
+   
+   foreach ($s as $e)
+      if ($e[status] == $db->mus_stat_yes)
+         echo "$e[name] ($e[semester]-$e[year]): $e[comment]<br>\n";
+      
+   echo "</td>\n";
+}
+
 $query = "SELECT id, firstname, lastname, title, work, tag, reference, comment " .
         "FROM repository order by {$sort}";
 
@@ -178,10 +206,13 @@ foreach ($stmt as $row)
 {
    if ($action != 'view' || $row[id] != $no)
    {
-      echo "<tr>
+      echo "<tr>";
+      if ($access->auth(AUTH::REP))
+         echo "
          <td><center>
            <a href=\"$php_self?_sort=$sort&_action=view&_no=$row[id]&id_project=$_REQUEST[id_project]\"><img src=\"images/cross_re.gif\" border=0></a>
-             </center></td>" .
+             </center></td>";
+      echo
       "<td>$row[lastname], $row[firstname]</td>" .
       "<td>$row[title]</td>" .
       "<td>$row[work]</td>" .
@@ -189,7 +220,10 @@ foreach ($stmt as $row)
       "<td>";
       echo str_replace("\n", "<br>\n", $row[comment]);
       echo "</td>";
-      toggle_project($row[id]);
+      if ($access->auth(AUTH::REP))
+         toggle_project($row[id]);
+      else
+         view_project($row[id]);
       echo "</tr>";
    } else
    {
@@ -214,9 +248,5 @@ foreach ($stmt as $row)
 
 </table>
 </form>
-
-<?php
-require 'framework_end.php';
-?>
 
 
