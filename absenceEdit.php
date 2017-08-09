@@ -22,7 +22,7 @@ function get_groups()
    $query = "select groups.id as id, groups.name as name "
            . "from participant, instruments, groups, person, plan "
            . "where participant.id_person = person.id "
-           . "and person.uid = '$whoami' "
+           . "and person.id = " . $whoami->id() . " "
            . "and participant.id_project = plan.id_project "
            . "and plan.id = $_REQUEST[id_plan] "
            . "and participant.id_instruments = instruments.id "

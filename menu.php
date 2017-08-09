@@ -102,13 +102,10 @@ class MENU
          $my_pages = new SUBMENU("class=\"dl-submenu\"");
          $menu->add("Mine sider", $my_pages);
 
-         $s = $db->query("select id from person where uid='$whoami'");
-         $pers = $s->fetch(PDO::FETCH_ASSOC);
-
-         $my_pages->add("Mine prosjekter", "participant_1x.php?id=$pers[id]", AUTH::MYPRJ);
-         $my_pages->add("Min prøveplan", "plan.php?id_person=$pers[id]", AUTH::MYPLAN);
-         $my_pages->add("Min regi", "myDirection.php?id_person=$pers[id]", AUTH::MYDIR);
-         $my_pages->add("Mine personopplysninger", "personEdit.php?_no=$pers[id]", AUTH::PERS, AUTH::MEMB_RW);
+         $my_pages->add("Mine prosjekter", "participant_1x.php?id=" . $whoami->id(), AUTH::MYPRJ);
+         $my_pages->add("Min prøveplan", "plan.php?id_person=" . $whoami->id(), AUTH::MYPLAN);
+         $my_pages->add("Min regi", "myDirection.php?id_person=" . $whoami->id(), AUTH::MYDIR);
+         $my_pages->add("Mine personopplysninger", "personEdit.php?_no=" . $whoami->id(), AUTH::PERS, AUTH::MEMB_RW);
       }
       {
          $direction = new SUBMENU("class=\"dl-submenu\"");
@@ -121,7 +118,7 @@ class MENU
       {
          $admin = new SUBMENU("class=\"dl-submenu\"");
          $menu->add("Admin", $admin);
-         $admin->add("Medlemsliste", "person.php", AUTH::MEMB_RO);
+         $admin->add("Medlemsliste", "person.php?f_status[]=$db->per_stat_member&f_status[]=$db->per_stat_eng", AUTH::MEMB_RO);
          $admin->add("Prøveplan", "plan.php?id_project=%", AUTH::PLAN_RO);
          $admin->add("Grupper", "groups.php", AUTH::BOARD_RO);
          $admin->add("Instrumenter", "instruments.php", AUTH::BOARD_RO);
@@ -154,7 +151,7 @@ class MENU
                     . "from project, participant, person "
                     . "where project.id = participant.id_project "
                     . "and participant.id_person = person.id "
-                    . "and person.uid = '$whoami' "
+                    . "and person.id = " . $whoami->id() . " "
                     . "and participant.stat_final = $db->par_stat_yes "
                     . "and year >= " . date("Y") . " "
                     . "order by year,semester DESC";
@@ -170,7 +167,7 @@ class MENU
             $project->add("Prosjektinfo", "prjInfo.php?id=$pid");
             $project->add("Gruppeoppsett", "seating.php?id_project=$pid");
             $project->add("Program", "program.php?id=$pid");
-            $project->add("Musikere", "person.php?id=$pid");
+            $project->add("Musikere", "person.php?f_project[]=$pid");
             $project->add("Noter", "document.php?path=project/$pid/sheet");
             $project->add("Innspilling", "document.php?path=project/$pid/rec");
             $project->add("Dokumenter", "document.php?path=project/$pid/doc");
@@ -232,19 +229,12 @@ class MENU
       {
          echo "<form action=\"$php_self\" method=post>
          <select name=set_eff_uid onChange=\"set_cookie('uid', this.form.set_eff_uid.value); submit();\">\n";
-         $this->select_person($whoami);
-         echo "</select>
-      </form>";
-      } else
+         $this->select_person($whoami->uid());
+         echo "</select>\n</form>\n";
+      } 
+      else
       {
-         $query = "select firstname, lastname, instrument "
-                 . "from person, instruments "
-                 . "where person.id_instruments = instruments.id "
-                 . "and uid = '$whoami'";
-         $stmt = $db->query($query);
-         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-         echo "$row[firstname] $row[lastname] ($row[instrument])";
+         echo $whoami->name() . "(" . $whoami->instrument() . ")";
       }
    }
 

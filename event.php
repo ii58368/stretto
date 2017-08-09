@@ -107,15 +107,12 @@ if ($action == 'update' && $access->auth(AUTH::EVENT))
 {
    $ts = strtotime("now");
 
-   $stmt = $db->query("select id from person where uid='$whoami'");
-   $person = $stmt->fetch(PDO::FETCH_ASSOC);
-
    if (is_null($no))
    {
       $query = "insert into event (subject, ts_create, ts_update, importance, body, "
               . "id_person, id_project, status) "
               . "values ('$_POST[subject]', $ts, $ts, "
-              . "$_POST[importance], " . $db->quote($_POST[body]) . ", $person[id], "
+              . "$_POST[importance], " . $db->quote($_POST[body]) . ", " . $whoami->id() . ", "
               . "$_POST[id_project], $_POST[status])";
    } else
    {
@@ -129,7 +126,7 @@ if ($action == 'update' && $access->auth(AUTH::EVENT))
                  "importance = $_POST[importance]," .
                  "body = " . $db->quote($_POST[body])  . "," .
                  "id_project = $_POST[id_project]," .
-                 "id_person = $person[id]," .
+                 "id_person = " . $whoami->id() . "," .
                  "id_project = $_POST[id_project]," .
                  "status = $_POST[status] " .
                  "where id = $no";
@@ -180,7 +177,7 @@ foreach ($stmt as $row)
     <textarea cols=60 rows=15 wrap=virtual name=body>$row[body]</textarea>\n";
    } else
    {
-      if ($row[uid] == $whoami && $access->auth(AUTH::EVENT))
+      if ($row[uid] == $whoami->uid() && $access->auth(AUTH::EVENT))
       {
          echo "<input type=button value=Endre onClick=\"location.href='$php_self?_sort=$sort&_action=view&_no=$row[id]';\">";
       }

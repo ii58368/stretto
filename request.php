@@ -1,5 +1,7 @@
 <?php
 
+require_once 'whoami.php';
+
 $sort = $_REQUEST['_sort'];
 str_replace("|", ",", $sort);
 
@@ -11,8 +13,6 @@ $delete = $_REQUEST['_delete'];
 
 $php_self = $_SERVER[PHP_SELF];
 
-$whoami = $_SERVER[PHP_AUTH_USER];
-if ($_COOKIE['uid'] != null)
-  $whoami = $_COOKIE['uid'];
+$whoami = new WHOAMI();
 
 ?>

@@ -61,7 +61,7 @@ function get_txt($part, $pos)
    {
       if ($p[position] == $pos)
       {
-         if ($p[uid] == $whoami)
+         if ($p[uid] == $whoami->uid())
             $tag = '*x';
          return $p[firstname] . " " . $p[lastname][0] . $tag;
       }

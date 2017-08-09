@@ -9,14 +9,7 @@ if ($sort == NULL)
 
 if (!$access->auth(AUTH::MEMB_RW))
 {
-   if (is_numeric($no))
-   {
-      $query = "select uid from person where id = $no";
-      $stmt = $db->query($query);
-      $row = $stmt->fetch(PDO::FETCH_ASSOC);
-   }
-
-   if ($row[uid] != $whoami)
+   if ($no != $whoami->id())
    {
       echo "<h1>Permission denied</h1>";
       exit(0);

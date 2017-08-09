@@ -10,7 +10,7 @@ $stmt = $db->query($query);
 $prj = $stmt->fetch(PDO::FETCH_ASSOC);
 
 echo "
-    <h1>$prj[name] $prj[semester]-$prj[year] <a href=prjinfo_pdf.php?id=$_REQUEST[id] title\"PDF versjon\"><img src=images/pdf.jpeg height=30></a></h1>\n";
+    <h1>$prj[name] $prj[semester]-$prj[year] <a href=prjinfo_pdf.php?id=$_REQUEST[id] title=\"PDF versjon\"><img src=images/pdf.jpeg height=30></a></h1>\n";
 echo str_replace("\n", "<br>\n", $prj[info]) . "\n";
 
 echo "<h2>Repertoar</h2>

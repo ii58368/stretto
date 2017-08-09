@@ -43,19 +43,19 @@ if ($action == 'new')
 
 if ($action == 'update' && $access->auth(AUTH::ACCGRP))
 {
-   $access = 0;
+   $acc_bit = 0;
 
    for ($i = 0; $i < AUTH::NO_VIEWS; $i++)
    {
       $key = 'access' . $i;
       if ($_POST[$key])
-         $access |= 1 << $i;
+         $acc_bit |= 1 << $i;
    }
 
    if ($no == NULL)
    {
       $query = "insert into view (name, comment, access) " .
-              "values ('$_POST[name]', '$_POST[comment]', '$access')";
+              "values ('$_POST[name]', '$_POST[comment]', '$acc_bit')";
    } else
    {
       if ($delete != NULL)
@@ -65,7 +65,7 @@ if ($action == 'update' && $access->auth(AUTH::ACCGRP))
       {
          $query = "update view set name = '$_POST[name]'," .
                  "comment = '$_POST[comment]'," .
-                 "access = '$access' " .
+                 "access = '$acc_bit' " .
                  "where id = $no";
          $no = NULL;
       }
@@ -162,7 +162,7 @@ add_li("Meny", 1);
    }
    add_li("Admin", 1);
    {
-      add_li("Medlemsliste", 0, AUTH::MEMB_RO, AUTH::MEMB_RW);
+      add_li("Medlemsliste", 0, AUTH::MEMB_RO, AUTH::MEMB_RW, "Medlemsliste/musikere. <font color=green>" . AUTH::MEMB_GREP . "</font>: Filter for å filtrere ut musikere.");
       add_li("Prøveplan", 0, AUTH::PLAN_RO, AUTH::PLAN_RW, "Prøveplan, alle prosjekter");
       add_li("Grupper", 0, AUTH::BOARD_RO, AUTH::GRP, "Faste medlemsgrupper som styret og instrumentgrupper");
       add_li("Instrumenter", 0, AUTH::BOARD_RO, AUTH::INSTR, "Liste over instrumentgrupper. Alle musikerne må tilhøre en instrumentgruppe");

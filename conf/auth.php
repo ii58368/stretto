@@ -43,7 +43,7 @@ class AUTH
    const RES_FIN = 34; // Resources available, decided, r/w
    const FBACK = 35; // Feedback, r/w
    const ABS_ALL = 36; // Absence, for all participants, not only for a group e.g. violin 1
-   //const free = 37; // not in use
+   const MEMB_GREP = 37; // List of memeber, possible to select filter
    const CONS = 38; // concert schedule, r/w
    const EVENT = 39; // What´s on?
    const RES_INV = 40; // Resources line-up, registered by art director r/w
@@ -61,9 +61,9 @@ class AUTH
 
       $su_bit = $this->bit(self::SU);
 
-      if ($whoami != $_SERVER[PHP_AUTH_USER])
+      if ($whoami->uid() != $_SERVER[PHP_AUTH_USER])
       {
-         $this->access = ($this->access & $su_bit) | ($this->auth_uid($whoami) & ~$su_bit);
+         $this->access = ($this->access & $su_bit) | ($this->auth_uid($whoami->uid()) & ~$su_bit);
       }
    }
 

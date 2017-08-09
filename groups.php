@@ -24,7 +24,7 @@ if ($access->auth(AUTH::GRP))
 echo "
       <th bgcolor=#A6CAF0>Navn</th>
       <th bgcolor=#A6CAF0>Ansvarlig</th>
-      <th bgcolor=#A6CAF0>Medlemmer</th>
+      <th bgcolor=#A6CAF0>Medlemmer/Instrumentgrupper</th>
       <th bgcolor=#A6CAF0>Kommentar</th>
       </tr>";
 
@@ -161,7 +161,9 @@ if ($action == 'update' && $access->auth(AUTH::GRP))
               "values ('$_POST[name]', $id_person, '$_POST[comment]')";
       $db->query($query);
       $no = $db->lastInsertId();
-   } else
+      member_update($no);
+   } 
+   else
    {
       if (!is_null($delete))
       {
@@ -169,7 +171,10 @@ if ($action == 'update' && $access->auth(AUTH::GRP))
          $s = $db->query($q);
          $e = $s->fetch(PDO::FETCH_ASSOC);
          if ($e[count] == 0)
-            $query = "DELETE FROM groups WHERE id = {$no}";
+         {
+            $db->query("delete from member where id_groups = $no");
+            $db->query("DELETE FROM groups WHERE id = $no");
+         }
          else
             echo "<font color=red>Error: Some instruments are already part of this group</font>";
       }
@@ -179,11 +184,11 @@ if ($action == 'update' && $access->auth(AUTH::GRP))
                  "id_person = $id_person," .
                  "comment = '$_POST[comment]' " .
                  "where id = $no";
+         $db->query($query);
+         member_update($no);
       }
-      $db->query($query);
    }
 
-   member_update($no);
    $no = NULL;
 }
 
@@ -239,8 +244,4 @@ foreach ($stmt as $row)
 echo "
     </table>
   </form>";
-
-require 'framework_end.php';
-?>
-
 

@@ -100,9 +100,12 @@ if ($action == 'update' && $access->auth(AUTH::DIR_RW))
 }
 
 
-$query = "SELECT person.id as id, id_instruments, instrument, firstname, lastname, " .
-        "email, phone1, status, status_dir, comment_dir " .
-        "FROM person, instruments where id_instruments = instruments.id order by ${sort}";
+$query = "SELECT person.id as id, id_instruments, instrument, firstname, lastname, "
+        . "email, phone1, status, status_dir, comment_dir "
+        . "FROM person, instruments "
+        . "where id_instruments = instruments.id "
+        . "and person.status = $db->per_stat_member "
+        . "order by ${sort}";
 
 $stmt = $db->query($query);
 
