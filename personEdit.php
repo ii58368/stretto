@@ -81,7 +81,7 @@ if ($action == 'update_pers')
             $no = NULL;
          } else
          {
-            $query = "update person set id_instruments = '$_POST[id_instruments]'," .
+            $query = "update person set " .
                     "firstname = '$_POST[firstname]'," .
                     "middlename = '$_POST[middlename]'," .
                     "lastname = '$_POST[lastname]'," .
@@ -91,9 +91,11 @@ if ($action == 'update_pers')
                     "email = '$_POST[email]'," .
                     "phone1 = '$_POST[phone1]'," .
                     "phone2 = '$_POST[phone2]'," .
-                    "phone3 = '$_POST[phone3]'," .
-                    "status = '$_POST[status]'," .
-                    "comment = '$_POST[comment]' " .
+                    "phone3 = '$_POST[phone3]',";
+            if ($access->auth(AUTH::MEMB_RW))
+               $query .= "status = '$_POST[status]'," .
+                         "id_instruments = '$_POST[id_instruments]',";
+            $query .= "comment = '$_POST[comment]' " .
                     "where id = $no";
             $db->query($query);
          }
@@ -188,7 +190,7 @@ if ($action == 'edit_pers')
         <input type=hidden name=_no value='$no'>
         <input type=hidden name=_action value=update_pers>
         <input type=submit value=\"Lagre\">\n";
-   if ($no != null)
+   if ($no != null  && $access->auth(AUTH::MEMB_RW))
       echo "<input type=submit name=_delete value=slett title=\"Kan slettes fra medlemsregisteret dersom vedkommende ikke har vært med på noen prosjekter\">\n";
    echo "</th>
     </tr>
@@ -201,7 +203,10 @@ if ($action == 'edit_pers')
     <tr>
       <td>Instrument:</td>
       <td>";
-   select_instrument($row[id_instruments]);
+   if ($access->auth(AUTH::MEMB_RW))
+      select_instrument($row[id_instruments]);
+   else
+      echo $row[instrument];
    echo
    "     </td>
       </tr>
@@ -227,7 +232,10 @@ if ($action == 'edit_pers')
     <tr>
       <td>Status:</td>
       <td>";
-   select_status($row[status]);
+   if ($access->auth(AUTH::MEMB_RW))
+      select_status($row[status]);
+   else
+      echo $db->per_stat[$row[status]];
    echo
    "     </td>
       </tr>
@@ -254,7 +262,7 @@ if ($action == 'edit_pers')
     <tr><td>Mobil:</td><td>$row[phone1]</td></tr>
     <tr><td>Privat:</td><td>$row[phone2]</td></tr>
     <tr><td>Jobb:</td><td>$row[phone3]</td></tr>
-    <tr><td>Status:</td><td>{$per_stat[$row[status]]}</td></tr>
+    <tr><td>Status:</td><td>{$db->per_stat[$row[status]]}</td></tr>
     <tr><td>Kommentar:</td><td>$row[comment]</td></tr>";
 }
 echo "</form>

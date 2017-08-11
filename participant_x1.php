@@ -315,7 +315,7 @@ $query = "SELECT person.id as id, firstname, lastname, status, id_instruments " 
         "FROM person, instruments " .
         "where id_instruments = instruments.id " .
         "and not status = $db->per_stat_quited " .
-        "order by {$sort}";
+        "order by $sort";
 
 $stmt = $db->query($query);
 
@@ -337,7 +337,7 @@ foreach ($stmt as $row)
       echo "</center></td>";
    }
    echo "<td>$row[firstname] $row[lastname]</td>"
-   . "<td>" . $per_stat[$row[status]] . "</td>";
+   . "<td>" . $db->per_stat[$row[status]] . "</td>";
 
    $part = get_participant($row[id]);
    $id_instruments = ($part[id_instruments] == null) ? $row[id_instruments] : $part[id_instruments];

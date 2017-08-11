@@ -116,7 +116,7 @@ function get_filter_as_url()
 }
 
 echo "
-    <h1>Musikere</h1>";
+    <h1>Adresseliste</h1>";
 if (!is_null($_REQUEST[f_project]))
 {
    $query = "select name, semester, year from project where ";

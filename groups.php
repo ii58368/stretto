@@ -39,7 +39,7 @@ function member_select($id_groups)
            "order by instruments.list_order, lastname, firstname";
    $s = $db->query($q);
 
-   $q2 = "SELECT id_person FROM member where id_groups = $id_groups";
+   $q2 = "SELECT id_person, role FROM member where id_groups = $id_groups";
    $s2 = $db->query($q2);
    $r2 = $s2->fetchAll(PDO::FETCH_ASSOC);
 
@@ -55,25 +55,49 @@ function member_select($id_groups)
       echo ">$e[firstname] $e[lastname] ($e[instrument])";
    }
    echo "</select>";
+   
+   reset($r2);
+   foreach ($r2 as $e2)
+      echo "<input type=hidden name=\"role:$e2[id_person]\" value=\"$e2[role]\">";
 }
 
 function member_list($id_groups)
 {
    global $db;
+   global $sort;
+   global $access;
 
-   $q = "SELECT firstname, lastname, instrument " .
-           "FROM person, instruments, member, groups " .
-           "where instruments.id = person.id_instruments " .
-           "and groups.id = member.id_groups " .
-           "and person.id = member.id_person " .
-           "and groups.id = $id_groups " .
-           "order by instruments.list_order, lastname, firstname";
+   $q = "SELECT firstname, lastname, instrument, member.role as role, "
+           . "person.id as id_person, groups.id as id_groups "
+           . "FROM person, instruments, member, groups "
+           . "where instruments.id = person.id_instruments "
+           . "and groups.id = member.id_groups "
+           . "and person.id = member.id_person "
+           . "and groups.id = $id_groups "
+           . "order by instruments.list_order, lastname, firstname";
 
    $s = $db->query($q);
 
    foreach ($s as $e)
    {
-      echo "$e[firstname] $e[lastname] ($e[instrument])<br>";
+      if ($_REQUEST[id_groups] == $e[id_groups] && $_REQUEST[id_person] == $e[id_person])
+      {
+         echo "<form action=\"$php_self\" method=post>\n"
+         . "<input type=hidden name=_sort value=\"$sort\">\n"
+         . "<input type=submit value=ok title=\"Lagre rolle...\">\n"
+         . "<input type=hidden name=_action value=update_role>\n"
+         . "<input type=hidden name=id_person value=$_REQUEST[id_person]>\n"
+         . "<input type=hidden name=id_groups value=$_REQUEST[id_groups]>\n"
+         . "$e[firstname] $e[lastname] "
+         . "<input type=text size=15 name=role value=\"$e[role]\" title=\"Spesifiser rolle...\">\n"
+         . "</form><br>\n";
+      } 
+      else
+      {
+         if ($access->auth(AUTH::GRP))
+            echo "<a href=\"$php_self?id_groups=$e[id_groups]&id_person=$e[id_person]\"><img src=\"images/cross_re.gif\" border=0 title=\"Editere rolle...\"></a> ";
+         echo "$e[firstname] $e[lastname] ($e[instrument]) <i>$e[role]</i><br>";
+      }
    }
 }
 
@@ -118,13 +142,15 @@ function member_update($id_groups)
 
    $query = "delete from member where id_groups = $id_groups";
    $db->query($query);
-
+   $i = 0;
+   
    if (!is_null($_POST[id_persons]))
    {
       foreach ($_POST[id_persons] as $id_person)
       {
-         $query = "insert into member (id_person, id_groups) " .
-                 "values ($id_person, $id_groups)";
+         $role = $_POST["role:$id_person"];
+         $query = "insert into member (id_person, id_groups, role) " .
+                 "values ($id_person, $id_groups, '$role')";
          $db->query($query);
       }
    }
@@ -162,8 +188,7 @@ if ($action == 'update' && $access->auth(AUTH::GRP))
       $db->query($query);
       $no = $db->lastInsertId();
       member_update($no);
-   } 
-   else
+   } else
    {
       if (!is_null($delete))
       {
@@ -174,8 +199,7 @@ if ($action == 'update' && $access->auth(AUTH::GRP))
          {
             $db->query("delete from member where id_groups = $no");
             $db->query("DELETE FROM groups WHERE id = $no");
-         }
-         else
+         } else
             echo "<font color=red>Error: Some instruments are already part of this group</font>";
       }
       else
@@ -192,6 +216,15 @@ if ($action == 'update' && $access->auth(AUTH::GRP))
    $no = NULL;
 }
 
+if ($action == 'update_role' && $access->auth(AUTH::GRP))
+{
+   $query = "update member set role = '$_POST[role]' "
+           . "where id_person = $_POST[id_person] "
+           . "and id_groups = $_POST[id_groups]";
+   $db->query($query);
+   
+   $_REQUEST[id_groups] = null;
+}
 
 
 $query = "SELECT groups.id as id, groups.name as name, firstname, lastname, instrument, groups.comment as comment " .
@@ -212,7 +245,7 @@ foreach ($stmt as $row)
          <td><center>
            <a href=\"$php_self?_sort=$sort&_action=view&_no=$row[id]\"><img src=\"images/cross_re.gif\" border=0></a>
              </center></td>";
-      echo 
+      echo
       "<td>$row[name]</td>" .
       "<td>$row[firstname] $row[lastname] ($row[instrument])</td><td>";
       instruments_list($row[id]);

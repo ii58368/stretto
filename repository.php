@@ -88,11 +88,12 @@ if ($action == 'new')
 if ($action == 'update' && $access->auth(AUTH::REP))
 {
    $tag = is_numeric($_POST[tag]) ? $_POST[tag] : 0;
-   
+   $ts = strtotime("now");
+
    if ($no == NULL)
-      $query = "insert into repository (firstname, lastname, title, work, tag, reference, comment) "
+      $query = "insert into repository (firstname, lastname, title, work, tag, reference, comment, ts) "
               . "values ('$_POST[firstname]', '$_POST[lastname]', '$_POST[title]', '$_POST[work]', "
-              . "$tag, '$_POST[reference]', '$_POST[comment]')";
+              . "$tag, '$_POST[reference]', '$_POST[comment]', $ts)";
    else
    {
       if ($delete != NULL)
@@ -111,7 +112,8 @@ if ($action == 'update' && $access->auth(AUTH::REP))
                  "work = '$_POST[work]'," .
                  "tag = $tag," .
                  "reference = '$_POST[reference]'," .
-                 "comment = '$_POST[comment]' " .
+                 "comment = '$_POST[comment]' ," .
+                 "ts = $ts " .
                  "where id = $no";
       $no = NULL;
    }
