@@ -1,5 +1,6 @@
 <?php
-include 'framework.php';
+require 'framework.php';
+require 'person_query.php';
 
 $pedit = "personEdit.php";
 
@@ -131,50 +132,7 @@ if (!is_null($_REQUEST[f_project]))
 }
 
 
-$query = "SELECT person.id as id, instruments.id as id_instruments, instrument, firstname, middlename, lastname, "
-        . "address, postcode, city, "
-        . "email, phone1, phone2, phone3, person.status as status, person.comment as comment "
-        . "FROM person, instruments ";
-if (!is_null($_REQUEST[f_project]))
-   $query .= ", participant, project ";
-if (!is_null($_REQUEST[f_group]))
-   $query .= ", groups, member ";
-$query .= "where person.id_instruments = instruments.id ";
-if (!is_null($_REQUEST[f_project]))
-{
-   $query .= "and participant.id_person = person.id "
-           . "and participant.id_project = project.id "
-           . "and participant.stat_final = $db->par_stat_yes "
-           . "and (";
-   foreach ($_REQUEST[f_project] as $f_project)
-      $query .= "project.id = $f_project or ";
-   $query .= "false) ";
-}
-if (!is_null($_REQUEST[f_group]))
-{
-   $query .= "and groups.id = member.id_groups "
-           . "and member.id_person = person.id "
-           . "and (";
-   foreach ($_REQUEST[f_group] as $f_group)
-      $query .= "groups.id = $f_group or ";
-   $query .= "false) ";
-}
-if (!is_null($_REQUEST[f_status]))
-{
-   $query .= "and (";
-   foreach ($_REQUEST[f_status] as $f_status)
-      $query .= "person.status = $f_status or ";
-   $query .= "false) ";
-}
-if (!is_null($_REQUEST[f_instrument]))
-{
-   $query .= "and (";
-   foreach ($_REQUEST[f_instrument] as $f_instrument)
-      $query .= "instruments.id = $f_instrument or ";
-   $query .= "false) ";
-}
-$query .= "group by person.id order by $sort";
-
+$query = person_query();
 
 $stmt = $db->query($query);
 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -191,7 +149,7 @@ if ($access->auth(AUTH::MEMB_RW))
       </form>\n";
 }
 
-echo "<a href=person_pdf.php?_sort=$sort$f_filter title=\"PDF versjon\"><img src=images/pdf.jpeg height=22></a>";
+echo "<a href=person_pdf.php?_sort=list_order,lastname,firstname$f_filter title=\"PDF versjon\"><img src=images/pdf.jpeg height=22></a>";
 
 if ($access->auth(AUTH::MEMB_RW, AUTH::MEMB_GREP))
 {
