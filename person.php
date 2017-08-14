@@ -14,7 +14,7 @@ function send_mail($r)
    foreach ($r as $e)
       if (strlen($e[email]) > 0)
          echo $e[email] . ",";
-   echo "&subject=OSO: \"><image border=0 src=images/image1.gif hspace=20 title=\"Send mail til alle på listen...\"></a>";
+   echo "&subject=OSO: \"><img border=0 src=images/send_mail.gif hspace=5 vspace=5 title=\"Send mail til alle på listen...\"></a>\n";
 }
 
 function format_phone($ph)
@@ -117,7 +117,7 @@ function get_filter_as_url()
 }
 
 echo "
-    <h1>Adresseliste</h1>";
+    <h1>Adresseliste</h1>\n";
 if (!is_null($_REQUEST[f_project]))
 {
    $query = "select name, semester, year from project where ";
@@ -140,16 +140,9 @@ $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $f_filter = get_filter_as_url();
 
 if ($access->auth(AUTH::MEMB_RW))
-{
-   echo "
-    <form action='$pedit' method=post>
-      <input type=hidden name=_sort value='$sort'>
-      <input type=hidden name=_action value=edit_pers>
-      <input type=submit value=\"Ny person\">
-      </form>\n";
-}
+   echo "<a href=\"$pedit?_sort=$sort&_action=edit_pers$f_filter\" title=\"Registrer ny person...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
 
-echo "<a href=person_pdf.php?_sort=list_order,lastname,firstname$f_filter title=\"PDF versjon\"><img src=images/pdf.jpeg height=22></a>";
+echo "<a href=\"person_pdf.php?_sort=list_order,lastname,firstname$f_filter\" title=\"PDF versjon...\"><img src=images/pdf.jpeg height=22 border=0 hspace=5 vspace=5></a>\n";
 
 if ($access->auth(AUTH::MEMB_RW, AUTH::MEMB_GREP))
 {
@@ -167,17 +160,17 @@ if ($access->auth(AUTH::MEMB_RW))
    echo "
       <th bgcolor=#A6CAF0>Edit</th>";
 echo "
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=list_order,lastname,firstname$f_filter\">Instrument</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=firstname,lastname$f_filter\">For</a>/
-                          <a href=\"$php_self?_sort=lastname,firstname$f_filter\">Etternavn</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=address,lastname,firstname$f_filter\">Adresse</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=postcode,lastname,firstname$f_filter\">Postnr</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=city,lastname,firstname$f_filter\">Sted</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=email$f_filter\">Mail</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=list_order,lastname,firstname$f_filter\" title=\"Sorter på instrumentgruppe...\">Instrument</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=firstname,lastname$f_filter\" title=\"Sorter på fornavn...\">For</a>/
+                          <a href=\"$php_self?_sort=lastname,firstname$f_filter\" title=\"Sorter på etternavn...\">Etternavn</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=address,lastname,firstname$f_filter\" title=\"Sorter på addresse...\">Adresse</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=postcode,lastname,firstname$f_filter\" title=\"Sorter på postnummer...\">Postnr</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=city,lastname,firstname$f_filter\" title=\"Sorter på sted...\">Sted</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=email$f_filter\" title=\"Sorter på email...\">Mail</a></th>
       <th bgcolor=#A6CAF0>Mobil</th>
       <th bgcolor=#A6CAF0>Priv</th>
       <th bgcolor=#A6CAF0>Arbeid</th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=status,list_order,lastname,firstname$f_filter\">Status</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=status,list_order,lastname,firstname$f_filter\" title=\"Sorter på status...\">Status</a></th>
       <th bgcolor=#A6CAF0>Kommentar</th>
       </tr>";
 
@@ -189,7 +182,7 @@ foreach ($result as $row)
    if ($access->auth(AUTH::MEMB_RW))
       echo "
          <td><center>
-           <a href=\"{$pedit}?_sort={$sort}&_action=view&_no={$row[id]}$f_filter\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
+           <a href=\"{$pedit}?_sort={$sort}&_action=view&_no={$row[id]}$f_filter\"><img src=\"images/cross_re.gif\" border=0 title=\"Editere person...\"></a>
           </center></td>";
    echo "<td>{$row[instrument]}</td>" .
    "<td>{$row[firstname]} {$row[middlename]} {$row[lastname]}</td>" .

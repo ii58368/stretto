@@ -175,9 +175,11 @@ if ($no != NULL)
 $person = ($no == NULL) ? "Ny person" : "$row[firstname] $row[middlename] $row[lastname]";
 $postcode = sprintf("%04d", $row[postcode]);
 
-echo "
-    <h1>$person</h1>
-    <table border=0>
+echo "<h1>$person</h1>\n";
+echo "<a href=\"person.php\" title=\"Til adresselisten...\"><img src=\"images/index.gif\" border=0 hspace=5></a>\n";
+if ($access->auth(AUTH::MEMB_RW))
+   echo "<a href=\"$php_self?_sort=$sort&_action=edit_pers\" title=\"Registrere ny person...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
+echo "<table border=0>
     <tr bgcolor=#A6CAF0>
       <th>Personalia</th>
       <form action='$php_self' method=post>";
@@ -185,7 +187,7 @@ echo "
 if ($action == 'edit_pers')
 {
    echo "
-      <th>
+      <th align=left>
         <input type=hidden name=_sort value='$sort'>
         <input type=hidden name=_no value='$no'>
         <input type=hidden name=_action value=update_pers>
@@ -247,7 +249,7 @@ if ($action == 'edit_pers')
 } else
 {
    echo "
-      <th>
+      <th align=left>
         <input type=hidden name=_sort value='$sort'>
         <input type=hidden name=_no value='$no'>
         <input type=hidden name=_action value=edit_pers>
@@ -281,7 +283,7 @@ if ($no != null)
    if ($action == 'edit_pwd')
    {
       echo "
-      <th>
+      <th align=left>
         <input type=hidden name=_sort value='$sort'>
         <input type=hidden name=_no value='$no'>
         <input type=hidden name=_action value=update_pwd>
@@ -314,8 +316,3 @@ if ($no != null)
     <tr><td>Passord:</td><td>************</td></tr>";
    }
 }
-
-
-
-include 'framework_end.php';
-?>

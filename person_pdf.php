@@ -35,11 +35,11 @@ class PDF extends PDF_util
             $this->Cell(50, 0, "$e[name] ($e[semester]$e[year]) ");
       }
 
-      $this->Ln();
 
       $this->Line(10, 38, 200, 38);
 
       $this->setFontSize(10);
+      $this->Ln();
 
       $tab = array(25, 25, 30, 20, 18, 18, 50);
       $col = array("Etternavn", "Fornavn", "Adresse", "Poststed", "Tlf1", "Tlf2", "Epost");
