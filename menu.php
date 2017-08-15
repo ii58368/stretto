@@ -119,7 +119,7 @@ class MENU
          $admin = new SUBMENU("class=\"dl-submenu\"");
          $menu->add("Admin", $admin);
          $admin->add("Medlemsliste", "person.php?f_status[]=$db->per_stat_member&f_status[]=$db->per_stat_eng", AUTH::MEMB_RO);
-         $admin->add("Prøveplan", "plan.php?id_project=%", AUTH::PLAN_RO);
+         $admin->add("Prøveplan", "plan.php", AUTH::PLAN_RO);
          $admin->add("Grupper", "groups.php", AUTH::BOARD_RO);
          $admin->add("Instrumenter", "instruments.php", AUTH::BOARD_RO);
          $admin->add("Tilgang", "access.php", AUTH::BOARD_RO);

@@ -2,9 +2,15 @@
 
 include 'framework.php';
 
+$id_project = is_null($_REQUEST[id_project]) ? "%" : $_REQUEST[id_project];
+$cur_semester = (date("n") > 6) ? 'H' : 'V';
+$cur_year = date("Y");
+$semester = is_null($_REQUEST[semester]) ? $cur_semester : $_REQUEST[semester];
+$year = is_null($_REQUEST[year]) ? $cur_year : $_REQUEST[year];
+
 function select_tsort($selected)
 {
-   echo "<select name=tsort title=\"Sorteringsrekkef&oslash;lge dersom dette en av flere aktiviteter p&aring; samme dato\">";
+   echo "<select name=tsort title=\"Sorteringsrekkefølge dersom dette en av flere aktiviteter på samme dato\">";
    for ($i = 0; $i < 8; $i++)
    {
       echo "<option value=$i";
@@ -42,8 +48,8 @@ function select_project($selected)
 
    $year = date("Y");
    $q = "SELECT id, name, semester, year, orchestration FROM project " .
-           "where year >= ${year} " .
-           "or id = '${selected}' " .
+           "where year >= $year " .
+           "or id = '$selected' " .
            "order by year, semester DESC";
    $s = $db->query($q);
 
@@ -59,17 +65,41 @@ function select_project($selected)
    echo "</select>";
 }
 
-echo "
-    <h1>Prøveplan</h1>";
-if ($access->auth(AUTH::PLAN_RW))
+echo "<h1>Prøveplan</h1>\n";
+
+if ($id_project == '%')
 {
-   echo "
-    <form action='$php_self' method=post>
-      <input type=hidden name=_action value=new>
-      <input type=hidden name=id_project value='$_REQUEST[id_project]'>
-      <input type=submit value=\"Ny prøve\">
-    </form>";
+   $h2 = ($semester == 'V') ? "Vår $year" : "Høst $year";
 }
+else
+{
+   $s = $db->query("select name, semester, year from project where id = $id_project");
+   $e = $s->fetch(PDO::FETCH_ASSOC);
+   $h2 = "$e[name] ($e[semester]$e[year])";
+}
+echo "<h2>$h2</h2>\n";
+
+if ($access->auth(AUTH::PLAN_RW))
+   echo "<a href=\"$php_self?id_project=$id_project&semester=$semester&year=$year&_action=new\" title=\"Registrer ny prøve...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
+echo "<a href=\"plan_pdf.php?semester=$semester&year=$year\" title=\"PDF versjon...\"><img src=images/pdf.jpeg height=22 border=0 hspace=5 vspace=5></a>\n";
+
+if ($semester == 'V')
+{
+   $op_semester = 'H';
+   $next_year = $year;
+   $last_year = $year - 1;
+} 
+else
+{
+   $op_semester = 'V';
+   $next_year = $year + 1;
+   $last_year = $year;
+}
+
+echo "<a href=\"$php_self?semester=$op_semester&year=$last_year\" title=\"Plan for forrige semester...\"><img src=\"images/left.gif\" height=22 border=0 hspace=5 vspace=5></a>\n";
+echo "<a href=\"$php_self?semester=$cur_semester&year=$cur_year\" title=\"Plan for dette semesteret...\"><img src=\"images/die1.gif\" height=22 border=0 hspace=5 vspace=5></a>\n";
+echo "<a href=\"$php_self?semester=$op_semester&year=$next_year\" title=\"Plan for neste semester...\"><img src=\"images/right.gif\" height=22 border=0 hspace=5 vspace=5></a>\n";
+
 echo "
     <form action='{$php_self}' method=post>
     <table border=1>
@@ -100,7 +130,7 @@ if ($action == 'new')
    echo "<br><input type=text size=22 name=location>";
    echo "</th>
     <th>";
-   select_project($_REQUEST[id_project]);
+   select_project($id_project);
    echo "
   </th>
   <th><textarea cols=50 rows=6 wrap=virtual name=comment>Tutti</textarea></th>
@@ -115,14 +145,14 @@ if ($action == 'update' && $access->auth(AUTH::PLAN_RW))
    {
       if ($no == NULL)
       {
-         $query2 = "select id_person from project where id = $_POST[id_project]";
+         $query2 = "select id_person from project where id = $id_project";
          $stmt = $db->query($query2);
          $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
          $query = "insert into plan (date, tsort, time, id_location, location, id_project, " .
                  "id_responsible, comment, event_type) " .
                  "values ('$ts', '$_POST[tsort]', '$_POST[time]', " .
-                 "'$_POST[id_location]', '$_POST[location]', '$_POST[id_project]', '$row[id_person]', " .
+                 "'$_POST[id_location]', '$_POST[location]', '$id_project', '$row[id_person]', " .
                  "'$_POST[comment]', $plan_evt_rehearsal)";
       } else
       {
@@ -136,7 +166,7 @@ if ($action == 'update' && $access->auth(AUTH::PLAN_RW))
                     "tsort = '$_POST[tsort]'," .
                     "id_location = '$_POST[id_location]'," .
                     "location = '$_POST[location]'," .
-                    "id_project = '$_POST[id_project]'," .
+                    "id_project = '$id_project'," .
                     "comment = '$_POST[comment]'," .
                     "event_type = $db->plan_evt_rehearsal " .
                     "where id = $no";
@@ -149,8 +179,6 @@ if ($action == 'update' && $access->auth(AUTH::PLAN_RW))
 }
 
 
-$cur_year = ($_REQUEST[id_project] == '%') ? date("Y") : 0;
-
 $query = "SELECT plan.id as id, date, time, tsort, id_project, " .
         "id_location, plan.location as location, location.name as lname, " .
         "project.name as pname, location.url as url, " .
@@ -158,9 +186,13 @@ $query = "SELECT plan.id as id, date, time, tsort, id_project, " .
         "FROM project, plan, location " .
         "where id_location = location.id " .
         "and id_project = project.id " .
-        "and plan.id_project like '$_REQUEST[id_project]' " .
-        "and plan.event_type = $db->plan_evt_rehearsal " .
-        "and project.year >= $cur_year " .
+        "and plan.id_project like '$id_project' " .
+        "and plan.event_type = $db->plan_evt_rehearsal ";
+if ($id_project == '%')
+   $query .= 
+        "and project.year = $year " .
+        "and project.semester = '$semester' ";
+$query .= 
         "order by date,tsort,time";
 
 $stmt = $db->query($query);
@@ -172,7 +204,7 @@ foreach ($stmt as $row)
       if ($access->auth(AUTH::PLAN_RW))
          echo "<tr>
         <td><center>
-            <a href=\"{$php_self}?_action=view&_no={$row[id]}&id_project=$_REQUEST[id_project]\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
+            <a href=\"{$php_self}?_action=view&_no={$row[id]}&id_project=$id_project&semester=$semester&year=$year\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
              </center></td>";
       echo "<td>" . date('D j.M y', $row[date]) . "</td>" .
       "<td>{$row[time]}</td><td>";

@@ -32,7 +32,7 @@ $prj_name = 'Stretto';
         <div class="container demo-1">	
 
             <?php
-
+setlocale(LC_TIME, "no_NO.UTF-8");
             require_once 'const.php';
             require_once 'request.php';
             require_once 'conf/opendb.php';
