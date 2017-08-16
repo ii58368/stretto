@@ -70,16 +70,16 @@ if ($action == 'new')
     <td align=left><input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
     <input type=submit value=ok></td>
-    <th><input type=text size=30 name=firstname>
-        <input type=text size=30 name=lastname></th>
-    <th><input type=text size=30 name=title></th>
-    <th><input type=text size=30 name=work></th>
-    <th><input type=text size=8 name=reference value=OSO>
+    <th><input type=text size=30 name=firstname title=Fornavn>
+        <input type=text size=30 name=lastname title=Etternavn></th>
+    <th><input type=text size=30 name=title title=\"Navn på verk\"></th>
+    <th><input type=text size=30 name=work title=\"Navn på hovedverk hvis dette er et utdrag\"></th>
+    <th><input type=text size=8 name=reference value=OSO title=\"Referanse på hvor noter er leid eller lånt\">
         <input type=text size=6 name=tag value=";
    $s = $db->query("select max(tag) as max_tag from repository where reference=\"OSO\"");
    $e = $s->fetch(PDO::FETCH_ASSOC);
    echo $e[max_tag] ? $e[max_tag] : 0;
-   echo "></th>
+   echo " title=\"Eventuelt referansnummer\"></th>
     <th><textarea cols=50 rows=7 wrap=virtual name=comment></textarea></th>
     <th></th>
   </tr>\n";
@@ -142,6 +142,7 @@ function toggle_project($cno)
    global $db;
    global $action;
    global $no;
+   global $sort;
 
    $q = "select name, semester, year, music.status as status, music.comment as comment "
            . "from project, music "
@@ -162,7 +163,7 @@ function toggle_project($cno)
       echo " bgcolor=lightgreen";
 
    echo ">";
-   if ($action == 'toggle' && $e[id_repository] == $cno && $no == $cno)
+   if ($action == 'toggle' && $no == $cno)
    {
       echo "<input type=hidden name=_action value=toggle_update>
             <input type=hidden name=_sort value='$sort'>

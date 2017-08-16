@@ -81,7 +81,7 @@ class PDF extends PDF_util
 
       foreach ($stmt as $row)
       {
-         $this->Cell($w[0], 5, date('D j.M y', $row[date]));
+         $this->Cell($w[0], 5, date('D j.M', $row[date]));
          $this->Cell($w[1], 5, $row[time]);
          $this->Cell($w[2], 5, $this->sconv($row[lname]));
          $this->Cell($w[3], 5, $this->sconv($row[comment]));

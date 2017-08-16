@@ -80,7 +80,7 @@ else
 echo "<h2>$h2</h2>\n";
 
 if ($access->auth(AUTH::PLAN_RW))
-   echo "<a href=\"$php_self?id_project=$id_project&semester=$semester&year=$year&_action=new\" title=\"Registrer ny prøve...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
+   echo "<a href=\"$php_self?id_project=$id_project&semester=$semester&year=$year&_action=new&id_location=$_REQUEST[id_location]\" title=\"Registrer ny prøve...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
 echo "<a href=\"plan_pdf.php?semester=$semester&year=$year\" title=\"PDF versjon...\"><img src=images/pdf.jpeg height=22 border=0 hspace=5 vspace=5></a>\n";
 
 if ($semester == 'V')
@@ -126,7 +126,7 @@ if ($action == 'new')
    select_tsort(null);
    echo "<input type=text size=11 name=time value=\"18:30-21:30\"></th>
     <th>";
-   select_location(1);
+   select_location($_REQUEST[id_location]);
    echo "<br><input type=text size=22 name=location>";
    echo "</th>
     <th>";
@@ -151,9 +151,9 @@ if ($action == 'update' && $access->auth(AUTH::PLAN_RW))
 
          $query = "insert into plan (date, tsort, time, id_location, location, id_project, " .
                  "id_responsible, comment, event_type) " .
-                 "values ('$ts', '$_POST[tsort]', '$_POST[time]', " .
-                 "'$_POST[id_location]', '$_POST[location]', '$id_project', '$row[id_person]', " .
-                 "'$_POST[comment]', $plan_evt_rehearsal)";
+                 "values ($ts, $_POST[tsort], '$_POST[time]', " .
+                 "$_POST[id_location], '$_POST[location]', $id_project, $row[id_person], " .
+                 "'$_POST[comment]', $db->plan_evt_rehearsal)";
       } else
       {
          if ($delete != NULL)
@@ -161,12 +161,12 @@ if ($action == 'update' && $access->auth(AUTH::PLAN_RW))
             $query = "DELETE FROM plan WHERE id = $no";
          } else
          {
-            $query = "update plan set date = '$ts'," .
+            $query = "update plan set date = $ts," .
                     "time = '$_POST[time]'," .
-                    "tsort = '$_POST[tsort]'," .
-                    "id_location = '$_POST[id_location]'," .
+                    "tsort = $_POST[tsort]," .
+                    "id_location = $_POST[id_location]," .
                     "location = '$_POST[location]'," .
-                    "id_project = '$id_project'," .
+                    "id_project = $id_project," .
                     "comment = '$_POST[comment]'," .
                     "event_type = $db->plan_evt_rehearsal " .
                     "where id = $no";

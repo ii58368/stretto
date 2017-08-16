@@ -9,11 +9,11 @@ $query = "select name, orchestration, semester, year, "
 $stmt = $db->query($query);
 $prj = $stmt->fetch(PDO::FETCH_ASSOC);
 
-echo "
-    <h1>$prj[name] $prj[semester]-$prj[year] <a href=prjinfo_pdf.php?id=$_REQUEST[id] title=\"PDF versjon\"><img src=images/pdf.jpeg height=30></a></h1>\n";
+echo "<h1>Prosjektinfo</h1>
+    <h2>$prj[name] $prj[semester]-$prj[year] <a href=prjinfo_pdf.php?id=$_REQUEST[id] title=\"PDF versjon\"><img src=images/pdf.jpeg height=30></a></h2>\n";
 echo str_replace("\n", "<br>\n", $prj[info]) . "\n";
 
-echo "<h2>Repertoar</h2>
+echo "<h3>Repertoar</h3>
     <table border=0>\n";
 
 $query = "SELECT title, work, firstname, lastname, music.comment as comment"
@@ -35,7 +35,7 @@ foreach ($stmt as $row)
 }
 echo "</table><p>\n";
 
-echo "<h2>Prøveplan</h2>
+echo "<h3>Prøveplan</h3>
     <table border=0>
     <tr>
       <th bgcolor=#A6CAF0>Dato</th>
@@ -60,7 +60,7 @@ $stmt = $db->query($query);
 foreach ($stmt as $row)
 {
    echo "<tr>
-       <td>" . date('D j.M y', $row[date]) . "</td>" .
+       <td>" . date('D j.M', $row[date]) . "</td>" .
    "<td>{$row[time]}</td><td>";
    if (strlen($row[url]) > 0)
       echo "<a href=\"{$row[url]}\">{$row[lname]}</a>";
@@ -74,7 +74,7 @@ foreach ($stmt as $row)
 }
 echo "</table><p>\n";
 
-echo "<h2>Musikere</h2>\n";
+echo "<h3>Musikere</h3>\n";
 
 $query = "select firstname, lastname, instrument, stat_inv, stat_final"
         . " from person, instruments, participant"

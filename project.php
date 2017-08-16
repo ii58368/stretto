@@ -179,8 +179,7 @@ foreach ($stmt as $row)
              </center></td>";
       echo
       "<td><a href=\"plan.php?id_project={$row[id]}\">{$row[name]}</a></td>" .
-      "<td>{$row[semester]} " .
-      "    {$row[year]}</td>" .
+      "<td>{$row[semester]}-{$row[year]}</td>" .
       "<td>" . $db->prj_stat[$row[status]] . "</td>" .
       "<td>" . date('D j.M y', $row[deadline]) . "</td>" .
       "<td>";
@@ -189,7 +188,7 @@ foreach ($stmt as $row)
       echo "</td><td>";
       for ($i = 0; $i < sizeof($db->par_stat); $i++)
          if ($row[valid_par_stat] & (1 << $i))
-            echo $db->par_stat[$i] . "<br>\n";
+            echo "<img src=\"images/ballc_g1.gif\" border=0>" . $db->par_stat[$i] . "<br>\n";
       echo "</td><td>";
       echo str_replace("\n", "<br>\n", $row[info]);
       echo "</td>" .
