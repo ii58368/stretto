@@ -2,9 +2,11 @@
 <?php
 require 'framework.php';
 
+$id_person = (is_null($_REQUEST[id_person])) ? $whoami->id() : $_REQUEST[id_person];
+
 $query = "select firstname, lastname, instrument, instruments.id as id_instruments"
         . " from person, instruments"
-        . " where person.id=$_REQUEST[id_person]"
+        . " where person.id=$id_person"
         . " and id_instruments = instruments.id";
 $stmt = $db->query($query);
 $pers = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -20,19 +22,19 @@ if ($_REQUEST[stat_self])
 {
    $ts = strtotime("now");
 
-   $q = "select * from participant where id_project=$_REQUEST[id_project] and id_person=$_REQUEST[id_person]";
+   $q = "select * from participant where id_project=$_REQUEST[id_project] and id_person=$id_person";
    $stmt = $db->query($q);
    if ($stmt->rowCount() == 0)
    {
       $query = "insert into participant (id_person, id_project, stat_self, ts_self, comment_self, id_instruments) " .
-              "values ($_REQUEST[id_person], $_REQUEST[id_project], $_REQUEST[stat_self], $ts, '$_REQUEST[comment_self]', $pers[id_instruments])";
+              "values ($id_person, $_REQUEST[id_project], $_REQUEST[stat_self], $ts, '$_REQUEST[comment_self]', $pers[id_instruments])";
    } else
    {
       $query = "update participant set " .
               "stat_self = $_REQUEST[stat_self], " .
               "ts_self = $ts, " .
               "comment_self = '$_REQUEST[comment_self]' " .
-              "where id_person = $_REQUEST[id_person] " .
+              "where id_person = $id_person " .
               "and id_project = $_REQUEST[id_project]";
    }
    $db->query($query);
@@ -41,7 +43,7 @@ if ($_REQUEST[stat_self])
 $query = "select *"
         . " from participant, instruments"
         . " where participant.id_instruments = instruments.id "
-        . " and id_person=$_REQUEST[id_person]"
+        . " and id_person=$id_person"
         . " and id_project=$_REQUEST[id_project]";
 $stmt = $db->query($query);
 if ($stmt->rowCount() > 0)
@@ -91,7 +93,7 @@ echo "</table><p>\n";
 
 echo "<form action=$php_self method=post>
    <input type=hidden name=_action value=update>
-   <input type=hidden name=id_person value=$_REQUEST[id_person]>
+   <input type=hidden name=id_person value=$id_person>
    <input type=hidden name=id_project value=$_REQUEST[id_project]>
    <table border=0>
   <tr>

@@ -166,13 +166,13 @@ class MENU
             $projects->add("$e[name] ($e[semester]$e[year])", $project);
             $project->add("Prosjektinfo", "prjInfo.php?id=$pid");
             $project->add("Gruppeoppsett", "seating.php?id_project=$pid");
-            $project->add("Program", "program.php?id=$pid");
+            $project->add("Repertoar", "repository.php?id_project=$pid", AUTH::REP);
             $project->add("Musikere", "person.php?f_project[]=$pid");
             $project->add("Noter", "document.php?path=project/$pid/sheet");
             $project->add("Innspilling", "document.php?path=project/$pid/rec");
             $project->add("Dokumenter", "document.php?path=project/$pid/doc");
             $project->add("Regikomité", "direction.php?id_project=$pid", AUTH::DIR_RO);
-            $project->add(($e[orchestration] == $db->prj_orch_tutti) ? "Permisjonssøknad" : "Påmelding", "participant_11.php?id_project=$pid&id_person=$pers[id]", AUTH::RES_SELF);
+            $project->add(($e[orchestration] == $db->prj_orch_tutti) ? "Permisjonssøknad" : "Påmelding", "participant_11.php?id_project=$pid", AUTH::RES_SELF);
             $project->add("Tilbakemelding", "feedback.php?id=$pid");
             $project->add("Fravær", "absence.php?id_project=$pid", AUTH::ABS_RO);
             $project->add("Prosjektressurser", "participant_x1.php?id=$pid", AUTH::RES);
@@ -182,7 +182,7 @@ class MENU
 
       $menu->add("Hva skjer?", "event.php", AUTH::PRJM);
 
-      // Pages in use, but not linked to the meu system
+      // Pages in use, but not linked to the menu system
       $menu->add(null, "participant_xx.php", AUTH::BOARD_RO);
       $menu->add(null, "participant_x1.php", AUTH::RES);
       $menu->add(null, "participant_11.php", AUTH::RES_SELF);

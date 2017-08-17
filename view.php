@@ -184,8 +184,8 @@ add_li("Meny", 1);
       {
          add_li("Prosjektinfo");
          add_li("Gruppeoppsett", 0, false, AUTH::SEAT, "Kart over plassering av musikere pr. instrumentgruppe");
-         add_li("Program");
-         add_li("Musikere");
+         add_li("Repertoar", 0, AUTH::REP, AUTH::REP, "Legge inn akttuelt repertoar");
+         add_li("Musikere", 0, false, AUTH::MEMB_RW, "Adresseliste over musikere for dette prosjektet");
          add_li("Noter", 0, false, AUTH::PRJDOC, "Oversikt/administrajon av øvingsnoter");
          add_li("Innspilling", 0, false, AUTH::PRJDOC, "Oversikt/administrajon av egne opptak og andre innspillinger");
          add_li("Dokumenter", 0, false, AUTH::PRJDOC, "Oversikt/administrajon av prosjektdokumenter");
