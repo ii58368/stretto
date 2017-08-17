@@ -44,7 +44,7 @@ foreach ($stmt as $row)
 {
    if ($row[person_id] != $prev_id)
    {
-      echo "</tr><tr><td bgcolor=#A6CAF0><a href=\"participant_1x.php?id=$row[person_id]\">$row[firstname] $row[lastname]</a>\n";
+      echo "</tr><tr><td bgcolor=#A6CAF0 nowrap><a href=\"participant_1x.php?id=$row[person_id]\">$row[firstname] $row[lastname]</a>\n";
       echo "</td><td bgcolor=#A6CAF0> $row[instrument] </td>\n";
       $prev_id = $row[person_id];
    }

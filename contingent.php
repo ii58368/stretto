@@ -1,6 +1,5 @@
 <?php
 require 'framework.php';
-require 'participant_status.php';
 
 $sel_year = is_null($_REQUEST[from]) ? date("Y") - 3 : intval($_REQUEST[from]);
 $prev_year = $sel_year - 1;

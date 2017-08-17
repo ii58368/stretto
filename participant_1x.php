@@ -61,7 +61,7 @@ foreach ($stmt as $row)
    echo "</td>\n";
    echo "<td>" . date('D j.M y', $row[deadline]) . "</td>" .
    "<td>";
-   if ($row[orchestration] == $prj_orch_tutti)
+   if ($row[orchestration] == $db->prj_orch_tutti)
       echo "<center><img src=\"images/tick2.gif\" border=0></center>";
    echo "</td>
          </tr>";
@@ -70,8 +70,4 @@ foreach ($stmt as $row)
 
 </table>
 </form>
-
-<?php
-require 'framework_end.php';
-?>
 

@@ -16,7 +16,9 @@ echo str_replace("\n", "<br>\n", $prj[info]) . "\n";
 echo "<h3>Repertoar</h3>
     <table border=0>\n";
 
-$query = "SELECT title, work, firstname, lastname, music.comment as comment"
+$query = "SELECT title, work, firstname, lastname, "
+        . " music.comment as comment, "
+        . " repository.comment as r_comment"
         . " from repository, music"
         . " where repository.id = music.id_repository"
         . " and music.status = $db->mus_stat_yes"
@@ -27,10 +29,10 @@ $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
-   echo "<tr><td>$row[firstname] $row[lastname]:</td><td>$row[title]</td>";
+   echo "<tr><td valign=top>$row[firstname] $row[lastname]:</td><td>$row[title]<br>$row[r_comment]</td>";
    if (strlen($row[work]) > 0)
-      echo "<td>fra $row[work]</td>";
-   echo "<td>$row[comment]</td>\n";
+      echo "<td valign=top>fra $row[work]</td>";
+   echo "<td valign=top>$row[comment]</td>\n";
    echo "</tr>\n";
 }
 echo "</table><p>\n";
