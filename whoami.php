@@ -23,6 +23,7 @@ class WHOAMI
               . "from person, instruments "
               . " where uid = '$uid' "
               . "and person.id_instruments = instruments.id";
+      
       $s = $db->query($q);
       $e = $s->fetch(PDO::FETCH_ASSOC);
 

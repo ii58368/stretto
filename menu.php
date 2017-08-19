@@ -139,7 +139,7 @@ class MENU
 
          if ($access->auth(AUTH::PRJM))
          {
-            $q = "select id, name, semester, year, orchestration "
+            $q = "select id, name, semester, year, orchestration, docs_avail "
                     . "from project "
                     . "where (status = $db->prj_stat_public "
                     . "or status = $db->prj_stat_tentative) "
@@ -147,7 +147,8 @@ class MENU
                     . "order by year,semester DESC";
          } else
          {
-            $q = "select project.id as id, project.name as name, semester, year, orchestration "
+            $q = "select project.id as id, project.name as name, semester, "
+                    . "year, orchestration, docs_avail "
                     . "from project, participant, person "
                     . "where project.id = participant.id_project "
                     . "and participant.id_person = person.id "
@@ -168,9 +169,12 @@ class MENU
             $project->add("Gruppeoppsett", "seating.php?id_project=$pid");
             $project->add("Repertoar", "repository.php?id_project=$pid", AUTH::REP);
             $project->add("Musikere", "person.php?f_project[]=$pid");
-            $project->add("Noter", "document.php?path=project/$pid/sheet");
-            $project->add("Innspilling", "document.php?path=project/$pid/rec");
-            $project->add("Dokumenter", "document.php?path=project/$pid/doc");
+            if (($e[docs_avail] & (1 << $db->prj_docs_avail_sheet)) || $access->auth(AUTH::PRJDOC))
+               $project->add("Noter", "document.php?path=project/$pid/sheet");
+            if ($e[docs_avail] & (1 << $db->prj_docs_avail_rec) || $access->auth(AUTH::PRJDOC))
+               $project->add("Innspilling", "document.php?path=project/$pid/rec");
+            if ($e[docs_avail] & (1 << $db->prj_docs_avail_doc) || $access->auth(AUTH::PRJDOC))
+               $project->add("Dokumenter", "document.php?path=project/$pid/doc");
             $project->add("Regikomité", "direction.php?id_project=$pid", AUTH::DIR_RO);
             $project->add(($e[orchestration] == $db->prj_orch_tutti) ? "Permisjonssøknad" : "Påmelding", "participant_11.php?id_project=$pid", AUTH::RES_SELF);
             $project->add("Tilbakemelding", "feedback.php?id=$pid");

@@ -18,15 +18,29 @@ function get_groups()
    global $whoami;
    global $db;
 
-   $query = "select groups.id as id, groups.name as name "
+   $query = "select groups.id as id "
            . "from participant, instruments, groups, person "
            . "where participant.id_person = person.id "
            . "and person.id = " . $whoami->id() . " "
            . "and participant.id_project = $_REQUEST[id_project] "
            . "and participant.id_instruments = instruments.id "
            . "and instruments.id_groups = groups.id";
+
    $stmt = $db->query($query);
-   return $stmt->fetch(PDO::FETCH_ASSOC);
+   $grp = $stmt->fetch(PDO::FETCH_ASSOC);
+
+   if ($grp == null)
+   {
+      $query = "select groups.id as id "
+              . "from instruments, groups, person "
+              . "where person.id = " . $whoami->id() . " "
+              . "and person.id_instruments = instruments.id "
+              . "and instruments.id_groups = groups.id";
+
+      $stmt = $db->query($query);
+      $grp = $stmt->fetch(PDO::FETCH_ASSOC);
+   }
+   return $grp[id];
 }
 
 function get_seating($id_groups)
@@ -66,22 +80,20 @@ function update_seating($id_groups, $template)
    global $whoami;
    global $db;
 
-   $s = $db->query("select id from person where uid = '$whoami'");
-   $person = $s->fetch(PDO::FETCH_ASSOC);
-
    $ts = strtotime("now");
 
    if (!($seat = get_seating($id_groups)))
    {
       $query = "insert into seating (id_groups, id_project, template, id_person, ts) "
-              . "values ($id_groups, $_POST[id_project], $template, $person[id], $ts)";
+              . "values ($id_groups, $_POST[id_project], $template, "
+              . $whoami->id() . ", $ts)";
    } else
    {
       if (is_null($template))
          $template = $seat[template];
 
       $query = "update seating set template = $template,"
-              . "id_person = '$person[id]',"
+              . "id_person = " . $whoami->id() . ","
               . "ts = '$ts' "
               . "where id_groups = $id_groups "
               . "and id_project = $_POST[id_project]";
@@ -89,11 +101,11 @@ function update_seating($id_groups, $template)
    $db->query($query);
 }
 
-$grp = get_groups();
+$grp_id = get_groups();
 
 if ($action == 'template')
 {
-   update_seating($grp[id], $_POST[template]);
+   update_seating($grp_id, $_POST[template]);
 }
 
 
@@ -110,11 +122,11 @@ if ($action == 'update')
    $db->query($query);
    $no = NULL;
 
-   update_seating($grp[id], null);
+   update_seating($grp_id, null);
 }
 
 $prj = get_project();
-$seat = get_seating($grp[id]);
+$seat = get_seating($grp_id);
 
 echo "
     <h1>Gruppeoppsett</h1>
@@ -146,7 +158,7 @@ if ($access->auth(AUTH::SEAT))
            . "and participant.id_project = $_REQUEST[id_project] "
            . "and participant.id_instruments = instruments.id "
            . "and instruments.id_groups = groups.id "
-           . "and groups.id = $grp[id] "
+           . "and groups.id = $grp_id "
            . "order by $sort";
 
    $stmt = $db->query($query);
@@ -187,12 +199,7 @@ if ($access->auth(AUTH::SEAT))
 </form>";
 }
 
-echo "<img src=\"map.php?id_groups=$grp[id]&id_project=$_REQUEST[id_project]&template=$seat[template]\"><br>\n";
+echo "<img src=\"map.php?id_groups=$grp_id&id_project=$_REQUEST[id_project]&template=$seat[template]\"><br>\n";
 
 if (!is_null($seat))
    echo "$seat[firstname]/" . date('j.M y', $seat[ts]) . "\n";
-
-require 'framework_end.php';
-?>
-
-

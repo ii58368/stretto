@@ -49,6 +49,9 @@ class DB extends PDO
    public $prj_stat = array("Public", "Internt", "Tentativt", "Draft", "Kanselert");
    public $prj_orch_reduced = 0;
    public $prj_orch_tutti = 1;
+   public $prj_docs_avail_rec = 0;
+   public $prj_docs_avail_sheet = 1;
+   public $prj_docs_avail_doc = 2;
 // table: direction
    public $dir_stat_free = 0;
    public $dir_stat_allocated = 1;

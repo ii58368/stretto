@@ -4,11 +4,36 @@ require 'framework.php';
 if (is_null($sort))
    $sort = 'name';
 
+function update_db($variant_idx, $id_project, $row)
+{
+   global $db;
+   
+   $docs_bit = 0;
+   
+   if ($handle = opendir($_REQUEST[path]))
+   {
+      while (($file = readdir($handle)) != false)
+      {
+         $abs_file = $_REQUEST[path] . "/" . $file;
+         if (!is_file($abs_file))
+            continue;
+         $docs_bit = 1 << $variant_idx;
+         break;
+      }
+      closedir($handle);
+   }
+   
+   $docs_avail = $row[docs_avail] & ~(1 << $variant_idx);
+   $docs_avail |= $docs_bit;
+
+   $db->query("update project set docs_avail = $docs_avail where id = $id_project");
+}
+
 list($category, $id_project, $variant) = explode('/', $_REQUEST[path]);
 
 if ($category == "project")
 {
-   $query = "select name, semester, year from project where id = $id_project";
+   $query = "select name, semester, year, docs_avail from project where id = $id_project";
    $s = $db->query($query);
    $row = $s->fetch(PDO::FETCH_ASSOC);
 
@@ -19,6 +44,11 @@ if ($category == "project")
 
    $heading = "$row[name] ($row[semester]$row[year])";
    $heading2 = $var_arr[$variant];
+
+   $variant_keys = array_keys($var_arr);
+   for ($variant_idx = 0; $variant_idx < count($variant_keys); $variant_idx++)
+      if ($variant_keys[$variant_idx] == $variant)
+         break;
 }
 
 if ($category == "common")
@@ -30,12 +60,12 @@ function this_access_rw()
 {
    global $access;
    global $category;
-   
+
    if ($category == 'project')
       return $access->auth(AUTH::PRJDOC);
    if ($category == 'common')
       return $access->auth(AUTH::DOC_RW);
-   
+
    return false;
 }
 
@@ -102,6 +132,9 @@ if ($action == 'update' && this_access_rw())
       }
       $no = NULL;
    }
+   
+   if (!is_null($variant_idx))
+      update_db($variant_idx, $id_project, $row);
 }
 
 if ($handle = opendir($_REQUEST[path]))
@@ -135,7 +168,7 @@ if ($handle = opendir($_REQUEST[path]))
     <td><input type=text size=30 name=file value=\"$file\"></td>
          </form>";
       }
-      echo "<td>" . (int)($stat[size] / 1024) . "K</td>" .
+      echo "<td>" . (int) ($stat[size] / 1024) . "K</td>" .
       "<td>" . date('D j.M y', $stat[mtime]) . "</td>" .
       "</tr>";
    }
@@ -145,9 +178,3 @@ if ($handle = opendir($_REQUEST[path]))
 ?> 
 
 </table>
-
-<?php
-require 'framework_end.php';
-?>
-
-
