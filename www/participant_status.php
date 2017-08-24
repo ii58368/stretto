@@ -1,7 +1,6 @@
 <?php
 
 require_once 'conf/opendb.php';
-require_once 'const.php';
 
 function participant_status($person_id, $project_id)
 {

@@ -5,11 +5,6 @@ class DB extends PDO
 
    public function __construct()
    {
-//$dbhost = 'mysql04.fastname.no';
-//$dbuser = 'd301218';
-//$dbpass = 'slow9down!';
-//$dbname = 'd301218';
-
       $dbhost = '127.0.0.1';
       $dbuser = 'root';
       $dbpass = 'Knoll.and.Tott';

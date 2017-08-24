@@ -1,6 +1,5 @@
 <?php
 
-require_once 'const.php';
 require_once 'request.php';
 require_once 'conf/opendb.php';
 

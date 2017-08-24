@@ -33,7 +33,7 @@ $prj_name = 'Stretto';
 
             <?php
 setlocale(LC_TIME, "no_NO.UTF-8");
-            require_once 'const.php';
+date_default_timezone_set('Europe/Paris');
             require_once 'request.php';
             require_once 'conf/opendb.php';
             require_once 'conf/auth.php';
