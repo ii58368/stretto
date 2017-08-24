@@ -1,0 +1,16 @@
+AuthBasicAuthoritative Off
+AuthUserFile /dev/null
+AuthMySQL On
+AuthName "Authentication required"
+AuthType Basic
+Auth_MySQL_Host "127.0.0.1"
+Auth_MySQL_User "root"
+Auth_MySQL_Password "Knoll.and.Tott"
+AuthMySQL_DB "stretto"
+AuthMySQL_Password_Table "person"
+Auth_MySQL_Username_Field "email"
+Auth_MySQL_Password_Field "password"
+Auth_MySQL_Empty_Passwords Off
+Auth_MySQL_Encryption_Types PHP_MD5
+Auth_MySQL_Authoritative On
+require valid-user

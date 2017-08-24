@@ -1,0 +1,5 @@
+AuthType Basic
+AuthName "For stage manager only"
+AuthUserFile /home/14/w256142/.htpasswd
+require user OSO
+

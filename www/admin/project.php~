@@ -1,0 +1,263 @@
+<html>
+  <head>
+    <title>Prosjekt</title>
+    <LINK href="style.css" rel="stylesheet" type="text/css">
+  </head>
+
+<?php
+
+include 'config.php';
+include 'opendb.php';
+
+include 'request.php';
+
+
+function list_group($id)
+{
+  $q  = "SELECT firstname, lastname, table_ok, instrument, shift.status as status, " .
+   "shift.comment as shift_comment " .
+   "FROM person, instruments, shift " .
+   "where person.id = shift.id_person " .
+   "and id_instrument = instruments.id " .
+   "and shift.id_project = ${id} " .
+   "and (shift.status >= 1 and shift.status <= 3) " .
+   "order by list_order, lastname, firstname";
+
+  $r = mysql_query($q);
+
+  while($e = mysql_fetch_array($r, MYSQL_ASSOC))
+  {
+    if ($e[status] == 1)
+      echo "<font color=grey>";
+    if ($e[status] == 3)
+      echo "<strike>";
+    echo $e[firstname] . " " . $e[lastname] . " (" . $e[instrument] . ")";
+    if ($e[status] == 1)
+      echo "</font>";
+    if ($e[status] == 3)
+      echo "</strike>";
+    if ($e[table_ok] == NULL)
+      echo "<image src=/images/chair-minus-icon.png border=0 title=\"Kan ikke l&oslash;fte bord\">";
+    echo "<br>";
+  }
+}
+
+function select_person($selected)
+{
+  $q  = "SELECT person.id as id, firstname, lastname, instrument FROM person, instruments " .
+   "where (status = 'aktiv' or status = 'fritatt') and id_instrument = instruments.id " .
+   "order by list_order, lastname, firstname";
+
+   $r = mysql_query($q);
+
+  while($e = mysql_fetch_array($r, MYSQL_ASSOC))
+  {
+    echo "<option value=\"" . $e[id] . "\"";
+    if ($e[id] == $selected)
+      echo " selected";
+    echo ">" . $e[firstname] . " " . $e[lastname] . " (" . $e[instrument] . ")";
+  }
+}
+
+function select_semester($selected)
+{
+   echo "<select name=semester>";
+   echo "<option value=V";
+   if ($selected == 'V')
+     echo " selected";
+   echo ">V&aring;r</option>\n";
+
+   echo "<option value=H";
+   if ($selected == 'H')
+     echo " selected";
+   echo ">H&oslash;st</option>\n";
+   echo "</semester>";
+}
+
+function mail2regi($id_project)
+{
+  $q = "select name from project where id = ${id_project}";
+  $r = mysql_query($q);
+  $e = mysql_fetch_array($r, MYSQL_ASSOC);
+  $project_name = $e[name];
+
+  $q = "select email, phone from person, shift " .
+       "where person.id = shift.id_person " .
+       "and shift.id_project = ${id_project} " .
+       "and (shift.status = 1 or shift.status = 2)";
+  $r = mysql_query($q);
+
+  echo "<a href=\"mailto:";
+  while ($e = mysql_fetch_array($r, MYSQL_ASSOC))
+    echo $e[email] . ",";
+  echo "?subject=OSO: Regikomit&eacute;, $project_name&body=Se oppdatert regiplan: http://" . $_SERVER['SERVER_NAME'] . "/oso/regi/plan.php?id_project=$id_project\"><image border=0 src=/images/image1.gif hspace=20 title=\"Send mail alle i regikomit&eacute;en\"></a>";
+
+  echo "<a href=\"sms:";
+  mysql_data_seek($r, 0);
+  while ($e = mysql_fetch_array($r, MYSQL_ASSOC))
+    $str .= $e[phone] . ",";
+  $str = str_replace(' ', '', $str);
+  echo substr($str, 0, -1);
+  echo "&body=OSO Regikomit&eacute:\"><image border=0 src=/images/sms.png hspace=20 title=\"Send SMS til alle i regikomit&eacute;en\"></a>";
+}
+
+$sel_year = ($_REQUEST[from] == NULL) ? date("Y") : intval($_REQUEST[from]);
+$prev_year = $sel_year - 1;
+
+echo "
+  <body BGCOLOR=FFFFF4 TEXT=000000 LINK=00009F VLINK=008B00 ALINK=890000>
+    <h1>Prosjekt</h1>";
+echo "
+    <form action='$php_self' method=post>
+      <input type=hidden name=_sort value='$sort'>
+      <input type=hidden name=_action value=new>
+      <input type=submit value=\"Nytt prosjekt\" title=\"Definer nytt prosjekt\" >
+    </form>
+    <table border=1>
+    <tr>
+      <th bgcolor=#A6CAF0>Edit</th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=name,id&from=$sel_year\" title=\"Sorter p&aring; prosjektnavn\">Prosjekt</a></th>
+      <th bgcolor=#A6CAF0 nowrap><a href=\"$php_self?_sort=year,semester+DESC,id&from=$sel_year\" title=\"Sorter p&aring; semester\">Sem</a>
+           <a href=\"$_SERVER[PHP_SELF]?from=$prev_year&_sort={$sort}\"><img src=/images/arrow_up.png border=0 title=\"Forrige &aring;r...\"></a></th>
+      <th bgcolor=#A6CAF0>Regiansvarlig</th>
+      <th bgcolor=#A6CAF0>Regikomit&eacute;</th>
+      <th bgcolor=#A6CAF0>Generell info</th>
+    </tr>";
+
+
+if ($action == 'new')
+{
+  echo "  <tr>
+  <form action='$php_self' method=post>
+    <td align=left><input type=hidden name=_action value=update>
+    <input type=hidden name=_sort value='$sort'>
+    <input type=hidden name=from value='$sel_year'>
+    <input type=submit value=ok title=\"Registrer prosjekt\" ></td>
+    <th><input type=text size=20 name=name></th>
+    <th nowrap>";
+  select_semester(null);
+  echo "
+    <input type=text size=4 maxlength=4 name=year></th>
+    <th><select name=id_def_responsible>";
+	select_person(null);
+  echo "</select></th>
+    <th>Legges inn via turnuslisten...</th>
+    <th><textarea cols=44 rows=10 wrap=virtual name=comment></textarea></th>
+  </form>
+  </tr>";
+}
+
+if ($action == 'update')
+{
+  if ($no == NULL)
+  {
+    $query = "insert into project (name, semester, year, id_def_responsible, comment) " .
+    "values ('$_POST[name]', '$_POST[semester]', " .
+    "'$_POST[year]', '$_POST[id_def_responsible]', '$_POST[comment]')";
+
+    $query2 = "insert into shift (id_person, id_project, status) " .
+    "values ('$_POST[id_def_responsible]', last_insert_id(), 5)";
+  }
+  else
+  {
+    if ($delete != NULL)
+    { 
+      $query = "DELETE from project WHERE project.id = $no";
+      $query2 = "delete from shift where id_project = $no";
+      mysql_query($query2); 
+      $query2 = "delete resource from resource, plan " .
+                "where id_project = $no and resource.id_plan = plan.id";
+      mysql_query($query2); 
+      $query2 = "delete from plan where id_project = $no";
+    } 
+    else
+    {
+      $query = "update project set name = '$_POST[name]'," .
+        "semester = '$_POST[semester]'," .
+        "year = '$_POST[year]'," .
+        "id_def_responsible = '$_POST[id_def_responsible]'," .
+        "comment = '$_POST[comment]' " .
+        "where id = $no";
+      $query2 = "delete from shift " .
+                     "where id_person = $_POST[current_id_def_responsible] " .
+                     "and id_project = $no";
+      mysql_query($query2);
+      $query2 = "insert into shift (id_person, id_project, status) " .
+                "values ($_POST[id_def_responsible], $no, 5)";
+      mysql_query($query2);
+      $query2 = "update shift set status = 5 " .
+                     "where id_person = $_POST[id_def_responsible] " .
+                     "and id_project = $no";
+    } 
+    $no = NULL; 
+  }
+  mysql_query($query);
+  mysql_query($query2);
+}   
+
+$query  = "SELECT project.id as id, name, semester, year, id_def_responsible, " .
+    "firstname, lastname, instrument, project.comment as comment " .
+    "FROM person, project, instruments " .
+    "where id_def_responsible = person.id " .
+    "and id_instrument = instruments.id " .
+    "and project.year >= $sel_year " .
+    "order by ${sort}";
+$result = mysql_query($query);
+
+while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+{
+  if ($row[id] != $no)
+  {
+    echo "<tr>
+        <td><center>
+            <a href=\"{$php_self}?_sort={$sort}&from=$sel_year&_action=view&_no={$row[id]}\"><img src=\"/images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
+             </center></td>" .
+        "<td><a href=plan.php?id_project={$row[id]} target=content>{$row[name]}</a></td>" .
+        "<td>{$row[semester]} " .
+        "    {$row[year]}</td>" .     
+        "<td>{$row[firstname]} {$row[lastname]} ({$row[instrument]})";
+    echo "</td>" .
+	"<td nowrap>";
+    mail2regi($row[id]);
+    echo "<br>";
+    list_group($row[id]);
+    echo "</td><td>";
+    echo str_replace("\n", "<br>\n", $row[comment]);
+    echo "</td>" .
+        "</tr>";
+  }
+  else
+  {
+    echo "<tr>
+    <form action='{$php_self}' method=post>
+    <input type=hidden name=_action value=update>
+    <input type=hidden name=_sort value='$sort'>
+    <input type=hidden name=_no value='$no'>
+    <input type=hidden name=from value='$sel_year'>
+    <input type hidden name=current_id_def_responsible value=$row[id_def_responsible]>
+    <th nowrap><input type=submit value=ok title=\"Lagere endring\" >
+    <input type=submit value=del name=_delete title=\"Slett prosjekt\" onClick=\"return confirm('Sikkert at du vil slette {$row[name]} og tilh&oslash;rende regiplan?');\"></th>
+    <th><input type=text size=20 name=name value=\"{$row[name]}\"></th>
+    <th nowrap>";
+  select_semester($row[semester]);
+  echo "<input type=text size=4 maxlength=4 name=year value=\"{$row[year]}\"></th>
+    <th><select name=id_def_responsible>";
+  select_person($row[id_def_responsible]);
+  echo "</select></th>";
+  echo "<td>";
+  list_group($row[id]);
+  echo " </td>
+    <th><textarea cols=44 rows=10 wrap=virtual name=comment>{$row[comment]}</textarea></th>
+    </form>
+    </tr>";
+  }
+} 
+
+include 'closedb.php';
+
+?> 
+
+    </table>
+  </body>
+</html>
+

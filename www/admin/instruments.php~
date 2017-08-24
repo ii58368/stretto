@@ -1,0 +1,114 @@
+<html>
+  <head>
+    <title>Grupper</title>
+    <LINK href="style.css" rel="stylesheet" type="text/css">
+  </head>
+
+<?php
+  echo "
+  <body BGCOLOR=FFFFF4 TEXT=000000 LINK=00009F VLINK=008B00 ALINK=890000>
+    <h1>Grupper</h1>
+    <form action=\"$_SERVER[PHP_SELF]\" method=post>
+      <input type=hidden name=_sort value=\"$_REQUEST[_sort]\">
+      <input type=hidden name=_action value=new>
+      <input type=submit value=\"Ny gruppe\">
+    </form>
+    <form action='$php_self' method=post>
+    <table border=1>
+    <tr>
+      <th bgcolor=#A6CAF0>Edit</th>
+      <th bgcolor=#A6CAF0><a href=\"{$_SERVER[PHP_SELF]}?_sort=instrument,list_order\">Gruppe</a></th>
+      <th bgcolor=#A6CAF0><a href=\"{$_SERVER[PHP_SELF]}?_sort=list_order\">Sortering</a></th>
+      <th bgcolor=#A6CAF0>Regi</th>
+      <th bgcolor=#A6CAF0>Kommentar</th>
+      </tr>";
+
+include 'config.php';
+include 'opendb.php';
+
+include 'request.php';
+
+if ($action == 'new')
+{
+  echo "  <tr>
+    <td align=left><input type=hidden name=_action value=update>
+    <input type=hidden name=_sort value=\"{$sort}\">
+    <input type=submit value=ok></td>
+    <th><input type=text size=10 name=instrument>
+    <th><input type=text size=15 name=list_order></th>
+    <th><input type=checkbox name=direction value='*' title=\"Kryss av for &aring; bli med i listen av regigrupper\"></th>
+    <th><input type=text size=10 name=comment></th>
+  </tr>";
+}
+
+if ($action == 'update')
+{
+  if ($no == NULL)
+    $query = "insert into instruments (instrument, list_order, direction, comment)
+              values ('$_POST[instrument]', '$_POST[list_order]', '$_POST[direction]', '$_POST[comment]')";
+  else
+  {
+    if ($delete != NULL)
+    {
+      $query = "DELETE FROM instruments WHERE id = {$no}";
+      $query2 = "delete from gresource where id_instrument = {$no}";
+      mysql_query($query2);
+    }
+    else
+      $query = "update instruments set instrument = '$_POST[instrument]'," .
+                               "list_order = '$_POST[list_order]'," .
+                               "direction = '$_POST[direction]'," .
+                               "comment = '$_POST[comment]' " .
+             "where id = $no";
+    $no = NULL;
+  }
+  mysql_query($query);
+}   
+
+$query  = "SELECT id, instrument, list_order, direction, comment " .
+          "FROM instruments order by {$sort}";
+$result = mysql_query($query);
+
+while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+{
+  if ($row[id] != $no)
+  {
+    echo "<tr>
+         <td><center>
+           <a href=\"{$_SERVER[PHP_SELF]}?_sort={$_REQUEST[_sort]}&_action=view&_no={$row[id]}\"><img src=\"/images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
+             </center></td>" .
+         "<td>{$row[instrument]}</td>" .
+         "<td>{$row[list_order]}</td><td>";
+    if ($row[direction] == '*')
+      echo "<center><img src=\"/images/tick2.gif\" border=0 title=\"Regigruppe\"></center>";
+    echo "</td><td>{$row[comment]}</td>" .
+         "</tr>";
+  }
+  else
+  {
+    echo "<tr>
+    <input type=hidden name=_action value=update>
+    <input type=hidden name=_sort value='$_REQUEST[_sort]'>
+    <input type=hidden name=_no value='$no'>
+    <th nowrap><input type=submit value=ok>
+      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette {$row[part_name]} {$row[instrument]}?');\"></th>
+    <th><input type=text size=10 name=instrument value=\"{$row[instrument]}\">
+    <th><input type=text size=15 name=list_order value=\"{$row[list_order]}\"></th>
+    <th><input type=checkbox name=direction value='*'";
+  if ($row[direction] != '')
+    echo " checked";
+  echo "></th>
+    <th><input type=text size=10 name=comment value=\"{$row[comment]}\"></th>
+    </tr>";
+  }
+} 
+
+include 'closedb.php';
+
+?> 
+
+    </table>
+    </form>
+  </body>
+</html>
+

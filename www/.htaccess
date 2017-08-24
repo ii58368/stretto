@@ -1,0 +1,4 @@
+AuthType Basic
+AuthName "Brukertilgang til stretto er tilsendt i egen mail"
+AuthUserFile /etc/apache2/stretto_user
+Require valid-user

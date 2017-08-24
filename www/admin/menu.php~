@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <title>Menu</title>
+    <LINK href="style.css" rel="stylesheet" type="text/css">
+  </head>
+  <body BGCOLOR=FFFFF4 TEXT=000000 LINK=00009F VLINK=008B00 ALINK=890000>
+    <h1>OSO regi</h1>
+    <ul>
+      <li><a href="person.php?_sort=list_order,lastname,firstname" target=content>Person</a></li>
+      <li><a href="project.php?_sort=year,semester+DESC,id" target=content>Prosjekt</a></li>
+      <li><a href="shift.php" target=content>Turnus</a></li>
+<!--      <li><a href="shift.php?_sort=list_order,lastname,firstname" target=content>Turnus</a></li>  -->
+      <li><a href="plan.php?id_project=%" target=content>Regiplan</a></li>
+      <li><a href="location.php?_sort=name" target=content>Lokale</a></li>
+      <li><a href="instruments.php?_sort=list_order" target=content>Gruppe</a></li>
+      <li><a href=../ target=content>Forh&aring;ndsvisning</a></li>
+    </ul>
+    <p>
+    <hr>
+    <img src="http://www.oslo-symfoniorkester.org/images/stories/osologo.png">
+  </body>
+</html>
+
