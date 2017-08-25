@@ -1,4 +1,4 @@
 AuthType Basic
-AuthName "Brukertilgang til stretto er tilsendt i egen mail"
-AuthUserFile /etc/apache2/stretto_user
+AuthName "Kontakt sekretar@oslo-symfoniorkester.org for tilgang til Stretto"
+AuthUserFile /Users/jor/Desktop/stretto/www/conf/stretto_user
 Require valid-user

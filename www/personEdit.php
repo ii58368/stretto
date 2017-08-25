@@ -149,9 +149,9 @@ function update_pwd($no)
    $stmt = $db->query("select uid from person where id = $no");
    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-   $ht_cmd = "/usr/sbin/htpasswd -D /etc/apache2/{$dbname}_user $row[uid] $pwd";
+   $ht_cmd = "conf/htpasswd -D conf/{$dbname}_user $row[uid] $pwd";
    system($ht_cmd);
-   $ht_cmd = "/usr/sbin/htpasswd -bd /etc/apache2/{$dbname}_user $_POST[uid] $pwd";
+   $ht_cmd = "conf/htpasswd -bd conf/{$dbname}_user $_POST[uid] $pwd";
    system($ht_cmd);
 }
 
