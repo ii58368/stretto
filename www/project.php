@@ -56,7 +56,7 @@ function select_valid_par_stat($valid_par_stat)
    echo "</select>";
 }
 
-$sel_year = ($_REQUEST[from] == NULL) ? date("Y") : intval($_REQUEST[from]);
+$sel_year = is_null($_REQUEST[from]) ? date("Y") : intval($_REQUEST[from]);
 $prev_year = $sel_year - 1;
 
 echo "

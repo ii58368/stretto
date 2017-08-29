@@ -228,20 +228,20 @@ if ($action == 'new')
    echo "<tr>
     <td align=left><input type=hidden name=_action value=update>
     <input type=submit value=ok></td>
-    <th><input type=text size=10 name=date title=\"Format: <dato>. <mnd> [<&aring;r>] Merk: M&aring;ned p&aring; engelsk. Eksempel: 12. dec\"></th>
-    <th nowrap>";
+    <td><input type=text size=10 name=date title=\"Format: <dato>. <mnd> [<&aring;r>] Merk: M&aring;ned p&aring; engelsk. Eksempel: 12. dec\"></td>
+    <td nowrap>";
    select_tsort(null);
-   echo "<input type=text size=10 name=time value=\"18:10\"></th>
-    <th>";
+   echo "<input type=text size=10 name=time value=\"18:10\"></td>
+    <td>";
    select_location(1);
    echo "<br><input type=text size=22 name=location>";
-   echo "</th>
-    <th>";
+   echo "</td>
+    <td>";
    select_project($_REQUEST[id_project]);
    echo "
-  </th>
-    <th></th>
-    <th><textarea cols=50 rows=6 wrap=virtual name=comment>Opprigg til vanlig orkesterprøve</textarea></th>
+  </td>
+    <td></td>
+    <td><textarea cols=50 rows=6 wrap=virtual name=comment>Opprigg til vanlig orkesterprøve</textarea></td>
   </tr>";
 }
 
@@ -375,26 +375,26 @@ foreach($stmt as $row)
       echo "<tr>
     <input type=hidden name=_action value=update>
     <input type=hidden name=_no value='$no'>
-    <th nowrap><input type=submit value=ok>
-    <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette" . date('j.M.y', $row[date]) . "?');\"></th>
-    <th><input type=text size=10 name=date value=\"" . date('j.M.y', $row[date]) . "\"></th>
-    <th nowrap>";
+    <td nowrap><input type=submit value=ok>
+    <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette" . date('j.M.y', $row[date]) . "?');\"></td>
+    <td><input type=text size=10 name=date value=\"" . date('j.M.y', $row[date]) . "\"></td>
+    <td nowrap>";
       select_tsort($row[tsort]);
-      echo "<input type=text size=10 name=time value=\"{$row[time]}\"></th>
-    <th>";
+      echo "<input type=text size=10 name=time value=\"{$row[time]}\"></td>
+    <td>";
       select_location($row[id_location]);
       echo "<br><input type=text size=22 name=location value=\"{$row[location]}\">";
-      echo "</th>
-    <th>";
+      echo "</td>
+    <td>";
       select_project($row[id_project]);
-      echo "</th>
-    <th>";
+      echo "</td>
+    <td>";
       select_person($row[id_responsible]);
       echo "<br>";
       direction_select($row[id]);
       echo "<br><input type=text size=22 name=responsible value=\"{$row[responsible]}\">";
-      echo "</th>
-    <th><textarea cols=50 rows=6 wrap=virtual name=comment>{$row[comment]}</textarea></th>
+      echo "</td>
+    <td><textarea cols=50 rows=6 wrap=virtual name=comment>{$row[comment]}</textarea></td>
     </tr>";
    }
 }

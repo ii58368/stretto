@@ -175,6 +175,7 @@ add_li("Meny", 1);
       add_li("Ressurser", 0, AUTH::RES, false, "Oversikt over status på ressurser pr. prosjekt");
       add_li("Dokumenter", 0, AUTH::DOC_RO, AUTH::DOC_RW, "Tilgang til generelle dokumenter som vedtekter, generalforsamlingspapirer, ol.");
       add_li("Kontigent", 0, AUTH::CONT_RO, AUTH::CONT_RW, "Oversikt over kontigentinnbetalinger");
+      add_li("Konserter", 0, AUTH::BOARD_RO, AUTH::CONS, "Spesifikasjon av konserter");
       add_li("Om $prj_name", -1, false, false, "Generell informasjon om $prj_name");
    }
    add_li("Prosjekter", 1);

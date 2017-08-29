@@ -131,6 +131,7 @@ class MENU
          $admin->add("Ressurser", "participant_xx.php", AUTH::RES);
          $admin->add("Dokumenter", "document.php?path=common", AUTH::DOC_RO);
          $admin->add("Kontingent", "contingent.php", AUTH::CONT_RO);
+         $admin->add("Konserter", "concert.php", AUTH::BOARD_RO);
          $admin->add("Om $prj_name", "about.php");
       }
       {
