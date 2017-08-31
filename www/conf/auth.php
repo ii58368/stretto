@@ -41,15 +41,16 @@ class AUTH
    const RES_REG = 32; // Resources available, registered by secretary, r/w
    const RES_REQ = 33; // Resources available, recommended by MR, r/w
    const RES_FIN = 34; // Resources available, decided, r/w
-   const FBACK = 35; // Feedback, r/w
+   const LEAVE_RO = 35; // Leave r/o
    const ABS_ALL = 36; // Absence, for all participants, not only for a group e.g. violin 1
    const MEMB_GREP = 37; // List of memeber, possible to select filter
    const CONS = 38; // concert schedule, r/w
    const EVENT = 39; // What´s on?
    const RES_INV = 40; // Resources line-up, registered by art director r/w
+   const LEAVE_RW = 41; // Leave, r/w
    
    const ALL = 0x7fffffffffffffff; // 63 bits enabled
-   const NO_VIEWS = 41;
+   const NO_VIEWS = 42;
 
    private $access;
 

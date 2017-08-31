@@ -86,7 +86,12 @@ class DB extends PDO
 // table: music
    public $mus_stat_no = 0;
    public $mus_stat_yes = 1;
-
+// table: leave
+   public $lea_stat_unknown = 0;
+   public $lea_stat_registered = 1;
+   public $lea_stat_rejected = 2;
+   public $lea_stat_granted = 3;
+   public $lea_stat = array("ukjent", "registrert", "avslått", "innvilget");
 }
 
 $db = new DB();

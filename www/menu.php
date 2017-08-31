@@ -129,6 +129,7 @@ class MENU
          $admin->add("Tilbakemeldinger", "feedback.php", AUTH::BOARD_RO);
          $admin->add("Lokale", "location.php", AUTH::BOARD_RO);
          $admin->add("Ressurser", "participant_xx.php", AUTH::RES);
+         $admin->add("Permisjoner", "leave.php", AUTH::LEAVE_RO);
          $admin->add("Dokumenter", "document.php?path=common", AUTH::DOC_RO);
          $admin->add("Kontingent", "contingent.php", AUTH::CONT_RO);
          $admin->add("Konserter", "concert.php", AUTH::BOARD_RO);
@@ -178,7 +179,6 @@ class MENU
                $project->add("Dokumenter", "document.php?path=project/$pid/doc");
             $project->add("Regikomité", "direction.php?id_project=$pid", AUTH::DIR_RO);
             $project->add(($e[orchestration] == $db->prj_orch_tutti) ? "Permisjonssøknad" : "Påmelding", "participant_11.php?id_project=$pid", AUTH::RES_SELF);
-            $project->add("Tilbakemelding", "feedback.php?id=$pid");
             $project->add("Fravær", "absence.php?id_project=$pid", AUTH::ABS_RO);
             $project->add("Prosjektressurser", "participant_x1.php?id=$pid", AUTH::RES);
             $project->add("Konsertkalender", "consert.php?id=$pid", AUTH::BOARD_RO);
