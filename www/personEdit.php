@@ -57,19 +57,21 @@ function select_status($selected)
 
 if ($action == 'update_pers')
 {
+   $birthday = strtotime($_POST[birthday]);
+   
    try
    {
       if ($no == NULL)
       {
          $query = "insert into person (id_instruments, firstname, middlename, lastname, address, 
               postcode, city, email, uid, password,
-              phone1, phone2, phone3, status, comment)
+              phone1, phone2, phone3, status, birthday, comment)
               values ('$_POST[id_instruments]', '$_POST[firstname]', 
                       '$_POST[middlename]', '$_POST[lastname]', '$_POST[address]',
                       '$_POST[postcode]', '$_POST[city]', '$_POST[email]',
                       '$_POST[email]', MD5('OSO'),
                       '$_POST[phone1]', '$_POST[phone2]', '$_POST[phone3]', 
-                      '$_POST[status]', '$_POST[comment]')";
+                      '$_POST[status]', $birthday, '$_POST[comment]')";
          $db->query($query);
          $no = $db->lastInsertId();
       } else
@@ -91,7 +93,8 @@ if ($action == 'update_pers')
                     "email = '$_POST[email]'," .
                     "phone1 = '$_POST[phone1]'," .
                     "phone2 = '$_POST[phone2]'," .
-                    "phone3 = '$_POST[phone3]',";
+                    "phone3 = '$_POST[phone3]'," .
+                    "birthday = $birthday,";
             if ($access->auth(AUTH::MEMB_RW))
                $query .= "status = '$_POST[status]'," .
                          "id_instruments = '$_POST[id_instruments]',";
@@ -163,7 +166,7 @@ if ($no != NULL)
    $query = "SELECT person.id as id, id_instruments, instrument, firstname, middlename, lastname, " .
            "uid, address, postcode, city, " .
            "email, phone1, phone2, phone3, status, person.comment as comment, " .
-           "comment_dir, status_dir " .
+           "comment_dir, status_dir, birthday " .
            "FROM person, instruments " .
            "where id_instruments = instruments.id " .
            "and person.id = $no";
@@ -242,6 +245,10 @@ if ($action == 'edit_pers')
    "     </td>
       </tr>
     <tr>
+      <td>Fødselsdag:</td>
+      <td><input type=text name=birthday size=15 value=\"" . date('j. M Y', $row[birthday]) . "\" title=\"(frivillig) Eks: 10 jan 2017\"></td>
+    </tr>
+    <tr>
       <td>Kommentar:</td>
       <td><input type=text name=comment size=50 value=\"$row[comment]\"></td>
     </tr>
@@ -265,6 +272,7 @@ if ($action == 'edit_pers')
     <tr><td>Privat:</td><td>$row[phone2]</td></tr>
     <tr><td>Jobb:</td><td>$row[phone3]</td></tr>
     <tr><td>Status:</td><td>{$db->per_stat[$row[status]]}</td></tr>
+    <tr><td>Fødselsdag:</td><td>" . date('j. M Y', $row[birthday]) . "</td></tr>
     <tr><td>Kommentar:</td><td>$row[comment]</td></tr>";
 }
 echo "</form>
