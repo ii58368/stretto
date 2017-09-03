@@ -88,6 +88,7 @@ class AUTH
 
       $stmt = $db->query($query);
 
+      $n = 0;
       foreach ($stmt as $row)
       {
          $access |= $row[access];
