@@ -7,11 +7,11 @@ class STMT implements Iterator
 
    public function __construct($res)
    {
-      if ($res)
+      if (is_object($res))
          while ($e = $res->fetch_assoc())
             $this->vec[] = $e;
    }
-  
+
    public function fetch($opt)
    {
       switch ($opt)
@@ -31,7 +31,7 @@ class STMT implements Iterator
       }
       return null;
    }
-   
+
    public function rowCount()
    {
       return count($this->vec);
@@ -82,7 +82,6 @@ class myPDO
 
    public function query($q)
    {
-//      echo $q . "<br>\n";
       $res = $this->mysqli->query($q);
       return new STMT($res);
    }
