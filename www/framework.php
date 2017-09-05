@@ -35,7 +35,7 @@ $prj_name = 'Stretto';
 
             require_once 'request.php';
             require_once 'conf/opendb.php';
-            require_once 'conf/auth.php';
+            require_once 'auth.php';
             require_once 'menu.php';
             include 'page.php';
 

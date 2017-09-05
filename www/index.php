@@ -1,6 +1,6 @@
 <?php
 
-require 'conf/auth.php';
+require 'auth.php';
 
 if ($access->auth(AUTH::PRJM))
 {

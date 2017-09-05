@@ -48,7 +48,6 @@ class AUTH
    const EVENT = 39; // What´s on?
    const RES_INV = 40; // Resources line-up, registered by art director r/w
    const LEAVE_RW = 41; // Leave, r/w
-   
    const ALL = 0x7fffffffffffffff; // 63 bits enabled
    const NO_VIEWS = 42;
 
@@ -68,11 +67,22 @@ class AUTH
       }
    }
 
-   protected function bit(...$auth)
+   /* PHP 5.6+
+     protected function bit(...$auth)
+     {
+     $acc = 0;
+     foreach ($auth as $a)
+     $acc |= (1 << $a);
+
+     return $acc;
+     }
+    */
+
+   protected function bit()
    {
       $acc = 0;
-      foreach ($auth as $a)
-         $acc |= (1 << $a);
+      for ($i = 0; $i < func_num_args(); $i++)
+         $acc |= (1 << func_get_arg($i));
 
       return $acc;
    }
@@ -99,16 +109,28 @@ class AUTH
 
    public function auth_bit($auth)
    {
-   //   printf("%x %x", $auth, $this->access);
+      //   printf("%x %x", $auth, $this->access);
       return ($this->access & $auth);
    }
 
-   public function auth(...$auths)
+   /* PHP 5.6+
+     public function auth(...$auths)
+     {
+     $auth = 0;
+
+     foreach ($auths as $a)
+     $auth |= (1 << $a);
+
+     return $this->auth_bit($auth);
+     }
+    */
+
+   public function auth()
    {
       $auth = 0;
 
-      foreach ($auths as $a)
-         $auth |= (1 << $a);
+      for ($i = 0; $i < func_num_args(); $i++)
+         $auth |= (1 << func_get_arg($i));
 
       return $this->auth_bit($auth);
    }
@@ -150,7 +172,7 @@ class ACCESS extends AUTH
          return;
 
       echo "<h1>Permission denied</h1>";
-      
+
       foreach ($this->list_ro as $key => $value)
          printf("%s %x<br>", $key, $value);
       exit(0);
