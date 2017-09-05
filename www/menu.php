@@ -31,6 +31,7 @@ class SUBMENU
       $this->ul_option = $ul_option;
    }
 
+   /* PHP 5.6+
    public function add($name, $link, ...$auth)
    {
       global $access;
@@ -38,6 +39,39 @@ class SUBMENU
       $acc = 0;
       foreach ($auth as $a)
          $acc |= (1 << $a);
+
+      if ($acc == 0)
+         $acc = AUTH::ALL;
+
+      $item = new ITEM($name, $link, $acc);
+
+      array_push($this->menu, $item);
+
+      if (is_string($link))
+      {
+         $urn = explode('?', $link);
+         $path = $urn[0];
+         $path_array = explode('/', $path);
+         $filename = array_pop($path_array);
+
+         $access->page_add($filename, $acc);
+      }
+   }
+    */
+
+   public function add()
+   {
+      global $access;
+
+      if (func_num_args() < 2)
+         return;
+      
+      $name = func_get_arg(0);
+      $link = func_get_arg(1);
+      
+      $acc = 0;
+      for ($i = 0; $i < func_num_args(); $i++)
+         $acc |= (1 << func_get_arg($i));
 
       if ($acc == 0)
          $acc = AUTH::ALL;
