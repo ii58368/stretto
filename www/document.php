@@ -7,9 +7,9 @@ if (is_null($sort))
 function update_db($variant_idx, $id_project, $row)
 {
    global $db;
-   
+
    $docs_bit = 0;
-   
+
    if ($handle = opendir($_REQUEST[path]))
    {
       while (($file = readdir($handle)) != false)
@@ -22,7 +22,7 @@ function update_db($variant_idx, $id_project, $row)
       }
       closedir($handle);
    }
-   
+
    $docs_avail = $row[docs_avail] & ~(1 << $variant_idx);
    $docs_avail |= $docs_bit;
 
@@ -109,6 +109,9 @@ if ($action == 'update' && this_access_rw())
 {
    if (is_null($no))
    {
+      if (!is_dir($_REQUEST[path]))
+         mkdir($_REQUEST[path], 0755, true);
+
       $dst_file = $_REQUEST[path] . "/" . $_FILES[filename][name];
       if ($_FILES[filename][size] > 10 * 1024 * 1024)
       {
@@ -132,31 +135,33 @@ if ($action == 'update' && this_access_rw())
       }
       $no = NULL;
    }
-   
+
    if (!is_null($variant_idx))
       update_db($variant_idx, $id_project, $row);
 }
 
-if ($handle = opendir($_REQUEST[path]))
+if (is_dir($_REQUEST[path]))
 {
-   while (($file = readdir($handle)) != false)
+   if ($handle = opendir($_REQUEST[path]))
    {
-      $abs_file = $_REQUEST[path] . "/" . $file;
-      if (!is_file($abs_file))
-         continue;
-      $stat = stat($abs_file);
-      echo "<tr>";
-      if ($file != $no)
+      while (($file = readdir($handle)) != false)
       {
-         if (this_access_rw())
-            echo "<td><center>
+         $abs_file = $_REQUEST[path] . "/" . $file;
+         if (!is_file($abs_file))
+            continue;
+         $stat = stat($abs_file);
+         echo "<tr>";
+         if ($file != $no)
+         {
+            if (this_access_rw())
+               echo "<td><center>
            <a href=\"{$php_self}?_sort={$sort}&_action=view&_no=" . urlencode($file) . "&path=$_REQUEST[path]\"><img src=\"images/cross_re.gif\" border=0></a>
              </center></td>";
-         echo "
+            echo "
              <td><a href=\"$abs_file\">$file</a></td>";
-      } else
-      {
-         echo "
+         } else
+         {
+            echo "
             <form action=$php_self method=post>
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
@@ -167,13 +172,14 @@ if ($handle = opendir($_REQUEST[path]))
       <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette $file?');\"></td>
     <td><input type=text size=30 name=file value=\"$file\"></td>
          </form>";
+         }
+         echo "<td>" . (int) ($stat[size] / 1024) . "K</td>" .
+         "<td>" . date('D j.M y', $stat[mtime]) . "</td>" .
+         "</tr>";
       }
-      echo "<td>" . (int) ($stat[size] / 1024) . "K</td>" .
-      "<td>" . date('D j.M y', $stat[mtime]) . "</td>" .
-      "</tr>";
-   }
 
-   closedir($handle);
+      closedir($handle);
+   }
 }
 ?> 
 

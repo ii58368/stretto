@@ -133,10 +133,8 @@ if ($action == 'update' && $access->auth(AUTH::PRJ))
                  "values ('$_POST[name]', '$_POST[semester]', " .
                  "'$_POST[year]', '$_POST[status]', '$ts', '$orchestration', '$_POST[info]', 1, $valid_par_stat)";
          $db->query($query);
-         mkdir("project/" . $db->lastInsertId() . "/rec", 0755, true);
-         mkdir("project/" . $db->lastInsertId() . "/doc", 0755, true);
-         mkdir("project/" . $db->lastInsertId() . "/sheet", 0755, true);
-      } else
+      } 
+      else
       {
          if ($delete != NULL)
          {
