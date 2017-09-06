@@ -74,14 +74,17 @@ if ($action == 'update_pers')
                       '$_POST[status]', $birthday, '$_POST[comment]')";
          $db->query($query);
          $no = $db->lastInsertId();
-      } else
+      } 
+      else
       {
          if ($delete != NULL)
          {
             $query = "DELETE FROM person WHERE id = $no";
             $result = $db->query($query);
             $no = NULL;
-         } else
+            update_htpasswd($_POST[uid], null);
+         } 
+         else
          {
             $query = "update person set " .
                     "firstname = '$_POST[firstname]'," .
@@ -109,10 +112,30 @@ if ($action == 'update_pers')
    }
 }
 
+function update_htpasswd($usr, $pwd)
+{
+   $fname = "conf/.htpasswd";
+   $fr = fopen($fname, "r");
+   $fw = fopen("{$fname}~", "w");
+   
+   while (($ln = fgets($fr, 1024)) != null)
+   {
+      $e = explode(':', $ln);
+      if ($usr != $e[0])
+         fwrite($fw, "$ln");
+   }
+   if ($pwd != null)
+      fwrite($fw, "$usr:" . md5($pwd) . "\n");
+   
+   fclose($fr);
+   fclose($fw);
+   
+   rename("$fname~", $fname);
+}
+
 function update_pwd($no)
 {
    global $db;
-   global $dbname;
 
    $s = $db->query("select id from person where not id = $no and uid = '$_POST[uid]'");
    if ($s->rowCount() > 0)
@@ -139,6 +162,12 @@ function update_pwd($no)
       return;
    }
 
+   if (preg_match("/[^A-Za-z0-9]/", $_POST[uid]))
+   {
+      echo "<font color=red>Ugyldig brukernavn. Gyldige tegn: A-Z, a-z, 0-9</font>";
+      return;
+   }
+
    $query = "update person set uid = '$_POST[uid]' , password = MD5('$_POST[pwd1]')" .
            "where id = $no";
    try
@@ -152,10 +181,7 @@ function update_pwd($no)
    $stmt = $db->query("select uid from person where id = $no");
    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-   $ht_cmd = "conf/htpasswd -D conf/{$dbname}_user $row[uid] $pwd";
-   system($ht_cmd);
-   $ht_cmd = "conf/htpasswd -bd conf/{$dbname}_user $_POST[uid] $pwd";
-   system($ht_cmd);
+   update_htpasswd($row[uid], $pwd);
 }
 
 if ($action == 'update_pwd')
@@ -196,7 +222,8 @@ if ($action == 'edit_pers')
         <input type=hidden name=_action value=update_pers>
         <input type=submit value=\"Lagre\">\n";
    if ($no != null  && $access->auth(AUTH::MEMB_RW))
-      echo "<input type=submit name=_delete value=slett title=\"Kan slettes fra medlemsregisteret dersom vedkommende ikke har vært med på noen prosjekter\">\n";
+      echo "<input type=hidden name=uid value=\"$row[uid]\">
+        <input type=submit name=_delete value=slett title=\"Kan slettes fra medlemsregisteret dersom vedkommende ikke har vært med på noen prosjekter\">\n";
    echo "</th>
     </tr>
     <tr>

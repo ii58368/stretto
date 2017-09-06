@@ -36,7 +36,7 @@ class STMT implements Iterator
    {
       return count($this->vec);
    }
-
+   
    public function current()
    {
       return current($this->vec);
@@ -89,6 +89,11 @@ class myPDO
    public function setAttribute($attribute, $value)
    {
       
+   }
+
+   public function lastInsertId()
+   {
+      return $this->mysqli->insert_id;
    }
 
 }
