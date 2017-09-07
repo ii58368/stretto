@@ -180,7 +180,7 @@ if (is_dir($_REQUEST[path]))
          </form>";
          }
          echo "<td>" . (int) ($stat[size] / 1024) . "K</td>" .
-         "<td>" . date('D j.M y', $stat[mtime]) . "</td>" .
+         "<td>" . strftime('%a %e.%b %y', $stat[mtime]) . "</td>" .
          "</tr>";
       }
 

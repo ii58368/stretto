@@ -160,7 +160,7 @@ foreach ($stmt as $row)
     </tr><tr>
     <td><i>Fra:</i></td><td>$row[firstname] $row[lastname]</td>
     </tr><tr>
-    <td><i>Opprettet:</i></td><td>" . date('j.M y', $row[ts_create]) . "</td>
+    <td><i>Opprettet:</i></td><td>" . strftime('%e.%b %y', $row[ts_create]) . "</td>
     </tr><tr>
     <td><i>Prosjekt:</i></td><td>";
       select_project($row[id_project]);
@@ -186,7 +186,7 @@ foreach ($stmt as $row)
     <table border=0><tr>
     <td><i>Fra:</i></td><td>$row[firstname] $row[lastname]</td>
     </tr><tr>
-    <td><i>Dato:</i></td><td>" . date('j.M y', $row[ts_update]) . "</td>
+    <td><i>Dato:</i></td><td>" . strftime('%e.%b %Y', $row[ts_update]) . "</td>
     </tr><tr>
     <td><i>Prosjekt:</i></td><td>";
       if ($row[id_project] > 0)

@@ -21,7 +21,7 @@ class PDF_util extends FPDF
       // Move to the right
       $this->Cell(80);
       // Title
-      $this->Cell(30, 10, 'Oslo Symfoniorkester ' . date('d.m.y'), 0, 0, 'C');
+      $this->Cell(30, 10, 'Oslo Symfoniorkester ' . strftime('%a %e.%b %Y'), 0, 0, 'C');
       // Line break
       $this->Ln(20);
    }

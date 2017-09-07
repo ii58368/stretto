@@ -58,8 +58,8 @@ class PDF extends PDF_util
       {
          $idx = 0;
          
-         $date = ($e[date] != $last_date) ? date('D j.M', $e[date]) : '';
-         $this->Cell($tab[$idx++], $hight, $date);
+         $date = ($e[date] != $last_date) ? strftime('%a %e.%b', $e[date]) : '';
+         $this->Cell($tab[$idx++], $hight, $this->sconv($date));
          $time = ($e[date] != $last_date || $e[time] != $last_time) ? $e[time] : '';
          $this->Cell($tab[$idx++], $hight, $e[time]);
 

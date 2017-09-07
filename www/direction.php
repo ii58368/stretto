@@ -137,7 +137,7 @@ foreach ($stmt as $row)
 {
     echo "<tr><td nowrap>";
     if ($row[date] != $last_date)
-      echo date('D j.M', $row[date]);
+      echo strftime('%a %e.%b', $row[date]);
     echo "</td><td>";
     if ($row[date] != $last_date || $row[time] != $last_time)
       echo $row[time];

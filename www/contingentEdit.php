@@ -138,7 +138,7 @@ if (is_null($delete))
 {
    echo "<tr>
       <td>Dato:</td>
-      <td><input type=text name=date size=10 value=\"" . date('j.M y', $ts) . "\"></td>
+      <td><input type=date name=date size=10 value=\"" . date('j. M y', $ts) . "\"></td>
     </tr>
     <tr>
       <td>Beløp:</td>

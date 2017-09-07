@@ -58,7 +58,7 @@ if ($action == 'update')
 echo "
     <h1><a href=\"absence.php?id_project=$prj[id]\">Fravær</a></h1>
     <h2>$prj[name] $prj[semester]-$prj[year]</h2>
-    <h3>" . date('D j.M', $prj[date]) . "</h3>
+    <h3>" . strftime('%a %e.%b', $prj[date]) . "</h3>
     <form action='$php_self' method=post>
     <input type=hidden name=id_plan value=$_REQUEST[id_plan]>
     <input type=hidden name=_sort value=$sort>

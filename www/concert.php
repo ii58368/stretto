@@ -83,7 +83,7 @@ if ($action == 'new')
     <td align=left><input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
     <input type=submit value=ok></td>
-    <td><input type=text size=10 name=ts>
+    <td><input type=date size=10 name=ts>
     <td><input type=text size=5 maxlength=5 name=time>
     <td>";
    select_project(null);
@@ -154,7 +154,7 @@ foreach ($stmt as $row)
            <a href=\"{$_SERVER[PHP_SELF]}?_sort=$sort&_action=view&_no={$row[id]}&from=$sel_year\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
              </center></td>";
       echo
-      "<td>" . date('D j.M y', $row[ts]) . "</td>" .
+      "<td>" . strftime('%a %e.%b %y', $row[ts]) . "</td>" .
       "<td>$row[time]</td>" .
       "<td>$row[pname] ($row[semester]$row[year])</td>" .
       "<td>$row[lname]</td>" .
@@ -170,8 +170,8 @@ foreach ($stmt as $row)
     <input type=hidden name=_no value='$no'>
     <input type=hidden name=from value='$sel_year'>
     <td nowrap><input type=submit value=ok>
-      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette " . date('D j.M y', $row[ts]) . "?');\"></td>
-    <td><input type=text size=10 name=ts value=\"" . date('j.M.y', $row[ts]) . "\"></td>
+      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette " . strftime('%a %e.%b %y', $row[ts]) . "?');\"></td>
+    <td><input type=text size=10 name=ts value=\"" . date('j. M y', $row[ts]) . "\"></td>
     <td><input type=text size=5 maxlength=5 name=time value=\"$row[time]\">
     <td>";
       select_project($row[id_project]);

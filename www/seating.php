@@ -202,4 +202,4 @@ if ($access->auth(AUTH::SEAT))
 echo "<img src=\"map.php?id_groups=$grp_id&id_project=$_REQUEST[id_project]&template=$seat[template]\"><br>\n";
 
 if (!is_null($seat))
-   echo "$seat[firstname]/" . date('j.M y', $seat[ts]) . "\n";
+   echo "$seat[firstname]/" . strftime('%e.%b %y', $seat[ts]) . "\n";

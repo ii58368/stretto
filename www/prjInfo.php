@@ -62,7 +62,7 @@ $stmt = $db->query($query);
 foreach ($stmt as $row)
 {
    echo "<tr>
-       <td>" . date('D j.M', $row[date]) . "</td>" .
+       <td>" . strftime('%a %e.%b', $row[date]) . "</td>" .
    "<td>{$row[time]}</td><td>";
    if (strlen($row[url]) > 0)
       echo "<a href=\"{$row[url]}\">{$row[lname]}</a>";

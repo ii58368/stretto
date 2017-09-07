@@ -52,7 +52,7 @@ $stmt = $db->query($query);
 
 foreach ($stmt as $e)
 {
-   $rehersal = date('D j.M', $e[date]);
+   $rehersal = strftime('%a %e.%b', $e[date]);
    if ($access->auth(AUTH::ABS_RW))
       echo "<th bgcolor=#A6CAF0><a href=\"absenceEdit.php?id_plan=$e[id]\" title=\"Klikk for å registrere fravær...\">$rehersal</a></th>";
    else

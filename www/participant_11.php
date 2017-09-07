@@ -77,7 +77,7 @@ $stmt = $db->query($query);
 foreach ($stmt as $row)
 {
    echo "<tr>
-       <td>" . date('D j.M y', $row[date]) . "</td>" .
+       <td>" . strftime('%a %e.%b %y', $row[date]) . "</td>" .
    "<td>{$row[time]}</td><td>";
    if (strlen($row[url]) > 0)
       echo "<a href=\"{$row[url]}\">{$row[lname]}</a>";
@@ -108,12 +108,12 @@ echo "</td>
   <td>";
 echo ($prj[orchestration] == $prj_orch_tutti) ? "Permisjonsfrist:" : "Påmeldingsprist:";
 echo "</td><td>";
-echo ($prj[deadline] < time()) ? "<font color=red>" . date('D j.M y', $prj[deadline]) . "</font>" :
-        date('D j.M y', $prj[deadline]);
+echo ($prj[deadline] < time()) ? "<font color=red>" . strftime('%a %e.%b %y', $prj[deadline]) . "</font>" :
+        strftime('%a %e.%b %y', $prj[deadline]);
 echo "</td></tr>\n";
 echo "<tr><td>Registrert:</td><td>";
 if ($part != null)
-   echo ($_REQUEST[stat_self] == null) ? date('D j.M y', $part[ts_self]) : "<font color=green>" . date('D j.M y', $part[ts_self]) . "</font>";
+   echo ($_REQUEST[stat_self] == null) ? strftime('%a %e.%b %y', $part[ts_self]) : "<font color=green>" . strftime('%a %e.%b %y', $part[ts_self]) . "</font>";
 echo "</td></tr>\n";
 if ($prj[deadline] > time())
 {

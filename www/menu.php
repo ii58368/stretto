@@ -70,7 +70,7 @@ class SUBMENU
       $link = func_get_arg(1);
       
       $acc = 0;
-      for ($i = 0; $i < func_num_args(); $i++)
+      for ($i = 2; $i < func_num_args(); $i++)
          $acc |= (1 << func_get_arg($i));
 
       if ($acc == 0)

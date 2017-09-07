@@ -59,7 +59,7 @@ foreach ($stmt as $row)
    if ($row[status] == $db->prj_stat_public)
       echo "<img src=\"images/part_stat_$status$blink.gif\" border=0 title=\"{$db->prj_stat[$status]}\">";
    echo "</td>\n";
-   echo "<td>" . date('D j.M y', $row[deadline]) . "</td>" .
+   echo "<td>" . strftime('%a %e.%b %y', $row[deadline]) . "</td>" .
    "<td>";
    if ($row[orchestration] == $db->prj_orch_tutti)
       echo "<center><img src=\"images/tick2.gif\" border=0></center>";

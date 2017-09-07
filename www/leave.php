@@ -83,14 +83,14 @@ if ($action == 'new')
     <td align=left><input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
     <input type=submit value=ok></td>
-    <td>" . date('D j.M y') . "</td>\n<td>";
+    <td>" . strftime('%a %e.%b %y') . "</td>\n<td>";
    select_person(null);
    echo "</td>\n<td>";
    select_status(null);
    echo "</td>
-    <td>" . date('D j.M y') . "</td>
-    <td><input type=text size=10 name=ts_from></td>
-    <td><input type=text size=10 name=ts_to></td>
+    <td>" . strftime('%a %e.%b %y') . "</td>
+    <td><input type=date size=10 name=ts_from></td>
+    <td><input type=date size=10 name=ts_to></td>
     <td><textarea name=text wrap=virtual cols=60 rows=10></textarea></td>
   </tr>";
 }
@@ -171,12 +171,12 @@ foreach ($stmt as $row)
            <a href=\"{$_SERVER[PHP_SELF]}?_sort=$sort&_action=view&_no={$row[id]}&ts_reg=$sel_year\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
              </center></td>";
       echo
-      "<td>" . date('D j.M y', $row[ts_reg]) . "</td>" .
+      "<td>" . strftime('%a %e.%b %y', $row[ts_reg]) . "</td>" .
       "<td>$row[firstname] $row[middlename] $row[lastname] ($row[instrument])</td>" .
       "<td>" . $db->lea_stat[$row[status]] . "</td>" .
-      "<td>" . date('D j.M y', $row[ts_proc]) . "</td>" .
-      "<td>" . date('D j.M y', $row[ts_from]) . "</td>" .
-      "<td>" . date('D j.M y', $row[ts_to]) . "</td>" .
+      "<td>" . strftime('%a %e.%b %y', $row[ts_proc]) . "</td>" .
+      "<td>" . strftime('%a %e.%b %y', $row[ts_from]) . "</td>" .
+      "<td>" . strftime('%a %e.%b %y', $row[ts_to]) . "</td>" .
       "<td>";
       echo str_replace("\n", "<br>\n", $row[text]);
       echo "</td>" .
@@ -190,16 +190,16 @@ foreach ($stmt as $row)
     <input type=hidden name=from value='$sel_year'>
     <td nowrap><input type=submit value=ok>
       <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette " . date('D j.M y', $row[ts_reg]) . "?');\"></td>
-    <td>" . date('j.M.y', $row[ts_reg]) . "</td>
+    <td>" . strftime('%e.%m.%y', $row[ts_reg]) . "</td>
     <td>";
       select_person($row[id_person]);
       echo "</td>
     <td>";
       select_status($row[id_status]);
       echo "</td>
-    <td>" . date('j.M.y') . "</td>
-    <td><input type=text size=10 name=ts_from value=\"" . date('j.M.y', $row[ts_from]) . "\"></td>
-    <td><input type=text size=10 name=ts_to value=\"" . date('j.M.y', $row[ts_to]) . "\"></td>
+    <td>" . strftime('%e.%m.%y') . "</td>
+    <td><input type=date size=10 name=ts_from value=\"" . date('j. M y', $row[ts_from]) . "\"></td>
+    <td><input type=date size=10 name=ts_to value=\"" . date('j. M y', $row[ts_to]) . "\"></td>
      <td><textarea cols=60 rows=10 wrap=virtual name=text>{$row[text]}</textarea></td>
     </tr>";
    }

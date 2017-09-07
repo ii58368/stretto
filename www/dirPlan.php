@@ -228,7 +228,7 @@ if ($action == 'new')
    echo "<tr>
     <td align=left><input type=hidden name=_action value=update>
     <input type=submit value=ok></td>
-    <td><input type=text size=10 name=date title=\"Format: <dato>. <mnd> [<&aring;r>] Merk: M&aring;ned p&aring; engelsk. Eksempel: 12. dec\"></td>
+    <td><input type=date size=10 name=date title=\"Format: <dato>. <mnd> [<&aring;r>] Merk: M&aring;ned p&aring; engelsk. Eksempel: 12. dec\"></td>
     <td nowrap>";
    select_tsort(null);
    echo "<input type=text size=10 name=time value=\"18:10\"></td>
@@ -350,7 +350,7 @@ foreach($stmt as $row)
          echo "</center></td>";
       }
       echo 
-      "<td>" . date('D j.M y', $row[date]) . "</td>" .
+      "<td>" . strftime('%a %e.%b %y', $row[date]) . "</td>" .
       "<td>{$row[time]}</td><td>";
       if (strlen($row[url]) > 0)
          echo "<a href=\"{$row[url]}\">{$row[lname]}</a>";
@@ -376,8 +376,8 @@ foreach($stmt as $row)
     <input type=hidden name=_action value=update>
     <input type=hidden name=_no value='$no'>
     <td nowrap><input type=submit value=ok>
-    <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette" . date('j.M.y', $row[date]) . "?');\"></td>
-    <td><input type=text size=10 name=date value=\"" . date('j.M.y', $row[date]) . "\"></td>
+    <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette" . strftime('%e.%b %y', $row[date]) . "?');\"></td>
+    <td><input type=date size=10 name=date value=\"" . date('j. M y', $row[date]) . "\"></td>
     <td nowrap>";
       select_tsort($row[tsort]);
       echo "<input type=text size=10 name=time value=\"{$row[time]}\"></td>

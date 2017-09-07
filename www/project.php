@@ -102,8 +102,8 @@ if ($action == 'new')
     <th>";
    select_status(null);
    echo "</th>
-    <th><input type=text size=10 name=deadline value=\"" . 
-    date('j.M y', time() + 60*60*24*7*12) .    // Default dealine: 12 weeks from now
+    <th><input type=date size=10 name=deadline value=\"" . 
+    date('j. M y', time() + 60*60*24*7*12) .    // Default dealine: 12 weeks from now
     "\" title=\"Format: <dato>. <mnd> [<&aring;r>] Merk: M&aring;ned p&aring; engelsk. Eksempel: 12. dec\"></th>
     <th><input type=checkbox name=orchestration></th>
     <th>";
@@ -179,7 +179,7 @@ foreach ($stmt as $row)
       "<td><a href=\"plan.php?id_project={$row[id]}\">{$row[name]}</a></td>" .
       "<td>{$row[semester]}-{$row[year]}</td>" .
       "<td>" . $db->prj_stat[$row[status]] . "</td>" .
-      "<td>" . date('D j.M y', $row[deadline]) . "</td>" .
+      "<td>" . strftime('%a %e.%b %y', $row[deadline]) . "</td>" .
       "<td>";
       if ($row[orchestration] == $db->prj_orch_tutti)
          echo "<center><img src=\"images/tick2.gif\" border=0></center>";
@@ -208,7 +208,7 @@ foreach ($stmt as $row)
     <th>";
       select_status($row[status]);
       echo "</th>";
-      echo "<td><input type=text size=10 name=deadline value=\"" . date('j.M.y', $row[deadline]) . "\"></td>";
+      echo "<td><input type=date size=10 name=deadline value=\"" . date('j. M y', $row[deadline]) . "\"></td>";
       echo "<th><input type=checkbox name=orchestration";
       if ($row[orchestration] == $db->prj_orch_tutti)
          echo " checked";

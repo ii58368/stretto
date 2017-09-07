@@ -273,7 +273,7 @@ if ($action == 'edit_pers')
       </tr>
     <tr>
       <td>Fødselsdag:</td>
-      <td><input type=text name=birthday size=15 value=\"" . date('j. M Y', $row[birthday]) . "\" title=\"(frivillig) Eks: 10 jan 2017\"></td>
+      <td><input type=date name=birthday size=15 value=\"" . date('j. M y', $row[birthday]) . "\" title=\"(frivillig) Eks: 10 jan 2017\"></td>
     </tr>
     <tr>
       <td>Kommentar:</td>
@@ -299,7 +299,7 @@ if ($action == 'edit_pers')
     <tr><td>Privat:</td><td>$row[phone2]</td></tr>
     <tr><td>Jobb:</td><td>$row[phone3]</td></tr>
     <tr><td>Status:</td><td>{$db->per_stat[$row[status]]}</td></tr>
-    <tr><td>Fødselsdag:</td><td>" . date('j. M Y', $row[birthday]) . "</td></tr>
+    <tr><td>Fødselsdag:</td><td>" . strftime('%e. %b %Y', $row[birthday]) . "</td></tr>
     <tr><td>Kommentar:</td><td>$row[comment]</td></tr>";
 }
 echo "</form>

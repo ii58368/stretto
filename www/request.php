@@ -2,7 +2,7 @@
 
 require_once 'whoami.php';
 
-setlocale(LC_TIME, "no_NO.UTF-8");
+setlocale(LC_TIME, "no_NO");
 date_default_timezone_set('Europe/Paris');
 
 $sort = $_REQUEST['_sort'];

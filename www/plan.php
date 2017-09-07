@@ -115,13 +115,14 @@ echo "
       <th bgcolor=#A6CAF0>Merknad</th>
     </tr>";
 
+$hlp_date = "Format: <dato>. <mnd> [<år>] Merk: Måned på engelsk. Eksempel: 12. dec";
 
 if ($action == 'new')
 {
    echo "<tr>
     <td align=left><input type=hidden name=_action value=update>
     <input type=submit value=ok></td>
-    <th><input type=text size=10 name=date title=\"Format: <dato>. <mnd> [<&aring;r>] Merk: M&aring;ned p&aring; engelsk. Eksempel: 12. dec\"></th>
+    <th><input type=date size=10 name=date title=\"$hlp_date\"></th>
     <th nowrap>";
    select_tsort(null);
    echo "<input type=text size=11 name=time value=\"18:30-21:30\"></th>
@@ -206,7 +207,7 @@ foreach ($stmt as $row)
         <td><center>
             <a href=\"{$php_self}?_action=view&_no={$row[id]}&id_project=$id_project&semester=$semester&year=$year\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
              </center></td>";
-      echo "<td>" . date('D j.M y', $row[date]) . "</td>" .
+      echo "<td>" . strftime('%a %e.%b %y', $row[date]) . "</td>" .
       "<td>{$row[time]}</td><td>";
       if (strlen($row[url]) > 0)
          echo "<a href=\"{$row[url]}\">{$row[lname]}</a>";
@@ -227,8 +228,8 @@ foreach ($stmt as $row)
     <input type=hidden name=_action value=update>
     <input type=hidden name=_no value='$no'>
     <td nowrap><input type=submit value=ok>
-    <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette" . date('j.M.y', $row[date]) . "?');\"></td>
-    <td><input type=text size=10 name=date value=\"" . date('j.M.y', $row[date]) . "\"></td>
+    <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette" . strftime('%e.%m.%y', $row[date]) . "?');\"></td>
+    <td><input type=date size=10 name=date value=\"" . date('j. M y', $row[date]) . "\" title=\"$hlp_date\"></td>
     <td nowrap>";
       select_tsort($row[tsort]);
       echo "<input type=text size=11 name=time value=\"{$row[time]}\"></td>

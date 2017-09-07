@@ -86,7 +86,7 @@ function manage_inv($part, $row, $edit)
          if ($part[stat_inv] == $db->par_stat_yes)
             echo "<img border=0 src=\"images/tick2.gif\" title=\"" . $db->par_stat[$part[stat_inv]] . "\">\n";
          //      if ($part[stat_inv])
-         //         echo "<i>" . date('j.M', $part[ts_inv]) . "</i>";
+         //         echo "<i>" . strftime('%e.%m', $part[ts_inv]) . "</i>";
          echo "<br>" . str_replace("\n", "<br>\n", $part[comment_inv]);
       }
    }
@@ -103,7 +103,7 @@ function manage_self($part, $row, $edit)
    {
       echo "<img border=0 src=\"images/part_stat_$part[stat_self].gif\" title=\"" . $db->par_stat[$part[stat_self]] . "\">\n";
       if ($part[stat_self])
-         echo "<i>" . date('j.M', $part[ts_self]) . "</i>";
+         echo "<i>" . strftime('%e.%m', $part[ts_self]) . "</i>";
       echo "<br>" . str_replace("\n", "<br>\n", $part[comment_self]);
    }
    echo "</td>";
@@ -126,7 +126,7 @@ function manage_reg($part, $row, $edit, $valid_par_stat)
       {
          echo "<img border=0 src=\"images/part_stat_$part[stat_reg].gif\" title=\"" . $db->par_stat[$part[stat_reg]] . "\">\n";
          if ($part[stat_reg])
-            echo "<i>" . date('j.M', $part[ts_reg]) . "</i>";
+            echo "<i>" . strftime('%e.%m', $part[ts_reg]) . "</i>";
          echo "<br>" . str_replace("\n", "<br>\n", $part[comment_reg]);
       }
    }
@@ -150,7 +150,7 @@ function manage_req($part, $row, $edit)
       {
          echo "<img border=0 src=\"images/part_stat_$part[stat_req].gif\" title=\"" . $db->par_stat[$part[stat_req]] . "\">\n";
          if ($part[stat_req])
-            echo "<i>" . date('j.M', $part[ts_req]) . "</i>";
+            echo "<i>" . strftime('%e.%m', $part[ts_req]) . "</i>";
          echo "<br>" . str_replace("\n", "<br>\n", $part[comment_req]);
       }
    }
@@ -177,7 +177,7 @@ function manage_final($part, $row, $edit)
       {
          echo "<img border=0 src=\"images/part_stat_$part[stat_final].gif\" title=\"" . $db->par_stat[$part[stat_final]] . "\">\n";
          if ($part[stat_final])
-            echo "<i>" . date('j.M', $part[ts_final]) . "</i>";
+            echo "<i>" . strftime('%e.%m', $part[ts_final]) . "</i>";
          echo "<br>" . str_replace("\n", "<br>\n", $part[comment_final]);
       }
    }
@@ -277,7 +277,7 @@ if ($prj[orchestration] == $prj_orch_tutti)
    echo "Permisjonsfrist: ";
 else
    echo "Påmeldingsfrist: ";
-echo date('j.M.y', $prj[deadline]) . "</h2>
+echo strftime('%e.%m.%y', $prj[deadline]) . "</h2>
     <form action='$php_self' method=post>
     <input type=hidden name=_action value=update>
     <input type=hidden name=id value=$_REQUEST[id]>
