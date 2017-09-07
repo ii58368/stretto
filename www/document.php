@@ -56,6 +56,12 @@ if ($category == "common")
    $heading = "Generelle dokumenter";
 }
 
+if (is_null($heading))
+{
+   echo "<h1>Illegal path</h1>Access denied";
+   exit(0);
+}
+
 function this_access_rw()
 {
    global $access;
