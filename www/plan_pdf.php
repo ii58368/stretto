@@ -13,6 +13,7 @@ class PDF extends PDF_util
    function plan()
    {
       global $db;
+      global $access;
 
       $this->SetDrawColor(200, 200, 200);
       $this->SetLineWidth(1);
@@ -40,14 +41,20 @@ class PDF extends PDF_util
 
       $query = "select date, time, location.name as lname, " .
               "project.name as pname, " .
-              "plan.comment as comment, orchestration " .
+              "plan.comment as comment, orchestration, " .
+              "project.status as status " .
               "FROM project, plan, location " .
               "where id_location = location.id " .
               "and id_project = project.id " .
               "and plan.event_type = $db->plan_evt_rehearsal " .
               "and project.year = $_REQUEST[year] " .
               "and project.semester = '$_REQUEST[semester]' " .
-              "order by date,tsort,time";
+              "and (project.status = $db->prj_stat_public ";
+      if ($access->auth(AUTH::PRJ_RO))
+         $query .= "or project.status = $db->prj_stat_draft ";
+      $query .= "or project.status = $db->prj_stat_tentative "
+              . "or project.status = $db->prj_stat_internal) "
+              . "order by date,tsort,time";
 
       $stmt = $db->query($query);
 
@@ -57,6 +64,13 @@ class PDF extends PDF_util
 
       foreach ($stmt as $e)
       {
+         $tcolor = 0;
+         if ($e[status] == $db->prj_stat_tentative)
+            $tcolor = 150;
+         if ($e[status] == $db->prj_stat_draft)
+            $tcolor = 200;
+         $this->SetTextColor($tcolor, $tcolor, $tcolor);
+
          $idx = 0;
          
          $date = ($e[date] != $last_date) ? strftime('%a %e.%b', $e[date]) : '';
@@ -116,6 +130,13 @@ class PDF extends PDF_util
 
       foreach ($stmt as $prj)
       {
+         $tcolor = 0;
+         if ($prj[status] == $db->prj_stat_tentative)
+            $tcolor = 150;
+         if ($prj[status] == $db->prj_stat_draft)
+            $tcolor = 200;
+         $this->SetTextColor($tcolor, $tcolor, $tcolor);
+         
          $q = "select "
               . "concert.ts as ts, "
               . "location.name as lname "

@@ -227,7 +227,7 @@ foreach ($stmt as $row)
          toggle_project($row[id]);
       else
          view_project($row[id]);
-      echo "</tr>";
+     echo "</tr>";
    } else
    {
       echo "<tr>

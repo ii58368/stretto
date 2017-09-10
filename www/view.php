@@ -185,6 +185,7 @@ add_li("Meny", 1);
       add_li("Symfonikonsert", 1, false, false, "(Prosjekt jeg er med på selv)");
       {
          add_li("Prosjektinfo");
+         add_li("Beskjeder", 0, false, false, "Meldinger fra Hva skjer? som gjelder spesifikt for dette prosjektet");
          add_li("Gruppeoppsett", 0, false, AUTH::SEAT, "Kart over plassering av musikere pr. instrumentgruppe");
          add_li("Repertoar", 0, AUTH::REP, AUTH::REP, "Legge inn akttuelt repertoar");
          add_li("Musikere", 0, false, AUTH::MEMB_RW, "Adresseliste over musikere for dette prosjektet");
