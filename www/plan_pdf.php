@@ -2,6 +2,7 @@
 
 require_once 'request.php';
 require_once 'conf/opendb.php';
+require_once 'auth.php';
 
 require 'common_pdf.php';
 require 'person_query.php';
@@ -9,7 +10,7 @@ require 'person_query.php';
 class PDF extends PDF_util
 {
 
-   function content()
+   function plan()
    {
       global $db;
 
@@ -52,7 +53,7 @@ class PDF extends PDF_util
 
       $this->SetTextColor(0, 0, 0);
       $this->setFontSize(12);
-      $hight = 2;
+      $hight = 3;
 
       foreach ($stmt as $e)
       {
@@ -71,8 +72,97 @@ class PDF extends PDF_util
          if ($e[orchestration] == $db->prj_orch_reduced)
             $project .= '*';
          $this->Cell($tab[$idx++], $hight, $project);
-         $this->MultiCell($tab[$idx++], $hight+2, $this->sconv($e[comment]));
-         $this->Ln();
+         $this->MultiCell($tab[$idx++], $hight, $this->sconv($e[comment]));
+         $this->Ln(3);
+      }
+
+      $this->SetFont('Arial', 'I', 8);
+      $this->Cell(0, 30, "* : redusert besetning", 0, 0, 'LB');
+   }
+   
+   function repertoire()
+   {
+      global $db;
+      global $access;
+
+      $this->SetDrawColor(200, 200, 200);
+      $this->SetLineWidth(1);
+      //     $this->Line(10, 20, 200, 20);
+
+      $this->SetTextColor(0, 0, 200);
+      $this->setFontSize(30);
+      $semester_text = ($_REQUEST[semester] == 'V') ? 'Våren' : 'Høsten';
+      $this->Cell(60, 0, $this->sconv("Repertoar $semester_text $_REQUEST[year]"));
+
+      $this->Line(10, 38, 200, 38);
+ 
+      $query = "select id, name, info, status, orchestration "
+              . "from project "
+              . "where project.year = $_REQUEST[year] "
+              . "and project.semester = '$_REQUEST[semester]' "
+              . "and (project.status = $db->prj_stat_public ";
+      if ($access->auth(AUTH::PRJ_RO))
+         $query .= "or project.status = $db->prj_stat_draft ";
+      $query .= "or project.status = $db->prj_stat_tentative) "
+              . "order by project.id";
+
+      $stmt = $db->query($query);
+      
+      $this->SetY(40);
+      $this->SetLineWidth(0.3);
+      $this->SetDrawColor(0, 0, 0);
+      $this->SetTextColor(0, 0, 0);
+      $this->setFontSize(10);
+
+      foreach ($stmt as $prj)
+      {
+         $q = "select "
+              . "concert.ts as ts, "
+              . "location.name as lname "
+              . "from concert, location "
+              . "where concert.id_project = $prj[id] "
+              . "and concert.id_location = location.id "
+              . "order by concert.ts";
+
+         $s = $db->query($q);
+         
+         $h2 = "";
+         if ($prj[orchestration] == $db->prj_orch_reduced)
+            $h2 = "* ";
+         $h2 .= "$prj[name] ";
+         foreach ($s as $e)
+           $h2 .= ', ' . $e[lname] . ' ' . strftime('%A %e. %B', $e[ts]);
+         $this->Cell(100, 5, $this->sconv($h2), "B");
+ 
+         $this->Ln(7);
+
+         $q = "select "
+              . "title, firstname, lastname, work, "
+              . "repository.comment as r_comment, "
+              . "music.comment as m_comment "
+              . "from music, repository "
+              . "where music.id_project = $prj[id] "
+              . "and music.id_repository = repository.id "
+              . "and music.status = $db->mus_stat_yes";
+         
+         $s = $db->query($q);
+         
+         foreach ($s as $e)
+         {
+            $this->Cell(50, 5, $this->sconv("$e[lastname], $e[firstname]"));
+            $this->Cell(50, 5, $this->sconv("$e[title], $e[work] $e[r_comment]"));
+            $this->Ln();
+            if (strlen($e[m_comment]) > 0)
+            {
+               $this->Cell(50, 5);
+               $this->Cell(50, 5, $this->sconv("$e[m_comment]"));
+               $this->Ln();
+            }
+         }
+         
+         $this->Ln(4);
+         $this->MultiCell(100, 5, $this->sconv($prj[info]));
+         $this->Ln(7);
       }
 
       $this->SetFont('Arial', 'I', 8);
@@ -87,6 +177,8 @@ $pdf->SetFont_('Times', '', 10);
 setlocale(LC_TIME, "no_NO.UTF-8");
 $pdf->AddPage();
 
-$pdf->content();
+$pdf->plan();
+$pdf->AddPage();
+$pdf->repertoire();
 
 $pdf->Output();

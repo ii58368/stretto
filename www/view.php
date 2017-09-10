@@ -169,7 +169,7 @@ add_li("Meny", 1);
       add_li("Tilgang", 0, AUTH::BOARD_RO, AUTH::ACC, "Liste over tilganger for hver enkelt musiker");
       add_li("Tilgangsgrupper", 0, AUTH::BOARD_RO, AUTH::ACCGRP, "Definering av tilgangsgrupper");
       add_li("Notearkiv", 0, AUTH::BOARD_RO, AUTH::REP, "Oversikt over notearkiv");
-      add_li("Prosjekter", 0, AUTH::BOARD_RO, AUTH::PRJ, "Overordnet administrasjon av prosjekter");
+      add_li("Prosjekter", 0, AUTH::PRJ_RO, AUTH::PRJ, "Overordnet administrasjon/oversikt over planlagte prosjekter");
       add_li("Tilbakemeldinger", 0, AUTH::BOARD_RO, false, "Oversikt over tilbakemeldiner fra medlemmer");
       add_li("Lokale", 0, AUTH::BOARD_RO, AUTH::LOC, "Informasjon om lokaliteter for øvelser og konsert");
       add_li("Ressurser", 0, AUTH::RES, false, "Oversikt over status på ressurser pr. prosjekt");

@@ -237,8 +237,8 @@ foreach ($stmt as $row)
     <input type=hidden name=_action value=update>
     <td nowrap><input type=submit value=ok>
       <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette $row[title]?');\"></td>
-    <td><input type=text size=30 name=lastname value=\"$row[lastname]\">,
-         <input type=text size=30 name=firstname value=\"$row[firstname]\"></td>
+    <td><input type=text size=30 name=firstname value=\"$row[firstname]\" title=\"Fornavn\">
+         <input type=text size=30 name=lastname value=\"$row[lastname]\" title=\"Etternavn\"></td>
     <td><input type=text size=30 name=title value=\"$row[title]\"></td>
     <td><input type=text size=30 name=work value=\"$row[work]\"></td>
     <td><input type=text size=8 name=reference value=\"$row[reference]\">

@@ -1,4 +1,4 @@
 AuthType Basic
-AuthName "Kontakt sekretar@oslo-symfoniorkester.org for tilgang til Stretto"
+AuthName "Oslo Symphony Orchestra. Contact sekretar@oslo-symfoniorkester.org for access to Stretto"
 AuthUserFile /Users/jor/Desktop/stretto/www/conf/.htpasswd
 Require valid-user

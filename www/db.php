@@ -165,13 +165,13 @@ class DB extends myPDO
    public $con_stat_part = 4;
    public $con_stat = array("Undefinert", "Ikke betalt", "Purret", "Betalt", "Delvis betalt");
 // table: absence
-   public $abs_stat_undef = 0;
-   public $abs_stat_sick = 1;
-   public $abs_stat_busy = 2;
-   public $abs_stat_away = 3;
-   public $abs_stat_part = 4;
-   public $abs_stat_in = 5;
-   public $abs_stat = array("Udefinert", "Syk", "Opptatt", "skulk", "Delvis vekke", "Tilstede");
+   public $abs_stat_in = 0;
+   public $abs_stat_part = 1;
+   public $abs_stat_sick = 2;
+   public $abs_stat_busy = 3;
+   public $abs_stat_away = 4;
+   public $abs_stat_other = 5;
+   public $abs_stat = array("Tilstede", "Delvis vekke", "Syk", "Opptatt", "Skulk", "Annet");
 // table: event
    public $evt_importance_low = 0;
    public $evt_inportance_norm = 1;

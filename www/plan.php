@@ -65,7 +65,7 @@ function select_project($selected)
    echo "</select>";
 }
 
-echo "<h1>Prøveplan</h1>\n";
+echo "<h1>Spilleplan</h1>\n";
 
 if ($id_project == '%')
 {
