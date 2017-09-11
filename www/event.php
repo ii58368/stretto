@@ -1,6 +1,8 @@
 <?php
 require 'framework.php';
 
+$id_project = is_null($_REQUEST[id_project]) ? '%' : $_REQUEST[id_project];
+   
 function select_project($selected)
 {
    global $db;
@@ -71,6 +73,7 @@ if ($action != 'new' && $access->auth(AUTH::EVENT))
    echo "<form action=\"$php_self\" method=post>
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=_action value=new>
+      <input type=hidden name=id_project value=\"$id_project\">
       <input type=submit value=\"Nytt event\">
     </form>\n";
 }
@@ -88,7 +91,7 @@ if ($action == 'new')
     <td><i>Subjekt:</i></td><td><input type=text size=60 name=subject></td>
     </tr><tr>
     <td><i>Prosjekt:</i></td><td>";
-   select_project(null);
+   select_project($id_project);
    echo "</td>
      </tr><tr>
      <td><i>Viktighetsgrad:</i></td><td>";
@@ -142,6 +145,7 @@ $query = "select event.id as id, subject, ts_create, ts_update, importance, body
         . "from event, person, instruments "
         . "where person.id = event.id_person "
         . "and person.id_instruments = instruments.id "
+        . "and event.id_project like '$id_project' "
         . "order by ts_update desc";
 $stmt = $db->query($query);
 

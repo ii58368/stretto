@@ -202,7 +202,7 @@ class MENU
             $project = new SUBMENU("class=\"dl-submenu\"");
             $projects->add("$e[name] ($e[semester]$e[year])", $project);
             $project->add("Prosjektinfo", "prjInfo.php?id=$pid");
-            $project->add("Beskjeder", "pevent.php?id=$pid");
+            $project->add("Beskjeder", "pevent.php?id_project=$pid");
             $project->add("Gruppeoppsett", "seating.php?id_project=$pid");
             $project->add("Repertoar", "repository.php?id_project=$pid", AUTH::REP);
             $project->add("Musikere", "person.php?f_project[]=$pid");

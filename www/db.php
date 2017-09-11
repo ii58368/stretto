@@ -95,6 +95,11 @@ class myPDO
    {
       return $this->mysqli->insert_id;
    }
+   
+   public function quote($str)
+   {
+      return "'" . $this->mysqli->real_escape_string($str) . "'";
+   }
 
 }
 
