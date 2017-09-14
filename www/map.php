@@ -1,13 +1,20 @@
 <?php
 
+// Note: Call to imagefttext() requires that FreeType is supported for the
+// actual php version.
 require_once 'request.php';
 require_once 'conf/opendb.php';
+
+$id_groups = $_REQUEST[id_groups];
+$id_project = $_REQUEST[id_project];
+$id_template = $_REQUEST[template];
 
 function draw_chair($img, $x, $y, $a, $w, $h, $ftext)
 {
    $black = imagecolorallocate($img, 0, 0, 0);
    $green = imagecolorallocate($img, 0, 255, 0);
-   $fsize = 4;
+   $fsize = 12;
+   $col = imagecolorallocate($img, 0, 0, 0);
 
    $p = array(
        $x, $y,
@@ -22,10 +29,17 @@ function draw_chair($img, $x, $y, $a, $w, $h, $ftext)
       imagefilledpolygon($img, $p, 4, $green);
    
    imagepolygon($img, $p, 4, $black);
+   
+   $font = "Avenir.ttc";
+   $text = $atext[0];
 
-   $tx = $x + ($w * cos($a) - $h * sin($a)) / 2 - imageFontWidth($fsize) * strlen($atext[0]) / 2;
-   $ty = $y + ($h * cos($a) + $w * sin($a)) / 2 - imageFontHeight($fsize) / 2;
-   imagestring($img, $fsize, $tx, $ty, $atext[0], $col);
+   $box = @imageTTFBbox($fsize, 0, $font, $text);
+   $width = abs($box[4] - $box[0]);
+   $height = abs($box[5] - $box[1]);
+   $tx = $x + + ($w * cos($a) - $h * sin($a)) / 2 - $width/2;
+   $ty = $y + ($h * cos($a) + $w * sin($a)) / 2 + $heigth/2;
+
+   imagefttext($img, $fsize, -$a*360/(2* pi()), $tx, $ty, $col, $font, $text);
 }
 
 function draw_desk($img, $x0, $y0, $a, $no, $text0, $text1)
@@ -63,7 +77,7 @@ function get_txt($part, $pos)
       {
          if ($p[uid] == $whoami->uid())
             $tag = '*x';
-         return $p[firstname] . " " . $p[lastname][0] . $tag;
+         return $p[firstname] . " " . mb_substr($p[lastname], 0, 1, 'utf-8') . $tag;
       }
    }
    return $pos;
@@ -72,6 +86,8 @@ function get_txt($part, $pos)
 function draw_group($img, $lineup)
 {
    global $db;
+   global $id_project;
+   global $id_groups;
 
    if ($lineup == null)
       return;
@@ -79,10 +95,10 @@ function draw_group($img, $lineup)
    $query = "SELECT position, firstname, lastname, uid "
            . "FROM person, participant, instruments, groups "
            . "where person.id = participant.id_person "
-           . "and participant.id_project = $_REQUEST[id_project] "
+           . "and participant.id_project = $id_project "
            . "and participant.id_instruments = instruments.id "
            . "and instruments.id_groups = groups.id "
-           . "and groups.id = $_REQUEST[id_groups] "
+           . "and groups.id = $id_groups "
            . "order by participant.position";
 
    $stmt = $db->query($query);
@@ -138,7 +154,7 @@ imagefill($img, 0, 0, $bgcol);
 
 header('Content-Type: image/jpeg');
 
-draw_group($img, $template[$_REQUEST[template]]);
+draw_group($img, $template[$id_template]);
 
 imagejpeg($img);
 imagedestroy($img);
