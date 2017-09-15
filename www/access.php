@@ -73,7 +73,7 @@ foreach($stmt as $row)
   {
      $action = "delete";
      $image = "images/tick2.gif";
-     $ts_txt = "Tilgang gitt:" . date('D j.M y', $row2[ts]) . " av $row2[firstname] $row2[lastname]";
+     $ts_txt = "Tilgang gitt:" . strftime('%a %e.%b %y', $row2[ts]) . " av $row2[firstname] $row2[lastname]";
   }
   if ($access->auth(AUTH::ACC))
      echo "<td align=center><a href=\"$_SERVER[PHP_SELF]?_action={$action}&id_person={$row[person_id]}&id_view={$row[view_id]}&_sort={$sort}\"><img src=\"$image\" border=0 title=\"Klikk for å endre tilgang. $ts_txt\"></td>";

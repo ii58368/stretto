@@ -62,7 +62,11 @@ function select_template($selected)
    $opt = array(
        "Blank",
        "Violin 1, 8 pulter",
-       "Violin 1, 7,5 pulter"
+       "Violin 1, 7,5 pulter",
+       "Violin 2, 9 pulter",
+       "Viola, 9 pulter",
+       "Cello, 8 pulter",
+       "Cello, 7,5 pulter"
    );
    echo "<select name=template onChange=\"submit();\">\n";
    for ($i = 0; $i < sizeof($opt); $i++)

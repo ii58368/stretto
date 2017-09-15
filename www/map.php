@@ -4,10 +4,12 @@
 // actual php version.
 require_once 'request.php';
 require_once 'conf/opendb.php';
+require_once 'auth.php';
 
 $id_groups = $_REQUEST[id_groups];
 $id_project = $_REQUEST[id_project];
 $id_template = $_REQUEST[template];
+
 
 function draw_chair($img, $x, $y, $a, $w, $h, $ftext)
 {
@@ -34,10 +36,10 @@ function draw_chair($img, $x, $y, $a, $w, $h, $ftext)
    $text = $atext[0];
 
    $box = @imageTTFBbox($fsize, 0, $font, $text);
-   $width = abs($box[4] - $box[0]);
-   $height = abs($box[5] - $box[1]);
-   $tx = $x + + ($w * cos($a) - $h * sin($a)) / 2 - $width/2;
-   $ty = $y + ($h * cos($a) + $w * sin($a)) / 2 + $heigth/2;
+   $tw = abs($box[4] - $box[0]);
+   $th = abs($box[5] - $box[1]);
+   $tx = $x + (($w - $tw) * cos($a) - ($h + $th) * sin($a)) / 2;
+   $ty = $y + (($h + $th) * cos($a) + ($w - $tw) * sin($a)) / 2;
 
    imagefttext($img, $fsize, -$a*360/(2* pi()), $tx, $ty, $col, $font, $text);
 }
@@ -56,7 +58,7 @@ function draw_desk($img, $x0, $y0, $a, $no, $text0, $text1)
 
    draw_chair($img, $x0, $y0, $a, $w, $h, $text0);
 
-   if ($text1 != null)
+   if (!is_null($text1))
    {
       $wt = $w;
       draw_chair($img, $x1, $y1, $a, $w, $h, $text1);
@@ -70,6 +72,7 @@ function draw_desk($img, $x0, $y0, $a, $no, $text0, $text1)
 function get_txt($part, $pos)
 {
    global $whoami;
+   global $access;
 
    foreach ($part as $p)
    {
@@ -80,7 +83,9 @@ function get_txt($part, $pos)
          return $p[firstname] . " " . mb_substr($p[lastname], 0, 1, 'utf-8') . $tag;
       }
    }
-   return $pos;
+   if ($access->auth(AUTH::SEAT))
+      return $pos;
+   return "";
 }
 
 function draw_group($img, $lineup)
@@ -116,7 +121,11 @@ function draw_group($img, $lineup)
       {
          draw_desk($img, $lineup[$i * 4 + 1], $lineup[$i * 4 + 2], $r, $i + 1, get_txt($part, $seat_no + 2), get_txt($part, $seat_no + 1));
       }
-      $seat_no += $lineup[$i * 4];
+      if ($lineup[$i * 4] == -2)
+      {
+         draw_desk($img, $lineup[$i * 4 + 1], $lineup[$i * 4 + 2], $r, $i + 1, get_txt($part, $seat_no + 1), get_txt($part, $seat_no + 2));
+      }
+      $seat_no += abs($lineup[$i * 4]);
    }
 }
 
@@ -142,13 +151,66 @@ $v1_15 = array(
     2, 20, 440, 10,
 );
 
+$v2_18 = array(
+    2, 350, 20,  30,
+    2, 400, 200, 25,
+    2, 200, 80,  32,
+    2, 430, 360, 25,
+    2, 240, 255, 30,
+    2, 50, 140, 33,
+    2, 430, 500, 25,
+    2, 240, 395, 30,
+    2, 50, 280, 33,
+);
+
+$vla_18 = array(
+    -2, 20, 100,  -30,
+    -2, 20, 210, -25,
+    -2, 220, 110,  -32,
+    -2, 20, 360, -25,
+    -2, 240, 255, -30,
+    -2, 440, 150, -33,
+    -2, 20, 500, -25,
+    -2, 240, 395, -30,
+    -2, 445, 280, -33,
+);
+
+$vcl_16 = array(
+    -2, 10, 20, 0,
+    -2, 10, 130, 0,
+    -2, 10, 240, 0,
+    -2, 10, 350, 0,
+    -2, 10, 460, 0,
+    -2, 300, 185, -10,
+    -2, 320, 290, -10,
+    -2, 340, 405, -10,
+    -2, 10, 570, 0,
+    -2, 240, 570, -5,
+    1, 470, 550, -10,
+);
+
+$vcl_15 = array(
+    -2, 10, 20, 0,
+    -2, 10, 140, 0,
+    -2, 10, 260, 0,
+    -2, 10, 380, 0,
+    -2, 10, 500, 0,
+    1, 350, 190, -10,
+    -2, 320, 320, -10,
+    -2, 340, 440, -10,
+);
+
 $template = array(
     array(), // Blank array
     $v1_16,
-    $v1_15
+    $v1_15,
+    $v2_18,
+    $vla_18,
+    $vcl_16,
+    $vcl_15
 );
 
-$img = imagecreatetruecolor(600, 600);
+$img = imagecreatetruecolor(650, 650);
 $bgcol = imagecolorAllocate($img, 0xff, 0xfc, 0xf5);
 imagefill($img, 0, 0, $bgcol);
 
