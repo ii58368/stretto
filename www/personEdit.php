@@ -42,7 +42,8 @@ function select_status($selected)
    if (is_null($selected))
       $selected = $db->per_stat_standin;
 
-   echo "<select name=status>";
+   echo "<input type=hidden name=status_old value=$selected>\n";
+   echo "<select name=status>\n";
 
    for ($i = 0; $i < count($db->per_stat); $i++)
    {
@@ -55,9 +56,27 @@ function select_status($selected)
    echo "</select>";
 }
 
+function select_status_log($selected)
+{
+   global $db;
+
+   echo "<select name=status>";
+
+   for ($i = 0; $i < count($db->rec_stat); $i++)
+   {
+      echo "<option value=$i";
+      if ($selected == $i)
+         echo " selected";
+      echo ">" . $db->rec_stat[$i] . "</option>\n";
+   }
+
+   echo "</select>";
+}
+
 if ($action == 'update_pers')
 {
    $birthday = strtotime($_POST[birthday]);
+   $now = strtotime("now");
    
    try
    {
@@ -74,6 +93,8 @@ if ($action == 'update_pers')
                       '$_POST[status]', $birthday, '$_POST[comment]')";
          $db->query($query);
          $no = $db->lastInsertId();
+         $db->query("insert into record (ts, status, comment, id_person) " .
+              "values ($now, $db->rec_stat_info, '" .$db->per_stat[$_POST[status]] . "', $no)");
       } 
       else
       {
@@ -81,6 +102,7 @@ if ($action == 'update_pers')
          {
             $query = "DELETE FROM person WHERE id = $no";
             $result = $db->query($query);
+            $db->query("delete from record where id_person = $no");
             $no = NULL;
             update_htpasswd($_POST[uid], null);
          } 
@@ -104,6 +126,9 @@ if ($action == 'update_pers')
             $query .= "comment = '$_POST[comment]' " .
                     "where id = $no";
             $db->query($query);
+            if ($_POST[status] != $_POST[status_old])
+               $db->query("insert into record (ts, status, comment, id_person) " .
+                 "values ($now, $db->rec_stat_info, 'Ny status: " . $db->per_stat[$_POST[status]] . "', $no)");
          }
       }
    } catch (PDOException $ex)
@@ -273,7 +298,7 @@ if ($action == 'edit_pers')
       </tr>
     <tr>
       <td>Fødselsdag:</td>
-      <td><input type=date name=birthday size=15 value=\"" . date('j. M y', $row[birthday]) . "\" title=\"(frivillig) Eks: 10 jan 2017\"></td>
+      <td><input type=date name=birthday size=15 value=\"" . date('j. M Y', $row[birthday]) . "\" title=\"(frivillig) Eks: 10 jan 2017\"></td>
     </tr>
     <tr>
       <td>Kommentar:</td>
@@ -350,4 +375,120 @@ if ($no != null)
     <tr><td>Bruker-id:</td><td>$row[uid]</td></tr>
     <tr><td>Passord:</td><td>************</td></tr>";
    }
+   echo "</form>
+        </table>";
+
 }
+
+
+echo "
+    <h3>Logg</h3>";
+if ($access->auth(AUTH::MEMB_RW))
+   echo "
+    <form action=\"$php_self\" method=post>
+      <input type=hidden name=_sort value=\"$sort\">
+      <input type=hidden name=_no value='$no'>
+      <input type=hidden name=_action value=new_log>
+      <input type=submit value=\"Legg til\">
+    </form>";
+echo "
+    <form action='$php_self' method=post>
+    <table border=1>
+    <tr>";
+if ($access->auth(AUTH::MEMB_RW))
+   echo "
+      <th bgcolor=#A6CAF0>Edit</th>";
+echo "
+      <th bgcolor=#A6CAF0>Dato</th>
+      <th bgcolor=#A6CAF0>Status</th>
+      <th bgcolor=#A6CAF0>Tekst</th>
+      </tr>";
+
+$rno = $_REQUEST[_rno];
+
+if ($action == 'new_log')
+{
+   echo "  <tr>
+    <td align=left><input type=hidden name=_action value=update_log>
+    <input type=hidden name=_sort value=\"$sort\">
+    <input type=hidden name=_no value=$no>
+    <input type=submit value=ok></td>
+    <th><input type=date size=15 value=\"" . date('j. M y') . "\" name=ts></th>
+    <th>\n";
+   select_status_log(null);
+   echo "
+   </th>
+    <th><textarea cols=60 rows=3 wrap=virtual name=comment></textarea></th>
+  </tr>";
+}
+
+if ($action == 'update_log' && $access->auth(AUTH::MEMB_RW))
+{
+   $ts = strtotime($_POST[ts]);
+
+   if (is_null($rno))
+      $query = "insert into record (ts, status, comment, id_person) " .
+              "values ($ts, $_POST[status], '$_POST[comment]', $no)";
+   else
+   {
+      if (!is_null($delete))
+      {
+         $query = "delete from record where id = $_POST[_rno]";
+      } 
+      else
+      {
+         $query = "update record set ts = $ts," .
+                 "status = $_POST[status]," .
+                 "comment = '$_POST[comment]' " .
+                 "where id = $rno";
+      }
+      $rno = null;
+   }
+   $db->query($query);
+}
+
+$query = "select id, ts, status, comment "
+        . "from record "
+        . "where id_person = $no "
+        . "order by ts";
+
+$stmt = $db->query($query);
+
+foreach ($stmt as $row)
+{
+   if ($row[id] != $rno)
+   {
+      echo "<tr>";
+      if ($access->auth(AUTH::MEMB_RW))
+         echo "
+         <td><center>
+           <a href=\"$php_self?_sort=$sort&_action=view_log&_rno=$row[id]&_no=$no\"><img src=\"images/cross_re.gif\" border=0></a>
+             </center></td>";
+      echo "<td>" . strftime('%e. %b %Y', $row[ts]) . "</td>" .
+      "<td>" . $db->rec_stat[$row[status]] . "</td>\n";
+      echo "<td>";
+      echo str_replace("\n", "<br>\n", $row[comment]);
+      echo "</td>" .
+      "</tr>";
+   }
+   else
+   {
+      echo "<tr>
+    <input type=hidden name=_action value=update_log>
+    <input type=hidden name=_sort value='$sort'>
+    <input type=hidden name=_rno value=$rno>
+    <input type=hidden name=_no value=$no>
+    <th nowrap><input type=submit value=ok>
+      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette?');\"></th>
+    <th><input type=date size=15 name=ts value=\"" . date('j. M y', $row[ts]) . "\" title=\"Eks: 10 dec 201\"></th>\n";
+    echo "<td>";
+      select_status_log($row[status]);
+    echo "</td>
+    <th><textarea cols=60 rows=3 wrap=virtual name=comment>$row[comment]</textarea></th>
+    </tr>";
+   }
+}
+?> 
+
+</table>
+</form>

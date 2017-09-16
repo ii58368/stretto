@@ -44,12 +44,12 @@ if ($action == 'new')
 
 if ($action == 'update' && $access->auth(AUTH::LOC))
 {
-   if ($no == NULL)
+   if (is_null($no))
       $query = "insert into location (name, address, url, contact, comment) " .
               "values ('$_POST[name]', '$_POST[address]', '$_POST[url]', '$_POST[contact]', '$_POST[comment]')";
    else
    {
-      if ($delete != NULL)
+      if (!is_null($delete))
       {
          $q = "select count(*) as count from plan where id_location = {$no}";
          $s = $db->query($q);
@@ -65,7 +65,7 @@ if ($action == 'update' && $access->auth(AUTH::LOC))
                  "contact = '$_POST[contact]'," .
                  "comment = '$_POST[comment]' " .
                  "where id = $no";
-      $no = NULL;
+      $no = null;
    }
    $db->query($query);
 }
