@@ -449,8 +449,10 @@ if ($action == 'update_log' && $access->auth(AUTH::MEMB_RW))
 
 $query = "select id, ts, status, comment "
         . "from record "
-        . "where id_person = $no "
-        . "order by ts";
+        . "where id_person = $no ";
+if (!$access->auth(AUTH::BOARD_RO))
+   $query .= "and status = $db->rec_stat_info ";
+$query .= "order by ts";
 
 $stmt = $db->query($query);
 
