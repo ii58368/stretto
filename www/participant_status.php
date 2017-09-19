@@ -16,46 +16,44 @@ function participant_status($person_id, $project_id)
    $s2 = $db->query($q2);
    $part = $s2->fetch(PDO::FETCH_ASSOC);
 
-   $past_dl = ($prj[deadline] < date("now"));
-   $orch = $prj[orchestration];
-   $stat_self = ($part[stat_reg] != $db->par_stat_void) ? $part[stat_reg] : $part[stat_self];
-   $stat_final = $part[stat_final];
+   $past_dl = ($prj['deadline'] < date("now"));
+   $orch = $prj['orchestration'];
+   $stat_self = ($part['stat_reg'] != $db->par_stat_void) ? $part['stat_reg'] : $part['stat_self'];
+   $stat_final = $part['stat_final'];
 
-   if (($status = $part[stat_final]) == null)
-   {
-      $status = $db->par_stat_void;
-   }
-
+   $status = isset($part['stat_final']) ? $part['stat_final'] : $db->par_stat_void;
+   $blink = null;
+   
    if ($orch == $db->prj_orch_reduced)
    {
       if ($status == $db->par_stat_void)
       {
-         if ($part[stat_self] != $db->par_stat_void)
+         if ($part['stat_self'] != $db->par_stat_void)
          {
             $blink = 'b';
-            $status = $part[stat_self];
+            $status = $part['stat_self'];
          }
-         if ($part[stat_reg] != $db->par_stat_void)
+         if ($part['stat_reg'] != $db->par_stat_void)
          {
             $blink = 'b';
-            $status = $part[stat_reg];
+            $status = $part['stat_reg'];
          }
       }
    }
 
    if ($orch == $db->prj_orch_tutti)
    {
-      if ($part[stat_final] == $db->par_stat_void)
+      if ($part['stat_final'] == $db->par_stat_void)
       {
-         if ($part[stat_self] != $db->par_stat_void)
+         if ($part['stat_self'] != $db->par_stat_void)
          {
             $blink = 'b';
-            $status = $part[stat_self];
+            $status = $part['stat_self'];
          }
-         if ($part[stat_reg] != $db->par_stat_void)
+         if ($part['stat_reg'] != $db->par_stat_void)
          {
             $blink = 'b';
-            $status = $part[stat_reg];
+            $status = $part['stat_reg'];
          }
       }
    }

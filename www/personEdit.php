@@ -206,7 +206,7 @@ function update_pwd($no)
    $stmt = $db->query("select uid from person where id = $no");
    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-   update_htpasswd($row[uid], $pwd);
+   update_htpasswd($row[uid], $pwd1);
 }
 
 if ($action == 'update_pwd')

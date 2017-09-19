@@ -57,11 +57,11 @@ class AUTH
    {
       global $whoami;
 
-      $this->access = $this->auth_uid($_SERVER[PHP_AUTH_USER]);
+      $this->access = $this->auth_uid($_SERVER['PHP_AUTH_USER']);
 
       $su_bit = $this->bit(self::SU);
 
-      if ($whoami->uid() != $_SERVER[PHP_AUTH_USER])
+      if ($whoami->uid() != $_SERVER['PHP_AUTH_USER'])
       {
          $this->access = ($this->access & $su_bit) | ($this->auth_uid($whoami->uid()) & ~$su_bit);
       }
@@ -98,10 +98,10 @@ class AUTH
 
       $stmt = $db->query($query);
 
-      $n = 0;
+      $access = 0;
       foreach ($stmt as $row)
       {
-         $access |= $row[access];
+         $access |= $row['access'];
       }
 
       return $access;
@@ -144,7 +144,8 @@ class ACCESS extends AUTH
 
    public function page_add($filename, $acc)
    {
-      $this->list_ro[$filename] |= $acc;
+      $this->list_ro[$filename] = isset($this->list_ro[$filename]) ? 
+         $this->list_ro[$filename] | $acc : $acc;
    }
 
    private function page_access($page = NULL)

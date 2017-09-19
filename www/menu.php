@@ -106,12 +106,10 @@ class SUBMENU
             $url = "#";
          if (is_string($item->link))
             $url = $item->link;
-
          if (!is_null($item->name))
             echo "<li><a href=\"$url\">$item->name</a>\n";
-
          if (is_object($item->link))
-            $item->link->generate($ul_option);
+            $item->link->generate($this->ul_option);
 
          echo "</li>\n";
       }
@@ -150,6 +148,8 @@ class MENU
          $direction->add("Regiplan", "dirPlan.php?id_project=%", AUTH::BOARD_RO);
       }
       {
+         global $prj_name;
+         
          $admin = new SUBMENU("class=\"dl-submenu\"");
          $menu->add("Admin", $admin);
          $admin->add("Medlemsliste", "person.php?f_status[]=$db->per_stat_member&f_status[]=$db->per_stat_eng", AUTH::MEMB_RO);
@@ -197,23 +197,23 @@ class MENU
 
          foreach ($s as $e)
          {
-            $pid = $e[id];
+            $pid = $e['id'];
 
             $project = new SUBMENU("class=\"dl-submenu\"");
-            $projects->add("$e[name] ($e[semester]$e[year])", $project);
+            $projects->add($e['name'] . " (" . $e['semester'] . " " . $e['year'] . ")", $project);
             $project->add("Prosjektinfo", "prjInfo.php?id=$pid");
             $project->add("Beskjeder", "pevent.php?id_project=$pid");
             $project->add("Gruppeoppsett", "seating.php?id_project=$pid");
             $project->add("Repertoar", "repository.php?id_project=$pid", AUTH::REP);
             $project->add("Musikere", "person.php?f_project[]=$pid");
-            if (($e[docs_avail] & (1 << $db->prj_docs_avail_sheet)) || $access->auth(AUTH::PRJDOC))
+            if (($e['docs_avail'] & (1 << $db->prj_docs_avail_sheet)) || $access->auth(AUTH::PRJDOC))
                $project->add("Noter", "document.php?path=project/$pid/sheet");
-            if ($e[docs_avail] & (1 << $db->prj_docs_avail_rec) || $access->auth(AUTH::PRJDOC))
+            if ($e['docs_avail'] & (1 << $db->prj_docs_avail_rec) || $access->auth(AUTH::PRJDOC))
                $project->add("Innspilling", "document.php?path=project/$pid/rec");
-            if ($e[docs_avail] & (1 << $db->prj_docs_avail_doc) || $access->auth(AUTH::PRJDOC))
+            if ($e['docs_avail'] & (1 << $db->prj_docs_avail_doc) || $access->auth(AUTH::PRJDOC))
                $project->add("Dokumenter", "document.php?path=project/$pid/doc");
             $project->add("Regikomité", "direction.php?id_project=$pid", AUTH::DIR_RO);
-            $project->add(($e[orchestration] == $db->prj_orch_tutti) ? "Permisjonssøknad" : "Påmelding", "participant_11.php?id_project=$pid", AUTH::RES_SELF);
+            $project->add(($e['orchestration'] == $db->prj_orch_tutti) ? "Permisjonssøknad" : "Påmelding", "participant_11.php?id_project=$pid", AUTH::RES_SELF);
             $project->add("Fravær", "absence.php?id_project=$pid", AUTH::ABS_RO);
             $project->add("Prosjektressurser", "participant_x1.php?id=$pid", AUTH::RES);
             $project->add("Konsertkalender", "consert.php?id=$pid", AUTH::BOARD_RO);
@@ -251,10 +251,10 @@ class MENU
 
       foreach ($s as $e)
       {
-         echo "<option value=\"" . $e[uid] . "\"";
-         if ($e[uid] == $selected)
+         echo "<option value=\"" . $e['uid'] . "\"";
+         if ($e['uid'] == $selected)
             echo " selected";
-         echo ">$e[firstname] $e[lastname] ($e[instrument])\n";
+         echo ">" . $e['firstname'] ." " . $e['lastname'] . " (" . $e['instrument'] . ")\n";
       }
    }
 

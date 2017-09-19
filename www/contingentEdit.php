@@ -161,6 +161,3 @@ if (is_null($delete))
 }
 echo "</form>
 </table>";
-
-include 'framework_end.php';
-?>

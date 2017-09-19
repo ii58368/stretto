@@ -121,7 +121,8 @@ Regiss&oslash;ren vil ikke ha beskjed dersom du ikke har anledning til &aring; k
 
 
 $query  = "SELECT plan.id as id, date, time, id_location, location.name as lname, project.name as pname, location.url as url, id_responsible, " .
-    "plan.responsible as responsible, firstname, lastname, plan.comment as comment " .
+    "plan.responsible as responsible, firstname, lastname, plan.comment as comment, " .
+    "event_type " .
     "FROM person, project, plan, location " .
     "where id_location = location.id " .
     "and id_project = project.id " .
@@ -150,7 +151,8 @@ foreach ($stmt as $row)
       echo "<a href=\"{$row[url]}\">{$row[lname]}</a>";
     else 
       echo $row[lname];
-    echo "</td><td nowrap><b>{$row[firstname]} {$row[lastname]}</b><br>";
+    if ($row[event_Type] == $db->plan_evt_direction)
+       echo "</td><td nowrap><b>{$row[firstname]} {$row[lastname]}</b><br>";
     resources_list($row[id]);
     echo $row[responsible];
     echo "</td>";

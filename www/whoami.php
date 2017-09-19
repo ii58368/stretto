@@ -15,8 +15,8 @@ class WHOAMI
    {
       global $db;
 
-      $uid = $_SERVER[PHP_AUTH_USER];
-      if ($_COOKIE['uid'] != null)
+      $uid = $_SERVER['PHP_AUTH_USER'];
+      if (isset($_COOKIE['uid']))
          $uid = $_COOKIE['uid'];
 
       $q = "select firstname, lastname, person.id as id, instrument "
@@ -27,11 +27,11 @@ class WHOAMI
       $s = $db->query($q);
       $e = $s->fetch(PDO::FETCH_ASSOC);
 
-      $this->id = $e[id];
+      $this->id = $e['id'];
       $this->uid = $uid;
-      $this->firstname = $e[firstname];
-      $this->lastname = $e[lastname];
-      $this->instrument = $e[instrument];
+      $this->firstname = $e['firstname'];
+      $this->lastname = $e['lastname'];
+      $this->instrument = $e['instrument'];
    }
 
    public function name()

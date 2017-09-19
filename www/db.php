@@ -17,6 +17,8 @@ class STMT implements Iterator
       switch ($opt)
       {
          case PDO::FETCH_ASSOC:
+            if (!isset($this->vec[0]))
+               return null;
             return $this->vec[0];
       }
       return null;
@@ -114,6 +116,15 @@ class DB extends myPDO
       parent::setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
    }
 
+   public function qpost($key)
+   {
+     if (!isset($_REQUEST[$key]))
+       return "''";
+     if (is_string($_REQUEST[$key]))
+        return $this->quote($_REQUEST[$key]);
+     return $_REQUEST[$key];
+   }
+   
 // table: person
 // field: status
    public $per_stat_quited = 0;

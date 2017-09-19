@@ -1,7 +1,7 @@
 <?php
 require 'framework.php';
 
-$id_project = is_null($_REQUEST[id_project]) ? '%' : $_REQUEST[id_project];
+$id_project = is_null(request('id_project')) ? '%' : request('id_project');
    
 function select_project($selected)
 {
@@ -20,10 +20,10 @@ function select_project($selected)
    
    foreach($s as $e)
    {
-      echo "<option value=\"" . $e[id] . "\"";
-      if ($e[id] == $selected)
+      echo "<option value=\"" . $e['id'] . "\"";
+      if ($e['id'] == $selected)
          echo " selected";
-      echo ">" . $e[name] . " (" . $e[semester], $e[year] . ")";
+      echo ">" . $e['name'] . " (" . $e['semester'] .' ' . $e['year'] . ")";
    }
    echo "</select>";
 }
@@ -114,9 +114,9 @@ if ($action == 'update' && $access->auth(AUTH::EVENT))
    {
       $query = "insert into event (subject, ts_create, ts_update, importance, body, "
               . "id_person, id_project, status) "
-              . "values ('$_POST[subject]', $ts, $ts, "
-              . "$_POST[importance], " . $db->quote($_POST[body]) . ", " . $whoami->id() . ", "
-              . "$_POST[id_project], $_POST[status])";
+              . "values (".$db->qpost('subject').", $ts, $ts, "
+              . request('importance').", " . $db->qpost('body') . ", " . $whoami->id() . ", "
+              . request('id_project').", ".request('status').")";
    } else
    {
       if (!is_null($delete))
@@ -124,14 +124,14 @@ if ($action == 'update' && $access->auth(AUTH::EVENT))
          $query = "delete from event where id = $no";
       } else
       {
-         $query = "update event set subject = '$_POST[subject]'," .
+         $query = "update event set subject = ".$db->qpost('subject')."," .
                  "ts_update = $ts," .
-                 "importance = $_POST[importance]," .
-                 "body = " . $db->quote($_POST[body])  . "," .
-                 "id_project = $_POST[id_project]," .
+                 "importance = ".request('importance')."," .
+                 "body = " . $db->qpost('body')  . "," .
+                 "id_project = ".request('id_project')."," .
                  "id_person = " . $whoami->id() . "," .
-                 "id_project = $_POST[id_project]," .
-                 "status = $_POST[status] " .
+                 "id_project = ".request('id_project')."," .
+                 "status = ".request('status')." " .
                  "where id = $no";
       }
       $no = NULL;
@@ -151,7 +151,7 @@ $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
-   if ($row[id] == $no)
+   if ($row['id'] == $no)
    {
       echo "<table border=0><tr>
     <td align=left><input type=hidden name=_action value=update>
@@ -160,55 +160,55 @@ foreach ($stmt as $row)
     <input type=submit value=Lagre>
     <input type=submit name=_delete value=Slett></td>
     </tr><tr>
-    <td><i>Subjekt:</i></td><td><input type=text size=60 name=subject value=\"$row[subject]\"></td>
+    <td><i>Subjekt:</i></td><td><input type=text size=60 name=subject value=\"".$row['subject']."\"></td>
     </tr><tr>
-    <td><i>Fra:</i></td><td>$row[firstname] $row[lastname]</td>
+    <td><i>Fra:</i></td><td>".$row['firstname']." ".$row['lastname']."</td>
     </tr><tr>
-    <td><i>Opprettet:</i></td><td>" . strftime('%e.%b %y', $row[ts_create]) . "</td>
+    <td><i>Opprettet:</i></td><td>" . strftime('%e.%b %y', $row['ts_create']) . "</td>
     </tr><tr>
     <td><i>Prosjekt:</i></td><td>";
-      select_project($row[id_project]);
+      select_project($row['id_project']);
       echo "</td>
      </tr><tr>
      <td><i>Viktighetsgrad:</i></td><td>";
-      select_importance($row[importance]);
+      select_importance($row['importance']);
       echo "</td>
      </tr><tr>
      <td><i>Status:</i></td><td>";
-      select_status($row[status]);
+      select_status($row['status']);
       echo "</td>
      </tr></table>
-    <textarea cols=60 rows=15 wrap=virtual name=body>$row[body]</textarea>\n";
+    <textarea cols=60 rows=15 wrap=virtual name=body>".$row['body']."</textarea>\n";
    } else
    {
-      if ($row[uid] == $whoami->uid() && $access->auth(AUTH::EVENT))
+      if ($row['uid'] == $whoami->uid() && $access->auth(AUTH::EVENT))
       {
-         echo "<input type=button value=Endre onClick=\"location.href='$php_self?_sort=$sort&_action=view&_no=$row[id]';\">";
+         echo "<input type=button value=Endre onClick=\"location.href='$php_self?_sort=$sort&_action=view&_no=".$row['id']."';\">";
       }
       echo "  <tr>
-    <font size=+2><b>$row[subject]</b></font>
+    <font size=+2><b>".$row['subject']."</b></font>
     <table border=0><tr>
-    <td><i>Fra:</i></td><td>$row[firstname] $row[lastname]</td>
+    <td><i>Fra:</i></td><td>".$row['firstname']." ".$row['lastname']."</td>
     </tr><tr>
-    <td><i>Dato:</i></td><td>" . strftime('%e.%b %Y', $row[ts_update]) . "</td>
+    <td><i>Dato:</i></td><td>" . strftime('%e.%b %Y', $row['ts_update']) . "</td>
     </tr><tr>
     <td><i>Prosjekt:</i></td><td>";
-      if ($row[id_project] > 0)
+      if ($row['id_project'] > 0)
       {
-         $s = $db->query("select name, semester, year from project where id=$row[id_project]");
+         $s = $db->query("select name, semester, year from project where id=".$row['id_project']);
          $e = $s->fetch(PDO::FETCH_ASSOC);
-         echo "$e[name] ($e[semester]-$e[year])";
+         echo $e['name']." (".$e['semester']."-".$e['year'].")";
       }
 
       echo "</td>
      </tr><tr>
      <td><i>Viktighetsgrad:</i></td><td>" .
-      $db->evt_importance[$row[importance]] .
+      $db->evt_importance[$row['importance']] .
       "</td>
      </tr>
      </table>";
-      $body = str_replace("\n", "<br>\n", $row[body]);
-      echo ($row[status] == $db->evt_status_draft) ? "<font color=grey>$body</font>" : $body;
+      $body = str_replace("\n", "<br>\n", $row['body']);
+      echo ($row['status'] == $db->evt_status_draft) ? "<font color=grey>$body</font>" : $body;
    }
    echo "<p>";
 }
