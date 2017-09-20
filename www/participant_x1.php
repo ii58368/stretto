@@ -224,13 +224,13 @@ function update_cell($id_person, $col, $status, $comment, $id_instruments)
       if ($status == $db->par_stat_void)
          return;
       $query = "insert into participant (id_person, id_project, stat_$col, ts_$col, comment_$col, id_instruments) " .
-              "values ($id_person, $id_project, $status, $ts, '$comment', $id_instruments)";
+              "values ($id_person, $id_project, $status, $ts, $db->quote($comment), $id_instruments)";
    } else
    {
       $query = "update participant set " .
               "stat_$col = $status, " .
               "ts_$col = $ts, " .
-              "comment_$col = '$comment', " .
+              "comment_$col = ".$db->quote($comment).", " .
               "id_instruments = $id_instruments " .
               "where id_person = $id_person " .
               "and id_project = $id_project";

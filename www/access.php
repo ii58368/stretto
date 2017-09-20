@@ -6,13 +6,13 @@ if ($action == 'insert')
 {
    $ts = strtotime("now");
    $query = "insert into auth_person (id_view, id_person, ts, id_auth) " .
-            "values ('$_REQUEST[id_view]', '$_REQUEST[id_person]', $ts, " . $whoami->id() . ")";
+            "values (".request('id_view').", ".request('id_person').", $ts, " . $whoami->id() . ")";
    $db->query($query);
 }   
 
 if ($action == 'delete')
 {
-   $query = "delete from auth_person where id_view = '$_REQUEST[id_view]' and id_person = '$_REQUEST[id_person]'";
+   $query = "delete from auth_person where id_view = ".request('id_view')." and id_person = ".request('id_person');
    $db->query($query);
 }   
 
@@ -35,7 +35,7 @@ $query  = "SELECT name " .
 $stmt = $db->query($query);
 
 foreach($stmt as $row)
-  echo "<th bgcolor=#A6CAF0>$row[name]</td>";
+  echo "<th bgcolor=#A6CAF0>".$row['name']."</td>";
 echo "</tr><tr>";
 
 $query  = "SELECT person.id as person_id, " .
@@ -53,30 +53,31 @@ $prev_id = 0;
 
 foreach($stmt as $row)
 {
-  if ($row[person_id] != $prev_id)
+  if ($row['person_id'] != $prev_id)
   {
-    echo "</tr><tr><td bgcolor=#A6CAF0>$row[firstname] $row[lastname]";   
-    echo "</td><td bgcolor=#A6CAF0> $row[instrument] </td>";
-    echo "</td><td bgcolor=#A6CAF0>" . $db->per_stat[$row[status]] . "</td>";
-    $prev_id = $row[person_id];
+    echo "</tr><tr><td bgcolor=#A6CAF0>".$row['firstname']." ".$row['lastname'];   
+    echo "</td><td bgcolor=#A6CAF0>".$row['instrument']."</td>";
+    echo "</td><td bgcolor=#A6CAF0>" . $db->per_stat[$row['status']] . "</td>";
+    $prev_id = $row['person_id'];
   }
   $query  = "SELECT auth_person.ts as ts, firstname, lastname "
           . "from auth_person, person "
           . "where person.id = auth_person.id_auth "
-          . "and id_view = {$row[view_id]} "
-          . "and id_person = {$row[person_id]}"; 
+          . "and id_view = ".$row['view_id']." "
+          . "and id_person = ".$row['person_id']; 
   $stmt2 = $db->query($query);
   
   $action = "insert";
   $image = "images/stop_red.gif";
+  $ts_txt= '';
   if ($row2 = $stmt2->fetch(PDO::FETCH_ASSOC))
   {
      $action = "delete";
      $image = "images/tick2.gif";
-     $ts_txt = "Tilgang gitt:" . strftime('%a %e.%b %y', $row2[ts]) . " av $row2[firstname] $row2[lastname]";
+     $ts_txt = "Tilgang gitt:" . strftime('%a %e.%b %y', $row2['ts']) . " av ".$row2['firstname']." ".$row2['lastname'];
   }
   if ($access->auth(AUTH::ACC))
-     echo "<td align=center><a href=\"$_SERVER[PHP_SELF]?_action={$action}&id_person={$row[person_id]}&id_view={$row[view_id]}&_sort={$sort}\"><img src=\"$image\" border=0 title=\"Klikk for å endre tilgang. $ts_txt\"></td>";
+     echo "<td align=center><a href=\"".$_SERVER['PHP_SELF']."?_action=$action&id_person=".$row['person_id']."&id_view=".$row['view_id']."&_sort=$sort\"><img src=\"$image\" border=0 title=\"Klikk for å endre tilgang. $ts_txt\"></td>";
   else
      echo "<td align=center><img src=\"$image\" border=0 title=\"$ts_txt\"></td>";
 } 
