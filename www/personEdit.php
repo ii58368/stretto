@@ -149,8 +149,8 @@ function update_htpasswd($usr, $pwd)
       if ($usr != $e[0])
          fwrite($fw, "$ln");
    }
-   if ($pwd != null)
-      fwrite($fw, "$usr:" . md5($pwd) . "\n");
+   if (!is_null($pwd))
+      fwrite($fw, "$usr:" . crypt($pwd, base64_encode($pwd)) . "\n");
    
    fclose($fr);
    fclose($fw);
@@ -206,7 +206,7 @@ function update_pwd($no)
    $stmt = $db->query("select uid from person where id = $no");
    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-   update_htpasswd($row[uid], $pwd1);
+   update_htpasswd($row[uid], $pwd);
 }
 
 if ($action == 'update_pwd')
