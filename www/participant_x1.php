@@ -235,7 +235,6 @@ function update_cell($id_person, $col, $status, $comment, $id_instruments)
               "where id_person = $id_person " .
               "and id_project = $id_project";
    }
-   echo $query . "<br>\n";
    $db->query($query);
 }
 
@@ -269,9 +268,12 @@ if ($action == 'update')
    {
       foreach ($_REQUEST as $key => $val)
       {
-         list($field, $pid) = explode(':', $key);
-         if ($field == "comment_$col")
-            update_cell($pid, $col, request("stat_$col:$pid"), $val, request("id_instruments:$pid"));
+         if (strstr($key, ':'))
+         {
+            list($field, $pid) = explode(':', $key);
+            if ($field == "comment_$col")
+               update_cell($pid, $col, request("stat_$col:$pid"), $val, request("id_instruments:$pid"));
+         }
       }
       $_REQUEST['col'] = null;
    }
