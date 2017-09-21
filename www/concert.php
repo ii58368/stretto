@@ -4,7 +4,7 @@ require 'framework.php';
 if (is_null($sort))
    $sort = 'ts';
 
-$sel_year = is_null($_REQUEST[from]) ? date("Y") : intval($_REQUEST[from]);
+$sel_year = is_null(request('from')) ? date("Y") : intval(request('from'));
 $prev_year = $sel_year - 1;
 
 echo "
@@ -27,7 +27,7 @@ echo "
       <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=ts&from=$sel_year\">Dato</a></th>
       <th bgcolor=#A6CAF0>Tid</th>
       <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=id_project,ts&from=$sel_year\">Prosjekt</a>
-         <a href=\"$php_self?from=$prev_year&_sort={$sort}\"><img src=images/arrow_up.png border=0 title=\"Forrige &aring;r...\"></a></th>
+         <a href=\"$php_self?from=$prev_year&_sort=$sort\"><img src=images/arrow_up.png border=0 title=\"Forrige &aring;r...\"></a></th>
       <th bgcolor=#A6CAF0>Lokale</th>
       <th bgcolor=#A6CAF0>Tekst</th>
       </tr>";
@@ -47,10 +47,10 @@ function select_project($selected)
 
    foreach ($s as $e)
    {
-      echo "<option value=\"" . $e[id] . "\"";
-      if ($e[id] == $selected)
+      echo "<option value=\"" . $e['id'] . "\"";
+      if ($e['id'] == $selected)
          echo " selected";
-      echo ">$e[name] ($e[semester]$e[year])</option>";
+      echo ">".$e['name']." (".$e['semester'].$e['year'].")</option>";
    }
    echo "</select>";
 }
@@ -69,10 +69,10 @@ function select_location($selected)
 
    foreach ($s as $e)
    {
-      echo "<option value=\"" . $e[id] . "\"";
-      if ($e[id] == $selected)
+      echo "<option value=\"" . $e['id'] . "\"";
+      if ($e['id'] == $selected)
          echo " selected";
-      echo ">$e[name]</option>";
+      echo ">".$e['name']."</option>";
    }
    echo "</select>";
 }
@@ -97,14 +97,14 @@ if ($action == 'new')
 
 if ($action == 'update' && $access->auth(AUTH::CONS))
 {
-   if (($ts = strtotime($_POST[ts])) == false)
-      echo "<font color=red>Illegal time format: " . $_POST[ts] . "</font>";
+   if (($ts = strtotime($_POST['ts'])) == false)
+      echo "<font color=red>Illegal time format: " . $_POST['ts'] . "</font>";
    else
    {
       if (is_null($no))
       {
          $query = "insert into concert (ts, time, id_project, id_location, text)
-              values ($ts, '$_POST[time]', $_POST[id_project], $_POST[id_location], '$_POST[text]')";
+              values ($ts, '".$_POST['time']."', ".$_POST['id_project'].", ".$_POST['id_location'].", ".$db->qpost('text');
       } else
       {
          if (!is_null($delete))
@@ -113,10 +113,10 @@ if ($action == 'update' && $access->auth(AUTH::CONS))
          } else
          {
             $query = "update concert set ts = $ts," .
-                    "time = '$_POST[time]'," .
-                    "id_project = $_POST[id_project]," .
-                    "id_location = $_POST[id_location]," .
-                    "text = '$_POST[text]' " .
+                    "time = '".$_POST['time']."'," .
+                    "id_project = ".$_POST['id_project']."," .
+                    "id_location = ".$_POST['id_location']."," .
+                    "text = ".$db->qpost('text')." " .
                     "where id = $no";
          }
          $no = NULL;
@@ -145,21 +145,21 @@ $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
-   if ($row[id] != $no)
+   if ($row['id'] != $no)
    {
       echo "<tr>";
       if ($access->auth(AUTH::CONS))
          echo "
          <td><center>
-           <a href=\"{$_SERVER[PHP_SELF]}?_sort=$sort&_action=view&_no={$row[id]}&from=$sel_year\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
+           <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."&from=$sel_year\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
              </center></td>";
       echo
-      "<td>" . strftime('%a %e.%b %y', $row[ts]) . "</td>" .
-      "<td>$row[time]</td>" .
-      "<td>$row[pname] ($row[semester]$row[year])</td>" .
-      "<td>$row[lname]</td>" .
+      "<td>" . strftime('%a %e.%b %y', $row['ts']) . "</td>" .
+      "<td>".$row['time']."</td>" .
+      "<td>".$row['pname']." (".$row['semester'].$row['year'].")</td>" .
+      "<td>".$row['lname']."</td>" .
       "<td>";
-      echo str_replace("\n", "<br>\n", $row[text]);
+      echo str_replace("\n", "<br>\n", $row['text']);
       echo "</td>" .
       "</tr>";
    } else
@@ -170,16 +170,16 @@ foreach ($stmt as $row)
     <input type=hidden name=_no value='$no'>
     <input type=hidden name=from value='$sel_year'>
     <td nowrap><input type=submit value=ok>
-      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette " . strftime('%a %e.%b %y', $row[ts]) . "?');\"></td>
-    <td><input type=text size=10 name=ts value=\"" . date('j. M y', $row[ts]) . "\"></td>
-    <td><input type=text size=5 maxlength=5 name=time value=\"$row[time]\">
+      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette " . strftime('%a %e.%b %y', $row['ts']) . "?');\"></td>
+    <td><input type=text size=10 name=ts value=\"" . date('j. M y', $row['ts']) . "\"></td>
+    <td><input type=text size=5 maxlength=5 name=time value=\"".$row['time']."\">
     <td>";
-      select_project($row[id_project]);
+      select_project($row['id_project']);
       echo "</td>
     <td>";
-      select_location($row[id_location]);
+      select_location($row['id_location']);
       echo "</td>
-    <td><textarea cols=60 rows=10 wrap=virtual name=text>{$row[text]}</textarea></td>
+    <td><textarea cols=60 rows=10 wrap=virtual name=text>".$row['text']."</textarea></td>
     </tr>";
    }
 }
