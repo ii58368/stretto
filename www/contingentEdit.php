@@ -10,7 +10,7 @@ function select_person($selected)
 
    echo "<form method=post action='$php_self'>
       <input type=hidden name=id_person value=$selected>
-      <input type=hidden name=year value=$_REQUEST[year]>
+      <input type=hidden name=year value=" . request('year') . ">
       <select name=id_person onChange=\"submit();\">\n";
 
    $q = "SELECT person.id as id, firstname, lastname, instrument "
@@ -22,10 +22,10 @@ function select_person($selected)
 
    foreach ($s as $e)
    {
-      echo "<option value=\"" . $e[id] . "\"";
-      if ($e[id] == $selected)
+      echo "<option value=\"" . $e['id'] . "\"";
+      if ($e['id'] == $selected)
          echo " selected";
-      echo ">$e[firstname] $e[lastname] ($e[instrument])";
+      echo ">" . $e['firstname'] . " " . $e['lastname'] . " (" . $e['instrument'] . ")";
    }
 
    echo "</select>\n</form>\n";
@@ -51,10 +51,12 @@ function select_status($selected)
    echo "</select>";
 }
 
+$style = '';
+
 if ($action == 'update')
 {
-   if (($ts = strtotime($_POST[date])) == false)
-      echo "<font color=red>Illegal time format: " . $_POST[date] . "</font>";
+   if (($ts = strtotime(request('date'))) == false)
+      echo "<font color=red>Illegal time format: " . request('date') . "</font>";
    else
    {
       try
@@ -62,9 +64,9 @@ if ($action == 'update')
          if ($no == null)
          {
             $query = "insert into contingent (ts, amount, year, comment, id_person, status, archive)
-              values ('$ts', '$_POST[amount]', 
-                      '$_POST[year]', '$_POST[comment]', '$_POST[id_person]',
-                      '$_POST[status]', '$_POST[archive]')";
+              values ('$ts', " . request('amount') . ", "
+                    . request('year') . ", " . $db->qpost('comment') . ", " . request('id_person') . ","
+                    . request('status') . ", " . $db->qpost('archive').")";
             $db->query($query);
             $no = $db->lastInsertId();
 
@@ -78,13 +80,13 @@ if ($action == 'update')
                $no = NULL;
             } else
             {
-               $query = "update contingent set ts = '$ts'," .
-                       "amount = '$_POST[amount]'," .
-                       "year = '$_POST[year]'," .
-                       "comment = '$_POST[comment]'," .
-                       "id_person = '$_POST[id_person]'," .
-                       "status = '$_POST[status]'," .
-                       "archive = '$_POST[archive]' " .
+               $query = "update contingent set ts = $ts," .
+                       "amount = " . request('amount') . "," .
+                       "year = " . request('year') . "," .
+                       "comment = " . $db->qpost('comment') . "," .
+                       "id_person = " . request('id_person') . "," .
+                       "status = " . request('status') . "," .
+                       "archive = " . $db->qpost('archive') . " " .
                        "where id = $no";
                $db->query($query);
 
@@ -101,36 +103,54 @@ if ($action == 'update')
 $query = "select firstname, middlename, lastname, instrument "
         . "FROM person, instruments "
         . "where person.id_instruments = instruments.id "
-        . "and person.id = $_REQUEST[id_person]";
+        . "and person.id = " . request('id_person');
 
 $stmt = $db->query($query);
 $per = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if ($no != null)
+function con($key = null)
 {
-   $stmt = $db->query("select * from contingent where id = $no");
-   $con = $stmt->fetch(PDO::FETCH_ASSOC);
+   global $no;
+   global $db;
+   static $c = null;
+   
+   if (is_null($no))
+      return null;
+
+   if (is_null($c))
+   {
+      $stmt = $db->query("select * from contingent where id = $no");
+      $c = $stmt->fetch(PDO::FETCH_ASSOC);
+   }
+   
+   if (is_null($key))
+      return '';
+   
+   if (isset($c[$key]))
+      return $c[$key];
+   
+   return '';
 }
 
-$ts = is_null($con) ? strtotime("now") : $con[ts];
+$ts = is_null(con('ts')) ? strtotime("now") : intval(con('ts'));
 
 echo "
-    <h1><a href=contingent.php>Medlemskontingent $_REQUEST[year]</a></h1>
-    <h2>$per[firstname] $per[middlename] $per[lastname] ($per[instrument])</h2>
+    <h1><a href=contingent.php>Medlemskontingent " . request('year') . "</a></h1>
+    <h2>" . $per['firstname'] . " " . $per['middlename'] . " " . $per['lastname'] . " (" . $per['instrument'] . ")</h2>
     <table border=0>
       <form action='$php_self' method=post>
       <tr>
       <th colspan=2 align=left>
         <input type=hidden name=_sort value='$sort'>
-        <input type=hidden name=_no value=$con[id]>
-        <input type=hidden name=id_person value=$_REQUEST[id_person]>
-        <input type=hidden name=year value=$_REQUEST[year]>
+        <input type=hidden name=_no value=" . con('id') . ">
+        <input type=hidden name=id_person value=" . request('id_person') . ">
+        <input type=hidden name=year value=" . request('year') . ">
         <input type=hidden name=_action value=update>\n";
 if (!is_null($no) || !is_null($delete))
-   echo "<input type=button value=Ny onClick=\"location.href='$php_self?id_person=$_REQUEST[id_person]&year=$_REQUEST[year]';\">";
+   echo "<input type=button value=Ny onClick=\"location.href='$php_self?id_person=" . request('id_person') . "&year=" . request('year') . "';\">\n";
 if (is_null($delete))
    echo "<input type=submit value=Lagre $style>\n";
-if (!is_null($con))
+if (!is_null(con()))
    echo "<input type=submit name=_delete value=slett>\n";
 echo "</th>
     </tr>\n";
@@ -142,21 +162,21 @@ if (is_null($delete))
     </tr>
     <tr>
       <td>Beløp:</td>
-      <td><input type=text name=amount size=5 value=\"$con[amount]\"></td>
+      <td><input type=text name=amount size=5 value=\"" . con('amount') . "\"></td>
     </tr>
     <tr>
        <td>Status:</td>
        <td>";
-   select_status($con[status]);
+   select_status(con('status'));
    echo "</td>
     </tr>
     <tr>
       <td>Billag:</td>
-      <td><input type=text name=archive length=10 value=\"$con[archive]\"></td>
+      <td><input type=text name=archive length=10 value=\"" . con('archive') . "\"></td>
    </tr>
    <tr>
       <td>Kommentar:</td>
-      <td><input type=text name=comment size=50 value=\"$con[comment]\"></td>
+      <td><input type=text name=comment size=50 value=\"" . con('comment') . "\"></td>
     </tr>\n";
 }
 echo "</form>
