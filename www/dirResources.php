@@ -4,20 +4,6 @@ include 'framework.php';
 if (is_null($sort))
    $sort = 'list_order,lastname,firstname';
 
-function mail2all()
-{
-   global $db;
-   
-   $q = "select email from person " .
-           "where (status = $db->per_stat_member or status = $db->per_stat_eng)";
-   $s = $db->query($q);
-
-   echo "<a href=\"mailto:?bcc=";
-   foreach ($s as $e)
-      echo $e[email] . ",";
-   echo "&subject=OSO: \"><image border=0 src=images/image1.gif hspace=20 title=\"Send mail alle i OSO med status medlem eller engasjert\"></a>";
-}
-
 function select_instrument($selected)
 {
    global $db;
@@ -29,10 +15,10 @@ function select_instrument($selected)
    
    foreach ($s as $e)
    {
-      echo "<option value=\"" . $e[id] . "\"";
-      if ($e[id] == $selected)
+      echo "<option value=\"" . $e['id'] . "\"";
+      if ($e['id'] == $selected)
          echo " selected";
-      echo ">" . $e[instrument];
+      echo ">" . $e['instrument'];
    }
    
    echo "</select>";
@@ -66,7 +52,6 @@ function format_phone($ph)
 
 echo "
     <h1>Regiressurser</h1>";
-mail2all();
 echo "
     </form>
     <form action='$php_self' method=post>
@@ -91,8 +76,8 @@ echo "</th>
 
 if ($action == 'update' && $access->auth(AUTH::DIR_RW))
 {
-   $query = "update person set status_dir = '$_POST[status_dir]'," .
-           "comment_dir = '$_POST[comment_dir]' " .
+   $query = "update person set status_dir = ".request('status_dir')."," .
+           "comment_dir = " . $db->qpost('comment_dir') . " " .
            "where id = $no";
    $no = NULL;
 
@@ -105,34 +90,34 @@ $query = "SELECT person.id as id, id_instruments, instrument, firstname, lastnam
         . "FROM person, instruments "
         . "where id_instruments = instruments.id "
         . "and person.status = $db->per_stat_member "
-        . "order by ${sort}";
+        . "order by $sort";
 
 $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
-   if ($row[id] != $no)
+   if ($row['id'] != $no)
    {
       if ($access->auth(AUTH::DIR_RW))
          echo "<tr>
          <td><center>
-           <a href=\"{$php_self}?_sort={$sort}&_action=view&_no={$row[id]}\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
+           <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
              </center></td>";
-      echo "<td>{$row[instrument]}</td>" .
-      "<td><a href=history.php?id_person=$row[id]>{$row[firstname]} " .
-      "{$row[lastname]}</a></td>" .
-      "<td><a href=\"mailto:{$row[email]}?subject=$concept - $project\">{$row[email]}</a></td>" .
-      "<td nowrap>" . format_phone($row[phone1]) . "</a></td>" .
-      "<td>" . $db->per_stat[$row[status]] . "</td>" .
+      echo "<td>".$row['instrument']."</td>" .
+      "<td><a href=history.php?id_person=".$row['id'].">".$row['firstname']." " .
+      $row['lastname']."</a></td>" .
+      "<td><a href=\"mailto:".$row['email']."?subject=OSO - regi\">".$row['email']."</a></td>" .
+      "<td nowrap>" . format_phone($row['phone1']) . "</a></td>" .
+      "<td>" . $db->per_stat[$row['status']] . "</td>" .
       "<td>";
-      if ($row[status_dir] == $db->per_dir_avail)
-         echo "<center><img src=\"images/happy.gif\" border=0 title=\"" . $db->per_dir[$per_dir_avail] . "\"></center>";
-      if ($row[status_dir] == $db->per_dir_nocarry)
-         echo "<center><img src=\"images/chair-minus-icon.png\" border=0 title=\"" . $db->per_dir[$per_dir_nocarry] . "\"></center>";
-      if ($row[status_dir] == $db->per_dir_exempt)
-         echo "<center><img src=\"images/answer_empty.gif\" border=0 title=\"" . $db->per_dir[$per_dir_exempt] . "\"></center>";
+      if ($row['status_dir'] == $db->per_dir_avail)
+         echo "<center><img src=\"images/happy.gif\" border=0 title=\"" . $db->per_dir[$row['status_dir']] . "\"></center>";
+      if ($row['status_dir'] == $db->per_dir_nocarry)
+         echo "<center><img src=\"images/chair-minus-icon.png\" border=0 title=\"" . $db->per_dir[$row['status_dir']] . "\"></center>";
+      if ($row['status_dir'] == $db->per_dir_exempt)
+         echo "<center><img src=\"images/answer_empty.gif\" border=0 title=\"" . $db->per_dir[$row['status_dir']] . "\"></center>";
       echo "</td>" .
-      "<td>{$row[comment_dir]}</td>" .
+      "<td>".$row['comment_dir']."</td>" .
       "</tr>";
    }
    else
@@ -142,15 +127,15 @@ foreach ($stmt as $row)
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
     <th nowrap><input type=submit value=ok></th>
-    <td>$row[instrument]</td>
-    <th nowrap>$row[firstname] $row[lastname]</th>
-    <th align=left>$row[email]</th>
-    <th>$row[phone1]</th>
-    <td>" . $db->per_stat[$row[status]] . "</td>
+    <td>".$row['instrument']."</td>
+    <th nowrap>".$row['firstname']." ".$row['lastname']."</th>
+    <th align=left>".$row['email']."</th>
+    <th>".$row['phone1']."</th>
+    <td>" . $db->per_stat[$row['status']] . "</td>
     <th>";
-      select_status($row[status_dir]);
+      select_status($row['status_dir']);
       echo "</th>
-    <th><input type=text size=40 name=comment_dir value=\"$row[comment_dir]\"></th>
+    <th><input type=text size=40 name=comment_dir value=\"".$row['comment_dir']."\"></th>
     </tr>";
    }
 }
