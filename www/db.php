@@ -132,7 +132,8 @@ class DB extends myPDO
    public $per_stat_standin = 2;
    public $per_stat_hired = 3;
    public $per_stat_eng = 4;
-   public $per_stat = array("Sluttet", "Medlem", "Vikar", "Innleid", "Engasjert");
+   public $per_stat_apply = 5;
+   public $per_stat = array("Sluttet", "Medlem", "Vikar", "Innleid", "Engasjert", "søkt");
 // field: status_dir
    public $per_dir_avail = 0;
    public $per_dir_nocarry = 1;

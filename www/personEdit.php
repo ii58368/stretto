@@ -1,5 +1,4 @@
 <?php
-
 include 'framework.php';
 
 $personList = "person.php";
@@ -77,7 +76,7 @@ if ($action == 'update_pers')
 {
    $birthday = strtotime($_POST[birthday]);
    $now = strtotime("now");
-   
+
    try
    {
       if ($no == NULL)
@@ -94,19 +93,24 @@ if ($action == 'update_pers')
          $db->query($query);
          $no = $db->lastInsertId();
          $db->query("insert into record (ts, status, comment, id_person) " .
-              "values ($now, $db->rec_stat_info, '" .$db->per_stat[$_POST[status]] . "', $no)");
-      } 
-      else
+                 "values ($now, $db->rec_stat_info, '" . $db->per_stat[$_POST[status]] . "', $no)");
+      } else
       {
          if ($delete != NULL)
          {
-            $query = "DELETE FROM person WHERE id = $no";
-            $result = $db->query($query);
-            $db->query("delete from record where id_person = $no");
-            $no = NULL;
-            update_htpasswd($_POST[uid], null);
-         } 
-         else
+            $s = $db->query("select id from participant where id_person = $no");
+            if ($s->rowCount() > 0)
+            {
+               echo "<font color=red>Kan ikke slettes siden vedkommende allerede har vært med på et prosjekt!</font>";
+            } else
+            {
+               $db->query("delete from record where id_person = $no");
+               $query = "DELETE FROM person WHERE id = $no";
+               $result = $db->query($query);
+               $no = NULL;
+               update_htpasswd($_POST[uid], null);
+            }
+         } else
          {
             $query = "update person set " .
                     "firstname = '$_POST[firstname]'," .
@@ -122,13 +126,13 @@ if ($action == 'update_pers')
                     "birthday = $birthday,";
             if ($access->auth(AUTH::MEMB_RW))
                $query .= "status = '$_POST[status]'," .
-                         "id_instruments = '$_POST[id_instruments]',";
+                       "id_instruments = '$_POST[id_instruments]',";
             $query .= "comment = '$_POST[comment]' " .
                     "where id = $no";
             $db->query($query);
             if ($_POST[status] != $_POST[status_old])
                $db->query("insert into record (ts, status, comment, id_person) " .
-                 "values ($now, $db->rec_stat_info, 'Ny status: " . $db->per_stat[$_POST[status]] . "', $no)");
+                       "values ($now, $db->rec_stat_info, 'Ny status: " . $db->per_stat[$_POST[status]] . "', $no)");
          }
       }
    } catch (PDOException $ex)
@@ -142,7 +146,7 @@ function update_htpasswd($usr, $pwd)
    $fname = "conf/.htpasswd";
    $fr = fopen($fname, "r");
    $fw = fopen("{$fname}~", "w");
-   
+
    while (($ln = fgets($fr, 1024)) != null)
    {
       $e = explode(':', $ln);
@@ -151,10 +155,10 @@ function update_htpasswd($usr, $pwd)
    }
    if (!is_null($pwd))
       fwrite($fw, "$usr:" . crypt($pwd, base64_encode($pwd)) . "\n");
-   
+
    fclose($fr);
    fclose($fw);
-   
+
    rename("$fname~", $fname);
 }
 
@@ -246,7 +250,7 @@ if ($action == 'edit_pers')
         <input type=hidden name=_no value='$no'>
         <input type=hidden name=_action value=update_pers>
         <input type=submit value=\"Lagre\">\n";
-   if ($no != null  && $access->auth(AUTH::MEMB_RW))
+   if ($no != null && $access->auth(AUTH::MEMB_RW))
       echo "<input type=hidden name=uid value=\"$row[uid]\">
         <input type=submit name=_delete value=slett title=\"Kan slettes fra medlemsregisteret dersom vedkommende ikke har vært med på noen prosjekter\">\n";
    echo "</th>
@@ -377,7 +381,6 @@ if ($no != null)
    }
    echo "</form>
         </table>";
-
 }
 
 
@@ -434,8 +437,7 @@ if ($action == 'update_log' && $access->auth(AUTH::MEMB_RW))
       if (!is_null($delete))
       {
          $query = "delete from record where id = $_POST[_rno]";
-      } 
-      else
+      } else
       {
          $query = "update record set ts = $ts," .
                  "status = $_POST[status]," .
@@ -483,9 +485,9 @@ foreach ($stmt as $row)
     <th nowrap><input type=submit value=ok>
       <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette?');\"></th>
     <th><input type=date size=15 name=ts value=\"" . date('j. M y', $row[ts]) . "\" title=\"Eks: 10 dec 201\"></th>\n";
-    echo "<td>";
+      echo "<td>";
       select_status_log($row[status]);
-    echo "</td>
+      echo "</td>
     <th><textarea cols=60 rows=3 wrap=virtual name=comment>$row[comment]</textarea></th>
     </tr>";
    }

@@ -1,4 +1,5 @@
 <?php
+
 include 'framework.php';
 
 function select_tsort($selected)
@@ -96,7 +97,8 @@ function direction_update($id_plan)
          {
             $query = "insert into direction (id_person, id_plan, status) " .
                     "values ($id_person, $id_plan, $db->dir_stat_allocated)";
-         } else
+         }
+         else
          {
             $query = "update direction set status = $db->dir_stat_allocated " .
                     "where id_plan = $id_plan " .
@@ -125,10 +127,10 @@ function direction_select($id_plan)
 
    if (($size = $s->rowCount()) == 0)
       return;
-   
+
    if ($size > 5)
       $size = 5;
-   
+
    echo "<select name=\"id_persons[]\" multiple size=$size title=\"Medlemmer i regikomit&eacute;en\nCtrl-click to select/unselect single\">";
 
    $q2 = "SELECT id_person FROM direction where id_plan = $id_plan and status = $db->dir_stat_allocated";
@@ -142,10 +144,10 @@ function direction_select($id_plan)
       foreach ($r2 as $e2)
          if ($e['id_person'] == $e2['id_person'])
             echo " selected";
-      echo ">".$e['firstname']." ".$e['lastname'];
+      echo ">" . $e['firstname'] . " " . $e['lastname'];
       if ($e['status'] == $db->shi_stat_tentative)
          echo "*";
-      echo " (".$e['instrument'].")";
+      echo " (" . $e['instrument'] . ")";
    }
    echo "</select>";
 }
@@ -193,11 +195,12 @@ if ($access->auth(AUTH::DIR_RW))
     <form action='$php_self' method=post>
       <input type=hidden name=rehearsal value=true>
       <input type=hidden name=_action value=new>
-      <input type=hidden name=id_project value=".request('id_project').">
+      <input type=hidden name=id_project value=" . request('id_project') . ">
+      <input type=hidden name=id_location value=" . request('id_location') . ">
       <input type=submit value=\"Ny aktivitet\">
     </form>
     <form action='$php_self' method=post>
-      <input type=hidden name=id_project value=".request('id_project').">
+      <input type=hidden name=id_project value=" . request('id_project') . ">
       <input type=checkbox name=rehearsal title=\"Vis også prøveplan\" onChange=\"submit();\"";
    if (request('rehearsal'))
       echo "checked ";
@@ -233,7 +236,7 @@ if ($action == 'new')
    select_tsort(null);
    echo "<input type=text size=10 name=time value=\"18:10\"></td>
     <td>";
-   select_location(1);
+   select_location(request('id_location'));
    echo "<br><input type=text size=22 name=location>";
    echo "</td>
     <td>";
@@ -259,27 +262,29 @@ if ($action == 'update' && $access->auth(AUTH::DIR_RW))
 
          $query = "insert into plan (date, tsort, time, id_location, location, id_project, " .
                  "id_responsible, responsible, comment, event_type) " .
-                 "values ($ts, ".request('tsort').", '".request('time')."', " .
-                 request('id_location').", ".$db->qpost('location').", ".request('id_project').", ".$row['id_person'].", " .
-                 "'Regikomité', ".$db->qpost('comment').", $db->plan_evt_direction)";
-      } else
+                 "values ($ts, " . request('tsort') . ", '" . request('time') . "', " .
+                 request('id_location') . ", " . $db->qpost('location') . ", " . request('id_project') . ", " . $row['id_person'] . ", " .
+                 "'Regikomité', " . $db->qpost('comment') . ", $db->plan_evt_direction)";
+      }
+      else
       {
          if (!is_null($delete))
          {
             $query = "DELETE FROM plan WHERE id = $no";
             $query2 = "delete from direction where id_plan = $no";
             $db->query($query2);
-         } else
+         }
+         else
          {
             $query = "update plan set date = $ts," .
-                    "time = '".request('time')."'," .
-                    "tsort = ".request('tsort')."," .
-                    "id_location = ".request('id_location')."," .
-                    "location = ".$db->qpost('location')."," .
-                    "id_project = ".request('id_project')."," .
-                    "id_responsible = ".request('id_responsible')."," .
-                    "responsible = ".$db->qpost('responsible')."," .
-                    "comment = ".$db->qpost('comment')."," .
+                    "time = '" . request('time') . "'," .
+                    "tsort = " . request('tsort') . "," .
+                    "id_location = " . request('id_location') . "," .
+                    "location = " . $db->qpost('location') . "," .
+                    "id_project = " . request('id_project') . "," .
+                    "id_responsible = " . request('id_responsible') . "," .
+                    "responsible = " . $db->qpost('responsible') . "," .
+                    "comment = " . $db->qpost('comment') . "," .
                     "event_type = $db->plan_evt_direction " .
                     "where id = $no";
             direction_update($no);
@@ -302,16 +307,17 @@ if ($action == 'add' && $access->auth(AUTH::DIR_RW))
    $stmt = $db->query($query);
    foreach ($stmt as $row)
    {
-      $s = $db->query("select * from direction where id_person=".$row['id_person']." and id_plan=$no");
+      $s = $db->query("select * from direction where id_person=" . $row['id_person'] . " and id_plan=$no");
       if ($s->rowCount() == 0)
       {
          $query = "insert into direction (id_person, id_plan, status) " .
-                 "values (".$row['id_person'].", $no, $db->dir_stat_allocated) ";
-      } else
+                 "values (" . $row['id_person'] . ", $no, $db->dir_stat_allocated) ";
+      }
+      else
       {
          $query = "update direction set status = $db->dir_stat_allocated " .
                  "where id_plan = $no " .
-                 "and id_person = ".$row['id_person'];
+                 "and id_person = " . $row['id_person'];
       }
       $db->query($query);
    }
@@ -328,14 +334,14 @@ $query = "SELECT plan.id as id, date, time, tsort, id_project, event_type, " .
         "where id_location = location.id " .
         "and id_project = project.id " .
         "and id_responsible = person.id " .
-        "and plan.id_project like ".request('id_project')." " .
+        "and plan.id_project like '" . request('id_project') . "' " .
         $event_type .
         "and project.year >= $cur_year " .
         "order by date,tsort,time";
 
 $stmt = $db->query($query);
 
-foreach($stmt as $row)
+foreach ($stmt as $row)
 {
    if ($row['id'] != $no || $action != 'view')
    {
@@ -346,21 +352,21 @@ foreach($stmt as $row)
          echo "<td><center>";
          if ($row['event_type'] == $db->plan_evt_direction)
             echo "
-               <a href=\"$php_self?_action=view&_no=".$row['id']."&id_project=".request('id_project')."$reh\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>";
+               <a href=\"$php_self?_action=view&_no=" . $row['id'] . "&id_project=" . request('id_project') . "$reh\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>";
          echo "</center></td>";
       }
-      echo 
+      echo
       "<td>" . strftime('%a %e.%b %y', $row['date']) . "</td>" .
-      "<td>".$row['time']."</td><td>";
+      "<td>" . $row['time'] . "</td><td>";
       if (strlen($row['url']) > 0)
-         echo "<a href=\"".$row['url']."\">".$row['lname']."</a>";
+         echo "<a href=\"" . $row['url'] . "\">" . $row['lname'] . "</a>";
       else
          echo $row['lname'];
       echo $row['location'];
-      echo "</td><td>".$row['pname']."</td><td nowrap>";
+      echo "</td><td>" . $row['pname'] . "</td><td nowrap>";
       if ($row['event_type'] == $db->plan_evt_direction)
       {
-         echo "<b>".$row['firstname']." ".$row['lastname']."</b><a href=\"$php_self?_action=add&_no=".$row['id']."&id_project=".request('id_project')."\"><img src=\"images/user_male_add2.png\" border=0 title=\"Legg til regigruppen\"></a><br>";
+         echo "<b>" . $row['firstname'] . " " . $row['lastname'] . "</b><a href=\"$php_self?_action=add&_no=" . $row['id'] . "&id_project=" . request('id_project') . "\"><img src=\"images/user_male_add2.png\" border=0 title=\"Legg til regigruppen\"></a><br>";
          direction_list($row['id']);
          echo $row['responsible'];
       }
@@ -368,7 +374,8 @@ foreach($stmt as $row)
       echo str_replace("\n", "<br>\n", $row['comment']);
       echo "</td>" .
       "</tr>";
-   } else
+   }
+   else
    {
       if (request('rehearsal'))
          echo "<input type=hidden name=rehearsal value=true>";
@@ -380,10 +387,10 @@ foreach($stmt as $row)
     <td><input type=date size=10 name=date value=\"" . date('j. M y', $row['date']) . "\"></td>
     <td nowrap>";
       select_tsort($row['tsort']);
-      echo "<input type=text size=10 name=time value=\"".$row['time']."\"></td>
+      echo "<input type=text size=10 name=time value=\"" . $row['time'] . "\"></td>
     <td>";
       select_location($row['id_location']);
-      echo "<br><input type=text size=22 name=location value=\"".$row['location']."\">";
+      echo "<br><input type=text size=22 name=location value=\"" . $row['location'] . "\">";
       echo "</td>
     <td>";
       select_project($row['id_project']);
@@ -392,9 +399,9 @@ foreach($stmt as $row)
       select_person($row['id_responsible']);
       echo "<br>";
       direction_select($row['id']);
-      echo "<br><input type=text size=22 name=responsible value=\"".$row['responsible']."\">";
+      echo "<br><input type=text size=22 name=responsible value=\"" . $row['responsible'] . "\">";
       echo "</td>
-    <td><textarea cols=50 rows=6 wrap=virtual name=comment>".$row['comment']."</textarea></td>
+    <td><textarea cols=50 rows=6 wrap=virtual name=comment>" . $row['comment'] . "</textarea></td>
     </tr>";
    }
 }
