@@ -4,17 +4,20 @@ require 'framework.php';
 if (is_null($sort))
    $sort = 'name';
 
+$path = request('path');
+
 function update_db($variant_idx, $id_project, $row)
 {
    global $db;
+   global $path;
 
    $docs_bit = 0;
 
-   if ($handle = opendir($_REQUEST[path]))
+   if ($handle = opendir($path))
    {
       while (($file = readdir($handle)) != false)
       {
-         $abs_file = $_REQUEST[path] . "/" . $file;
+         $abs_file = $path . "/" . $file;
          if (!is_file($abs_file))
             continue;
          $docs_bit = 1 << $variant_idx;
@@ -23,13 +26,21 @@ function update_db($variant_idx, $id_project, $row)
       closedir($handle);
    }
 
-   $docs_avail = $row[docs_avail] & ~(1 << $variant_idx);
+   $docs_avail = $row['docs_avail'] & ~(1 << $variant_idx);
    $docs_avail |= $docs_bit;
 
    $db->query("update project set docs_avail = $docs_avail where id = $id_project");
 }
 
-list($category, $id_project, $variant) = explode('/', $_REQUEST[path]);
+$apath = explode('/', $path);
+$category = $apath[0];
+if (isset($apath[1]))
+   $id_project = $apath[1];
+if (isset($apath[2]))
+   $variant = $apath[2];
+
+$heading = '';
+$heading2 = '';
 
 if ($category == "project")
 {
@@ -42,7 +53,7 @@ if ($category == "project")
        "sheet" => "Noter",
        "doc" => "Dokumenter");
 
-   $heading = "$row[name] ($row[semester]$row[year])";
+   $heading = $row['name'] . " (" . $row['semester'] . $row['year'] . ")";
    $heading2 = $var_arr[$variant];
 
    $variant_keys = array_keys($var_arr);
@@ -83,7 +94,7 @@ if (this_access_rw())
     <form action=\"$php_self\" method=post>
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=_action value=new>
-      <input type=hidden name=path value=\"$_REQUEST[path]\">
+      <input type=hidden name=path value=\"$path\">
       <input type=submit value=\"Nytt dokument\">
     </form>";
 echo "
@@ -104,7 +115,7 @@ if ($action == 'new')
     <form action=$php_self method=post enctype=multipart/form-data>
     <td align=left><input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
-    <input type=hidden name=path value=\"$_REQUEST[path]\">
+    <input type=hidden name=path value=\"$path\">
     <input type=submit value=ok></td>
     <th colspan=3><input type=file name=filename id=filename</th>
     </form>
@@ -115,44 +126,47 @@ if ($action == 'update' && this_access_rw())
 {
    if (is_null($no))
    {
-      if (!is_dir($_REQUEST[path]))
-         mkdir($_REQUEST[path], 0755, true);
+      if (!is_dir($path))
+         mkdir($path, 0755, true);
 
-      $dst_file = $_REQUEST[path] . "/" . $_FILES[filename][name];
-      if ($_FILES[filename][size] > 10 * 1024 * 1024)
+      $dst_file = $path . "/" . $_FILES['filename']['name'];
+      if ($_FILES['filename']['size'] > 10 * 1024 * 1024)
       {
          echo "<font color=red>File too large! (>10MB)</font>";
-      } else
+      }
+      else
       {
-         if (!move_uploaded_file($_FILES[filename][tmp_name], $dst_file))
+         if (!move_uploaded_file($_FILES['filename']['tmp_name'], $dst_file))
          {
             echo "<font color=red>Failed to upload!</font>";
          }
       }
-   } else
+   }
+   else
    {
-      $cur_file = $_REQUEST[path] . "/" . $no;
+      $cur_file = $path . "/" . $no;
       if (!is_null($delete))
       {
          unlink($cur_file);
-      } else
+      }
+      else
       {
-         rename($cur_file, $_REQUEST[path] . "/" . $_REQUEST[file]); // old, new
+         rename($cur_file, $path . "/" . request('file')); // old, new
       }
       $no = NULL;
    }
 
-   if (!is_null($variant_idx))
+   if (isset($variant_idx))
       update_db($variant_idx, $id_project, $row);
 }
 
-if (is_dir($_REQUEST[path]))
+if (is_dir($path))
 {
-   if ($handle = opendir($_REQUEST[path]))
+   if ($handle = opendir($path))
    {
       while (($file = readdir($handle)) != false)
       {
-         $abs_file = $_REQUEST[path] . "/" . $file;
+         $abs_file = $path . "/" . $file;
          if (!is_file($abs_file))
             continue;
          $stat = stat($abs_file);
@@ -161,26 +175,27 @@ if (is_dir($_REQUEST[path]))
          {
             if (this_access_rw())
                echo "<td><center>
-           <a href=\"{$php_self}?_sort={$sort}&_action=view&_no=" . urlencode($file) . "&path=$_REQUEST[path]\"><img src=\"images/cross_re.gif\" border=0></a>
+           <a href=\"$php_self?_sort=$sort&_action=view&_no=" . urlencode($file) . "&path=$path\"><img src=\"images/cross_re.gif\" border=0></a>
              </center></td>";
             echo "
              <td><a href=\"$abs_file\">$file</a></td>";
-         } else
+         }
+         else
          {
             echo "
             <form action=$php_self method=post>
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_filename value='$file'>
-    <input type=hidden name=path value=\"$_REQUEST[path]\">
+    <input type=hidden name=path value=\"$path\">
     <input type=hidden name=_no value=\"$no\">
     <td nowrap><input type=submit value=ok>
       <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette $file?');\"></td>
     <td><input type=text size=30 name=file value=\"$file\"></td>
          </form>";
          }
-         echo "<td>" . (int) ($stat[size] / 1024) . "K</td>" .
-         "<td>" . strftime('%a %e.%b %y', $stat[mtime]) . "</td>" .
+         echo "<td>" . (int) ($stat['size'] / 1024) . "K</td>" .
+         "<td>" . strftime('%a %e.%b %y', $stat['mtime']) . "</td>" .
          "</tr>";
       }
 
