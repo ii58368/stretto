@@ -25,7 +25,7 @@ function resources_list($id_plan)
 
   foreach ($s as $e)
   {
-    echo $e[firstname] . " " . $e[lastname] . " (" . $e[instrument] . ")<br>";
+    echo $e['firstname'] . " " . $e['lastname'] . " (" . $e['instrument'] . ")<br>";
   }
 }
 
@@ -54,14 +54,14 @@ function shift_list()
   $q[0] = "SELECT firstname, lastname, instrument, phone1 " .
    "FROM person, instruments, project " .
    "where person.id_instruments = instruments.id " .
-   "and project.id = $_REQUEST[id_project] " .
+   "and project.id = " . request('id_project') . " " .
    "and person.id = project.id_person";
 
   $q[1] = "SELECT firstname, lastname, instrument, phone1 " .
    "FROM person, instruments, participant " .
    "where person.id = participant.id_person " .
    "and person.id_instruments = instruments.id " .
-   "and participant.id_project = $_REQUEST[id_project] " .
+   "and participant.id_project = " . request('id_project') . " " .
    "and (participant.stat_dir = $db->shi_stat_tentative " .
    "or participant.stat_dir = $db->shi_stat_confirmed) " .
    "order by list_order, lastname, firstname";
@@ -75,40 +75,43 @@ function shift_list()
 
     foreach ($s as $e)
     {
-      echo "<tr><td>" . $bf[$i] . $e[firstname] . " " . $e[lastname] . $bf_[$i] . "</td><td>" . $e[instrument] . "</td><td>" . format_phone($e[phone1]) . "</a></td></tr>";
+      echo "<tr><td>" . $bf[$i] . $e['firstname'] . " " . $e['lastname'] . $bf_[$i] . "</td><td>" . $e['instrument'] . "</td><td>" . format_phone($e['phone1']) . "</a></td></tr>";
     }
   }
 
   echo "</table>";
 }
 
-$query  = "SELECT name, semester, year, info_dir from project where id = $_REQUEST[id_project]";
+$query  = "SELECT name, semester, year, info_dir from project where id = " . request('id_project');
 $stmt = $db->query($query);
 $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-$project_info = str_replace("\n", "<br>\n", $row[info_dir]);
+$project_info = str_replace("\n", "<br>\n", $row['info_dir']);
 
 echo "
-    <h1>Regiplan for $row[name], $row[semester]-$row[year]</h1>
-Oppgaven til regikomit&eacute;en best&aring;r av &aring; klargj&oslash;re lokalet f&oslash;r pr&oslash;ver og konserter. Til vanlige orkesterpr&oslash;ver gj&oslash;r 5 stykker jobben greit p&aring; 10 minutter. Mengden regioppgaver i selve konsertlokalet vil variere s&aring; her vil behovet for regikomit&eacute;ens innsats blir vurdert fra prosjekt til prosjekt. 
+    <h1>Regiplan for " . $row['name'] . ", " . $row['semester'] . "-" . $row['year'] . "</h1>
+Oppgaven til regikomitéen består av å klargjøre lokalet før prøver og konserter. 
+Til vanlige orkesterprøver gjør 5 stykker jobben greit på 10 minutter. 
+Mengden regioppgaver i selve konsertlokalet vil variere så her vil behovet for 
+regikomitéens innsats blir vurdert fra prosjekt til prosjekt. 
 <p>
-<b>Regikomit&eacute;en</b> er ansvarlig for &aring;:
+<b>Regikomitéen</b> er ansvarlig for å:
 <ul>
-    <li>Rydde bort bord/stoler til vanlige &oslash;velser med oppm&oslash;te 20 minutter f&oslash;r pr&oslash;ven begynner
-    <li>Rigge opp orkesteret til pr&oslash;ver og konserter. Riggen skal st&aring; klar 10 minutter f&oslash;r pr&oslash;ven begynner.
-    <li>Slippe folk inn hovedd&oslash;ren fra 15 min f&oslash;r pr&oslash;ven begynner.
+    <li>Rydde bort bord/stoler til vanlige øvelser med oppmøte 20 minutter før prøven begynner
+    <li>Rigge opp orkesteret til prøver og konserter. Riggen skal stå klar 10 minutter før prøven begynner.
+    <li>Slippe folk inn hoveddøren fra 15 min før prøven begynner.
     <li>Delta ved transport av utstyr mellom HiOA og konsertlokalet.
 </ul>
-<b>Alle</b> medlemmer er ansvarlig for &aring;:
+<b>Alle</b> medlemmer er ansvarlig for å:
 <ul>
-    <li>V&aelig;re med &aring; rigge ned etter pr&oslash;vene. Dette skal alle som kan bidra med. (Det holder hvis alle tar et bord/en stol)
-    <li>Sl&aring; opp notestativer. Dette er den enkeltes ansvar. (Men det er hyggelig at noen gj&oslash;r det likevel...)
-    <li>Rigge opp spesialstoler (horn, fagott, cello, kontrabass osv.). Dette m&aring; de som trenger det ta ansvar for selv.
+    <li>Være med å rigge ned etter prøvene. Dette skal alle som kan bidra med. (Det holder hvis alle tar et bord/en stol)
+    <li>Slå opp notestativer. Dette er den enkeltes ansvar. (Men det er hyggelig at noen gjør det likevel...)
+    <li>Rigge opp spesialstoler (horn, fagott, cello, kontrabass osv.). Dette må de som trenger det ta ansvar for selv.
 </ul>
 
-Alle medlemmer som ikke har utvidede funksjoner (gruppeledere, styreverv, osv) eller av andre personlige grunner ikke kan bidra med dette, vil m&aring;tte ta del i regioppgaver (Ref. vedtektene &sect;4.2f).
+Alle medlemmer som ikke har utvidede funksjoner (gruppeledere, styreverv, osv) eller av andre personlige grunner ikke kan bidra med dette, vil måtte ta del i regioppgaver (Ref. vedtektene &sect;4.2f).
 
-Regiss&oslash;ren vil ikke ha beskjed dersom du ikke har anledning til &aring; komme n&aring;r hele gruppen er satt opp som ansvarlig. Ved for mye skulk kan du risikere &aring; m&aring;tte ta dette igjen p&aring; seinere prosjekter.
+Regissøren vil ikke ha beskjed dersom du ikke har anledning til å komme når hele gruppen er satt opp som ansvarlig. Ved for mye skulk kan du risikere å måtte ta dette igjen på seinere prosjekter.
 <p>
     <table border=1>
     <tr>
@@ -127,46 +130,43 @@ $query  = "SELECT plan.id as id, date, time, id_location, location.name as lname
     "where id_location = location.id " .
     "and id_project = project.id " .
     "and id_responsible = person.id " .
-    "and plan.id_project like '$_REQUEST[id_project]' " .
+    "and plan.id_project like '" . request('id_project') . "' " .
     "order by date,tsort,time";
 $stmt = $db->query($query);
 
 $last_date = 0;
-$last_time = "";
+$last_time = '';
 
 foreach ($stmt as $row)
 {
     echo "<tr><td nowrap>";
-    if ($row[date] != $last_date)
-      echo strftime('%a %e.%b', $row[date]);
+    if ($row['date'] != $last_date)
+      echo strftime('%a %e.%b', $row['date']);
     echo "</td><td>";
-    if ($row[date] != $last_date || $row[time] != $last_time)
-      echo $row[time];
+    if ($row['date'] != $last_date || $row['time'] != $last_time)
+      echo $row['time'];
 
-    $last_date = $row[date];
-    $last_time = $row[time];
+    $last_date = $row['date'];
+    $last_time = $row['time'];
 
     echo "</td><td>";
-    if (strlen($row[url]) > 0)
-      echo "<a href=\"{$row[url]}\">{$row[lname]}</a>";
+    if (strlen($row['url']) > 0)
+      echo "<a href=\"" . $row['url'] . "\">" . $row['lname'] . "</a>";
     else 
-      echo $row[lname];
-    if ($row[event_Type] == $db->plan_evt_direction)
-       echo "</td><td nowrap><b>{$row[firstname]} {$row[lastname]}</b><br>";
-    resources_list($row[id]);
-    echo $row[responsible];
+      echo $row['lname'];
+    if ($row['event_type'] == $db->plan_evt_direction)
+       echo "</td><td nowrap><b>" . $row['firstname'] . " " . $row['lastname'] . "</b><br>";
+    resources_list($row['id']);
+    echo $row['responsible'];
     echo "</td>";
     echo "<td>";
-    echo str_replace("\n", "<br>\n", $row[comment]);
+    echo str_replace("\n", "<br>\n", $row['comment']);
     echo "</td>" .
         "</tr>";
 } 
 
 echo "</table>
-     <h2>Regikomit&eacute;</h2>";
+     <h2>Regikomité</h2>";
 shift_list();
-echo "<h2>Generell prosjekt info</h2>
-    $project_info";
-
-
-require 'framework_end.php';
+echo "<h2>Generell prosjekt info</h2>";
+echo $project_info;
