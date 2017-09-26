@@ -47,18 +47,18 @@ function member_select($id_groups)
 
    foreach ($s as $e)
    {
-      echo "<option value=\"" . $e[id] . "\"";
+      echo "<option value=\"" . $e['id'] . "\"";
       reset($r2);
       foreach ($r2 as $e2)
-         if ($e[id] == $e2[id_person])
+         if ($e['id'] == $e2['id_person'])
             echo " selected";
-      echo ">$e[firstname] $e[lastname] ($e[instrument])";
+      echo ">" . $e['firstname'] . " " . $e['lastname'] . " (" . $e['instrument'] . ")";
    }
    echo "</select>";
    
    reset($r2);
    foreach ($r2 as $e2)
-      echo "<input type=hidden name=\"role:$e2[id_person]\" value=\"$e2[role]\">";
+      echo "<input type=hidden name=\"role:" . $e2['id_person'] . "\" value=\"" . $e2['role'] . "\">";
 }
 
 function member_list($id_groups)
@@ -66,6 +66,7 @@ function member_list($id_groups)
    global $db;
    global $sort;
    global $access;
+   global $php_self;
 
    $q = "SELECT firstname, lastname, instrument, member.role as role, "
            . "person.id as id_person, groups.id as id_groups "
@@ -80,23 +81,23 @@ function member_list($id_groups)
 
    foreach ($s as $e)
    {
-      if ($_REQUEST[id_groups] == $e[id_groups] && $_REQUEST[id_person] == $e[id_person])
+      if (request('id_groups') == $e['id_groups'] && request('id_person') == $e['id_person'])
       {
          echo "<form action=\"$php_self\" method=post>\n"
          . "<input type=hidden name=_sort value=\"$sort\">\n"
          . "<input type=submit value=ok title=\"Lagre rolle...\">\n"
          . "<input type=hidden name=_action value=update_role>\n"
-         . "<input type=hidden name=id_person value=$_REQUEST[id_person]>\n"
-         . "<input type=hidden name=id_groups value=$_REQUEST[id_groups]>\n"
-         . "$e[firstname] $e[lastname] "
-         . "<input type=text size=15 name=role value=\"$e[role]\" title=\"Spesifiser rolle...\">\n"
+         . "<input type=hidden name=id_person value=" . request('id_person') . ">\n"
+         . "<input type=hidden name=id_groups value=" . request('id_groups') . ">\n"
+         . $e['firstname'] . " " . $e['lastname'] . " "
+         . "<input type=text size=15 name=role value=\"" . $e['role'] . "\" title=\"Spesifiser rolle...\">\n"
          . "</form><br>\n";
       } 
       else
       {
          if ($access->auth(AUTH::GRP))
-            echo "<a href=\"$php_self?id_groups=$e[id_groups]&id_person=$e[id_person]\"><img src=\"images/cross_re.gif\" border=0 title=\"Editere rolle...\"></a> ";
-         echo "$e[firstname] $e[lastname] ($e[instrument]) <i>$e[role]</i><br>";
+            echo "<a href=\"$php_self?id_groups=".$e['id_groups']."&id_person=".$e['id_person']."\"><img src=\"images/cross_re.gif\" border=0 title=\"Editere rolle...\"></a> ";
+         echo $e['firstname']." ".$e['lastname']." (".$e['instrument'].") <i>".$e['role']."</i><br>";
       }
    }
 }
@@ -110,7 +111,7 @@ function instruments_list($id_groups)
 
    foreach ($s as $e)
    {
-      echo "$e[instrument]<br>";
+      echo $e['instrument']."<br>";
    }
 }
 
@@ -128,10 +129,10 @@ function person_select($selected)
 
    foreach ($s as $e)
    {
-      echo "<option value=\"" . $e[id] . "\"";
-      if ($e[id] == $selected)
+      echo "<option value=\"" . $e['id'] . "\"";
+      if ($e['id'] == $selected)
          echo " selected";
-      echo ">$e[firstname] $e[lastname] ($e[instrument])";
+      echo ">".$e['firstname']." ".$e['lastname']." (".$e['instrument'].")";
    }
    echo "</select>";
 }
@@ -144,11 +145,11 @@ function member_update($id_groups)
    $db->query($query);
    $i = 0;
    
-   if (!is_null($_POST[id_persons]))
+   if (isset($_POST['id_persons']))
    {
-      foreach ($_POST[id_persons] as $id_person)
+      foreach ($_POST['id_persons'] as $id_person)
       {
-         $role = $_POST["role:$id_person"];
+         $role = request("role:$id_person");
          $query = "insert into member (id_person, id_groups, role) " .
                  "values ($id_person, $id_groups, '$role')";
          $db->query($query);
@@ -177,14 +178,14 @@ if ($action == 'new')
 
 if ($action == 'update' && $access->auth(AUTH::GRP))
 {
-   $id_person = $_POST[id_person];
+   $id_person = request('id_person');
    if (is_null($id_person))
       $id_person = 0;
 
    if (is_null($no))
    {
       $query = "insert into groups (name, id_person, comment) " .
-              "values ('$_POST[name]', $id_person, '$_POST[comment]')";
+              "values (".$db->qpost('name').", $id_person, ".$db->qpost('comment').")";
       $db->query($query);
       $no = $db->lastInsertId();
       member_update($no);
@@ -192,10 +193,10 @@ if ($action == 'update' && $access->auth(AUTH::GRP))
    {
       if (!is_null($delete))
       {
-         $q = "select count(*) as count from instruments where id_groups = {$no}";
+         $q = "select count(*) as count from instruments where id_groups = $no";
          $s = $db->query($q);
          $e = $s->fetch(PDO::FETCH_ASSOC);
-         if ($e[count] == 0)
+         if ($e['count'] == 0)
          {
             $db->query("delete from member where id_groups = $no");
             $db->query("DELETE FROM groups WHERE id = $no");
@@ -204,9 +205,9 @@ if ($action == 'update' && $access->auth(AUTH::GRP))
       }
       else
       {
-         $query = "update groups set name = '$_POST[name]'," .
+         $query = "update groups set name = " . $db->qpost('name') . "," .
                  "id_person = $id_person," .
-                 "comment = '$_POST[comment]' " .
+                 "comment = " . $db->qpost('comment') . " " .
                  "where id = $no";
          $db->query($query);
          member_update($no);
@@ -218,16 +219,18 @@ if ($action == 'update' && $access->auth(AUTH::GRP))
 
 if ($action == 'update_role' && $access->auth(AUTH::GRP))
 {
-   $query = "update member set role = '$_POST[role]' "
-           . "where id_person = $_POST[id_person] "
-           . "and id_groups = $_POST[id_groups]";
+   $query = "update member set role = " . $db->qpost('role') . " "
+           . "where id_person = " . request('id_person') . " "
+           . "and id_groups = " . request('id_groups');
    $db->query($query);
    
-   $_REQUEST[id_groups] = null;
+   $_REQUEST['id_groups'] = null;
 }
 
 
-$query = "SELECT groups.id as id, groups.name as name, firstname, lastname, instrument, groups.comment as comment " .
+$query = "SELECT groups.id as id, groups.name as name, firstname, lastname, instrument, "
+        . "groups.comment as comment, "
+        . "person.id as id_person " .
         "FROM groups, person, instruments " .
         "where person.id = groups.id_person " .
         "and instruments.id = person.id_instruments " .
@@ -237,21 +240,21 @@ $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
-   if ($row[id] != $no)
+   if ($row['id'] != $no)
    {
       echo "<tr>";
       if ($access->auth(AUTH::GRP))
          echo "
          <td><center>
-           <a href=\"$php_self?_sort=$sort&_action=view&_no=$row[id]\"><img src=\"images/cross_re.gif\" border=0></a>
+           <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."\"><img src=\"images/cross_re.gif\" border=0></a>
              </center></td>";
       echo
-      "<td>$row[name]</td>" .
-      "<td>$row[firstname] $row[lastname] ($row[instrument])</td><td>";
-      instruments_list($row[id]);
-      member_list($row[id]);
+      "<td>".$row['name']."</td>" .
+      "<td>".$row['firstname']." ".$row['lastname']." (".$row['instrument'].")</td><td>";
+      instruments_list($row['id']);
+      member_list($row['id']);
       echo "</td><td>";
-      echo str_replace("\n", "<br>\n", $row[comment]);
+      echo str_replace("\n", "<br>\n", $row['comment']);
       echo "</td>" .
       "</tr>";
    } else
@@ -261,15 +264,15 @@ foreach ($stmt as $row)
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
     <th nowrap><input type=submit value=ok>
-      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette $row[name]?');\"></th>
-    <th><input type=text size=30 name=name value=\"$row[name]\"></th>
+      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette ".$row['name']."?');\"></th>
+    <th><input type=text size=30 name=name value=\"".$row['name']."\"></th>
     <th>";
-      person_select($row[id_person]);
+      person_select($row['id_person']);
       echo "</td><td>";
-      instruments_list($row[id]);
+      instruments_list($row['id']);
       member_select($no);
       echo "</th>
-    <th><textarea cols=60 rows=7 wrap=virtual name=comment>$row[comment]</textarea></th>
+    <th><textarea cols=60 rows=7 wrap=virtual name=comment>".$row['comment']."</textarea></th>
     </tr>";
    }
 }
