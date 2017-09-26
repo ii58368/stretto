@@ -4,7 +4,7 @@ require 'framework.php';
 if (is_null($sort))
    $sort = 'ts_reg';
 
-$sel_year = is_null($_REQUEST[from]) ? date("Y") : intval($_REQUEST[from]);
+$sel_year = is_null(request('from')) ? date("Y") : intval(request('from'));
 $prev_year = $sel_year - 1;
 
 echo "
@@ -49,10 +49,10 @@ function select_person($selected)
 
    foreach ($s as $e)
    {
-      echo "<option value=\"" . $e[id] . "\"";
-      if ($e[id] == $selected)
+      echo "<option value=\"" . $e['id'] . "\"";
+      if ($e['id'] == $selected)
          echo " selected";
-      echo ">$e[firstname] $e[middlename] $e[lastname]</option>";
+      echo ">" . $e['firstname'] . " " . $e['middlename'] . " " . $e['lastname'] . "</option>";
    }
    echo "</select>";
 }
@@ -102,15 +102,15 @@ function update_db()
    global $no;
    global $delete;
    
-   if (($ts_from = strtotime($_POST[ts_from])) == false)
+   if (($ts_from = strtotime(request('ts_from'))) == false)
    {
-      echo "<font color=red>Illegal time format: " . $_POST[ts_from] . "</font>";
+      echo "<font color=red>Illegal time format: " . request('ts_from') . "</font>";
       return;
    }
 
-   if (($ts_to = strtotime($_POST[ts_to])) == false)
+   if (($ts_to = strtotime(request('ts_to'))) == false)
    {
-      echo "<font color=red>Illegal time format: " . $_POST[ts_to] . "</font>";
+      echo "<font color=red>Illegal time format: " . request('ts_to') . "</font>";
       return;
    }
 
@@ -119,21 +119,21 @@ function update_db()
    if (is_null($no))
    {
       $query = "insert into `leave` (ts_reg, id_person, status, ts_proc, ts_from, ts_to, text)
-              values ($ts_now, $_POST[id_person], $_POST[status], $ts_now, $ts_from, $ts_to, '$_POST[text]')";
+              values ($ts_now, " . request('id_person') . ", " . request('status') . ", $ts_now, $ts_from, $ts_to, " . $db->qpost('text') . ")";
    } else
    {
       if (!is_null($delete))
       {
-         $query = "DELETE FROM leave WHERE id = $no";
+         $query = "DELETE FROM `leave` WHERE id = $no";
       } else
       {
          $query = "update `leave` set " .
-                 "id_person = $_POST[id_person]," .
-                 "status = $_POST[status]," .
+                 "id_person = " . request('id_person') . "," .
+                 "status = " . request('status') . "," .
                  "ts_proc = $ts_now," .
                  "ts_from = $ts_from," .
                  "ts_to = $ts_to," .
-                 "text = '$_POST[text]' " .
+                 "text = " . $db->qpost('text') . " " .
                  "where id = $no";
       }
       $no = NULL;
@@ -146,6 +146,7 @@ if ($action == 'update' && $access->auth(AUTH::LEAVE_RW))
 
 $query = "select leave.id as id, "
         . "leave.ts_reg as ts_reg, "
+        . "person.id as id_person, "
         . "firstname, middlename, lastname, instrument, "
         . "leave.status as status, "
         . "leave.ts_proc as ts_proc, "
@@ -162,23 +163,23 @@ $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
-   if ($row[id] != $no)
+   if ($row['id'] != $no)
    {
       echo "<tr>";
       if ($access->auth(AUTH::LEAVE_RW))
          echo "
          <td><center>
-           <a href=\"{$_SERVER[PHP_SELF]}?_sort=$sort&_action=view&_no={$row[id]}&ts_reg=$sel_year\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
+           <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."&ts_reg=$sel_year\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
              </center></td>";
       echo
-      "<td>" . strftime('%a %e.%b %y', $row[ts_reg]) . "</td>" .
-      "<td>$row[firstname] $row[middlename] $row[lastname] ($row[instrument])</td>" .
-      "<td>" . $db->lea_stat[$row[status]] . "</td>" .
-      "<td>" . strftime('%a %e.%b %y', $row[ts_proc]) . "</td>" .
-      "<td>" . strftime('%a %e.%b %y', $row[ts_from]) . "</td>" .
-      "<td>" . strftime('%a %e.%b %y', $row[ts_to]) . "</td>" .
+      "<td>" . strftime('%a %e.%b %y', $row['ts_reg']) . "</td>" .
+      "<td>".$row['firstname']." ".$row['middlename']." ".$row['lastname']." (".$row['instrument'].")</td>" .
+      "<td>" . $db->lea_stat[$row['status']] . "</td>" .
+      "<td>" . strftime('%a %e.%b %y', $row['ts_proc']) . "</td>" .
+      "<td>" . strftime('%a %e.%b %y', $row['ts_from']) . "</td>" .
+      "<td>" . strftime('%a %e.%b %y', $row['ts_to']) . "</td>" .
       "<td>";
-      echo str_replace("\n", "<br>\n", $row[text]);
+      echo str_replace("\n", "<br>\n", $row['text']);
       echo "</td>" .
       "</tr>";
    } else
@@ -189,18 +190,18 @@ foreach ($stmt as $row)
     <input type=hidden name=_no value='$no'>
     <input type=hidden name=from value='$sel_year'>
     <td nowrap><input type=submit value=ok>
-      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette " . date('D j.M y', $row[ts_reg]) . "?');\"></td>
-    <td>" . strftime('%e.%m.%y', $row[ts_reg]) . "</td>
+      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette " . date('D j.M y', $row['ts_reg']) . "?');\"></td>
+    <td>" . strftime('%e.%m.%y', $row['ts_reg']) . "</td>
     <td>";
-      select_person($row[id_person]);
+      select_person($row['id_person']);
       echo "</td>
     <td>";
-      select_status($row[id_status]);
+      select_status($row['status']);
       echo "</td>
     <td>" . strftime('%e.%m.%y') . "</td>
-    <td><input type=date size=10 name=ts_from value=\"" . date('j. M y', $row[ts_from]) . "\"></td>
-    <td><input type=date size=10 name=ts_to value=\"" . date('j. M y', $row[ts_to]) . "\"></td>
-     <td><textarea cols=60 rows=10 wrap=virtual name=text>{$row[text]}</textarea></td>
+    <td><input type=date size=10 name=ts_from value=\"" . date('j. M y', $row['ts_from']) . "\"></td>
+    <td><input type=date size=10 name=ts_to value=\"" . date('j. M y', $row['ts_to']) . "\"></td>
+     <td><textarea cols=60 rows=10 wrap=virtual name=text>".$row['text']."</textarea></td>
     </tr>";
    }
 }
