@@ -6,10 +6,9 @@ require_once 'request.php';
 require_once 'conf/opendb.php';
 require_once 'auth.php';
 
-$id_groups = $_REQUEST[id_groups];
-$id_project = $_REQUEST[id_project];
-$id_template = $_REQUEST[template];
-
+$id_groups = request('id_groups');
+$id_project = request('id_project');
+$id_template = request('template');
 
 function draw_chair($img, $x, $y, $a, $w, $h, $ftext)
 {
@@ -27,7 +26,7 @@ function draw_chair($img, $x, $y, $a, $w, $h, $ftext)
 
    $atext = explode("*", $ftext);
    
-   if ($atext[1])
+   if (isset($atext[1]))
       imagefilledpolygon($img, $p, 4, $green);
    
    imagepolygon($img, $p, 4, $black);
@@ -76,11 +75,10 @@ function get_txt($part, $pos)
 
    foreach ($part as $p)
    {
-      if ($p[position] == $pos)
+      if ($p['position'] == $pos)
       {
-         if ($p[uid] == $whoami->uid())
-            $tag = '*x';
-         return $p[firstname] . " " . mb_substr($p[lastname], 0, 1, 'utf-8') . $tag;
+         $tag = ($p['uid'] == $whoami->uid()) ? $tag = '*x' : '';
+         return $p['firstname'] . " " . mb_substr($p['lastname'], 0, 1, 'utf-8') . $tag;
       }
    }
    if ($access->auth(AUTH::SEAT))
@@ -220,4 +218,3 @@ draw_group($img, $template[$id_template]);
 
 imagejpeg($img);
 imagedestroy($img);
-?>

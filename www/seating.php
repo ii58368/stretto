@@ -8,7 +8,7 @@ function get_project()
 
    $query = "select name, semester, year "
            . " from project"
-           . " where id=$_REQUEST[id_project]";
+           . " where id=".request('id_project');
    $stmt = $db->query($query);
    return $stmt->fetch(PDO::FETCH_ASSOC);
 }
@@ -22,7 +22,7 @@ function get_groups()
            . "from participant, instruments, groups, person "
            . "where participant.id_person = person.id "
            . "and person.id = " . $whoami->id() . " "
-           . "and participant.id_project = $_REQUEST[id_project] "
+           . "and participant.id_project = ".request('id_project')." "
            . "and participant.id_instruments = instruments.id "
            . "and instruments.id_groups = groups.id";
 
@@ -40,7 +40,7 @@ function get_groups()
       $stmt = $db->query($query);
       $grp = $stmt->fetch(PDO::FETCH_ASSOC);
    }
-   return $grp[id];
+   return $grp['id'];
 }
 
 function get_seating($id_groups)
@@ -50,7 +50,7 @@ function get_seating($id_groups)
    $query = "select template, firstname, lastname, seating.ts as ts "
            . "from seating, person "
            . "where seating.id_person = person.id "
-           . "and id_project=$_REQUEST[id_project] "
+           . "and id_project=".request('id_project')." "
            . "and id_groups=$id_groups";
 
    $stmt = $db->query($query);
@@ -89,18 +89,18 @@ function update_seating($id_groups, $template)
    if (!($seat = get_seating($id_groups)))
    {
       $query = "insert into seating (id_groups, id_project, template, id_person, ts) "
-              . "values ($id_groups, $_POST[id_project], $template, "
+              . "values ($id_groups, ".request('id_project').", $template, "
               . $whoami->id() . ", $ts)";
    } else
    {
       if (is_null($template))
-         $template = $seat[template];
+         $template = $seat['template'];
 
       $query = "update seating set template = $template,"
               . "id_person = " . $whoami->id() . ","
               . "ts = '$ts' "
               . "where id_groups = $id_groups "
-              . "and id_project = $_POST[id_project]";
+              . "and id_project = ".request('id_project');
    }
    $db->query($query);
 }
@@ -109,7 +109,7 @@ $grp_id = get_groups();
 
 if ($action == 'template')
 {
-   update_seating($grp_id, $_POST[template]);
+   update_seating($grp_id, request('template'));
 }
 
 
@@ -118,11 +118,11 @@ if (is_null($sort))
 
 if ($action == 'update')
 {
-   $position = is_null($_POST[position]) ? 'NULL' : $_POST[position];
+   $position = is_null(request('position')) ? 'NULL' : request('position');
    $query = "update participant set position = $position," .
-           "comment_pos = '$_POST[comment_pos]' " .
+           "comment_pos = " . $db->qpost('comment_pos') . " " .
            "where id_person = $no " .
-           "and id_project = $_REQUEST[id_project]";
+           "and id_project = " . request('id_project');
    $db->query($query);
    $no = NULL;
 
@@ -134,24 +134,24 @@ $seat = get_seating($grp_id);
 
 echo "
     <h1>Gruppeoppsett</h1>
-    <h2>$prj[name] $prj[semester]-$prj[year]</h2>";
+    <h2>".$prj['name']." ".$prj['semester']."-".$prj['year']."</h2>";
 if ($access->auth(AUTH::SEAT))
 {
    echo "
     <form action='$php_self' method=post>
        <input type=hidden name=_action value=template>
        <input type=hidden name=_sort value='$sort'>
-       <input type=hidden name=id_project value=$_REQUEST[id_project]>\n";
-   select_template($seat[template]);
+       <input type=hidden name=id_project value=".request('id_project').">\n";
+   select_template($seat['template']);
    echo "
     </form>
     <form action='$php_self' method=post>
     <table border=1>
     <tr>
       <th bgcolor=#A6CAF0>Edit</th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?id_project=$_REQUEST[id_project]&_sort=firstname,lastname\">Navn</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?id_project=".request('id_project')."&_sort=firstname,lastname\">Navn</a></th>
       <th bgcolor=#A6CAF0>Instrument</th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?id_project=$_REQUEST[id_project]&_sort=position,list_order,firstname,lastname\">Plass</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?id_project=".request('id_project')."&_sort=position,list_order,firstname,lastname\">Plass</a></th>
       <th bgcolor=#A6CAF0>Kommentar</th>
       </tr>";
 
@@ -159,7 +159,7 @@ if ($access->auth(AUTH::SEAT))
    $query = "SELECT participant.id_person as id, firstname, lastname, instrument, position, comment_pos "
            . "FROM person, participant, instruments, groups "
            . "where person.id = participant.id_person "
-           . "and participant.id_project = $_REQUEST[id_project] "
+           . "and participant.id_project = ".request('id_project')." "
            . "and participant.id_instruments = instruments.id "
            . "and instruments.id_groups = groups.id "
            . "and groups.id = $grp_id "
@@ -169,16 +169,16 @@ if ($access->auth(AUTH::SEAT))
 
    foreach ($stmt as $row)
    {
-      if ($row[id] != $no)
+      if ($row['id'] != $no)
       {
          echo "<tr>
          <td><center>
-           <a href=\"$php_self?_sort=$sort&_action=view&_no=$row[id]&id_project=$_REQUEST[id_project]\"><img src=\"images/cross_re.gif\" border=0></a>
+           <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."&id_project=".request('id_project')."\"><img src=\"images/cross_re.gif\" border=0></a>
              </center></td>" .
-         "<td>$row[firstname] $row[lastname]</td>" .
-         "<td>$row[instrument]</td>" .
-         "<td>$row[position]</td>" .
-         "<td>$row[comment_pos]</td>" .
+         "<td>".$row['firstname']." ".$row['lastname']."</td>" .
+         "<td>".$row['instrument']."</td>" .
+         "<td>".$row['position']."</td>" .
+         "<td>".$row['comment_pos']."</td>" .
          "</tr>";
       } else
       {
@@ -186,13 +186,12 @@ if ($access->auth(AUTH::SEAT))
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
-    <input type=hidden name=id_project value=$_REQUEST[id_project]>
+    <input type=hidden name=id_project value=".request('id_project').">
     <th nowrap><input type=submit value=ok>
-      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette {$row[name]}?');\"></th>
-    <td>$row[firstname] $row[lastname]</td>
-    <td>$row[instrument]</td>
-    <th><input type=text size=2 name=position value=\"$row[position]\"></th>
-    <th><input type=text size=30 name=comment_pos value=\"$row[comment_pos]\"></th>
+    <td>".$row['firstname']." ".$row['lastname']."</td>
+    <td>".$row['instrument']."</td>
+    <th><input type=text size=2 name=position value=\"".$row['position']."\"></th>
+    <th><input type=text size=30 name=comment_pos value=\"".$row['comment_pos']."\"></th>
     </tr>";
       }
    }
@@ -203,7 +202,7 @@ if ($access->auth(AUTH::SEAT))
 </form>";
 }
 
-echo "<img src=\"map.php?id_groups=$grp_id&id_project=$_REQUEST[id_project]&template=$seat[template]\"><br>\n";
+echo "<img src=\"map.php?id_groups=$grp_id&id_project=".request('id_project')."&template=".$seat['template']."\"><br>\n";
 
 if (!is_null($seat))
-   echo "$seat[firstname]/" . strftime('%e.%b %y', $seat[ts]) . "\n";
+   echo $seat['firstname']."/" . strftime('%e.%b %y', $seat['ts']) . "\n";
