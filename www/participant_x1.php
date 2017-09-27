@@ -224,7 +224,7 @@ function update_cell($id_person, $col, $status, $comment, $id_instruments)
       if ($status == $db->par_stat_void)
          return;
       $query = "insert into participant (id_person, id_project, stat_$col, ts_$col, comment_$col, id_instruments) " .
-              "values ($id_person, $id_project, $status, $ts, $db->quote($comment), $id_instruments)";
+              "values ($id_person, $id_project, $status, $ts, ".$db->quote($comment).", $id_instruments)";
    } else
    {
       $query = "update participant set " .
@@ -243,7 +243,7 @@ if ($sort == NULL)
 
 if ($action == 'update')
 {
-   if ($no != null)
+   if (!is_null($no))
    {
       $id_instruments = request("id_instruments:$no");
 

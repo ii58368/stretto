@@ -1,4 +1,3 @@
-
 <?php
 require 'framework.php';
 include_once 'participant_status.php';
@@ -47,7 +46,7 @@ foreach ($stmt as $row)
    list($status, $blink) = participant_status($_REQUEST[id], $row[id]);
    echo "<tr>
       <td>";
-   if ($row[status] == $prj_stat_public)
+   if ($row['status'] == $db->prj_stat_public)
       echo "<a href=\"participant_11.php?id_project=$row[id]&id_person=$pers[id]\" title=\"Påmelding eller søk om permisjon\">";
    echo $row[name];
    if ($row[status] == $prj_stat_public)
@@ -57,7 +56,7 @@ foreach ($stmt as $row)
    "    {$row[year]}</td>" .
    "<td align=center>";
    if ($row[status] == $db->prj_stat_public)
-      echo "<img src=\"images/part_stat_$status$blink.gif\" border=0 title=\"{$db->prj_stat[$status]}\">";
+      echo "<img src=\"images/part_stat_$status$blink.gif\" border=0 title=\"".$db->prj_stat[$row['status']]."\">";
    echo "</td>\n";
    echo "<td>" . strftime('%a %e.%b %y', $row[deadline]) . "</td>" .
    "<td>";
