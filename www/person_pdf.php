@@ -22,16 +22,16 @@ class PDF extends PDF_util
       $this->Cell(60, 0, "Adresseliste");
       $this->SetFontSize(20);
       $this->SetTextColor(0, 0, 0);
-      if (!is_null($_REQUEST[f_project]))
+      if (!is_null(request('f_project')))
       {
          $query = "select name, semester, year from project where ";
-         foreach ($_REQUEST[f_project] as $f_project)
+         foreach (request('f_project') as $f_project)
             $query .= "project.id = $f_project or ";
          $query .= "false order by year DESC,semester";
          $stmt = $db->query($query);
 
          foreach ($stmt as $e)
-            $this->Cell(50, 0, "$e[name] ($e[semester]$e[year]) ");
+            $this->Cell(50, 0, $e['name']." (".$e['semester'].$e['year'].") ");
       }
 
 
@@ -58,29 +58,31 @@ class PDF extends PDF_util
       $this->SetLineWidth(0.3);
       $this->Cell(0, 1);
 
+      $last_instrument = ''; 
+      
       foreach ($stmt as $e)
       {
-         if ($e[instrument] != $last_instrument)
+         if ($e['instrument'] != $last_instrument)
          {
             $this->SetFont('Arial', 'B', 8);  // Set bold
             $this->Ln();
-            $this->Cell(0, 4, $this->sconv($e[instrument]));
+            $this->Cell(0, 4, $this->sconv($e['instrument']));
             $this->Ln();
             $this->Line(10, $this->GetY(), 200, $this->GetY());
             $this->SetFont('');  // Removed bold
-            $last_instrument = $e[instrument];
+            $last_instrument = $e['instrument'];
          }
          $this->setFontSize(8);
 
          $idx = 0;
          $hight = 4;
-         $this->Cell($tab[$idx++], $hight, $this->sconv($e[lastname]));
-         $this->Cell($tab[$idx++], $hight, $this->sconv("$e[firstname] $e[middlename]"));
-         $this->Cell($tab[$idx++], $hight, $this->sconv($e[address]));
-         $this->Cell($tab[$idx++], $hight, $this->sconv(sprintf("%04d", $e[postcode]) . " $e[city]"));
-         $this->Cell($tab[$idx++], $hight, $e[phone1]);
-         $this->Cell($tab[$idx++], $hight, $e[phone2]);
-         $this->Cell($tab[$idx++], $hight, $e[email]);
+         $this->Cell($tab[$idx++], $hight, $this->sconv($e['lastname']));
+         $this->Cell($tab[$idx++], $hight, $this->sconv($e['firstname']." ".$e['middlename']));
+         $this->Cell($tab[$idx++], $hight, $this->sconv($e['address']));
+         $this->Cell($tab[$idx++], $hight, $this->sconv(sprintf("%04d", $e['postcode']) . " " . $e['city']));
+         $this->Cell($tab[$idx++], $hight, $e['phone1']);
+         $this->Cell($tab[$idx++], $hight, $e['phone2']);
+         $this->Cell($tab[$idx++], $hight, $e['email']);
          $this->Ln();
       }
    }

@@ -12,8 +12,8 @@ function send_mail($r)
    reset($r);
    echo "<a href=\"mailto:?bcc=";
    foreach ($r as $e)
-      if (strlen($e[email]) > 0)
-         echo $e[email] . ",";
+      if (strlen($e['email']) > 0)
+         echo $e['email'] . ",";
    echo "&subject=OSO: \"><img border=0 src=images/send_mail.gif hspace=5 vspace=5 title=\"Send mail til alle på listen...\"></a>\n";
 }
 
@@ -37,8 +37,8 @@ function select_filter()
    for ($i = 0; $i < count($db->per_stat); $i++)
    {
       echo "<option value=$i";
-      if (!is_null($_REQUEST[f_status]))
-         foreach ($_REQUEST[f_status] as $f_status)
+      if (!is_null(request('f_status')))
+         foreach (request('f_status') as $f_status)
             if ($f_status == $i)
                echo " selected";
       echo ">" . $db->per_stat[$i] . "</option>\n";
@@ -52,12 +52,12 @@ function select_filter()
    $s = $db->query("select id, instrument from instruments");
    foreach ($s as $e)
    {
-      echo "<option value=$e[id]";
-      if (!is_null($_REQUEST[f_instrument]))
-         foreach ($_REQUEST[f_instrument] as $f_instrument)
-            if ($f_instrument == $e[id])
+      echo "<option value=".$e['id'];
+      if (!is_null(request('f_instrument')))
+         foreach (request('f_instrument') as $f_instrument)
+            if ($f_instrument == $e['id'])
                echo " selected";
-      echo ">" . $e[instrument] . "</option>\n";
+      echo ">" . $e['instrument'] . "</option>\n";
    }
 
    echo "</select>\n";
@@ -69,12 +69,12 @@ function select_filter()
            . "where groups.id = member.id_groups group by id order by name");
    foreach ($s as $e)
    {
-      echo "<option value=$e[id]";
-      if (!is_null($_REQUEST[f_group]))
-         foreach ($_REQUEST[f_group] as $f_group)
-            if ($f_group == $e[id])
+      echo "<option value=".$e['id'];
+      if (!is_null(request('f_group')))
+         foreach (request('f_group') as $f_group)
+            if ($f_group == $e['id'])
                echo " selected";
-      echo ">" . $e[name] . "</option>\n";
+      echo ">" . $e['name'] . "</option>\n";
    }
 
    echo "</select>\n";
@@ -85,12 +85,12 @@ function select_filter()
    $s = $db->query("select id, name, year, semester from project order by year DESC,semester");
    foreach ($s as $e)
    {
-      echo "<option value=$e[id]";
-      if (!is_null($_REQUEST[f_project]))
-         foreach ($_REQUEST[f_project] as $f_project)
-            if ($f_project == $e[id])
+      echo "<option value=".$e['id'];
+      if (!is_null(request('f_project')))
+         foreach (request('f_project') as $f_project)
+            if ($f_project == $e['id'])
                echo " selected";
-      echo ">" . "$e[name] ($e[semester]$e[year])" . "</option>\n";
+      echo ">" . $e['name']." (".$e['semester'].$e['year'].")</option>\n";
    }
 
    echo "</select>\n";
@@ -100,17 +100,19 @@ function select_filter()
 
 function get_filter_as_url()
 {
-   if (!is_null($_REQUEST[f_status]))
-      foreach ($_REQUEST[f_status] as $f_status)
+   $filter = '';
+   
+   if (!is_null(request('f_status')))
+      foreach (request('f_status') as $f_status)
          $filter .= "&f_status[]=$f_status";
-   if (!is_null($_REQUEST[f_instrument]))
-      foreach ($_REQUEST[f_instrument] as $f_instrument)
+   if (!is_null(request('f_instrument')))
+      foreach (request('f_instrument') as $f_instrument)
          $filter .= "&f_instrument[]=$f_instrument";
-   if (!is_null($_REQUEST[f_group]))
-      foreach ($_REQUEST[f_group] as $f_group)
+   if (!is_null(request('f_group')))
+      foreach (request('f_group') as $f_group)
          $filter .= "&f_group[]=$f_group";
-   if (!is_null($_REQUEST[f_project]))
-      foreach ($_REQUEST[f_project] as $f_project)
+   if (!is_null(request('f_project')))
+      foreach (request('f_project') as $f_project)
          $filter .= "&f_project[]=$f_project";
    
    return $filter;
@@ -118,16 +120,16 @@ function get_filter_as_url()
 
 echo "
     <h1>Adresseliste</h1>\n";
-if (!is_null($_REQUEST[f_project]))
+if (!is_null(request('f_project')))
 {
    $query = "select name, semester, year from project where ";
-   foreach ($_REQUEST[f_project] as $f_project)
+   foreach (request('f_project') as $f_project)
       $query .= "project.id = $f_project or ";
    $query .= "false order by year DESC,semester";
    $stmt = $db->query($query);
    echo "<h2>";
    foreach ($stmt as $e)
-      echo "$e[name] ($e[semester]$e[year]) ";
+      echo $e['name']." (".$e['semester'].$e['year'].") ";
    echo "</h2>\n";
 }
 
@@ -182,21 +184,21 @@ foreach ($result as $row)
    if ($access->auth(AUTH::MEMB_RW))
       echo "
          <td><center>
-           <a href=\"{$pedit}?_sort={$sort}&_action=view&_no={$row[id]}$f_filter\"><img src=\"images/cross_re.gif\" border=0 title=\"Editere person...\"></a>
+           <a href=\"$pedit?_sort=$sort&_action=view&_no=".$row['id'].$f_filter."\"><img src=\"images/cross_re.gif\" border=0 title=\"Editere person...\"></a>
           </center></td>";
-   echo "<td>{$row[instrument]}</td>" .
-   "<td>{$row[firstname]} {$row[middlename]} {$row[lastname]}</td>" .
-   "<td>{$row[address]}</td>" .
+   echo "<td>".$row['instrument']."</td>" .
+   "<td>".$row['firstname']." ".$row['middlename']." ".$row['lastname']."</td>" .
+   "<td>".$row['address']."</td>" .
    "<td>" .
-   sprintf("%04d", $row[postcode]) .
+   sprintf("%04d", $row['postcode']) .
    "</td>" .
-   "<td>{$row[city]}</td>" .
-   "<td><a href=\"mailto:{$row[email]}?subject=OSO:\">{$row[email]}</a></td>" .
-   "<td nowrap>" . format_phone($row[phone1]) . "</td>" .
-   "<td>{$row[phone2]}</td>" .
-   "<td>{$row[phone3]}</td>" .
-   "<td>{$db->per_stat[$row[status]]}</td>" .
-   "<td>{$row[comment]}</td>" .
+   "<td>".$row['city']."</td>" .
+   "<td><a href=\"mailto:".$row['email']."?subject=OSO:\">".$row['email']."</a></td>" .
+   "<td nowrap>" . format_phone($row['phone1']) . "</td>" .
+   "<td>".$row['phone2']."</td>" .
+   "<td>".$row['phone3']."</td>" .
+   "<td>".$db->per_stat[$row['status']]."</td>" .
+   "<td>".$row['comment']."</td>" .
    "</tr>";
 }
 ?>

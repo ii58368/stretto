@@ -25,10 +25,10 @@ function select_instrument($selected)
 
    foreach ($s as $e)
    {
-      echo "<option value=\"" . $e[id] . "\"";
-      if ($e[id] == $selected)
+      echo "<option value=\"" . $e['id'] . "\"";
+      if ($e['id'] == $selected)
          echo " selected";
-      echo ">" . $e[instrument];
+      echo ">" . $e['instrument'];
    }
 
    echo "</select>";
@@ -74,7 +74,7 @@ function select_status_log($selected)
 
 if ($action == 'update_pers')
 {
-   $birthday = strtotime($_POST[birthday]);
+   $birthday = strtotime($_POST['birthday']);
    $now = strtotime("now");
 
    try
@@ -84,17 +84,18 @@ if ($action == 'update_pers')
          $query = "insert into person (id_instruments, firstname, middlename, lastname, address, 
               postcode, city, email, uid, password,
               phone1, phone2, phone3, status, birthday, comment)
-              values ('$_POST[id_instruments]', '$_POST[firstname]', 
-                      '$_POST[middlename]', '$_POST[lastname]', '$_POST[address]',
-                      '$_POST[postcode]', '$_POST[city]', '$_POST[email]',
-                      '$_POST[email]', MD5('OSO'),
-                      '$_POST[phone1]', '$_POST[phone2]', '$_POST[phone3]', 
-                      '$_POST[status]', $birthday, '$_POST[comment]')";
+              values (" . request('id_instruments') . ", " . $db->qpost('firstname') . ", 
+                      " . $db->qpost('middlename') . ", " . $db->qpost('lastname') . ", " . $db->qpost('address') . ",
+                      " . request('postcode') . ", " . $db->qpost('city') . ", " . $db->qpost('email') . ",
+                      " . $db->qpost('email') . ", MD5('OSO'),
+                      " . $db->qpost('phone1') . ", " . $db->qpost('phone2') . ", " . $db->qpost('phone3') . ", 
+                      " . $db->qpost('status') . ", $birthday, " . $db->qpost('comment') . ")";
          $db->query($query);
          $no = $db->lastInsertId();
          $db->query("insert into record (ts, status, comment, id_person) " .
-                 "values ($now, $db->rec_stat_info, '" . $db->per_stat[$_POST[status]] . "', $no)");
-      } else
+                 "values ($now, $db->rec_stat_info, '" . $db->per_stat[$_POST['status']] . "', $no)");
+      }
+      else
       {
          if ($delete != NULL)
          {
@@ -102,37 +103,39 @@ if ($action == 'update_pers')
             if ($s->rowCount() > 0)
             {
                echo "<font color=red>Kan ikke slettes siden vedkommende allerede har vært med på et prosjekt!</font>";
-            } else
+            }
+            else
             {
                $db->query("delete from record where id_person = $no");
                $query = "DELETE FROM person WHERE id = $no";
                $result = $db->query($query);
                $no = NULL;
-               update_htpasswd($_POST[uid], null);
+               update_htpasswd(request('uid'), null);
             }
-         } else
+         }
+         else
          {
             $query = "update person set " .
-                    "firstname = '$_POST[firstname]'," .
-                    "middlename = '$_POST[middlename]'," .
-                    "lastname = '$_POST[lastname]'," .
-                    "address = '$_POST[address]'," .
-                    "postcode = '$_POST[postcode]'," .
-                    "city = '$_POST[city]'," .
-                    "email = '$_POST[email]'," .
-                    "phone1 = '$_POST[phone1]'," .
-                    "phone2 = '$_POST[phone2]'," .
-                    "phone3 = '$_POST[phone3]'," .
+                    "firstname = " . $db->qpost('firstname') . "," .
+                    "middlename = " . $db->qpost('middlename') . "," .
+                    "lastname = " . $db->qpost('lastname') . "," .
+                    "address = " . $db->qpost('address') . "," .
+                    "postcode = " . request('postcode') . "," .
+                    "city = " . $db->qpost('city') . "," .
+                    "email = " . $db->qpost('email') . "," .
+                    "phone1 = " . $db->qpost('phone1') . "," .
+                    "phone2 = " . $db->qpost('phone2') . "," .
+                    "phone3 = " . $db->qpost('phone3') . "," .
                     "birthday = $birthday,";
             if ($access->auth(AUTH::MEMB_RW))
-               $query .= "status = '$_POST[status]'," .
-                       "id_instruments = '$_POST[id_instruments]',";
-            $query .= "comment = '$_POST[comment]' " .
+               $query .= "status = " . request('status') . "," .
+                       "id_instruments = " . request('id_instruments') . ",";
+            $query .= "comment = " . $db->qpost('comment') . " " .
                     "where id = $no";
             $db->query($query);
-            if ($_POST[status] != $_POST[status_old])
+            if (request('status') != request('status_old'))
                $db->query("insert into record (ts, status, comment, id_person) " .
-                       "values ($now, $db->rec_stat_info, 'Ny status: " . $db->per_stat[$_POST[status]] . "', $no)");
+                       "values ($now, $db->rec_stat_info, 'Ny status: " . $db->per_stat[request('status')] . "', $no)");
          }
       }
    } catch (PDOException $ex)
@@ -166,38 +169,38 @@ function update_pwd($no)
 {
    global $db;
 
-   $s = $db->query("select id from person where not id = $no and uid = '$_POST[uid]'");
+   $s = $db->query("select id from person where not id = $no and uid = " . request('uid'));
    if ($s->rowCount() > 0)
    {
       echo "<font color=red>Ikke oppdatert, brukeren finnes fra før!</font>";
       return;
    }
 
-   if (strlen($_POST[uid]) < 2)
+   if (strlen(request('uid')) < 2)
    {
       echo "<font color=red>Ikke oppdatert, brukeren må bestå av minst 2 bokstaver!</font>";
       return;
    }
 
-   if ($_POST[pwd1] != $_POST[pwd2])
+   if (request('pwd1') != request('pwd2'))
    {
       echo "<font color=red>Ikke oppdatert, passordene må være like!</font>";
       return;
    }
 
-   if (strlen($_POST[pwd1]) == 0)
+   if (strlen(request('pwd1')) == 0)
    {
       echo "<font color=red>Ikke oppdatert, passord må ha minst 1 bokstav</font>";
       return;
    }
 
-   if (preg_match("/[^A-Za-z0-9]/", $_POST[uid]))
+   if (preg_match("/[^A-Za-z0-9]/", request('uid')))
    {
       echo "<font color=red>Ugyldig brukernavn. Gyldige tegn: A-Z, a-z, 0-9</font>";
       return;
    }
 
-   $query = "update person set uid = '$_POST[uid]' , password = MD5('$_POST[pwd1]')" .
+   $query = "update person set uid = " . $db->qpost('uid') . ", password = MD5(" . $db->qpost('pwd1') . ")" .
            "where id = $no";
    try
    {
@@ -206,17 +209,38 @@ function update_pwd($no)
    {
       echo "<font color=red>Failed to update</font>";
    }
-   $pwd = $_POST[pwd1];
+   $pwd = request('pwd1');
    $stmt = $db->query("select uid from person where id = $no");
    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-   update_htpasswd($row[uid], $pwd);
+   update_htpasswd($row['uid'], $pwd);
 }
 
 if ($action == 'update_pwd')
    update_pwd($no);
 
-if ($no != NULL)
+$row = array(
+    'id' => 0,
+    'id_instruments' => 0,
+    'instrument' => '',
+    'firstname' => '',
+    'middlename' => '',
+    'lastname' => '',
+    'uid' => '',
+    'address' => '',
+    'postcode' => 0,
+    'city' => '',
+    'email' => '',
+    'phone1' => '',
+    'phone2' => '',
+    'phone3' => '',
+    'status' => 0,
+    'comment' => '',
+    'comment_dir' => '',
+    'birthday' => 0,
+);
+
+if (!is_null($no))
 {
    $query = "SELECT person.id as id, id_instruments, instrument, firstname, middlename, lastname, " .
            "uid, address, postcode, city, " .
@@ -230,8 +254,8 @@ if ($no != NULL)
    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-$person = ($no == NULL) ? "Ny person" : "$row[firstname] $row[middlename] $row[lastname]";
-$postcode = sprintf("%04d", $row[postcode]);
+$person = is_null($no) ? "Ny person" : $row['firstname'] . " " . $row['middlename'] . " " . $row['lastname'];
+$postcode = sprintf("%04d", $row['postcode']);
 
 echo "<h1>$person</h1>\n";
 echo "<a href=\"person.php\" title=\"Til adresselisten...\"><img src=\"images/index.gif\" border=0 hspace=5></a>\n";
@@ -257,56 +281,56 @@ if ($action == 'edit_pers')
     </tr>
     <tr>
       <td>Navn:</td>
-      <td><input type=text name=firstname size=30 value=\"$row[firstname]\">
-          <input type=text name=middlename size=30 value=\"$row[middlename]\">
-          <input type=text name=lastname size=30 value=\"$row[lastname]\"></td>
+      <td><input type=text name=firstname size=30 value=\"" . $row['firstname'] . "\">
+          <input type=text name=middlename size=30 value=\"" . $row['middlename'] . "\">
+          <input type=text name=lastname size=30 value=\"" . $row['lastname'] . "\"></td>
     </tr>
     <tr>
       <td>Instrument:</td>
       <td>";
    if ($access->auth(AUTH::MEMB_RW))
-      select_instrument($row[id_instruments]);
+      select_instrument($row['id_instruments']);
    else
-      echo $row[instrument];
+      echo $row['instrument'];
    echo
    "     </td>
       </tr>
    <tr>
       <td>Adresse:</td>
-      <td><input type=text name=address size=30 value=\"$row[address]\"></td>
+      <td><input type=text name=address size=30 value=\"" . $row['address'] . "\"></td>
     </tr>
     <tr>
       <td>Post:</td>
       <td><input type=text name=postcode size=4 maxlength=4 value=\"$postcode\">
-          <input type=text name=city size=30 value=\"$row[city]\"></td>
+          <input type=text name=city size=30 value=\"" . $row['city'] . "\"></td>
     </tr>
     <tr>
      <td>Mail:</td>
-      <td><input type=text name=email size=40 value=\"$row[email]\"></td>
+      <td><input type=text name=email size=40 value=\"" . $row['email'] . "\"></td>
     </tr>
     <tr>
       <td>Telefon:</td>
-      <td>mob:<input type=text name=phone1 size=12 value=\"$row[phone1]\">
-          priv:<input type=text name=phone2 size=12 value=\"$row[phone2]\">
-          jobb:<input type=text name=phone3 size=12 value=\"$row[phone3]\"></td>
+      <td>mob:<input type=text name=phone1 size=12 value=\"" . $row['phone1'] . "\">
+          priv:<input type=text name=phone2 size=12 value=\"" . $row['phone2'] . "\">
+          jobb:<input type=text name=phone3 size=12 value=\"" . $row['phone3'] . "\"></td>
     </tr>
     <tr>
       <td>Status:</td>
       <td>";
    if ($access->auth(AUTH::MEMB_RW))
-      select_status($row[status]);
+      select_status($row['status']);
    else
-      echo $db->per_stat[$row[status]];
+      echo $db->per_stat[$row['status']];
    echo
    "     </td>
       </tr>
     <tr>
       <td>Fødselsdag:</td>
-      <td><input type=date name=birthday size=15 value=\"" . date('j. M Y', $row[birthday]) . "\" title=\"(frivillig) Eks: 10 jan 2017\"></td>
+      <td><input type=date name=birthday size=15 value=\"" . date('j. M Y', $row['birthday']) . "\" title=\"(frivillig) Eks: 10 jan 2017\"></td>
     </tr>
     <tr>
       <td>Kommentar:</td>
-      <td><input type=text name=comment size=50 value=\"$row[comment]\"></td>
+      <td><input type=text name=comment size=50 value=\"" . $row['comment'] . "\"></td>
     </tr>
   ";
 } else
@@ -319,23 +343,23 @@ if ($action == 'edit_pers')
         <input type=submit value=\"Endre\">
       </th>
     </tr>
-    <tr><td>Navn:</td><td>$row[firstname] $row[middlename] $row[lastname]</td></tr>
-    <tr><td>Instrument:</td><td>$row[instrument]</td></tr>
-    <tr><td>Adresse:</td><td>$row[address]</td></tr>
-    <tr><td>Post:</td><td>$postcode $row[city]</td></tr>
-    <tr><td>Mail:</td><td>$row[email]</td></tr>
-    <tr><td>Mobil:</td><td>$row[phone1]</td></tr>
-    <tr><td>Privat:</td><td>$row[phone2]</td></tr>
-    <tr><td>Jobb:</td><td>$row[phone3]</td></tr>
-    <tr><td>Status:</td><td>{$db->per_stat[$row[status]]}</td></tr>
-    <tr><td>Fødselsdag:</td><td>" . strftime('%e. %b %Y', $row[birthday]) . "</td></tr>
-    <tr><td>Kommentar:</td><td>$row[comment]</td></tr>";
+    <tr><td>Navn:</td><td>" . $row['firstname'] . " " . $row['middlename'] . " " . $row['lastname'] . "</td></tr>
+    <tr><td>Instrument:</td><td>" . $row['instrument'] . "</td></tr>
+    <tr><td>Adresse:</td><td>" . $row['address'] . "</td></tr>
+    <tr><td>Post:</td><td>$postcode " . $row['city'] . "</td></tr>
+    <tr><td>Mail:</td><td>" . $row['email'] . "</td></tr>
+    <tr><td>Mobil:</td><td>" . $row['phone1'] . "</td></tr>
+    <tr><td>Privat:</td><td>" . $row['phone2'] . "</td></tr>
+    <tr><td>Jobb:</td><td>" . $row['phone3'] . "</td></tr>
+    <tr><td>Status:</td><td>" . $db->per_stat[$row['status']] . "</td></tr>
+    <tr><td>Fødselsdag:</td><td>" . strftime('%e. %b %Y', $row['birthday']) . "</td></tr>
+    <tr><td>Kommentar:</td><td>" . $row['comment'] . "</td></tr>";
 }
 echo "</form>
         </table>";
 
 
-if ($no != null)
+if (!is_null($no))
 {
    echo "
     <p>
@@ -356,7 +380,7 @@ if ($no != null)
     </tr>
     <tr>
       <td>Bruker-id:</td>
-      <td><input type=text name=uid size=30 value=\"$row[uid]\"></td>
+      <td><input type=text name=uid size=30 value=\"" . $row['uid'] . "\"></td>
     </tr>
     <tr>
       <td>Nytt passord:</td>
@@ -366,7 +390,8 @@ if ($no != null)
       <td>Gjenta passord:</td>
       <td><input type=password name=pwd2 size=20></td>
     </tr>";
-   } else
+   }
+   else
    {
       echo "
       <th>
@@ -376,7 +401,7 @@ if ($no != null)
         <input type=submit value=\"Endre\">
       </th>
     </tr>
-    <tr><td>Bruker-id:</td><td>$row[uid]</td></tr>
+    <tr><td>Bruker-id:</td><td>" . $row['uid'] . "</td></tr>
     <tr><td>Passord:</td><td>************</td></tr>";
    }
    echo "</form>
@@ -407,7 +432,7 @@ echo "
       <th bgcolor=#A6CAF0>Tekst</th>
       </tr>";
 
-$rno = $_REQUEST[_rno];
+$rno = request('_rno');
 
 if ($action == 'new_log')
 {
@@ -427,21 +452,22 @@ if ($action == 'new_log')
 
 if ($action == 'update_log' && $access->auth(AUTH::MEMB_RW))
 {
-   $ts = strtotime($_POST[ts]);
+   $ts = strtotime(request('ts'));
 
    if (is_null($rno))
       $query = "insert into record (ts, status, comment, id_person) " .
-              "values ($ts, $_POST[status], '$_POST[comment]', $no)";
+              "values ($ts, " . request('status') . ", " . $db->qpost('comment') . ", $no)";
    else
    {
       if (!is_null($delete))
       {
-         $query = "delete from record where id = $_POST[_rno]";
-      } else
+         $query = "delete from record where id = " . request('_rno');
+      }
+      else
       {
          $query = "update record set ts = $ts," .
-                 "status = $_POST[status]," .
-                 "comment = '$_POST[comment]' " .
+                 "status = " . request('status') . "," .
+                 "comment = " . $db->qpost('comment') . " " .
                  "where id = $rno";
       }
       $rno = null;
@@ -460,18 +486,18 @@ $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
-   if ($row[id] != $rno)
+   if ($row['id'] != $rno)
    {
       echo "<tr>";
       if ($access->auth(AUTH::MEMB_RW))
          echo "
          <td><center>
-           <a href=\"$php_self?_sort=$sort&_action=view_log&_rno=$row[id]&_no=$no\"><img src=\"images/cross_re.gif\" border=0></a>
+           <a href=\"$php_self?_sort=$sort&_action=view_log&_rno=" . $row['id'] . "&_no=$no\"><img src=\"images/cross_re.gif\" border=0></a>
              </center></td>";
-      echo "<td>" . strftime('%e. %b %Y', $row[ts]) . "</td>" .
-      "<td>" . $db->rec_stat[$row[status]] . "</td>\n";
+      echo "<td>" . strftime('%e. %b %Y', $row['ts']) . "</td>" .
+      "<td>" . $db->rec_stat[$row['status']] . "</td>\n";
       echo "<td>";
-      echo str_replace("\n", "<br>\n", $row[comment]);
+      echo str_replace("\n", "<br>\n", $row['comment']);
       echo "</td>" .
       "</tr>";
    }
@@ -484,11 +510,11 @@ foreach ($stmt as $row)
     <input type=hidden name=_no value=$no>
     <th nowrap><input type=submit value=ok>
       <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette?');\"></th>
-    <th><input type=date size=15 name=ts value=\"" . date('j. M y', $row[ts]) . "\" title=\"Eks: 10 dec 201\"></th>\n";
+    <th><input type=date size=15 name=ts value=\"" . date('j. M y', $row['ts']) . "\" title=\"Eks: 10 dec 201\"></th>\n";
       echo "<td>";
-      select_status_log($row[status]);
+      select_status_log($row['status']);
       echo "</td>
-    <th><textarea cols=60 rows=3 wrap=virtual name=comment>$row[comment]</textarea></th>
+    <th><textarea cols=60 rows=3 wrap=virtual name=comment>" . $row['comment'] . "</textarea></th>
     </tr>";
    }
 }
