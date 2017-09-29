@@ -132,7 +132,6 @@ if ($action == 'update' && $access->auth(AUTH::PRJ))
          $query = "insert into project (name, semester, year, status, deadline, orchestration, info, id_person, valid_par_stat) " .
                  "values (".$db->qpost('name').", '".request('semester')."', " .
                  request('year').", ".request('status').", $ts, $orchestration, ".$db->qpost('info').", 1, $valid_par_stat)";
-echo $query;
          $db->query($query);
       } 
       else
