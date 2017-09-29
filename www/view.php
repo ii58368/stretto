@@ -2,7 +2,7 @@
 
 require 'framework.php';
 
-if ($sort == NULL)
+if (is_null($sort))
    $sort = 'name';
 
 echo "
@@ -48,53 +48,55 @@ if ($action == 'update' && $access->auth(AUTH::ACCGRP))
    for ($i = 0; $i < AUTH::NO_VIEWS; $i++)
    {
       $key = 'access' . $i;
-      if ($_POST[$key])
+      if (isset($_POST[$key]))
          $acc_bit |= 1 << $i;
    }
 
-   if ($no == NULL)
+   if (is_null($no))
    {
       $query = "insert into view (name, comment, access) " .
-              "values ('$_POST[name]', '$_POST[comment]', '$acc_bit')";
-   } else
+              "values (" . $db->qpost('name') . ", " . $db->qpost('comment') . ", $acc_bit)";
+   }
+   else
    {
-      if ($delete != NULL)
+      if (!is_null($delete))
       {
-         $query = "DELETE FROM location WHERE id = {$no}";
-      } else
-      {
-         $query = "update view set name = '$_POST[name]'," .
-                 "comment = '$_POST[comment]'," .
-                 "access = '$acc_bit' " .
-                 "where id = $no";
-         $no = NULL;
+         $query = "DELETE FROM view WHERE id = $no";
       }
+      else
+      {
+         $query = "update view set name = " . $db->qpost('name') . "," .
+                 "comment = " . $db->qpost('comment') . "," .
+                 "access = $acc_bit " .
+                 "where id = $no";
+      }
+      $no = null;
    }
    $db->query($query);
 }
 
 $query = "SELECT id, name, comment, access " .
-        "FROM view order by {$sort}";
+        "FROM view order by $sort";
 
 $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
-   if ($row[id] != $no)
+   if ($row['id'] != $no)
    {
       echo "<tr>";
       if ($access->auth(AUTH::ACCGRP))
          echo "
          <td><center>
-           <a href=\"{$php_self}?_sort={$sort}&_action=view&_no={$row[id]}\"><img src=\"images/cross_re.gif\" border=0></a>
+           <a href=\"$php_self?_sort=$sort&_action=view&_no=" . $row['id'] . "\"><img src=\"images/cross_re.gif\" border=0></a>
              </center></td>";
-      echo 
-      "<td><b>$row[name]</b></td>" .
-      "<td>$row[comment]</td>";
+      echo
+      "<td><b>" . $row['name'] . "</b></td>" .
+      "<td>" . $row['comment'] . "</td>";
       for ($i = 0; $i < AUTH::NO_VIEWS; $i++)
       {
          echo "<td>";
-         if ($row[access] & (1 << $i))
+         if ($row['access'] & (1 << $i))
             echo "<center><img src=\"images/tick2.gif\" border=0></center>";
          echo "</td>";
       }
@@ -107,14 +109,14 @@ foreach ($stmt as $row)
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
     <th nowrap><input type=submit value=ok>
-      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette {$row[name]}?');\"></th>
-    <th><input type=text size=30 name=name value=\"{$row[name]}\"></th>
-    <th><input type=text size=30 name=comment value=\"{$row[comment]}\"></th>";
+      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette " . $row['name'] . "?');\"></th>
+    <th><input type=text size=30 name=name value=\"" . $row['name'] . "\"></th>
+    <th><input type=text size=30 name=comment value=\"" . $row['comment'] . "\"></th>";
 
       for ($i = 0; $i < AUTH::NO_VIEWS; $i++)
       {
          echo "<td><input type=checkbox name=access$i value='*' ";
-         if ($row[access] & (1 << $i))
+         if ($row['access'] & (1 << $i))
             echo "checked";
          echo "></td>";
       }
