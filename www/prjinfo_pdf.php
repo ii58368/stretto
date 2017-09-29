@@ -19,8 +19,8 @@ class PDF extends PDF_util
       $stmt = $db->query($query);
       $prj = $stmt->fetch(PDO::FETCH_ASSOC);
 
-      $this->header1("$prj[name] $prj[semester]-$prj[year]");
-      $this->MultiCell(0, 5, $this->sconv($prj[info]));
+      $this->header1($prj['name']." ".$prj['semester']."-".$prj['year']);
+      $this->MultiCell(0, 5, $this->sconv($prj['info']));
       $this->Ln();
    }
 
@@ -28,11 +28,12 @@ class PDF extends PDF_util
    {
       global $db;
 
-      $query = "SELECT title, work, firstname, lastname, music.comment as comment"
+      $query = "SELECT title, work, firstname, lastname, music.comment as comment,"
+              . " repository.comment as r_comment"
               . " from repository, music"
               . " where repository.id = music.id_repository"
               . " and music.status = $db->mus_stat_yes"
-              . " and music.id_project = $_REQUEST[id] "
+              . " and music.id_project = ".request('id')." "
               . " order by lastname, firstname, work";
 
       $stmt = $db->query($query);
@@ -41,11 +42,12 @@ class PDF extends PDF_util
 
       foreach ($stmt as $row)
       {
-         $this->Cell(50, 5, $this->sconv("$row[firstname] $row[lastname]:"));
-         $this->Cell(50, 5, $this->sconv($row[title]));
-         if (strlen($row[work]) > 0)
-            $this->Cell(60, 5, $this->sconv("fra $row[work]"));
-         $this->Cell(50, 5, $this->sconv($row[comment]));
+         $this->Cell(50, 5, $this->sconv($row['firstname']." ".$row['lastname'].":"));
+         $this->Cell(50, 5, $this->sconv($row['title']));
+         if (strlen($row['work']) > 0)
+            $this->Cell(60, 5, $this->sconv("fra ".$row['work']));
+         $this->Cell(50, 5, $this->sconv($row['r_comment']));
+         $this->Cell(50, 5, $this->sconv($row['comment']));
          $this->Ln();
       }
       $this->Ln();
@@ -80,10 +82,10 @@ class PDF extends PDF_util
 
       foreach ($stmt as $row)
       {
-         $this->Cell($w[0], 5, $this->sconv(strftime('%a %e.%b', $row[date])));
-         $this->Cell($w[1], 5, $row[time]);
-         $this->Cell($w[2], 5, $this->sconv($row[lname]));
-         $this->Cell($w[3], 5, $this->sconv($row[comment]));
+         $this->Cell($w[0], 5, $this->sconv(strftime('%a %e.%b', $row['date'])));
+         $this->Cell($w[1], 5, $row['time']);
+         $this->Cell($w[2], 5, $this->sconv($row['lname']));
+         $this->Cell($w[3], 5, $this->sconv($row['comment']));
          $this->Ln();
       }
       $this->Ln();
@@ -107,23 +109,24 @@ class PDF extends PDF_util
       $this->header1("Musikere");
 
       $this->colStart();
+      $last_instrument = '';
       
       foreach ($stmt as $e)
       {
-         if ($last_instrument != $e[instrument])
+         if ($last_instrument != $e['instrument'])
          {
             $this->colLn();            
             if ($this->GetY() > $this->GetPageHeight() - 30)
                $this->colNext(35);
-            $this->bold("$e[instrument]:");
+            $this->bold($e['instrument'].":");
             $this->colLn(2);
          }
-         $name = ($e[stat_final] == $db->par_stat_yes) ? "$e[firstname] $e[lastname]" : "<uavklart>";
+         $name = ($e['stat_final'] == $db->par_stat_yes) ? $e['firstname']." ".$e['lastname'] : "<uavklart>";
          $this->Cell(0, 4, $this->sconv($name));
          $this->colLn();
          if ($this->GetY() > $this->GetPageHeight())
             $this->colNext(35);
-         $last_instrument = $e[instrument];
+         $last_instrument = $e['instrument'];
       }
    }
 
@@ -133,9 +136,9 @@ $pdf = new PDF();
 $pdf->AliasNbPages();
 $pdf->SetFont_('Times', '', 10);
 $pdf->AddPage();
-$pdf->info($_REQUEST[id]);
-$pdf->program($_REQUEST[id]);
-$pdf->plan($_REQUEST[id]);
-$pdf->participants($_REQUEST[id]);
+$pdf->info(request('id'));
+$pdf->program(request('id'));
+$pdf->plan(request('id'));
+$pdf->participants(request('id'));
 
 $pdf->Output();

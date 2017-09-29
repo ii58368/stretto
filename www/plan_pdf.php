@@ -21,8 +21,8 @@ class PDF extends PDF_util
 
       $this->SetTextColor(0, 0, 200);
       $this->setFontSize(30);
-      $semester_text = ($_REQUEST[semester] == 'V') ? 'Våren' : 'Høsten';
-      $this->Cell(60, 0, $this->sconv("Spilleplan $semester_text $_REQUEST[year]"));
+      $semester_text = (request('semester') == 'V') ? 'Våren' : 'Høsten';
+      $this->Cell(60, 0, $this->sconv("Spilleplan $semester_text ".request('year')));
       $this->SetFontSize(20);
       $this->SetTextColor(0, 0, 0);
 
@@ -47,8 +47,8 @@ class PDF extends PDF_util
               "where id_location = location.id " .
               "and id_project = project.id " .
               "and plan.event_type = $db->plan_evt_rehearsal " .
-              "and project.year = $_REQUEST[year] " .
-              "and project.semester = '$_REQUEST[semester]' " .
+              "and project.year = ".request('year')." " .
+              "and project.semester = '".request('semester')."' " .
               "and (project.status = $db->prj_stat_public ";
       if ($access->auth(AUTH::PRJ_RO))
          $query .= "or project.status = $db->prj_stat_draft ";
@@ -61,32 +61,35 @@ class PDF extends PDF_util
       $this->SetTextColor(0, 0, 0);
       $this->setFontSize(12);
       $hight = 3;
+      
+      $last_date = '';
+      $last_time = '';
 
       foreach ($stmt as $e)
       {
          $tcolor = 0;
-         if ($e[status] == $db->prj_stat_tentative)
+         if ($e['status'] == $db->prj_stat_tentative)
             $tcolor = 150;
-         if ($e[status] == $db->prj_stat_draft)
+         if ($e['status'] == $db->prj_stat_draft)
             $tcolor = 200;
          $this->SetTextColor($tcolor, $tcolor, $tcolor);
 
          $idx = 0;
          
-         $date = ($e[date] != $last_date) ? strftime('%a %e.%b', $e[date]) : '';
+         $date = ($e['date'] != $last_date) ? strftime('%a %e.%b', $e['date']) : '';
          $this->Cell($tab[$idx++], $hight, $this->sconv($date));
-         $time = ($e[date] != $last_date || $e[time] != $last_time) ? $e[time] : '';
-         $this->Cell($tab[$idx++], $hight, $e[time]);
+         $time = ($e['date'] != $last_date || $e['time'] != $last_time) ? $e['time'] : '';
+         $this->Cell($tab[$idx++], $hight, $e['time']);
 
-         $last_date = $e[date];
-         $last_time = $e[time];
+         $last_date = $e['date'];
+         $last_time = $e['time'];
 
-         $this->Cell($tab[$idx++], $hight, $this->sconv($e[lname]));
-         $project = $this->sconv($e[pname]);
-         if ($e[orchestration] == $db->prj_orch_reduced)
+         $this->Cell($tab[$idx++], $hight, $this->sconv($e['lname']));
+         $project = $this->sconv($e['pname']);
+         if ($e['orchestration'] == $db->prj_orch_reduced)
             $project .= '*';
          $this->Cell($tab[$idx++], $hight, $project);
-         $this->MultiCell($tab[$idx++], $hight, $this->sconv($e[comment]));
+         $this->MultiCell($tab[$idx++], $hight, $this->sconv($e['comment']));
          $this->Ln(3);
       }
 
@@ -105,15 +108,15 @@ class PDF extends PDF_util
 
       $this->SetTextColor(0, 0, 200);
       $this->setFontSize(30);
-      $semester_text = ($_REQUEST[semester] == 'V') ? 'Våren' : 'Høsten';
-      $this->Cell(60, 0, $this->sconv("Repertoar $semester_text $_REQUEST[year]"));
+      $semester_text = (request('semester') == 'V') ? 'Våren' : 'Høsten';
+      $this->Cell(60, 0, $this->sconv("Repertoar $semester_text ".request('year')));
 
       $this->Line(10, 38, 200, 38);
  
       $query = "select id, name, info, status, orchestration "
               . "from project "
-              . "where project.year = $_REQUEST[year] "
-              . "and project.semester = '$_REQUEST[semester]' "
+              . "where project.year = ".request('year')." "
+              . "and project.semester = '".request('semester')."' "
               . "and (project.status = $db->prj_stat_public ";
       if ($access->auth(AUTH::PRJ_RO))
          $query .= "or project.status = $db->prj_stat_draft ";
@@ -131,9 +134,9 @@ class PDF extends PDF_util
       foreach ($stmt as $prj)
       {
          $tcolor = 0;
-         if ($prj[status] == $db->prj_stat_tentative)
+         if ($prj['status'] == $db->prj_stat_tentative)
             $tcolor = 150;
-         if ($prj[status] == $db->prj_stat_draft)
+         if ($prj['status'] == $db->prj_stat_draft)
             $tcolor = 200;
          $this->SetTextColor($tcolor, $tcolor, $tcolor);
          
@@ -141,18 +144,18 @@ class PDF extends PDF_util
               . "concert.ts as ts, "
               . "location.name as lname "
               . "from concert, location "
-              . "where concert.id_project = $prj[id] "
+              . "where concert.id_project = ".$prj['id']." "
               . "and concert.id_location = location.id "
               . "order by concert.ts";
 
          $s = $db->query($q);
          
          $h2 = "";
-         if ($prj[orchestration] == $db->prj_orch_reduced)
+         if ($prj['orchestration'] == $db->prj_orch_reduced)
             $h2 = "* ";
-         $h2 .= "$prj[name] ";
+         $h2 .= $prj['name']." ";
          foreach ($s as $e)
-           $h2 .= ', ' . $e[lname] . ' ' . strftime('%A %e. %B', $e[ts]);
+           $h2 .= ', ' . $e['lname'] . ' ' . strftime('%A %e. %B', $e['ts']);
          $this->Cell(100, 5, $this->sconv($h2), "B");
  
          $this->Ln(7);
@@ -162,7 +165,7 @@ class PDF extends PDF_util
               . "repository.comment as r_comment, "
               . "music.comment as m_comment "
               . "from music, repository "
-              . "where music.id_project = $prj[id] "
+              . "where music.id_project = ".$prj['id']." "
               . "and music.id_repository = repository.id "
               . "and music.status = $db->mus_stat_yes";
          
@@ -170,19 +173,19 @@ class PDF extends PDF_util
          
          foreach ($s as $e)
          {
-            $this->Cell(50, 5, $this->sconv("$e[lastname], $e[firstname]"));
-            $this->Cell(50, 5, $this->sconv("$e[title], $e[work] $e[r_comment]"));
+            $this->Cell(50, 5, $this->sconv($e['lastname'].", ".$e['firstname']));
+            $this->Cell(50, 5, $this->sconv($e['title'].", ".$e['work']." ".$e['r_comment']));
             $this->Ln();
-            if (strlen($e[m_comment]) > 0)
+            if (strlen($e['m_comment']) > 0)
             {
                $this->Cell(50, 5);
-               $this->Cell(50, 5, $this->sconv("$e[m_comment]"));
+               $this->Cell(50, 5, $this->sconv($e['m_comment']));
                $this->Ln();
             }
          }
          
          $this->Ln(4);
-         $this->MultiCell(100, 5, $this->sconv($prj[info]));
+         $this->MultiCell(100, 5, $this->sconv($prj['info']));
          $this->Ln(7);
       }
 

@@ -11,17 +11,17 @@ function has_access()
    if ($access->auth(AUTH::PRJM))
       return true;
 
-   if (!is_numeric($_REQUEST[id_project]))
+   if (!is_numeric(request('id_project')))
       return false;
 
    $q = "select count(*) as count from participant "
            . "where id_person = " . $whoami->id() . " "
-           . "and id_project = $_REQUEST[id_project] "
+           . "and id_project = ".request('id_project')." "
            . "and stat_final = $db->par_stat_yes";
    $s = $db->query($q);
    $e = $s->fetch(PDO::FETCH_ASSOC);
    
-   if ($e[count] > 0)
+   if ($e['count'] > 0)
       return true;
 
    return false;

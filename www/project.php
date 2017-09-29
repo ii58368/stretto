@@ -11,12 +11,12 @@ function select_semester($selected)
    echo "<option value=V";
    if ($selected == 'V')
       echo " selected";
-   echo ">V&aring;r</option>\n";
+   echo ">Vår</option>\n";
 
    echo "<option value=H";
    if ($selected == 'H')
       echo " selected";
-   echo ">H&oslash;st</option>\n";
+   echo ">Høst</option>\n";
    echo "</select>";
 }
 
@@ -56,7 +56,7 @@ function select_valid_par_stat($valid_par_stat)
    echo "</select>";
 }
 
-$sel_year = is_null($_REQUEST[from]) ? date("Y") : intval($_REQUEST[from]);
+$sel_year = is_null(request('from')) ? date("Y") : intval(request('from'));
 $prev_year = $sel_year - 1;
 
 echo "
@@ -78,7 +78,7 @@ if ($access->auth(AUTH::PRJ))
 echo "
       <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=name,id&from=$sel_year\" title=\"Sorter p&aring; prosjektnavn\">Prosjekt</a></th>
       <th bgcolor=#A6CAF0 nowrap><a href=\"$php_self?_sort=year,semester+DESC,id&from=$sel_year\" title=\"Sorter p&aring; semester\">Sem</a>
-           <a href=\"$php_self?from=$prev_year&_sort={$sort}\"><img src=images/arrow_up.png border=0 title=\"Forrige &aring;r...\"></a></th>
+           <a href=\"$php_self?from=$prev_year&_sort=$sort\"><img src=images/arrow_up.png border=0 title=\"Forrige &aring;r...\"></a></th>
       <th bgcolor=#A6CAF0>Status</th>
       <th bgcolor=#A6CAF0>På-/avm.frist</th>
       <th bgcolor=#A6CAF0>Tutti</th>
@@ -115,23 +115,24 @@ if ($action == 'new')
 
 if ($action == 'update' && $access->auth(AUTH::PRJ))
 {
-   $orchestration = ($_POST[orchestration] == null) ? $db->prj_orch_reduced : $db->prj_orch_tutti;
+   $orchestration = is_null(request('orchestration')) ? $db->prj_orch_reduced : $db->prj_orch_tutti;
 
    $valid_par_stat = 0;
-   if ($_POST[valid_par_stat] != null)
-      foreach ($_POST[valid_par_stat] as $idx)
+   if (request('valid_par_stat') != null)
+      foreach (request('valid_par_stat') as $idx)
          $valid_par_stat |= (1 << $idx);
 
-   if (($ts = strtotime($_POST[deadline])) == false)
+   if (($ts = strtotime(request('deadline'))) == false)
    {
-      echo "<font color=red>Illegal time format: " . $_POST[deadline] . "</font>";
+      echo "<font color=red>Illegal time format: " . request('deadline') . "</font>";
    } else
    {
       if ($no == NULL)
       {
          $query = "insert into project (name, semester, year, status, deadline, orchestration, info, id_person, valid_par_stat) " .
-                 "values ('$_POST[name]', '$_POST[semester]', " .
-                 "'$_POST[year]', '$_POST[status]', '$ts', '$orchestration', '$_POST[info]', 1, $valid_par_stat)";
+                 "values (".$db->qpost('name').", '".request('semester')."', " .
+                 request('year').", ".request('status').", $ts, $orchestration, ".$db->qpost('info').", 1, $valid_par_stat)";
+echo $query;
          $db->query($query);
       } 
       else
@@ -141,14 +142,14 @@ if ($action == 'update' && $access->auth(AUTH::PRJ))
             $query = "DELETE from project WHERE project.id = $no";
          } else
          {
-            $query = "update project set name = '$_POST[name]'," .
-                    "semester = '$_POST[semester]'," .
-                    "year = '$_POST[year]'," .
-                    "status = '$_POST[status]'," .
-                    "deadline = '$ts', " .
-                    "orchestration = '$orchestration', " .
+            $query = "update project set name = ".$db->qpost('name')."," .
+                    "semester = '".request('semester')."'," .
+                    "year = ".request('year')."," .
+                    "status = ".request('status')."," .
+                    "deadline = $ts, " .
+                    "orchestration = $orchestration, " .
                     "valid_par_stat = $valid_par_stat, " .
-                    "info = '$_POST[info]' " .
+                    "info = ".$db->qpost('info')." " .
                     "where id = $no";
          }
          $db->query($query);
@@ -161,34 +162,34 @@ $query = "SELECT project.id as id, name, semester, year, status, " .
         "deadline, orchestration, valid_par_stat, info " .
         "FROM project " .
         "where project.year >= $sel_year " .
-        "order by ${sort}";
+        "order by $sort";
 
 $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
-   if ($row[id] != $no)
+   if ($row['id'] != $no)
    {
       echo "<tr>";
       if ($access->auth(AUTH::PRJ))
          echo "
         <td><center>
-            <a href=\"{$php_self}?_sort={$sort}&from=$sel_year&_action=view&_no={$row[id]}\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
+            <a href=\"$php_self?_sort=$sort&from=$sel_year&_action=view&_no=".$row['id']."\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
              </center></td>";
       echo
-      "<td><a href=\"plan.php?id_project={$row[id]}\">{$row[name]}</a></td>" .
-      "<td>{$row[semester]}-{$row[year]}</td>" .
-      "<td>" . $db->prj_stat[$row[status]] . "</td>" .
-      "<td>" . strftime('%a %e.%b %y', $row[deadline]) . "</td>" .
+      "<td><a href=\"plan.php?id_project=".$row['id']."\">".$row['name']."</a></td>" .
+      "<td>".$row['semester']."-".$row['year']."</td>" .
+      "<td>" . $db->prj_stat[$row['status']] . "</td>" .
+      "<td>" . strftime('%a %e.%b %y', $row['deadline']) . "</td>" .
       "<td>";
-      if ($row[orchestration] == $db->prj_orch_tutti)
+      if ($row['orchestration'] == $db->prj_orch_tutti)
          echo "<center><img src=\"images/tick2.gif\" border=0></center>";
       echo "</td><td>";
       for ($i = 0; $i < sizeof($db->par_stat); $i++)
-         if ($row[valid_par_stat] & (1 << $i))
+         if ($row['valid_par_stat'] & (1 << $i))
             echo "<img src=\"images/ballc_g1.gif\" border=0>" . $db->par_stat[$i] . "<br>\n";
       echo "</td><td>";
-      echo str_replace("\n", "<br>\n", $row[info]);
+      echo str_replace("\n", "<br>\n", $row['info']);
       echo "</td>" .
       "</tr>";
    }
@@ -200,22 +201,22 @@ foreach ($stmt as $row)
     <input type=hidden name=_no value='$no'>
     <input type=hidden name=from value='$sel_year'>
     <th nowrap><input type=submit value=ok title=\"Lagere endring\" >
-    <input type=submit value=del name=_delete title=\"Slett prosjekt\" onClick=\"return confirm('Sikkert at du vil slette {$row[name]}?');\"></th>
-    <th><input type=text size=20 name=name value=\"{$row[name]}\"></th>
+    <input type=submit value=del name=_delete title=\"Slett prosjekt\" onClick=\"return confirm('Sikkert at du vil slette ".$row['name']."?');\"></th>
+    <th><input type=text size=20 name=name value=\"".$row['name']."\"></th>
     <th nowrap>";
-      select_semester($row[semester]);
-      echo "<input type=text size=4 maxlength=4 name=year value=\"{$row[year]}\"></th>
+      select_semester($row['semester']);
+      echo "<input type=text size=4 maxlength=4 name=year value=\"".$row['year']."\"></th>
     <th>";
-      select_status($row[status]);
+      select_status($row['status']);
       echo "</th>";
-      echo "<td><input type=date size=10 name=deadline value=\"" . date('j. M y', $row[deadline]) . "\"></td>";
+      echo "<td><input type=date size=10 name=deadline value=\"" . date('j. M y', $row['deadline']) . "\"></td>";
       echo "<th><input type=checkbox name=orchestration";
-      if ($row[orchestration] == $db->prj_orch_tutti)
+      if ($row['orchestration'] == $db->prj_orch_tutti)
          echo " checked";
       echo "></th>\<td>";
-      select_valid_par_stat($row[valid_par_stat]);
+      select_valid_par_stat($row['valid_par_stat']);
       echo " </td>
-    <td><textarea cols=44 rows=10 wrap=virtual name=info>{$row[info]}</textarea></td>
+    <td><textarea cols=44 rows=10 wrap=virtual name=info>".$row['info']."</textarea></td>
     </tr>";
    }
 }
@@ -223,8 +224,3 @@ foreach ($stmt as $row)
 
 </table>
 </form>
-
-<?php
-require 'framework_end.php';
-?>
-
