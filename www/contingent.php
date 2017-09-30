@@ -1,18 +1,17 @@
 <?php
 require 'framework.php';
 
-$sel_year = is_null(request('from')) ? date("Y") - 3 : intval(request('from'));
-$prev_year = $sel_year - 1;
-$end_year = date("Y") + 1;
+$sel_year = $season->year() - 3;
+$end_year = $season->year() + 1;
 
 echo "
     <h1>Medlemskontingent</h1>
     <table border=1>
     <tr>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?from=$prev_year&_sort=$sort\"><img src=images/left.gif border=0 title=\"Forrige &aring;r...\"></a>
-         <a href=\"$php_self?from=$sel_year&_sort=firstname,lastname\" title=\"Sorter p&aring; fornavn...\">Fornavn</a>/
-         <a href=\"$php_self?from=$sel_year&_sort=lastname,firstname\" title=\"Sorter p&aring; etternavn...\">Etternavn</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?from=$sel_year&_sort=list_order,lastname,firstname\" title=\"Sorter p&aring; instrumentgruppe...\">Instrument</a></th>\n";
+      <th bgcolor=#A6CAF0>
+         <a href=\"$php_self?_sort=firstname,lastname\" title=\"Sorter p&aring; fornavn...\">Fornavn</a>/
+         <a href=\"$php_self?_sort=lastname,firstname\" title=\"Sorter p&aring; etternavn...\">Etternavn</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=list_order,lastname,firstname\" title=\"Sorter p&aring; instrumentgruppe...\">Instrument</a></th>\n";
 
 for ($i = $sel_year; $i <= $end_year; $i++)
    echo "<th bgcolor=#A6CAF0>$i</td>\n";

@@ -172,7 +172,6 @@ add_li("Meny", 1);
       add_li("Tilgangsgrupper", 0, AUTH::BOARD_RO, AUTH::ACCGRP, "Definering av tilgangsgrupper");
       add_li("Notearkiv", 0, AUTH::BOARD_RO, AUTH::REP, "Oversikt over notearkiv");
       add_li("Prosjekter", 0, AUTH::PRJ_RO, AUTH::PRJ, "Overordnet administrasjon/oversikt over planlagte prosjekter");
-      add_li("Tilbakemeldinger", 0, AUTH::BOARD_RO, false, "Oversikt over tilbakemeldiner fra medlemmer");
       add_li("Lokale", 0, AUTH::BOARD_RO, AUTH::LOC, "Informasjon om lokaliteter for øvelser og konsert");
       add_li("Ressurser", 0, AUTH::RES, false, "Oversikt over status på ressurser pr. prosjekt");
       add_li("Permisjoner", 0, AUTH::LEAVE_RO, AUTH::LEAVE_RW, "Oversikt over langtidspermisjoner");

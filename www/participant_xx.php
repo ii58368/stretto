@@ -2,21 +2,18 @@
 require 'framework.php';
 require 'participant_status.php';
 
-$sel_year = (request('from') == null) ? date("Y") : intval(request('from'));
-$prev_year = $sel_year - 1;
-
 echo "
     <h1>Prosjektressurser</h1>
     <table border=1>
     <tr>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?from=$prev_year&_sort=$sort\"><img src=images/left.gif border=0 title=\"Forrige &aring;r...\"></a>
-         <a href=\"$php_self?from=$sel_year&_sort=firstname,lastname\" title=\"Sorter p&aring; fornavn...\">Fornavn</a>/
-         <a href=\"$php_self?from=$sel_year&_sort=lastname,firstname\" title=\"Sorter p&aring; etternavn...\">Etternavn</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?from=$sel_year&_sort=list_order,lastname,firstname\" title=\"Sorter p&aring; instrumentgruppe...\">Instrument</a></th>\n";
+      <th bgcolor=#A6CAF0>
+         <a href=\"$php_self?_sort=firstname,lastname\" title=\"Sorter p&aring; fornavn...\">Fornavn</a>/
+         <a href=\"$php_self?_sort=lastname,firstname\" title=\"Sorter p&aring; etternavn...\">Etternavn</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=list_order,lastname,firstname\" title=\"Sorter p&aring; instrumentgruppe...\">Instrument</a></th>\n";
 
 $query = "SELECT id, name, semester, year " .
         "FROM project " .
-        "where year >= $sel_year " .
+        "where year >= " . $season->year() . " " .
         "order by year, semester DESC, project.id";
 $stmt = $db->query($query);
 
@@ -34,7 +31,7 @@ $query = "SELECT person.id as person_id, " .
         "FROM person, instruments, project " .
         "where instruments.id = id_instruments " .
         "and not person.status = $db->per_stat_quited " .
-        "and project.year >= $sel_year " .
+        "and project.year >= " . $season->year() . " " .
         "order by $sort, year, semester DESC, project.id";
 $stmt = $db->query($query);
 

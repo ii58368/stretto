@@ -1,7 +1,8 @@
 <!-- Codrops top bar -->
 <div class="codrops-top clearfix">
     <?php echo $prj_name; ?>
-    <span class="right"><strong><?php echo $menu->whoami(); ?></strong></span>
+    <span class="right"><strong><?php $menu->season(); ?></strong></span>
+    <span class="right"><strong><?php $menu->whoami(); ?></strong></span>
 <!-- </div> --><!--/ Codrops top bar -->
 <!-- <div class="main clearfix">  -->
 <!--    <div class="column">   -->

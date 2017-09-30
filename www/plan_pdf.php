@@ -14,6 +14,7 @@ class PDF extends PDF_util
    {
       global $db;
       global $access;
+      global $season;
 
       $this->SetDrawColor(200, 200, 200);
       $this->SetLineWidth(1);
@@ -21,8 +22,8 @@ class PDF extends PDF_util
 
       $this->SetTextColor(0, 0, 200);
       $this->setFontSize(30);
-      $semester_text = (request('semester') == 'V') ? 'Våren' : 'Høsten';
-      $this->Cell(60, 0, $this->sconv("Spilleplan $semester_text ".request('year')));
+      $season_text = "Spilleplan " . $season->semester(2) . " " . $season->year();
+      $this->Cell(60, 0, $this->sconv($season_text));
       $this->SetFontSize(20);
       $this->SetTextColor(0, 0, 0);
 
@@ -47,8 +48,8 @@ class PDF extends PDF_util
               "where id_location = location.id " .
               "and id_project = project.id " .
               "and plan.event_type = $db->plan_evt_rehearsal " .
-              "and project.year = ".request('year')." " .
-              "and project.semester = '".request('semester')."' " .
+              "and project.year = ".$season->year()." " .
+              "and project.semester = '".$season->semester()."' " .
               "and (project.status = $db->prj_stat_public ";
       if ($access->auth(AUTH::PRJ_RO))
          $query .= "or project.status = $db->prj_stat_draft ";
@@ -101,6 +102,7 @@ class PDF extends PDF_util
    {
       global $db;
       global $access;
+      global $season;
 
       $this->SetDrawColor(200, 200, 200);
       $this->SetLineWidth(1);
@@ -108,15 +110,15 @@ class PDF extends PDF_util
 
       $this->SetTextColor(0, 0, 200);
       $this->setFontSize(30);
-      $semester_text = (request('semester') == 'V') ? 'Våren' : 'Høsten';
-      $this->Cell(60, 0, $this->sconv("Repertoar $semester_text ".request('year')));
+      $semester_text = "Repertoar " . $season->semester(2) . " " . $season->year();
+      $this->Cell(60, 0, $this->sconv($semester_text));
 
       $this->Line(10, 38, 200, 38);
  
       $query = "select id, name, info, status, orchestration "
               . "from project "
-              . "where project.year = ".request('year')." "
-              . "and project.semester = '".request('semester')."' "
+              . "where project.year = ".$season->year()." "
+              . "and project.semester = '".$season->semester()."' "
               . "and (project.status = $db->prj_stat_public ";
       if ($access->auth(AUTH::PRJ_RO))
          $query .= "or project.status = $db->prj_stat_draft ";

@@ -3,10 +3,6 @@
 include 'framework.php';
 
 $id_project = is_null(request('id_project')) ? "%" : request('id_project');
-$cur_semester = (date("n") > 6) ? 'H' : 'V';
-$cur_year = date("Y");
-$semester = is_null(request('semester')) ? $cur_semester : request('semester');
-$year = is_null(request('year')) ? $cur_year : request('year');
 
 function select_tsort($selected)
 {
@@ -69,7 +65,7 @@ echo "<h1>Spilleplan</h1>\n";
 
 if ($id_project == '%')
 {
-   $h2 = ($semester == 'V') ? "Vår $year" : "Høst $year";
+   $h2 = $season->semester(1) . " " . $season->year();
 }
 else
 {
@@ -80,25 +76,8 @@ else
 echo "<h2>$h2</h2>\n";
 
 if ($access->auth(AUTH::PLAN_RW))
-   echo "<a href=\"$php_self?id_project=$id_project&semester=$semester&year=$year&_action=new&id_location=" . request('id_location') . "\" title=\"Registrer ny prøve...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
-echo "<a href=\"plan_pdf.php?semester=$semester&year=$year\" title=\"PDF versjon...\"><img src=images/pdf.jpeg height=22 border=0 hspace=5 vspace=5></a>\n";
-
-if ($semester == 'V')
-{
-   $op_semester = 'H';
-   $next_year = $year;
-   $last_year = $year - 1;
-}
-else
-{
-   $op_semester = 'V';
-   $next_year = $year + 1;
-   $last_year = $year;
-}
-
-echo "<a href=\"$php_self?semester=$op_semester&year=$last_year\" title=\"Plan for forrige semester...\"><img src=\"images/left.gif\" height=22 border=0 hspace=5 vspace=5></a>\n";
-echo "<a href=\"$php_self?semester=$cur_semester&year=$cur_year\" title=\"Plan for dette semesteret...\"><img src=\"images/die1.gif\" height=22 border=0 hspace=5 vspace=5></a>\n";
-echo "<a href=\"$php_self?semester=$op_semester&year=$next_year\" title=\"Plan for neste semester...\"><img src=\"images/right.gif\" height=22 border=0 hspace=5 vspace=5></a>\n";
+   echo "<a href=\"$php_self?id_project=$id_project&_action=new&id_location=" . request('id_location') . "\" title=\"Registrer ny prøve...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
+echo "<a href=\"plan_pdf.php\" title=\"PDF versjon...\"><img src=images/pdf.jpeg height=22 border=0 hspace=5 vspace=5></a>\n";
 
 echo "
     <form action='$php_self' method=post>
@@ -191,8 +170,8 @@ $query = "SELECT plan.id as id, date, time, tsort, id_project, " .
         "and plan.id_project like '$id_project' " .
         "and plan.event_type = $db->plan_evt_rehearsal ";
 if ($id_project == '%')
-   $query .= "and project.year = $year " .
-           "and project.semester = '$semester' ";
+   $query .= "and project.year = " . $season->year() . " " .
+           "and project.semester = '" . $season->semester() . "' ";
 $query .= "order by date,tsort,time";
 
 $stmt = $db->query($query);
@@ -204,7 +183,7 @@ foreach ($stmt as $row)
       if ($access->auth(AUTH::PLAN_RW))
          echo "<tr>
         <td><center>
-            <a href=\"$php_self?_action=view&_no=".$row['id']."&id_project=$id_project&semester=$semester&year=$year\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
+            <a href=\"$php_self?_action=view&_no=".$row['id']."&id_project=$id_project\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
              </center></td>";
       echo "<td>" . strftime('%a %e.%b %y', $row['date']) . "</td>" .
       "<td>".$row['time']."</td><td>";

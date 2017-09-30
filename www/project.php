@@ -56,9 +56,6 @@ function select_valid_par_stat($valid_par_stat)
    echo "</select>";
 }
 
-$sel_year = is_null(request('from')) ? date("Y") : intval(request('from'));
-$prev_year = $sel_year - 1;
-
 echo "
     <h1>Prosjekt</h1>";
 if ($access->auth(AUTH::PRJ))
@@ -76,9 +73,8 @@ if ($access->auth(AUTH::PRJ))
    echo "
       <th bgcolor=#A6CAF0>Edit</th>";
 echo "
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=name,id&from=$sel_year\" title=\"Sorter p&aring; prosjektnavn\">Prosjekt</a></th>
-      <th bgcolor=#A6CAF0 nowrap><a href=\"$php_self?_sort=year,semester+DESC,id&from=$sel_year\" title=\"Sorter p&aring; semester\">Sem</a>
-           <a href=\"$php_self?from=$prev_year&_sort=$sort\"><img src=images/arrow_up.png border=0 title=\"Forrige &aring;r...\"></a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=name,id\" title=\"Sorter p&aring; prosjektnavn\">Prosjekt</a></th>
+      <th bgcolor=#A6CAF0 nowrap><a href=\"$php_self?_sort=year,semester+DESC,id\" title=\"Sorter p&aring; semester\">Sem</a>
       <th bgcolor=#A6CAF0>Status</th>
       <th bgcolor=#A6CAF0>På-/avm.frist</th>
       <th bgcolor=#A6CAF0>Tutti</th>
@@ -92,7 +88,6 @@ if ($action == 'new')
    echo "  <tr>
     <td align=left><input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
-    <input type=hidden name=from value='$sel_year'>
     <input type=submit value=ok title=\"Registrer prosjekt\" ></td>
     <th><input type=text size=20 name=name></th>
     <th nowrap>";
@@ -160,7 +155,7 @@ if ($action == 'update' && $access->auth(AUTH::PRJ))
 $query = "SELECT project.id as id, name, semester, year, status, " .
         "deadline, orchestration, valid_par_stat, info " .
         "FROM project " .
-        "where project.year >= $sel_year " .
+        "where project.year >= " . $season->year() . " " .
         "order by $sort";
 
 $stmt = $db->query($query);
@@ -173,7 +168,7 @@ foreach ($stmt as $row)
       if ($access->auth(AUTH::PRJ))
          echo "
         <td><center>
-            <a href=\"$php_self?_sort=$sort&from=$sel_year&_action=view&_no=".$row['id']."\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
+            <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
              </center></td>";
       echo
       "<td><a href=\"plan.php?id_project=".$row['id']."\">".$row['name']."</a></td>" .
@@ -198,7 +193,6 @@ foreach ($stmt as $row)
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
-    <input type=hidden name=from value='$sel_year'>
     <th nowrap><input type=submit value=ok title=\"Lagere endring\" >
     <input type=submit value=del name=_delete title=\"Slett prosjekt\" onClick=\"return confirm('Sikkert at du vil slette ".$row['name']."?');\"></th>
     <th><input type=text size=20 name=name value=\"".$row['name']."\"></th>

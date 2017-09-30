@@ -86,9 +86,6 @@ function mail2dir($id_project)
    echo "&body=OSO Regikomit&eacute:\"><image border=0 src=images/sms.png hspace=20 title=\"Send SMS til alle i regikomit&eacute;en\"></a>";
 }
 
-$sel_year = is_null(request('from')) ? date("Y") : intval(request('from'));
-$prev_year = $sel_year - 1;
-
 echo "
     <h1>Regiprosjekt</h1>
     <form action='$php_self' method=post>
@@ -98,9 +95,8 @@ if ($access->auth(AUTH::DIR_RW))
    echo "
       <th bgcolor=#A6CAF0>Edit</th>";
 echo "
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=name,id&from=$sel_year\" title=\"Sorter p&aring; prosjektnavn\">Prosjekt</a></th>
-      <th bgcolor=#A6CAF0 nowrap><a href=\"$php_self?_sort=year,semester+DESC,id&from=$sel_year\" title=\"Sorter p&aring; semester\">Sem</a>
-           <a href=\"$php_self?from=$prev_year&_sort=$sort\"><img src=images/arrow_up.png border=0 title=\"Forrige &aring;r...\"></a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=name,id\" title=\"Sorter p&aring; prosjektnavn\">Prosjekt</a></th>
+      <th bgcolor=#A6CAF0 nowrap><a href=\"$php_self?_sort=year,semester+DESC,id\" title=\"Sorter p&aring; semester\">Sem</a></th>
       <th bgcolor=#A6CAF0>Status</th>
       <th bgcolor=#A6CAF0>Regiansvarlig</th>
       <th bgcolor=#A6CAF0>Regikomit&eacute;</th>
@@ -132,7 +128,7 @@ $query = "SELECT project.id as id, name, semester, year, id_person, project.stat
         "FROM person, project, instruments " .
         "where project.id_person = person.id " .
         "and id_instruments = instruments.id " .
-        "and project.year >= $sel_year " .
+        "and project.year >= " . $season->year() . " " .
         "order by $sort";
 
 $stmt = $db->query($query);
@@ -145,7 +141,7 @@ foreach($stmt as $row)
          if ($access->auth(AUTH::DIR_RW))
             echo "
         <td><center>
-            <a href=\"$php_self?_sort=$sort&from=$sel_year&_action=view&_no=".$row['id']."\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
+            <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
              </center></td>";
       echo 
       "<td><a href=\"dirPlan.php?id_project=".$row['id']."\">".$row['name']."</a></td>" .
@@ -167,7 +163,6 @@ foreach($stmt as $row)
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
-    <input type=hidden name=from value='$sel_year'>
     <input type hidden name=id_person value=".$row['id_person'].">
     <th nowrap><input type=submit value=ok title=\"Lagere endring\" >
     <th>".$row['name']."</th>

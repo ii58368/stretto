@@ -4,11 +4,8 @@ require 'framework.php';
 if (is_null($sort))
    $sort = 'ts';
 
-$sel_year = is_null(request('from')) ? date("Y") : intval(request('from'));
-$prev_year = $sel_year - 1;
-
 echo "
-<h1>Konserter</h1>";
+<h1>Konserter " . $season->year() . "</h1>";
 if ($access->auth(AUTH::CONS))
    echo "
     <form action=\"$php_self\" method=post>
@@ -24,10 +21,9 @@ if ($access->auth(AUTH::CONS))
    echo "
       <th bgcolor=#A6CAF0>Edit</th>";
 echo "
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=ts&from=$sel_year\">Dato</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=ts\">Dato</a></th>
       <th bgcolor=#A6CAF0>Tid</th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=id_project,ts&from=$sel_year\">Prosjekt</a>
-         <a href=\"$php_self?from=$prev_year&_sort=$sort\"><img src=images/arrow_up.png border=0 title=\"Forrige &aring;r...\"></a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=id_project,ts\">Prosjekt</a></th>
       <th bgcolor=#A6CAF0>Lokale</th>
       <th bgcolor=#A6CAF0>Tekst</th>
       </tr>";
@@ -40,7 +36,7 @@ function select_project($selected)
 
    $q = "SELECT id, name, semester, year "
            . "FROM project "
-           . "where year >= " . date("Y") . " "
+           . "where year >= " . $season->year() . " "
            . "order by year, semester DESC, id ";
 
    $s = $db->query($q);
@@ -138,7 +134,7 @@ $query = "SELECT concert.id as id, "
         . "from concert, location, project "
         . "where concert.id_project = project.id "
         . "and concert.id_location = location.id "
-        . "and project.year >= $sel_year "
+        . "and project.year = " . $season->year() . " "
         . "order by $sort";
 
 $stmt = $db->query($query);
@@ -151,7 +147,7 @@ foreach ($stmt as $row)
       if ($access->auth(AUTH::CONS))
          echo "
          <td><center>
-           <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."&from=$sel_year\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
+           <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
              </center></td>";
       echo
       "<td>" . strftime('%a %e.%b %y', $row['ts']) . "</td>" .
@@ -168,7 +164,6 @@ foreach ($stmt as $row)
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
-    <input type=hidden name=from value='$sel_year'>
     <td nowrap><input type=submit value=ok>
       <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette " . strftime('%a %e.%b %y', $row['ts']) . "?');\"></td>
     <td><input type=text size=10 name=ts value=\"" . date('j. M y', $row['ts']) . "\"></td>

@@ -15,21 +15,18 @@ if ($action == 'update' && $access->auth(AUTH::DIR_RW))
    $db->query($query);
 }
 
-$sel_year = is_null(request('from')) ? date("Y") : intval(request('from'));
-$prev_year = $sel_year - 1;
-
 echo "
     <h1>Turnus</h1>
     <table border=1>
     <tr>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?from=$prev_year&_sort=$sort\"><img src=images/left.gif border=0 title=\"Forrige år...\"></a>
-         <a href=\"$php_self?from=$sel_year&_sort=firstname,lastname\" title=\"Sorter p&aring; fornavn...\">Fornavn</a>/
-         <a href=\"$php_self?from=$sel_year&_sort=lastname,firstname\" title=\"Sorter p&aring; etternavn...\">Etternavn</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?from=$sel_year&_sort=list_order,lastname,firstname\" title=\"Sorter p&aring; instrumentgruppe...\">Instrument</a></th>";
+      <th bgcolor=#A6CAF0>
+         <a href=\"$php_self?_sort=firstname,lastname\" title=\"Sorter p&aring; fornavn...\">Fornavn</a>/
+         <a href=\"$php_self?_sort=lastname,firstname\" title=\"Sorter p&aring; etternavn...\">Etternavn</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=list_order,lastname,firstname\" title=\"Sorter p&aring; instrumentgruppe...\">Instrument</a></th>";
 
 $query = "SELECT id, name, semester, year " .
         "FROM project " .
-        "where year >= $sel_year " .
+        "where year = " . $season->year() . " " .
         "order by year, semester DESC, project.id";
 $stmt = $db->query($query);
 
@@ -49,7 +46,7 @@ $query = "SELECT person.id as person_id, " .
         "FROM person, instruments, project " .
         "where instruments.id = id_instruments " .
         "and person.status = $db->per_stat_member " .
-        "and project.year >= $sel_year " .
+        "and project.year = " . $season->year() . " " .
         "order by $sort, year, semester DESC, project.id";
 $stmt = $db->query($query);
 
@@ -79,7 +76,7 @@ foreach ($stmt as $row)
       $comment = $row2['comment_dir'];
       $img = "<img src=\"images/shift_status_{$status}.gif\" border=0 title=\"{$db->shi_stat[$status]} (".$row['project_name'].") {$comment}\">";
       if ($access->auth(AUTH::DIR_RW))
-         echo "<a href=\"".$_SERVER['PHP_SELF']."?_action=update&id_person=".$row['person_id']."&id_project=".$row['project_id']."&stat_dir={$status}&from=$sel_year&_sort={$sort}\">$img</a>\n";
+         echo "<a href=\"".$_SERVER['PHP_SELF']."?_action=update&id_person=".$row['person_id']."&id_project=".$row['project_id']."&stat_dir={$status}&_sort={$sort}\">$img</a>\n";
       else
          if ($status != $db->shi_stat_free)
             echo $img;

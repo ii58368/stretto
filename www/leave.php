@@ -4,9 +4,6 @@ require 'framework.php';
 if (is_null($sort))
    $sort = 'ts_reg';
 
-$sel_year = is_null(request('from')) ? date("Y") : intval(request('from'));
-$prev_year = $sel_year - 1;
-
 echo "
 <h1>Permisjoner (langtid)</h1>";
 if ($access->auth(AUTH::LEAVE_RW))
@@ -24,11 +21,10 @@ if ($access->auth(AUTH::LEAVE_RW))
    echo "
       <th bgcolor=#A6CAF0>Edit</th>";
 echo "
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=ts_reg&from=$sel_year\">Registrert</a>
-         <a href=\"$php_self?from=$prev_year&_sort={$sort}\"><img src=images/arrow_up.png border=0 title=\"Forrige &aring;r...\"></a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=ts_reg\">Registrert</a></th>
       <th bgcolor=#A6CAF0>Navn</th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=status,ts_reg&from=$sel_year\">Status</a></th>
-      <th bgcolor=#A6CAF0>Behandlet</th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=status,ts_reg\">Status</a></th>
+      <th bgcolor=#A6CAF0>Endret</th>
       <th bgcolor=#A6CAF0>Fra</th>
       <th bgcolor=#A6CAF0>Til</th>
       <th bgcolor=#A6CAF0>Tekst</th>
@@ -156,7 +152,7 @@ $query = "select leave.id as id, "
         . "from `leave`, person, instruments "
         . "where leave.id_person = person.id "
         . "and person.id_instruments = instruments.id "
-        . "and leave.ts_reg >= " . strtotime("1. jan $sel_year") . " "
+        . "and leave.ts_to >= " . strtotime("1. jan ".$season->year()) . " "
         . "order by $sort";
 
 $stmt = $db->query($query);
@@ -169,7 +165,7 @@ foreach ($stmt as $row)
       if ($access->auth(AUTH::LEAVE_RW))
          echo "
          <td><center>
-           <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."&ts_reg=$sel_year\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
+           <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."&ts_reg=".$season->year()."\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
              </center></td>";
       echo
       "<td>" . strftime('%a %e.%b %y', $row['ts_reg']) . "</td>" .
@@ -188,7 +184,6 @@ foreach ($stmt as $row)
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
-    <input type=hidden name=from value='$sel_year'>
     <td nowrap><input type=submit value=ok>
       <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette " . date('D j.M y', $row['ts_reg']) . "?');\"></td>
     <td>" . strftime('%e.%m.%y', $row['ts_reg']) . "</td>

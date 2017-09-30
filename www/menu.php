@@ -32,31 +32,31 @@ class SUBMENU
    }
 
    /* PHP 5.6+
-   public function add($name, $link, ...$auth)
-   {
-      global $access;
+     public function add($name, $link, ...$auth)
+     {
+     global $access;
 
-      $acc = 0;
-      foreach ($auth as $a)
-         $acc |= (1 << $a);
+     $acc = 0;
+     foreach ($auth as $a)
+     $acc |= (1 << $a);
 
-      if ($acc == 0)
-         $acc = AUTH::ALL;
+     if ($acc == 0)
+     $acc = AUTH::ALL;
 
-      $item = new ITEM($name, $link, $acc);
+     $item = new ITEM($name, $link, $acc);
 
-      array_push($this->menu, $item);
+     array_push($this->menu, $item);
 
-      if (is_string($link))
-      {
-         $urn = explode('?', $link);
-         $path = $urn[0];
-         $path_array = explode('/', $path);
-         $filename = array_pop($path_array);
+     if (is_string($link))
+     {
+     $urn = explode('?', $link);
+     $path = $urn[0];
+     $path_array = explode('/', $path);
+     $filename = array_pop($path_array);
 
-         $access->page_add($filename, $acc);
-      }
-   }
+     $access->page_add($filename, $acc);
+     }
+     }
     */
 
    public function add()
@@ -65,10 +65,10 @@ class SUBMENU
 
       if (func_num_args() < 2)
          return;
-      
+
       $name = func_get_arg(0);
       $link = func_get_arg(1);
-      
+
       $acc = 0;
       for ($i = 2; $i < func_num_args(); $i++)
          $acc |= (1 << func_get_arg($i));
@@ -130,6 +130,7 @@ class MENU
          global $db;
          global $access;
          global $whoami;
+         global $season;
 
          $my_pages = new SUBMENU("class=\"dl-submenu\"");
          $menu->add("Mine sider", $my_pages);
@@ -149,7 +150,7 @@ class MENU
       }
       {
          global $prj_name;
-         
+
          $admin = new SUBMENU("class=\"dl-submenu\"");
          $menu->add("Admin", $admin);
          $admin->add("Medlemsliste", "person.php?f_status[]=$db->per_stat_member&f_status[]=$db->per_stat_eng", AUTH::MEMB_RO);
@@ -160,7 +161,6 @@ class MENU
          $admin->add("Tilgangsgrupper", "view.php", AUTH::BOARD_RO);
          $admin->add("Notearkiv", "repository.php", AUTH::BOARD_RO);
          $admin->add("Prosjekter", "project.php", AUTH::BOARD_RO);
-         $admin->add("Tilbakemeldinger", "feedback.php", AUTH::BOARD_RO);
          $admin->add("Lokale", "location.php", AUTH::BOARD_RO);
          $admin->add("Ressurser", "participant_xx.php", AUTH::RES);
          $admin->add("Permisjoner", "leave.php", AUTH::LEAVE_RO);
@@ -179,9 +179,10 @@ class MENU
                     . "from project "
                     . "where (status = $db->prj_stat_public "
                     . "or status = $db->prj_stat_tentative) "
-                    . "and year >= " . date("Y") . " "
+                    . "and year = " . $season->year() . " "
                     . "order by year,semester DESC";
-         } else
+         }
+         else
          {
             $q = "select project.id as id, project.name as name, semester, "
                     . "year, orchestration, docs_avail "
@@ -190,7 +191,7 @@ class MENU
                     . "and participant.id_person = person.id "
                     . "and person.id = " . $whoami->id() . " "
                     . "and participant.stat_final = $db->par_stat_yes "
-                    . "and year >= " . date("Y") . " "
+                    . "and year = " . $season->year() . " "
                     . "order by year,semester DESC";
          }
          $s = $db->query($q);
@@ -254,28 +255,63 @@ class MENU
          echo "<option value=\"" . $e['uid'] . "\"";
          if ($e['uid'] == $selected)
             echo " selected";
-         echo ">" . $e['firstname'] ." " . $e['lastname'] . " (" . $e['instrument'] . ")\n";
+         echo ">" . $e['firstname'] . " " . $e['lastname'] . " (" . $e['instrument'] . ")\n";
       }
    }
 
+   private function url()
+   {
+      $url = '';
+      foreach ($_REQUEST as $key => $value)
+         if ($key != '_update')
+            $url .= ((strlen($url) > 0) ? '&' : '?') . $key . '=' . $value;
+      
+      return $url;
+   }
+   
    public function whoami()
    {
-      global $db;
       global $whoami;
       global $php_self;
       global $access;
 
       if ($access->auth(AUTH::SU))
       {
-         echo "<form action=\"$php_self\" method=post>
+         echo "<form action=\"$php_self" . $this->url() . "\" method=post>
          <select name=set_eff_uid onChange=\"set_cookie('uid', this.form.set_eff_uid.value); submit();\">\n";
          $this->select_person($whoami->uid());
          echo "</select>\n</form>\n";
-      } 
+      }
       else
       {
          echo $whoami->name() . "(" . $whoami->instrument() . ")";
       }
+   }
+
+   public function season()
+   {
+      global $season;
+      global $php_self;
+      
+      $sem = $season->semester();
+      $year = $season->year();
+
+      if ($sem == 'V')
+      {
+         $op_sem = 'H';
+         $next_year = $year;
+         $last_year = $year - 1;
+      }
+      else
+      {
+         $op_sem = 'V';
+         $next_year = $year + 1;
+         $last_year = $year;
+      }
+
+      echo "<a href=\"$php_self" . $this->url() . "\" title=\"forrige semester...\" onClick=\"set_cookie('semester', '{$op_sem}.{$last_year}'); return true;\"><img src=\"images/left.gif\" height=20 border=0 ></a>\n";
+      echo $sem . $year;
+      echo "<a href=\"$php_self" . $this->url() . "\" title=\"neste semester...\" onClick=\"set_cookie('semester', '{$op_sem}.{$next_year}'); return true;\"><img src=\"images/right.gif\" height=20 border=0></a>\n";
    }
 
 }
