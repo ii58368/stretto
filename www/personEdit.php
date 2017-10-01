@@ -93,7 +93,7 @@ if ($action == 'update_pers')
          $db->query($query);
          $no = $db->lastInsertId();
          $db->query("insert into record (ts, status, comment, id_person) " .
-                 "values ($now, $db->rec_stat_info, '" . $db->per_stat[$_POST['status']] . "', $no)");
+                 "values ($now, $db->rec_stat_info, 'Ny status: " . $db->per_stat[$_POST['status']] . "', $no)");
       }
       else
       {

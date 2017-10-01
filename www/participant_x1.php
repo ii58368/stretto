@@ -64,7 +64,7 @@ function stat_select($name, $selected, $valid_par_stat)
    echo "</select>";
 }
 
-function manage_inv($part, $row, $edit)
+function manage_inv($part, $row, $pstat, $edit)
 {
    global $db;
    global $access;
@@ -74,9 +74,8 @@ function manage_inv($part, $row, $edit)
    if ($edit && $access->auth(AUTH::RES_INV))
    {
       echo "<input type=checkbox name=stat_inv:$row";
-      if (!is_null($part))
-         if ($part['stat_inv'] == $db->par_stat_yes)
-            echo " checked";
+      if ((is_null($part) && $pstat == $db->per_stat_member) || (!is_null($part) && $part['stat_inv'] == $db->par_stat_yes))
+         echo " checked";
       echo " value=$db->par_stat_yes>";
       echo "<input type=hidden name=comment_inv:$row value=\"\">";
       //   echo "<input type=text name=comment_inv:$row size=20 value=\"$part[comment_inv]\">";
@@ -215,12 +214,12 @@ function manage_col($col)
 function view_leave($id_person, $year, $semester)
 {
    global $db;
-   
+
    echo "<td>";
-   
+
    $date_min = ($semester == 'V') ? "1. jan" : "1. jul";
    $date_max = ($semester == 'V') ? "30. jun" : "31. dec";
-   
+
    $ts_min = strtotime("$date_min $year");
    $ts_max = strtotime("$date_max $year");
 
@@ -232,23 +231,22 @@ function view_leave($id_person, $year, $semester)
            . "or (ts_from < $ts_max and ts_to > $ts_max) "
            . "or (ts_from < $ts_min and ts_to > $ts_max))";
    $stmt = $db->query($query);
-   
+
    $first_time = true;
-   
+
    foreach ($stmt as $e)
    {
       if (!$first_time)
          echo "<hr>\n";
       $first_time = false;
-      
-      echo "<i>" . strftime('%e.%m %y', $e['ts_from']) . "-" . 
-              strftime('%e.%m %y', $e['ts_to']) . "</i><br>\n";
+
+      echo "<i>" . strftime('%e.%m %y', $e['ts_from']) . "-" .
+      strftime('%e.%m %y', $e['ts_to']) . "</i><br>\n";
       echo "status: " . $db->lea_stat[$e['status']] . "<br>\n";
       echo str_replace("\n", "<br>\n", $e['text']);
    }
-   
-   echo "</td>";
 
+   echo "</td>";
 }
 
 function update_cell($id_person, $col, $status, $comment, $id_instruments)
@@ -259,7 +257,7 @@ function update_cell($id_person, $col, $status, $comment, $id_instruments)
    $ts = strtotime("now");
 
    if (is_null($status))
-      $status = $db->par_stat_no;
+      $status = $db->par_stat_void;
 
    $q = "select * from participant where id_project=$id_project and id_person=$id_person";
    $stmt = $db->query($q);
@@ -271,10 +269,12 @@ function update_cell($id_person, $col, $status, $comment, $id_instruments)
               "values ($id_person, $id_project, $status, $ts, " . $db->quote($comment) . ", $id_instruments)";
    } else
    {
+      $e = $stmt->fetch(PDO::FETCH_ASSOC);
       $query = "update participant set " .
-              "stat_$col = $status, " .
-              "ts_$col = $ts, " .
-              "comment_$col = " . $db->quote($comment) . ", " .
+              "stat_$col = $status, ";
+      if ($status != $e["stat_$col"])
+         $query .= "ts_$col = $ts, ";
+      $query .= "comment_$col = " . $db->quote($comment) . ", " .
               "id_instruments = $id_instruments " .
               "where id_person = $id_person " .
               "and id_project = $id_project";
@@ -303,6 +303,8 @@ if ($action == 'update')
       update_cell($no, "reg", $stat_reg, $comment_reg, $id_instruments);
 
       $stat_final = request("stat_final:$no");
+      if (is_null($stat_final))
+         $stat_final = $db->par_stat_no;
       $comment_final = request("comment_final:$no");
       update_cell($no, "final", $stat_final, $comment_final, $id_instruments);
 
@@ -402,7 +404,7 @@ foreach ($stmt as $row)
    $part = get_participant($row['id']);
    $id_instruments = ($part['id_instruments'] == null) ? $row['id_instruments'] : $part['id_instruments'];
    manage_instrument($id_instruments, $row['id'], $row['id'] == $no || request('col') != null);
-   manage_inv($part, $row['id'], $row['id'] == $no || request('col') == "inv");
+   manage_inv($part, $row['id'], $row['status'], $row['id'] == $no || request('col') == "inv");
    view_leave($row['id'], $prj['year'], $prj['semester']);
    manage_self($part, $row['id'], false);
    manage_reg($part, $row['id'], $row['id'] == $no || request('col') == "reg", $prj['valid_par_stat']);

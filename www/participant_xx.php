@@ -34,9 +34,10 @@ echo "
     <table border=1>
     <tr>
       <th bgcolor=#A6CAF0>
-         <a href=\"$php_self?_sort=firstname,lastname\" title=\"Sorter p&aring; fornavn...\">Fornavn</a>/
-         <a href=\"$php_self?_sort=lastname,firstname\" title=\"Sorter p&aring; etternavn...\">Etternavn</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=list_order,lastname,firstname\" title=\"Sorter p&aring; instrumentgruppe...\">Instrument</a></th>\n";
+         <a href=\"$php_self?_sort=firstname,lastname\" title=\"Sorter på fornavn...\">Fornavn</a>/
+         <a href=\"$php_self?_sort=lastname,firstname\" title=\"Sorter på etternavn...\">Etternavn</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=list_order,lastname,firstname\" title=\"Sorter på instrumentgruppe...\">Instrument</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=status,list_order,lastname,firstname\" title=\"Sorter på medlemsstatus...\">Status</a></th>\n";
 
 $query = "SELECT id, name, semester, year " .
         "FROM project " .
@@ -55,6 +56,7 @@ $query = "SELECT person.id as person_id, " .
         "project.id as project_id,  " .
         "project.name as project_name, " .
         "firstname, lastname, instrument, " .
+        "person.status as status, " .
         "year, semester " .
         "FROM person, instruments, project " .
         "where instruments.id = id_instruments " .
@@ -71,6 +73,7 @@ foreach ($stmt as $row)
    {
       echo "</tr><tr><td bgcolor=#A6CAF0 nowrap><a href=\"participant_1x.php?id=".$row['person_id']."\">".$row['firstname']." ".$row['lastname']."</a>\n";
       echo "</td><td bgcolor=#A6CAF0> ".$row['instrument']." </td>\n";
+      echo "</td><td bgcolor=#A6CAF0> ".$db->per_stat[$row['status']]." </td>\n";
       $prev_id = $row['person_id'];
    }
 

@@ -86,8 +86,11 @@ foreach ($stmt as $row)
    echo "</td>\n" .
       "<td>".$row['semester']." ".$row['year']."</td>" .
    "<td align=center $bgcolor>";
+   $tstat = $db->par_stat[$status];
+   if (!is_null($blink))
+      $tstat .= " (under behandling i styret...)";
    if ($row['status'] == $db->prj_stat_public)
-      echo "<img src=\"images/part_stat_$status$blink.gif\" border=0 title=\"".$db->prj_stat[$row['status']]."\">";
+      echo "<img src=\"images/part_stat_$status$blink.gif\" border=0 title=\"$tstat\">";
    echo "</td>\n";
    echo "<td>" . strftime('%a %e.%b %y', $row['deadline']) . "</td>" .
    "<td>";
