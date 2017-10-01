@@ -155,7 +155,7 @@ class DB extends myPDO
    public $prj_stat_tentative = 2;
    public $prj_stat_draft = 3;
    public $prj_stat_canceled = 4;
-   public $prj_stat = array("Public", "Internt", "Tentativt", "Draft", "Kanselert");
+   public $prj_stat = array("Reelt", "Internt", "Tentativt", "Draft", "Kanselert");
    public $prj_orch_reduced = 0;
    public $prj_orch_tutti = 1;
    public $prj_docs_avail_rec = 0;
