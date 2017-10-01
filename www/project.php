@@ -74,7 +74,7 @@ if ($access->auth(AUTH::PRJ))
       <th bgcolor=#A6CAF0>Edit</th>";
 echo "
       <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=name,id\" title=\"Sorter p&aring; prosjektnavn\">Prosjekt</a></th>
-      <th bgcolor=#A6CAF0 nowrap><a href=\"$php_self?_sort=year,semester+DESC,id\" title=\"Sorter p&aring; semester\">Sem</a>
+      <th bgcolor=#A6CAF0 nowrap><a href=\"$php_self?_sort=year,semester+DESC,id\" title=\"Sorter p&aring; semester\">Sem</a></th>
       <th bgcolor=#A6CAF0>Status</th>
       <th bgcolor=#A6CAF0>På-/avm.frist</th>
       <th bgcolor=#A6CAF0>Tutti</th>

@@ -74,14 +74,16 @@ function manage_inv($part, $row, $edit)
    if ($edit && $access->auth(AUTH::RES_INV))
    {
       echo "<input type=checkbox name=stat_inv:$row";
-      if ($part['stat_inv'] == $db->par_stat_yes)
-         echo " checked";
+      if (!is_null($part))
+         if ($part['stat_inv'] == $db->par_stat_yes)
+            echo " checked";
       echo " value=$db->par_stat_yes>";
       echo "<input type=hidden name=comment_inv:$row value=\"\">";
       //   echo "<input type=text name=comment_inv:$row size=20 value=\"$part[comment_inv]\">";
-   } else
+   }
+   else
    {
-      if ($part != null || $part['stat_inv'] != $db->par_stat_void)
+      if (!is_null($part) && $part['stat_inv'] != $db->par_stat_void)
       {
          if ($part['stat_inv'] == $db->par_stat_yes)
             echo "<img border=0 src=\"images/tick2.gif\" title=\"" . $db->par_stat[$part['stat_inv']] . "\">\n";
@@ -122,7 +124,8 @@ function manage_reg($part, $row, $edit, $valid_par_stat)
       {
          stat_select("stat_reg:$row", $part['stat_reg'], $valid_par_stat);
          echo "<input type=text name=comment_reg:$row size=20 value=\"" . $part['comment_reg'] . "\">";
-      } else
+      }
+      else
       {
          if ($part['stat_reg'] != $db->par_stat_void)
          {
@@ -149,7 +152,8 @@ function manage_req($part, $row, $edit)
       {
          stat_select("stat_req:$row", $part['stat_req'], 0xff);
          echo "<input type=text name=comment_req:$row size=20 value=\"" . $part['comment_req'] . "\">";
-      } else
+      }
+      else
       {
          if ($part['stat_req'] != $db->par_stat_void)
          {
@@ -201,10 +205,50 @@ function manage_col($col)
    {
       echo "<input type=submit value=lagre>"
       . "<input type=hidden name=col value=$col>";
-   } else
+   }
+   else
    {
       echo "<a href=\"$php_self?id=" . request('id') . "&col=$col\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>";
    }
+}
+
+function view_leave($id_person, $year, $semester)
+{
+   global $db;
+   
+   echo "<td>";
+   
+   $date_min = ($semester == 'V') ? "1. jan" : "1. jul";
+   $date_max = ($semester == 'V') ? "30. jun" : "31. dec";
+   
+   $ts_min = strtotime("$date_min $year");
+   $ts_max = strtotime("$date_max $year");
+
+   $query = "select ts_from, ts_to, status, text "
+           . "from `leave` "
+           . "where id_person = $id_person "
+           . "and ((ts_from >= $ts_min and ts_to <= $ts_max) "
+           . "or (ts_from < $ts_min and ts_to > $ts_min) "
+           . "or (ts_from < $ts_max and ts_to > $ts_max) "
+           . "or (ts_from < $ts_min and ts_to > $ts_max))";
+   $stmt = $db->query($query);
+   
+   $first_time = true;
+   
+   foreach ($stmt as $e)
+   {
+      if (!$first_time)
+         echo "<hr>\n";
+      $first_time = false;
+      
+      echo "<i>" . strftime('%e.%m %y', $e['ts_from']) . "-" . 
+              strftime('%e.%m %y', $e['ts_to']) . "</i><br>\n";
+      echo "status: " . $db->lea_stat[$e['status']] . "<br>\n";
+      echo str_replace("\n", "<br>\n", $e['text']);
+   }
+   
+   echo "</td>";
+
 }
 
 function update_cell($id_person, $col, $status, $comment, $id_instruments)
@@ -224,13 +268,13 @@ function update_cell($id_person, $col, $status, $comment, $id_instruments)
       if ($status == $db->par_stat_void)
          return;
       $query = "insert into participant (id_person, id_project, stat_$col, ts_$col, comment_$col, id_instruments) " .
-              "values ($id_person, $id_project, $status, $ts, ".$db->quote($comment).", $id_instruments)";
+              "values ($id_person, $id_project, $status, $ts, " . $db->quote($comment) . ", $id_instruments)";
    } else
    {
       $query = "update participant set " .
               "stat_$col = $status, " .
               "ts_$col = $ts, " .
-              "comment_$col = ".$db->quote($comment).", " .
+              "comment_$col = " . $db->quote($comment) . ", " .
               "id_instruments = $id_instruments " .
               "where id_person = $id_person " .
               "and id_project = $id_project";
@@ -308,6 +352,7 @@ echo "
 if ($access->auth(AUTH::RES_INV))
    manage_col("inv");
 echo "Bes</th>
+      <th bgcolor=#A6CAF0>Permisjon</th>
       <th bgcolor=#A6CAF0>Egen</th>
       <th bgcolor=#A6CAF0>";
 if ($access->auth(AUTH::RES_REG))
@@ -344,7 +389,8 @@ foreach ($stmt as $row)
       {
          echo "<input type=submit value = lagre>"
          . "<input type=hidden name=_no value=$no>";
-      } else
+      }
+      else
       {
          echo "<a href=\"$php_self?_no=" . $row['id'] . "&id=" . request('id') . "\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>";
       }
@@ -357,6 +403,7 @@ foreach ($stmt as $row)
    $id_instruments = ($part['id_instruments'] == null) ? $row['id_instruments'] : $part['id_instruments'];
    manage_instrument($id_instruments, $row['id'], $row['id'] == $no || request('col') != null);
    manage_inv($part, $row['id'], $row['id'] == $no || request('col') == "inv");
+   view_leave($row['id'], $prj['year'], $prj['semester']);
    manage_self($part, $row['id'], false);
    manage_reg($part, $row['id'], $row['id'] == $no || request('col') == "reg", $prj['valid_par_stat']);
    manage_req($part, $row['id'], $row['id'] == $no || request('col') == "req");

@@ -27,7 +27,7 @@ if (request('stat_self'))
    {
       $query = "insert into participant (id_person, id_project, stat_self, ts_self, comment_self, id_instruments) " .
               "values ($id_person, ".request('id_project').", ".request('stat_self').", $ts, "
-              . $db->qposrt('comment_self').", " . $pers['id_instruments'] . ")";
+              . $db->qpost('comment_self').", " . $pers['id_instruments'] . ")";
    } else
    {
       $query = "update participant set " .
@@ -101,7 +101,7 @@ echo "<form action=$php_self method=post>
   </tr>
   <tr>
   <td>Instrument:</td><td>";
-echo ($part == null) ? $pers['instrument'] : $part['instrument'];
+echo (isset($part)) ? $part['instrument'] : $pers['instrument'];
 echo "</td>
   </tr>
   <tr>
@@ -112,7 +112,7 @@ echo ($prj['deadline'] < time()) ? "<font color=red>" . strftime('%a %e.%b %y', 
         strftime('%a %e.%b %y', $prj['deadline']);
 echo "</td></tr>\n";
 echo "<tr><td>Registrert:</td><td>";
-if ($part != null)
+if (isset($part))
    echo (is_null(request('stat_self'))) ? strftime('%a %e.%b %y', $part['ts_self']) : "<font color=green>" . strftime('%a %e.%b %y', $part['ts_self']) . "</font> (Kommentar kan endres på frem til dato for permisjonsfrist)";
 echo "</td></tr>\n";
 if ($prj['deadline'] > time())
@@ -123,7 +123,7 @@ if ($prj['deadline'] > time())
       if ($prj['valid_par_stat'] & (1 << $i))
       {
          echo "<input type=radio name=stat_self value=$i";
-         if ($part['stat_self'] == $i)
+         if (isset($part) && $part['stat_self'] == $i)
             echo " checked";
          echo ">" . $db->par_stat[$i] . "<br>\n";
       }
@@ -134,7 +134,13 @@ if ($prj['deadline'] > time())
 }
 else
 {
-   echo "<tr><td>Registrert svar:</td><td><b>" . $db->par_stat[$part['stat_self']] . "</b></td></tr>\n";
-   echo "<tr><td>Kommentar:</td><td><b>" . str_replace("\n", "<br>\n", $part['comment_self']) . "</b></td></tr>\n";
+   echo "<tr><td>Registrert svar:</td><td><b>";
+   if (isset($part))
+      echo $db->par_stat[$part['stat_self']];
+   echo "</b></td></tr>\n";
+   echo "<tr><td>Kommentar:</td><td><b>";
+   if (isset($part))
+      echo str_replace("\n", "<br>\n", $part['comment_self']);
+   echo "</b></td></tr>\n";
 }
 echo "</table>\n</form>";

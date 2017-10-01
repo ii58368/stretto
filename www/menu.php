@@ -262,8 +262,8 @@ class MENU
    private function url()
    {
       $url = '';
-      foreach ($_REQUEST as $key => $value)
-         if ($key != '_update')
+      foreach ($_GET as $key => $value)
+         if (is_string($value))
             $url .= ((strlen($url) > 0) ? '&' : '?') . $key . '=' . $value;
       
       return $url;
