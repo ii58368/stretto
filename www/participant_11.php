@@ -3,7 +3,9 @@ require 'framework.php';
 
 $id_person = (is_null(request('id_person'))) ? $whoami->id() : request('id_person');
 
-$query = "select firstname, lastname, instrument, instruments.id as id_instruments"
+$query = "select person.id as id, "
+        . "firstname, lastname, instrument, "
+        . "instruments.id as id_instruments"
         . " from person, instruments"
         . " where person.id=$id_person"
         . " and id_instruments = instruments.id";
@@ -115,7 +117,7 @@ echo "<tr><td>Registrert:</td><td>";
 if (isset($part))
    echo (is_null(request('stat_self'))) ? strftime('%a %e.%b %y', $part['ts_self']) : "<font color=green>" . strftime('%a %e.%b %y', $part['ts_self']) . "</font> (Kommentar kan endres på frem til dato for permisjonsfrist)";
 echo "</td></tr>\n";
-if ($prj['deadline'] > time())
+if ($prj['deadline'] > time() && $pers['id'] == $whoami->id())
 {
    echo "<tr><td>Ønsker å være med:</td><td>";
    for ($i = 0; $i < count($db->par_stat); $i++)
