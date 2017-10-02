@@ -318,7 +318,12 @@ if ($action == 'update')
          {
             list($field, $pid) = explode(':', $key);
             if ($field == "comment_$col")
-               update_cell($pid, $col, request("stat_$col:$pid"), $val, request("id_instruments:$pid"));
+            {
+               $stat = request("stat_$col:$pid");
+               if ($col == 'final' && is_null($stat))
+                  $stat = $db->par_stat_no;
+               update_cell($pid, $col, $stat, $val, request("id_instruments:$pid"));
+            }
          }
       }
       $_REQUEST['col'] = null;

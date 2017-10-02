@@ -6,57 +6,43 @@ function participant_status($person_id, $project_id)
 {
    global $db;
 
-   $q1 = "select deadline, orchestration from project where id=$project_id";
-   $s1 = $db->query($q1);
-   $prj = $s1->fetch(PDO::FETCH_ASSOC);
-
-   $q2 = "select stat_self, stat_reg, stat_final from participant " .
-           "where id_project = $project_id " .
-           "and id_person = $person_id";
-   $s2 = $db->query($q2);
-   $part = $s2->fetch(PDO::FETCH_ASSOC);
-
-   $past_dl = ($prj['deadline'] < date("now"));
-   $orch = $prj['orchestration'];
-   $stat_self = ($part['stat_reg'] != $db->par_stat_void) ? $part['stat_reg'] : $part['stat_self'];
-   $stat_final = $part['stat_final'];
-
-   $status = isset($part['stat_final']) ? $part['stat_final'] : $db->par_stat_void;
+   $status = $db->par_stat_void;
    $blink = null;
-   
-   if ($orch == $db->prj_orch_reduced)
+
+   $q = "select stat_self, stat_reg, stat_req, stat_final, "
+           . "ts_self, ts_reg, ts_req, ts_final, "
+           . "orchestration "
+           . "from participant, project "
+           . "where participant.id_project = $project_id "
+           . "and participant.id_person = $person_id "
+           . "and participant.id_project = project.id";
+   $s = $db->query($q);
+   $part = $s->fetch(PDO::FETCH_ASSOC);
+
+   if (!$part)
+      return array($status, $blink);
+
+   if (isset($part['stat_final']))
+      $status = $part['stat_final'];
+
+   if ($part['stat_final'] == $db->par_stat_void)
    {
-      if ($status == $db->par_stat_void)
-      {
-         if ($part['stat_self'] != $db->par_stat_void)
-         {
-            $blink = 'b';
-            $status = $part['stat_self'];
-         }
-         if ($part['stat_reg'] != $db->par_stat_void)
-         {
-            $blink = 'b';
-            $status = $part['stat_reg'];
-         }
-      }
+      $blink = 'b';
+      $status = ($part['orchestration'] == $db->prj_orch_reduced) ?
+              $db->par_stat_no : $db->par_stat_yes;
+
+      if ($part['stat_self'] != $db->par_stat_void)
+         $status = $part['stat_self'];
+
+      if ($part['stat_reg'] != $db->par_stat_void)
+         $status = $part['stat_reg'];
    }
 
-   if ($orch == $db->prj_orch_tutti)
-   {
-      if ($part['stat_final'] == $db->par_stat_void)
-      {
-         if ($part['stat_self'] != $db->par_stat_void)
-         {
-            $blink = 'b';
-            $status = $part['stat_self'];
-         }
-         if ($part['stat_reg'] != $db->par_stat_void)
-         {
-            $blink = 'b';
-            $status = $part['stat_reg'];
-         }
-      }
-   }
+   if ($part['stat_final'] != $db->par_stat_void)
+      if ($part['ts_self'] > $part['ts_final'] ||
+              $part['ts_reg'] > $part['ts_final'] ||
+              $part['ts_req'] > $part['ts_final'])
+         $blink = 'b';
 
    return array($status, $blink);
 }
