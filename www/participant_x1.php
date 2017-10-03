@@ -117,7 +117,7 @@ function manage_reg($part, $row, $edit, $valid_par_stat)
 
    echo "<td>";
 
-   if (!is_null($part))
+   if (!is_null($part) && $part['stat_inv'] == $db->par_stat_yes)
    {
       if ($edit && $access->auth(AUTH::RES_REG))
       {
@@ -145,7 +145,7 @@ function manage_req($part, $row, $edit)
 
    echo "<td>";
 
-   if (!is_null($part))
+   if (!is_null($part) && $part['stat_inv'] == $db->par_stat_yes)
    {
       if ($edit && $access->auth(AUTH::RES_REQ))
       {
@@ -173,7 +173,7 @@ function manage_final($part, $row, $edit)
 
    echo "<td>";
 
-   if (!is_null($part))
+   if (!is_null($part) && ($part['stat_inv'] == $db->par_stat_yes || $part['stat_final'] != $db->par_stat_void))
    {
       if ($edit && $access->auth(AUTH::RES_FIN))
       {
@@ -207,8 +207,15 @@ function manage_col($col)
    }
    else
    {
-      echo "<a href=\"$php_self?id=" . request('id') . "&col=$col\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>";
+      echo "<a href=\"$php_self?id=" . request('id') . "&col=$col\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>";
    }
+}
+
+function reset_col($col)
+{
+   global $php_self;
+   
+   echo "<a href=\"$php_self?id=" . request('id') . "&col=$col&_action=reset\" onClick=\"return confirm('Sikkert at du vil nullstille hele kolonnen?');\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for reset...\"></a>";   
 }
 
 function view_leave($id_person, $year, $semester)
@@ -305,6 +312,8 @@ if ($action == 'update')
       $stat_final = request("stat_final:$no");
       if (is_null($stat_final))
          $stat_final = $db->par_stat_no;
+      if (is_null($stat_inv))
+         $stat_final = $db->par_stat_void;
       $comment_final = request("comment_final:$no");
       update_cell($no, "final", $stat_final, $comment_final, $id_instruments);
 
@@ -330,6 +339,16 @@ if ($action == 'update')
    }
 }
 
+if ($action == 'reset')
+{
+   $q = "update participant set "
+           . "stat_final = $db->par_stat_void "
+           . "where  id_project = " . request('id');
+   $db->query($q);
+   
+   $_REQUEST['col'] = null;
+}
+
 $query = "select name, semester, year, deadline, orchestration, valid_par_stat"
         . " from project where id=" . request('id');
 $stmt = $db->query($query);
@@ -352,9 +371,9 @@ if ($access->auth(AUTH::RES_INV, AUTH::RES_REG, AUTH::RES_REQ, AUTH::RES_FIN))
    echo "
       <th bgcolor=#A6CAF0>Edit</th>";
 echo "
-      <th bgcolor=#A6CAF0>Navn</th>
-      <th bgcolor=#A6CAF0>Status</th>
-      <th bgcolor=#A6CAF0>Instrument</th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?id=".request('id')."&_sort=lastname,firstname\">Navn</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?id=".request('id')."&_sort=status,list_order,lastname,firstname\">Status</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?id=".request('id')."&_sort=list_order,lastname,firstname\">Instrument</a></th>
       <th bgcolor=#A6CAF0>";
 if ($access->auth(AUTH::RES_INV))
    manage_col("inv");
@@ -371,7 +390,10 @@ if ($access->auth(AUTH::RES_REQ))
 echo "MR</th>
       <th bgcolor=#A6CAF0>";
 if ($access->auth(AUTH::RES_FIN))
+{
    manage_col("final");
+   reset_col("final");
+}
 echo "Styret</th>
       </tr>";
 
