@@ -5,13 +5,14 @@ if (is_null($sort))
    $sort = 'ts';
 
 echo "
-<h1>Konserter " . $season->year() . "</h1>";
+<h1>Konserter " . $season->semester(1) . " " . $season->year() . "</h1>";
 if ($access->auth(AUTH::CONS))
    echo "
     <form action=\"$php_self\" method=post>
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=_action value=new>
       <input type=submit value=\"Ny konsert\">
+      <a href=calender.php title=\"Vis kalender...\"><img src=images/text2.gif border=0></a>
     </form>";
 echo "
     <form action='$php_self' method=post>
@@ -25,12 +26,14 @@ echo "
       <th bgcolor=#A6CAF0>Tid</th>
       <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=id_project,ts\">Prosjekt</a></th>
       <th bgcolor=#A6CAF0>Lokale</th>
+      <th bgcolor=#A6CAF0>Overskrift</th>
       <th bgcolor=#A6CAF0>Tekst</th>
       </tr>";
 
 function select_project($selected)
 {
    global $db;
+   global $season;
 
    echo "<select name=id_project title=\"Prosjekt\">";
 
@@ -86,6 +89,7 @@ if ($action == 'new')
    echo "</td>
        <td>";
    select_location(null);
+   echo "<td><input type=text size=30 name=heading>\n";
    echo "</td>
     <td><textarea name=text wrap=virtual cols=60 rows=10></textarea></td>
   </tr>";
@@ -99,8 +103,8 @@ if ($action == 'update' && $access->auth(AUTH::CONS))
    {
       if (is_null($no))
       {
-         $query = "insert into concert (ts, time, id_project, id_location, text)
-              values ($ts, '".$_POST['time']."', ".$_POST['id_project'].", ".$_POST['id_location'].", ".$db->qpost('text');
+         $query = "insert into concert (ts, time, id_project, id_location, heading, text)
+              values ($ts, '".$_POST['time']."', ".$_POST['id_project'].", ".$_POST['id_location'].", ".$db->qpost('heading').", ".$db->qpost('text').")";
       } else
       {
          if (!is_null($delete))
@@ -112,6 +116,7 @@ if ($action == 'update' && $access->auth(AUTH::CONS))
                     "time = '".$_POST['time']."'," .
                     "id_project = ".$_POST['id_project']."," .
                     "id_location = ".$_POST['id_location']."," .
+                    "heading = ".$db->qpost('heading').", " .
                     "text = ".$db->qpost('text')." " .
                     "where id = $no";
          }
@@ -128,6 +133,7 @@ $query = "SELECT concert.id as id, "
         . "project.year as year, "
         . "project.semester as semester, "
         . "location.name as lname, "
+        . "concert.heading as heading, "
         . "concert.text as text, "
         . "concert.id_location as id_location, "
         . "concert.id_project as id_project "
@@ -135,6 +141,7 @@ $query = "SELECT concert.id as id, "
         . "where concert.id_project = project.id "
         . "and concert.id_location = location.id "
         . "and project.year = " . $season->year() . " "
+        . "and project.semester = '" . $season->semester() . "' "
         . "order by $sort";
 
 $stmt = $db->query($query);
@@ -154,6 +161,7 @@ foreach ($stmt as $row)
       "<td>".$row['time']."</td>" .
       "<td>".$row['pname']." (".$row['semester'].$row['year'].")</td>" .
       "<td>".$row['lname']."</td>" .
+      "<td>".$row['heading']."</td>" .
       "<td>";
       echo str_replace("\n", "<br>\n", $row['text']);
       echo "</td>" .
@@ -174,6 +182,7 @@ foreach ($stmt as $row)
     <td>";
       select_location($row['id_location']);
       echo "</td>
+    <td><input type=text size=30 name=heading value=\"".$row['heading']."\">
     <td><textarea cols=60 rows=10 wrap=virtual name=text>".$row['text']."</textarea></td>
     </tr>";
    }
