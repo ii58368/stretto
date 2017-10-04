@@ -130,6 +130,7 @@ $query  = "SELECT plan.id as id, date, time, id_location, location.name as lname
     "where id_location = location.id " .
     "and id_project = project.id " .
     "and id_responsible = person.id " .
+    "and plan.event_type = $db->plan_evt_direction " .
     "and plan.id_project like '" . request('id_project') . "' " .
     "order by date,tsort,time";
 $stmt = $db->query($query);

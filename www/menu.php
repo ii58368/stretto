@@ -177,9 +177,12 @@ class MENU
          {
             $q = "select id, name, semester, year, orchestration, docs_avail "
                     . "from project "
-                    . "where (status = $db->prj_stat_public "
-                    . "or status = $db->prj_stat_tentative) "
+                    . "where (status = $db->prj_stat_public ";
+            if ($access->auth(AUTH::PRJ_RO))
+               $q .= "or status = $db->prj_stat_draft ";
+            $q .= "or status = $db->prj_stat_tentative) "
                     . "and year = " . $season->year() . " "
+                    . "and semester = '" . $season->semester() . "' "
                     . "order by year,semester DESC";
          }
          else
@@ -265,10 +268,10 @@ class MENU
       foreach ($_GET as $key => $value)
          if (is_string($value))
             $url .= ((strlen($url) > 0) ? '&' : '?') . $key . '=' . $value;
-      
+
       return $url;
    }
-   
+
    public function whoami()
    {
       global $whoami;
@@ -292,7 +295,7 @@ class MENU
    {
       global $season;
       global $php_self;
-      
+
       $sem = $season->semester();
       $year = $season->year();
 
