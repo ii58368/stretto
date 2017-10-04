@@ -173,9 +173,7 @@ class ACCESS extends AUTH
          return;
 
       echo "<h1>Permission denied</h1>";
-
-      foreach ($this->list_ro as $key => $value)
-         printf("%s %x<br>", $key, $value);
+      echo "Kontakt <a href=\"mailto:sekretaer@oslo-symfoniorkester.org\">Sekretæren</a> for å få nødvendig tilgang";
       exit(0);
    }
 

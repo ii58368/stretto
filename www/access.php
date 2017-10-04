@@ -60,7 +60,8 @@ foreach($stmt as $row)
     echo "</td><td bgcolor=#A6CAF0>" . $db->per_stat[$row['status']] . "</td>";
     $prev_id = $row['person_id'];
   }
-  $query  = "SELECT auth_person.ts as ts, firstname, lastname "
+  $query  = "SELECT auth_person.ts as ts, "
+          . "firstname, lastname "
           . "from auth_person, person "
           . "where person.id = auth_person.id_auth "
           . "and id_view = ".$row['view_id']." "
@@ -70,6 +71,7 @@ foreach($stmt as $row)
   $action = "insert";
   $image = "images/stop_red.gif";
   $ts_txt= '';
+  $warning = "Sikkert at du vil endre tilgang for ".$row['firstname']." ".$row['lastname']."?";
   if ($row2 = $stmt2->fetch(PDO::FETCH_ASSOC))
   {
      $action = "delete";
@@ -77,7 +79,7 @@ foreach($stmt as $row)
      $ts_txt = "Tilgang gitt:" . strftime('%a %e.%b %y', $row2['ts']) . " av ".$row2['firstname']." ".$row2['lastname'];
   }
   if ($access->auth(AUTH::ACC))
-     echo "<td align=center><a href=\"".$_SERVER['PHP_SELF']."?_action=$action&id_person=".$row['person_id']."&id_view=".$row['view_id']."&_sort=$sort\"><img src=\"$image\" border=0 title=\"Klikk for å endre tilgang. $ts_txt\"></td>";
+     echo "<td align=center><a href=\"".$_SERVER['PHP_SELF']."?_action=$action&id_person=".$row['person_id']."&id_view=".$row['view_id']."&_sort=$sort\" onClick=\"return confirm('$warning');\"><img src=\"$image\" border=0 title=\"Klikk for å endre tilgang. $ts_txt\"></td>";
   else
      echo "<td align=center><img src=\"$image\" border=0 title=\"$ts_txt\"></td>";
 } 
