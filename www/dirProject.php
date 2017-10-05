@@ -19,7 +19,7 @@ function list_group($id)
 
    $s = $db->query($q);
 
-   foreach($s as $e)
+   foreach ($s as $e)
    {
       if ($e['status'] == $db->shi_stat_tentative)
          echo "<font color=grey>";
@@ -46,7 +46,7 @@ function select_person($selected)
 
    $s = $db->query($q);
 
-   foreach($s as $e)
+   foreach ($s as $e)
    {
       echo "<option value=\"" . $e['id'] . "\"";
       if ($e['id'] == $selected)
@@ -72,15 +72,30 @@ function mail2dir($id_project)
    $r = $s->fetchAll(PDO::FETCH_ASSOC);
 
    echo "<a href=\"mailto:";
-   foreach($r as $e)
-      echo $e['email'] . ",";
+   foreach ($r as $e)
+      if (strlen($e['email']) > 0)
+         echo $e['email'] . ",";
+
+   $q = "select email, phone1 "
+           . "from person, project "
+           . "where person.id = project.id_person "
+           . "and project.id = $id_project";
+   $s2 = $db->query($q);
+   $r2 = $s2->fetch(PDO::FETCH_ASSOC);
+
+   if (strlen($r2['email']) > 0)
+      echo $r2['email'];
+
    echo "?subject=OSO: Regikomit&eacute;, $project_name&body=Se oppdatert regiplan: http://" . $_SERVER['SERVER_NAME'] . "/oso/regi/plan.php?id_project=$id_project\"><image border=0 src=images/image1.gif hspace=20 title=\"Send mail alle i regikomit&eacute;en\"></a>";
 
    echo "<a href=\"sms:";
    reset($r);
    $str = '';
-   foreach($r as $e)
-      $str .= $e['phone1'] . ",";
+   foreach ($r as $e)
+      if (strlen($e['phone1']) > 0)
+         $str .= $e['phone1'] . ",";
+   if (strlen($r2['phone1']) > 0)
+      $str .= $r2['phone1'] . ",";
    $str = str_replace(' ', '', $str);
    echo substr($str, 0, -1);
    echo "&body=OSO Regikomit&eacute:\"><image border=0 src=images/sms.png hspace=20 title=\"Send SMS til alle i regikomit&eacute;en\"></a>";
@@ -107,19 +122,19 @@ echo "
 if ($action == 'update' && $access->auth(AUTH::DIR_RW))
 {
    $query = "update project set " .
-           "id_person = ".request('id_person')."," .
-           "info_dir = ".$db->qpost('info_dir')." " .
+           "id_person = " . request('id_person') . "," .
+           "info_dir = " . $db->qpost('info_dir') . " " .
            "where id = $no";
    $query2 = "update participant set stat_dir = $db->shi_stat_free "
            . "where stat_dir = $db->shi_stat_responsible "
            . "and id_project = $no";
    $db->query($query2);
    $query2 = "update participant set stat_dir = $db->shi_stat_responsible " .
-           "where id_person = ".request('id_person')." " .
+           "where id_person = " . request('id_person') . " " .
            "and id_project = $no";
    $db->query($query2);
    $db->query($query);
-   
+
    $no = NULL;
 }
 
@@ -133,22 +148,22 @@ $query = "SELECT project.id as id, name, semester, year, id_person, project.stat
 
 $stmt = $db->query($query);
 
-foreach($stmt as $row)
+foreach ($stmt as $row)
 {
    if ($row['id'] != $no)
    {
       echo "<tr>";
-         if ($access->auth(AUTH::DIR_RW))
-            echo "
+      if ($access->auth(AUTH::DIR_RW))
+         echo "
         <td><center>
-            <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
+            <a href=\"$php_self?_sort=$sort&_action=view&_no=" . $row['id'] . "\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
              </center></td>";
-      echo 
-      "<td><a href=\"dirPlan.php?id_project=".$row['id']."\">".$row['name']."</a></td>" .
-      "<td>".$row['semester']." " .
-      "    ".$row['year']."</td>" .
+      echo
+      "<td><a href=\"dirPlan.php?id_project=" . $row['id'] . "\">" . $row['name'] . "</a></td>" .
+      "<td>" . $row['semester'] . " " .
+      "    " . $row['year'] . "</td>" .
       "<td>" . $db->prj_stat[$row['status']] . "</td>" .
-      "<td>".$row['firstname']." ".$row['lastname']." (".$row['instrument'].")</td>" .
+      "<td>" . $row['firstname'] . " " . $row['lastname'] . " (" . $row['instrument'] . ")</td>" .
       "<td nowrap>";
       mail2dir($row['id']);
       echo "<br>";
@@ -163,10 +178,10 @@ foreach($stmt as $row)
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
-    <input type hidden name=id_person value=".$row['id_person'].">
+    <input type hidden name=id_person value=" . $row['id_person'] . ">
     <th nowrap><input type=submit value=ok title=\"Lagere endring\" >
-    <th>".$row['name']."</th>
-    <th>".$row['semester']." ".$row['year']."</th>
+    <th>" . $row['name'] . "</th>
+    <th>" . $row['semester'] . " " . $row['year'] . "</th>
     <th>" . $db->prj_stat[$row['status']] . "</th>
     <th><select name=id_person>";
       select_person($row['id_person']);
@@ -174,7 +189,7 @@ foreach($stmt as $row)
       echo "<td>";
       list_group($row['id']);
       echo " </td>
-    <th><textarea cols=44 rows=10 wrap=virtual name=info_dir>".$row['info_dir']."</textarea></th>
+    <th><textarea cols=44 rows=10 wrap=virtual name=info_dir>" . $row['info_dir'] . "</textarea></th>
     </tr>";
    }
 }
