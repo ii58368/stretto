@@ -1,12 +1,12 @@
 <?php
 require 'framework.php';
 
-$id_project = is_null(request('id_project')) ? '%' : request('id_project');
-   
+$id_project = request('id_project');
+
 function select_project($selected)
 {
    global $db;
-   
+
    echo "<select name=id_project>";
 
    $year = date("Y");
@@ -17,13 +17,13 @@ function select_project($selected)
    $s = $db->query($q);
 
    echo "<option value=0>Generell</option>\n";
-   
-   foreach($s as $e)
+
+   foreach ($s as $e)
    {
       echo "<option value=\"" . $e['id'] . "\"";
       if ($e['id'] == $selected)
          echo " selected";
-      echo ">" . $e['name'] . " (" . $e['semester'] .' ' . $e['year'] . ")";
+      echo ">" . $e['name'] . " (" . $e['semester'] . ' ' . $e['year'] . ")";
    }
    echo "</select>";
 }
@@ -61,7 +61,6 @@ function select_status($selected)
 
    echo "</select>";
 }
-
 
 if ($sort == NULL)
    $sort = 'ts_change';
@@ -114,24 +113,26 @@ if ($action == 'update' && $access->auth(AUTH::EVENT))
    {
       $query = "insert into event (subject, ts_create, ts_update, importance, body, "
               . "id_person, id_project, status) "
-              . "values (".$db->qpost('subject').", $ts, $ts, "
-              . request('importance').", " . $db->qpost('body') . ", " . $whoami->id() . ", "
-              . request('id_project').", ".request('status').")";
-   } else
+              . "values (" . $db->qpost('subject') . ", $ts, $ts, "
+              . request('importance') . ", " . $db->qpost('body') . ", " . $whoami->id() . ", "
+              . request('id_project') . ", " . request('status') . ")";
+   }
+   else
    {
       if (!is_null($delete))
       {
          $query = "delete from event where id = $no";
-      } else
+      }
+      else
       {
-         $query = "update event set subject = ".$db->qpost('subject')."," .
+         $query = "update event set subject = " . $db->qpost('subject') . "," .
                  "ts_update = $ts," .
-                 "importance = ".request('importance')."," .
-                 "body = " . $db->qpost('body')  . "," .
-                 "id_project = ".request('id_project')."," .
+                 "importance = " . request('importance') . "," .
+                 "body = " . $db->qpost('body') . "," .
+                 "id_project = " . request('id_project') . "," .
                  "id_person = " . $whoami->id() . "," .
-                 "id_project = ".request('id_project')."," .
-                 "status = ".request('status')." " .
+                 "id_project = " . request('id_project') . "," .
+                 "status = " . request('status') . " " .
                  "where id = $no";
       }
       $no = NULL;
@@ -144,11 +145,13 @@ $query = "select event.id as id, subject, ts_create, ts_update, importance, body
         . "event.status as status, firstname, lastname, instrument "
         . "from event, person, instruments "
         . "where person.id = event.id_person "
-        . "and person.id_instruments = instruments.id "
-        . "and event.id_project like '$id_project' "
-        . "and ts_update > " . $season->ts()[0] . " "
-        . "and ts_update < " . $season->ts()[1] . " "
-        . "order by ts_update desc";
+        . "and person.id_instruments = instruments.id ";
+if ($id_project)
+   $query .= "and event.id_project = $id_project ";
+else
+   $query .= "and ts_update > " . $season->ts()[0] . " "
+           . "and ts_update < " . $season->ts()[1] . " ";
+$query .= "order by ts_update desc";
 $stmt = $db->query($query);
 
 foreach ($stmt as $row)
@@ -162,9 +165,9 @@ foreach ($stmt as $row)
     <input type=submit value=Lagre>
     <input type=submit name=_delete value=Slett></td>
     </tr><tr>
-    <td><i>Subjekt:</i></td><td><input type=text size=60 name=subject value=\"".$row['subject']."\"></td>
+    <td><i>Subjekt:</i></td><td><input type=text size=60 name=subject value=\"" . $row['subject'] . "\"></td>
     </tr><tr>
-    <td><i>Fra:</i></td><td>".$row['firstname']." ".$row['lastname']."</td>
+    <td><i>Fra:</i></td><td>" . $row['firstname'] . " " . $row['lastname'] . "</td>
     </tr><tr>
     <td><i>Opprettet:</i></td><td>" . strftime('%e.%b %y', $row['ts_create']) . "</td>
     </tr><tr>
@@ -180,26 +183,27 @@ foreach ($stmt as $row)
       select_status($row['status']);
       echo "</td>
      </tr></table>
-    <textarea cols=60 rows=15 wrap=virtual name=body>".$row['body']."</textarea>\n";
-   } else
+    <textarea cols=60 rows=15 wrap=virtual name=body>" . $row['body'] . "</textarea>\n";
+   }
+   else
    {
       if ($row['uid'] == $whoami->uid() && $access->auth(AUTH::EVENT))
       {
-         echo "<input type=button value=Endre onClick=\"location.href='$php_self?_sort=$sort&_action=view&_no=".$row['id']."';\">";
+         echo "<input type=button value=Endre onClick=\"location.href='$php_self?_sort=$sort&_action=view&_no=" . $row['id'] . "';\">";
       }
       echo "  <tr>
-    <font size=+2><b>".$row['subject']."</b></font>
+    <font size=+2><b>" . $row['subject'] . "</b></font>
     <table border=0><tr>
-    <td><i>Fra:</i></td><td>".$row['firstname']." ".$row['lastname']."</td>
+    <td><i>Fra:</i></td><td>" . $row['firstname'] . " " . $row['lastname'] . "</td>
     </tr><tr>
     <td><i>Dato:</i></td><td>" . strftime('%e.%b %Y', $row['ts_update']) . "</td>
     </tr><tr>
     <td><i>Prosjekt:</i></td><td>";
       if ($row['id_project'] > 0)
       {
-         $s = $db->query("select name, semester, year from project where id=".$row['id_project']);
+         $s = $db->query("select name, semester, year from project where id=" . $row['id_project']);
          $e = $s->fetch(PDO::FETCH_ASSOC);
-         echo $e['name']." (".$e['semester']."-".$e['year'].")";
+         echo $e['name'] . " (" . $e['semester'] . "-" . $e['year'] . ")";
       }
 
       echo "</td>
