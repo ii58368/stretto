@@ -136,7 +136,7 @@ class MENU
          $menu->add("Mine sider", $my_pages);
 
          $my_pages->add("Mine prosjekter", "participant_1x.php?id=" . $whoami->id(), AUTH::MYPRJ);
-         $my_pages->add("Min prøveplan", "plan.php?id_person=" . $whoami->id(), AUTH::MYPLAN);
+         $my_pages->add("Min prøveplan", "myplan.php?id_person=" . $whoami->id(), AUTH::MYPLAN);
          $my_pages->add("Min regi", "myDirection.php?id_person=" . $whoami->id(), AUTH::MYDIR);
          $my_pages->add("Mine personopplysninger", "personEdit.php?_no=" . $whoami->id(), AUTH::PERS, AUTH::MEMB_RW);
       }
