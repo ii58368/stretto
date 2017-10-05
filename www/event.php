@@ -146,6 +146,8 @@ $query = "select event.id as id, subject, ts_create, ts_update, importance, body
         . "where person.id = event.id_person "
         . "and person.id_instruments = instruments.id "
         . "and event.id_project like '$id_project' "
+        . "and ts_update > " . $season->ts()[0] . " "
+        . "and ts_update < " . $season->ts()[1] . " "
         . "order by ts_update desc";
 $stmt = $db->query($query);
 

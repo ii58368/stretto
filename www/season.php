@@ -20,7 +20,7 @@ class SEASON
          return ($this->semester == 'V') ? 'Vår' : 'Høst';
       if ($opt == 2)
          return ($this->semester == 'V') ? 'Våren' : 'Høsten';
-      
+
       return $this->semester;
    }
 
@@ -33,6 +33,29 @@ class SEASON
    {
       $this->semester = (date('n') <= 6) ? 'V' : 'H';
       $this->year = date('Y');
+   }
+
+   public function ts()
+   {
+      $f_date = ($this->semester == 'V') ? "1. jan" : "1. jul";
+      $t_date = ($this->semester == 'V') ? "30. jun" : "31. dec";
+
+      $f_ts = strtotime("$f_date " . $this->year);
+      $t_ts = strtotime("$t_date " . $this->year);
+
+      return array($f_ts, $t_ts);
+   }
+   
+   public function isWithin($ts)
+   {
+      list($f_ts, $t_ts) = $this->ts();
+      
+      if ($ts < $f_ts)
+         return false;
+      if ($ts > $t_ts)
+         return false;
+
+      return true;
    }
 
 }

@@ -48,7 +48,7 @@ foreach ($stmt as $row)
    else
       echo $row['lname'];
    echo $row['location'];
-   echo "</td><td><a href=\"prjInfo.php?id=".$row[id_project]."\">" . $row['pname'] . "</a>";
+   echo "</td><td><a href=\"prjInfo.php?id=".$row['id_project']."\">" . $row['pname'] . "</a>";
    if ($row['orchestration'] == $db->prj_orch_reduced)
       echo '*';
    echo "</td><td>";
