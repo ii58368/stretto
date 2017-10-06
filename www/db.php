@@ -150,7 +150,7 @@ class DB extends myPDO
    public $shi_stat = array("Ledig", "Tentativt", "Bekreftet", "Ikke godkjent oppmøte",
        "Permisjon", "Regiansvarlig", "Er ikke med på prosjektet");
 // table: project
-   public $prj_stat_public = 0;
+   public $prj_stat_real = 0;
    public $prj_stat_internal = 1;
    public $prj_stat_tentative = 2;
    public $prj_stat_draft = 3;

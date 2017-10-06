@@ -23,7 +23,7 @@ if ($id_project)
 else
    $query .= "and project.year >= " . $season->year() . " ";
 if (!$access->auth(AUTH::CONS, AUTH::PRJ_RO))
-   $query .= "and project.status = $db->prj_stat_public ";
+   $query .= "and project.status = $db->prj_stat_real ";
 $query .=  "order by concert.ts";
 
 $stmt = $db->query($query);

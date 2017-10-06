@@ -50,7 +50,7 @@ class PDF extends PDF_util
               "and plan.event_type = $db->plan_evt_rehearsal " .
               "and project.year = ".$season->year()." " .
               "and project.semester = '".$season->semester()."' " .
-              "and (project.status = $db->prj_stat_public ";
+              "and (project.status = $db->prj_stat_real ";
       if ($access->auth(AUTH::PRJ_RO))
          $query .= "or project.status = $db->prj_stat_draft ";
       $query .= "or project.status = $db->prj_stat_tentative "
@@ -119,7 +119,7 @@ class PDF extends PDF_util
               . "from project "
               . "where project.year = ".$season->year()." "
               . "and project.semester = '".$season->semester()."' "
-              . "and (project.status = $db->prj_stat_public ";
+              . "and (project.status = $db->prj_stat_real ";
       if ($access->auth(AUTH::PRJ_RO))
          $query .= "or project.status = $db->prj_stat_draft ";
       $query .= "or project.status = $db->prj_stat_tentative) "

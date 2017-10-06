@@ -136,8 +136,8 @@ class MENU
          $menu->add("Mine sider", $my_pages);
 
          $my_pages->add("Mine prosjekter", "participant_1x.php?id=" . $whoami->id(), AUTH::MYPRJ);
-         $my_pages->add("Min prøveplan", "myplan.php?id_person=" . $whoami->id(), AUTH::MYPLAN);
-         $my_pages->add("Min regi", "myDirection.php?id_person=" . $whoami->id(), AUTH::MYDIR);
+         $my_pages->add("Min spilleplan", "myplan.php?id_person=" . $whoami->id(), AUTH::MYPLAN);
+         $my_pages->add("Min regi", "myDirection.php", AUTH::MYDIR);
          $my_pages->add("Mine personopplysninger", "personEdit.php?_no=" . $whoami->id(), AUTH::PERS, AUTH::MEMB_RW);
       }
       {
@@ -177,7 +177,7 @@ class MENU
          {
             $q = "select id, name, semester, year, orchestration, docs_avail "
                     . "from project "
-                    . "where (status = $db->prj_stat_public ";
+                    . "where (status = $db->prj_stat_real ";
             if ($access->auth(AUTH::PRJ_RO))
                $q .= "or status = $db->prj_stat_draft ";
             $q .= "or status = $db->prj_stat_tentative) "

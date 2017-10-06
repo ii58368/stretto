@@ -57,7 +57,7 @@ $query = "SELECT project.id as id, name, semester, year, status, " .
         "deadline, orchestration " .
         "FROM project " .
         "where project.year >= " . $season->year() . " " .
-        "and status = $db->prj_stat_public " .
+        "and status = $db->prj_stat_real " .
         "or status = $db->prj_stat_tentative " .
         "order by $sort";
 
@@ -78,10 +78,10 @@ foreach ($stmt as $row)
 
    echo "<tr>
       <td>";
-   if ($row['status'] == $db->prj_stat_public)
+   if ($row['status'] == $db->prj_stat_real)
       echo "<a href=\"participant_11.php?id_project=".$row['id']."&id_person=".$pers['id']."\" title=\"Påmelding eller søk om permisjon\">";
    echo $row['name'];
-   if ($row['status'] == $db->prj_stat_public)
+   if ($row['status'] == $db->prj_stat_real)
       echo "</a>";
    echo "</td>\n" .
       "<td>".$row['semester']." ".$row['year']."</td>" .
@@ -89,7 +89,7 @@ foreach ($stmt as $row)
    $tstat = $db->par_stat[$status];
    if (!is_null($blink))
       $tstat .= " (under behandling i styret...)";
-   if ($row['status'] == $db->prj_stat_public)
+   if ($row['status'] == $db->prj_stat_real)
       echo "<img src=\"images/part_stat_$status$blink.gif\" border=0 title=\"$tstat\">";
    echo "</td>\n";
    echo "<td>" . strftime('%a %e.%b %y', $row['deadline']) . "</td>" .

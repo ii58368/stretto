@@ -5,6 +5,7 @@ if ($sort == NULL)
    $sort = 'lastname,firstname,title';
 
 $id_project = is_null(request('id_project')) ? 0 : request('id_project');
+$search = request('search');
 
 if ($id_project == 0)
 {
@@ -38,11 +39,19 @@ function select_project()
 
 echo "
     <h1>Notearkiv</h1>";
+echo "
+    <form action=\"$php_self\" method=post>
+      <input type=hidden name=_sort value=\"$sort\">
+      <input type=hidden name=id_project value=$id_project>
+      <img src=\"images/search.png\" height=20>
+      <input type=text name=search value=\"$search\" title=\"Søk for komponist ellet tittel og trykk enter\">
+    </form>";
 if ($access->auth(AUTH::REP))
    echo "
     <form action=\"$php_self\" method=post>
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=id_project value=$id_project>
+      <input type=hidden name=search value=\"$search\">
       <input type=hidden name=_action value=new>
       <input type=submit value=\"Nytt verk\">
     </form>";
@@ -52,12 +61,12 @@ echo "
     <tr>";
 if ($access->auth(AUTH::REP))
    echo "
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=id+DESC&id_project=$id_project\">Edit</a></th>";
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=id+DESC&id_project=$id_project&search=$search\">Edit</a></th>";
 echo "
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=lastname,firstname,title&id_project=$id_project\">Komponist</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=title,lastname,firstname&id_project=$id_project\">Tittle</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=lastname,firstname,title&id_project=$id_project&search=$search\">Komponist</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=title,lastname,firstname&id_project=$id_project&search=$search\">Tittle</a></th>
       <th bgcolor=#A6CAF0>Fra</th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=reference,tag&id_project=$id_project\">Arkivref</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=reference,tag&id_project=$id_project&search=$search\">Arkivref</a></th>
       <th bgcolor=#A6CAF0>Kommentar</th>
       <th bgcolor=#A6CAF0>\n";
 if ($access->auth(AUTH::REP))
@@ -73,6 +82,7 @@ if ($action == 'new')
   <tr>
     <td align=left><input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
+    <input type=hidden name=search value=\"$search\">
     <input type=submit value=ok></td>
     <th><input type=text size=30 name=firstname title=Fornavn>
         <input type=text size=30 name=lastname title=Etternavn></th>
@@ -150,6 +160,7 @@ function toggle_project($cno)
    global $sort;
    global $php_self;
    global $id_project;
+   global $search;
 
    $q = "select name, semester, year, music.status as status, music.comment as comment "
            . "from project, music "
@@ -177,6 +188,7 @@ function toggle_project($cno)
    {
       echo "<input type=hidden name=_action value=toggle_update>
             <input type=hidden name=_sort value='$sort'>
+            <input type=hidden name=search value=\"$search\">
             <input type=hidden name=id_project value=$id_project>
             <input type=hidden name=_no value='$no'>
             <input type=submit value=ok>
@@ -185,7 +197,7 @@ function toggle_project($cno)
    else
    {
       $act = ($status == $db->mus_stat_yes) ? 'toggle_update' : 'toggle';
-      echo "<a href=\"$php_self?_action=$act&_no=$cno&_sort=$sort&id_project=$id_project&id_repository=$cno\"><img src=\"images/cross_re.gif\" border=0 title=\"$title\"></a>";
+      echo "<a href=\"$php_self?_action=$act&_no=$cno&_sort=$sort&id_project=$id_project&id_repository=$cno&search=$search\"><img src=\"images/cross_re.gif\" border=0 title=\"$title\"></a>";
       if ($id_repository == $cno && $status == $db->mus_stat_yes)
          echo $e['comment'];
    }
@@ -211,8 +223,15 @@ function view_project($cno)
    echo "</td>\n";
 }
 
-$query = "SELECT id, firstname, lastname, title, work, tag, reference, comment " .
-        "FROM repository order by $sort";
+$query = "SELECT id, firstname, lastname, title, work, tag, reference, comment "
+        . "FROM repository ";
+$db_search = $db->quote("%$search%");
+if (strlen($search) > 0)
+   $query .= "where firstname like $db_search "
+           . "or lastname like $db_search "
+           . "or title like $db_search ";
+$query .= "order by $sort "
+        . "limit 50";
 
 $stmt = $db->query($query);
 
@@ -224,7 +243,7 @@ foreach ($stmt as $row)
       if ($access->auth(AUTH::REP))
          echo "
          <td><center>
-           <a href=\"$php_self?_sort=$sort&_action=view&_no=" . $row['id'] . "&id_project=$id_project\"><img src=\"images/cross_re.gif\" border=0></a>
+           <a href=\"$php_self?_sort=$sort&_action=view&_no=" . $row['id'] . "&id_project=$id_project&search=$search\"><img src=\"images/cross_re.gif\" border=0></a>
              </center></td>";
       echo
       "<td>" . $row['lastname'] . ", " . $row['firstname'] . "</td>" .
@@ -243,6 +262,7 @@ foreach ($stmt as $row)
    {
       echo "<tr>
     <input type=hidden name=_sort value='$sort'>
+    <input type=hidden name=search value=\"$search\">
     <input type=hidden name=id_project value=$id_project>
     <input type=hidden name=_no value='$no'>
     <input type=hidden name=_action value=update>
