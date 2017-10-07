@@ -57,11 +57,11 @@ class AUTH
    {
       global $whoami;
 
-      $this->access = $this->auth_uid($_SERVER['PHP_AUTH_USER']);
+      $this->access = $this->auth_uid($whoami->real_uid());
 
       $su_bit = $this->bit(self::SU);
 
-      if ($whoami->uid() != $_SERVER['PHP_AUTH_USER'])
+      if ($whoami->uid() != $whoami->real_uid())
       {
          $this->access = ($this->access & $su_bit) | ($this->auth_uid($whoami->uid()) & ~$su_bit);
       }
@@ -173,7 +173,8 @@ class ACCESS extends AUTH
          return;
 
       echo "<h1>Permission denied</h1>";
-      echo "Kontakt <a href=\"mailto:sekretaer@oslo-symfoniorkester.org\">Sekretæren</a> for å få nødvendig tilgang";
+      echo "Kontakt <a href=\"mailto:sekretar@oslo-symfoniorkester.org\">Sekretæren</a> for å få nødvendig tilgang";
+      phpinfo();
       exit(0);
    }
 

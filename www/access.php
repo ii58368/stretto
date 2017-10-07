@@ -79,7 +79,7 @@ foreach($stmt as $row)
      $ts_txt = "Tilgang gitt:" . strftime('%a %e.%b %y', $row2['ts']) . " av ".$row2['firstname']." ".$row2['lastname'];
   }
   if ($access->auth(AUTH::ACC))
-     echo "<td align=center><a href=\"".$_SERVER['PHP_SELF']."?_action=$action&id_person=".$row['person_id']."&id_view=".$row['view_id']."&_sort=$sort\" onClick=\"return confirm('$warning');\"><img src=\"$image\" border=0 title=\"Klikk for å endre tilgang. $ts_txt\"></td>";
+     echo "<td align=center><a href=\"$php_self?_action=$action&id_person=".$row['person_id']."&id_view=".$row['view_id']."&_sort=$sort\" onClick=\"return confirm('$warning');\"><img src=\"$image\" border=0 title=\"Klikk for å endre tilgang. $ts_txt\"></td>";
   else
      echo "<td align=center><img src=\"$image\" border=0 title=\"$ts_txt\"></td>";
 } 
