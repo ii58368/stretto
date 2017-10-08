@@ -101,7 +101,7 @@ class PDF extends PDF_util
               . " where participant.id_project=$id_project"
               . " and participant.id_instruments = instruments.id"
               . " and participant.id_person = person.id"
-              . " and participant.stat_inv = $db->par_stat_yes"
+              . " and participant.stat_final = $db->par_stat_yes"
               . " order by instruments.list_order, participant.position";
 
       $stmt = $db->query($query);
@@ -121,7 +121,7 @@ class PDF extends PDF_util
             $this->bold($e['instrument'].":");
             $this->colLn(2);
          }
-         $name = ($e['stat_final'] == $db->par_stat_yes) ? $e['firstname']." ".$e['lastname'] : "<uavklart>";
+         $name = $e['firstname']." ".$e['lastname'];
          $this->Cell(0, 4, $this->sconv($name));
          $this->colLn();
          if ($this->GetY() > $this->GetPageHeight())

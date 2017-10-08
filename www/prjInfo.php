@@ -82,7 +82,7 @@ $query = "select firstname, lastname, instrument, stat_inv, stat_final"
         . " where participant.id_project=".request('id')
         . " and participant.id_instruments = instruments.id"
         . " and participant.id_person = person.id"
-        . " and participant.stat_inv = $db->par_stat_yes"
+        . " and participant.stat_final = $db->par_stat_yes"
         . " order by instruments.list_order, participant.position";
 $stmt = $db->query($query);
 
@@ -93,7 +93,7 @@ foreach ($stmt as $e)
 {
    if ($last_instrument != $e['instrument'])
       echo "</ul><p><b>".$e['instrument']."</b><ul>\n";
-   $name = ($e['stat_final'] == $db->par_stat_yes) ? $e['firstname']." ".$e['lastname'] : "&lt;uavklart&gt;";
+   $name = $e['firstname']." ".$e['lastname'];
    echo "<li>$name</li>\n";
    $last_instrument = $e['instrument'];
 }
