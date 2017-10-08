@@ -9,7 +9,7 @@ require 'person_query.php';
 class PDF extends PDF_util
 {
 
-   function heading()
+   public function content()
    {
       global $db;
 
@@ -94,6 +94,6 @@ $pdf->AliasNbPages();
 $pdf->SetFont_('Times', '', 10);
 $pdf->AddPage();
 
-$pdf->heading();
+$pdf->content();
 
 $pdf->Output();

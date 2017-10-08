@@ -10,7 +10,7 @@ require 'person_query.php';
 class PDF extends PDF_util
 {
 
-   function plan()
+   public function plan()
    {
       global $db;
       global $access;
@@ -98,7 +98,7 @@ class PDF extends PDF_util
       $this->Cell(0, 30, "* : redusert besetning", 0, 0, 'LB');
    }
    
-   function repertoire()
+   public function repertoire()
    {
       global $db;
       global $access;

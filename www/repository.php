@@ -44,17 +44,14 @@ echo "
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=id_project value=$id_project>
       <img src=\"images/search.png\" height=20>
-      <input type=text name=search value=\"$search\" title=\"Søk for komponist ellet tittel og trykk enter\">
+      <input type=text name=search value=\"$search\" title=\"Søk for komponist eller tittel og trykk enter\">
     </form>";
+
 if ($access->auth(AUTH::REP))
-   echo "
-    <form action=\"$php_self\" method=post>
-      <input type=hidden name=_sort value=\"$sort\">
-      <input type=hidden name=id_project value=$id_project>
-      <input type=hidden name=search value=\"$search\">
-      <input type=hidden name=_action value=new>
-      <input type=submit value=\"Nytt verk\">
-    </form>";
+   echo "<a href=\"$php_self?_sort=$sort&_action=new&id_project=$id_project&search=$search\" title=\"Registrer nytt verk...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
+
+echo "<a href=\"repository_pdf.php\" title=\"PDF versjon av alle verk som har arkivref OSO\"><img src=images/pdf.jpeg height=22 border=0 hspace=5 vspace=5></a>\n";
+
 echo "
     <form action='$php_self' method=post>
     <table border=1>
@@ -66,7 +63,7 @@ echo "
       <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=lastname,firstname,title&id_project=$id_project&search=$search\">Komponist</a></th>
       <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=title,lastname,firstname&id_project=$id_project&search=$search\">Tittle</a></th>
       <th bgcolor=#A6CAF0>Fra</th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=reference,tag&id_project=$id_project&search=$search\">Arkivref</a></th>
+      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=archive,tag&id_project=$id_project&search=$search\">Arkivref</a></th>
       <th bgcolor=#A6CAF0>Kommentar</th>
       <th bgcolor=#A6CAF0>\n";
 if ($access->auth(AUTH::REP))
@@ -88,9 +85,9 @@ if ($action == 'new')
         <input type=text size=30 name=lastname title=Etternavn></th>
     <th><input type=text size=30 name=title title=\"Navn på verk\"></th>
     <th><input type=text size=30 name=work title=\"Navn på hovedverk hvis dette er et utdrag\"></th>
-    <th><input type=text size=8 name=reference value=OSO title=\"Referanse på hvor noter er leid eller lånt\">
+    <th><input type=text size=8 name=archive value=OSO title=\"Referanse på hvor noter er leid eller lånt\">
         <input type=text size=6 name=tag value=";
-   $s = $db->query("select max(tag) as max_tag from repository where reference=\"OSO\"");
+   $s = $db->query("select max(tag) as max_tag from repository where archive=\"OSO\"");
    $e = $s->fetch(PDO::FETCH_ASSOC);
    echo isset($e['max_tag']) ? $e['max_tag'] : 0;
    echo " title=\"Eventuelt referansnummer\"></th>
@@ -105,9 +102,9 @@ if ($action == 'update' && $access->auth(AUTH::REP))
    $ts = strtotime("now");
 
    if ($no == NULL)
-      $query = "insert into repository (firstname, lastname, title, work, tag, reference, comment, ts) "
+      $query = "insert into repository (firstname, lastname, title, work, tag, archive, comment, ts) "
               . "values (" . $db->qpost('firstname') . ", " . $db->qpost('lastname') . ", " . $db->qpost('title') . ", " . $db->qpost('work') . ", "
-              . "$tag, " . $db->qpost('reference') . ", " . $db->qpost('comment') . ", $ts)";
+              . "$tag, " . $db->qpost('archive') . ", " . $db->qpost('comment') . ", $ts)";
    else
    {
       if ($delete != NULL)
@@ -126,7 +123,7 @@ if ($action == 'update' && $access->auth(AUTH::REP))
                  "title = " . $db->qpost('title') . "," .
                  "work = " . $db->qpost('work') . "," .
                  "tag = $tag," .
-                 "reference = " . $db->qpost('reference') . "," .
+                 "archive = " . $db->qpost('archive') . "," .
                  "comment = " . $db->qpost('comment') . " ," .
                  "ts = $ts " .
                  "where id = $no";
@@ -223,7 +220,7 @@ function view_project($cno)
    echo "</td>\n";
 }
 
-$query = "SELECT id, firstname, lastname, title, work, tag, reference, comment "
+$query = "SELECT id, firstname, lastname, title, work, tag, archive, comment "
         . "FROM repository ";
 $db_search = $db->quote("%$search%");
 if (strlen($search) > 0)
@@ -249,7 +246,7 @@ foreach ($stmt as $row)
       "<td>" . $row['lastname'] . ", " . $row['firstname'] . "</td>" .
       "<td>" . $row['title'] . "</td>" .
       "<td>" . $row['work'] . "</td>" .
-      "<td>" . $row['reference'] . ":" . $row['tag'] . "</td>" .
+      "<td>" . $row['archive'] . ":" . $row['tag'] . "</td>" .
       "<td>";
       echo str_replace("\n", "<br>\n", $row['comment']);
       echo "</td>";
@@ -272,7 +269,7 @@ foreach ($stmt as $row)
          <input type=text size=30 name=lastname value=\"" . $row['lastname'] . "\" title=\"Etternavn\"></td>
     <td><input type=text size=30 name=title value=\"" . $row['title'] . "\"></td>
     <td><input type=text size=30 name=work value=\"" . $row['work'] . "\"></td>
-    <td><input type=text size=8 name=reference value=\"" . $row['reference'] . "\">
+    <td><input type=text size=8 name=archive value=\"" . $row['archive'] . "\">
          <input type=text size=6 name=tag value=\"" . $row['tag'] . "\"></td>
     <td><textarea cols=50 rows=7 wrap=virtual name=comment>" . $row['comment'] . "</textarea></td>
     </tr>";
