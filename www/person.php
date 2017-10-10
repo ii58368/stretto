@@ -30,6 +30,7 @@ function select_filter()
 {
    global $db;
    global $sort;
+   global $season;
 
    // Select status
    echo "<select name=\"f_status[]\" multiple size=3 onChange=\"submit();\">\n";
@@ -82,7 +83,11 @@ function select_filter()
    // Project
    echo "<select name=\"f_project[]\" multiple size=3 onChange=\"submit();\">\n";
 
-   $s = $db->query("select id, name, year, semester from project order by year DESC,semester");
+   $s = $db->query("select id, name, year, semester from project "
+           . "where year = ".$season->year()." "
+           . "and semester = '".$season->semester()."' "
+           . "and status = $db->prj_stat_real "
+           . "order by id");
    foreach ($s as $e)
    {
       echo "<option value=".$e['id'];
