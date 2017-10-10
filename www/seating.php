@@ -142,6 +142,8 @@ if ($access->auth(AUTH::SEAT))
        <input type=hidden name=_action value=template>
        <input type=hidden name=_sort value='$sort'>
        <input type=hidden name=id_project value=".request('id_project').">\n";
+   $url = "seating_pdf.php?id_project=".request('id_project')."&id_groups=$grp_id&template=".$seat['template'];
+   echo "<a href=\"$url\" title=\"PDF versjon av gruppeoppsett\"><img src=images/pdf.jpeg height=22 border=0 hspace=5 vspace=5></a>\n";
    select_template($seat['template']);
    echo "
     </form>

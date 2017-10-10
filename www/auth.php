@@ -90,6 +90,9 @@ class AUTH
    private function auth_uid($uid)
    {
       global $db;
+      
+      if (is_null($uid))
+         return 0;
 
       $query = "select access from person, auth_person, view " .
               "where person.id = auth_person.id_person " .

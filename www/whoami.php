@@ -8,16 +8,23 @@ class WHOAMI
    private $id = 0;
    private $firstname;
    private $lastname;
-   private $uid;
+   private $uid = null;
    private $instrument;
-   private $real_uid;
+   private $real_uid = null;
 
    function __construct()
    {
       global $db;
 
-      $real_uid = isset($_SERVER['PHP_AUTH_USER']) ? 
-              $_SERVER['PHP_AUTH_USER'] : $_SERVER['REDIRECT_REMOTE_USER'];
+      $real_uid = null;
+      
+      if (isset($_SERVER['REDIRECT_REMOTE_USER']))
+         $real_uid = $_SERVER['REDIRECT_REMOTE_USER'];
+      if (isset($_SERVER['PHP_AUTH_USER']))
+         $real_uid = $_SERVER['PHP_AUTH_USER'];
+
+      if (is_null($real_uid))
+         return;
       
       $uid = $real_uid;
       if (isset($_COOKIE['uid']))
@@ -27,7 +34,7 @@ class WHOAMI
               . "from person, instruments "
               . " where uid = '$uid' "
               . "and person.id_instruments = instruments.id";
-      
+
       $s = $db->query($q);
       $e = $s->fetch(PDO::FETCH_ASSOC);
 
@@ -58,7 +65,7 @@ class WHOAMI
    {
       return $this->instrument;
    }
-   
+
    public function real_uid()
    {
       return $this->real_uid;

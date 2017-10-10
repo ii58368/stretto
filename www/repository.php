@@ -87,9 +87,9 @@ if ($action == 'new')
     <th><input type=text size=30 name=work title=\"Navn på hovedverk hvis dette er et utdrag\"></th>
     <th><input type=text size=8 name=archive value=OSO title=\"Referanse på hvor noter er leid eller lånt\">
         <input type=text size=6 name=tag value=";
-   $s = $db->query("select max(tag) as max_tag from repository where archive=\"OSO\"");
+   $s = $db->query("select max(tag) as max_tag from repository where archive = 'OSO'");
    $e = $s->fetch(PDO::FETCH_ASSOC);
-   echo isset($e['max_tag']) ? $e['max_tag'] : 0;
+   echo isset($e['max_tag']) ? $e['max_tag'] + 1 : 0;
    echo " title=\"Eventuelt referansnummer\"></th>
     <th><textarea cols=50 rows=7 wrap=virtual name=comment></textarea></th>
     <th></th>
