@@ -369,26 +369,26 @@ echo strftime('%e.%m.%y', $prj['deadline']) . "</h2>
     <tr>";
 if ($access->auth(AUTH::RES_INV, AUTH::RES_REG, AUTH::RES_REQ, AUTH::RES_FIN))
    echo "
-      <th bgcolor=#A6CAF0>Edit</th>";
+      <th>Edit</th>";
 echo "
-      <th bgcolor=#A6CAF0><a href=\"$php_self?id=".request('id')."&_sort=lastname,firstname\">Navn</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?id=".request('id')."&_sort=status,list_order,lastname,firstname\">Status</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?id=".request('id')."&_sort=list_order,lastname,firstname\">Instrument</a></th>
-      <th bgcolor=#A6CAF0>";
+      <th><a href=\"$php_self?id=".request('id')."&_sort=lastname,firstname\">Navn</a></th>
+      <th><a href=\"$php_self?id=".request('id')."&_sort=status,list_order,lastname,firstname\">Status</a></th>
+      <th><a href=\"$php_self?id=".request('id')."&_sort=list_order,lastname,firstname\">Instrument</a></th>
+      <th>";
 if ($access->auth(AUTH::RES_INV))
    manage_col("inv");
 echo "Bes</th>
-      <th bgcolor=#A6CAF0>Permisjon</th>
-      <th bgcolor=#A6CAF0>Egen</th>
-      <th bgcolor=#A6CAF0>";
+      <th>Permisjon</th>
+      <th>Egen</th>
+      <th>";
 if ($access->auth(AUTH::RES_REG))
    manage_col("reg");
 echo "Sekretær</th>
-      <th bgcolor=#A6CAF0>";
+      <th>";
 if ($access->auth(AUTH::RES_REQ))
    manage_col("req");
 echo "MR</th>
-      <th bgcolor=#A6CAF0>";
+      <th>";
 if ($access->auth(AUTH::RES_FIN))
 {
    manage_col("final");

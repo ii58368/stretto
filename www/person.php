@@ -165,20 +165,20 @@ echo "
     <tr>";
 if ($access->auth(AUTH::MEMB_RW))
    echo "
-      <th bgcolor=#A6CAF0>Edit</th>";
+      <th>Edit</th>";
 echo "
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=list_order,lastname,firstname$f_filter\" title=\"Sorter på instrumentgruppe...\">Instrument</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=firstname,lastname$f_filter\" title=\"Sorter på fornavn...\">For</a>/
+      <th><a href=\"$php_self?_sort=list_order,lastname,firstname$f_filter\" title=\"Sorter på instrumentgruppe...\">Instrument</a></th>
+      <th><a href=\"$php_self?_sort=firstname,lastname$f_filter\" title=\"Sorter på fornavn...\">For</a>/
                           <a href=\"$php_self?_sort=lastname,firstname$f_filter\" title=\"Sorter på etternavn...\">Etternavn</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=address,lastname,firstname$f_filter\" title=\"Sorter på addresse...\">Adresse</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=postcode,lastname,firstname$f_filter\" title=\"Sorter på postnummer...\">Postnr</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=city,lastname,firstname$f_filter\" title=\"Sorter på sted...\">Sted</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=email$f_filter\" title=\"Sorter på email...\">Mail</a></th>
-      <th bgcolor=#A6CAF0>Mobil</th>
-      <th bgcolor=#A6CAF0>Priv</th>
-      <th bgcolor=#A6CAF0>Arbeid</th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=status,list_order,lastname,firstname$f_filter\" title=\"Sorter på status...\">Status</a></th>
-      <th bgcolor=#A6CAF0>Kommentar</th>
+      <th><a href=\"$php_self?_sort=address,lastname,firstname$f_filter\" title=\"Sorter på addresse...\">Adresse</a></th>
+      <th><a href=\"$php_self?_sort=postcode,lastname,firstname$f_filter\" title=\"Sorter på postnummer...\">Postnr</a></th>
+      <th><a href=\"$php_self?_sort=city,lastname,firstname$f_filter\" title=\"Sorter på sted...\">Sted</a></th>
+      <th><a href=\"$php_self?_sort=email$f_filter\" title=\"Sorter på email...\">Mail</a></th>
+      <th>Mobil</th>
+      <th>Priv</th>
+      <th>Arbeid</th>
+      <th><a href=\"$php_self?_sort=status,list_order,lastname,firstname$f_filter\" title=\"Sorter på status...\">Status</a></th>
+      <th>Kommentar</th>
       </tr>";
 
 reset($result);

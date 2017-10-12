@@ -85,13 +85,13 @@ echo "
     <tr>";
 if ($access->auth(AUTH::PLAN_RW))
    echo "
-      <th bgcolor=#A6CAF0>Edit</th>";
+      <th>Edit</th>";
 echo "
-      <th bgcolor=#A6CAF0>Dato</th>
-      <th bgcolor=#A6CAF0>Prøvetid</th>
-      <th bgcolor=#A6CAF0>Lokale</th>
-      <th bgcolor=#A6CAF0>Prosjekt</th>
-      <th bgcolor=#A6CAF0>Merknad</th>
+      <th>Dato</th>
+      <th>Prøvetid</th>
+      <th>Lokale</th>
+      <th>Prosjekt</th>
+      <th>Merknad</th>
     </tr>";
 
 $hlp_date = "Format: <dato>. <mnd> [<år>] Merk: Måned på engelsk. Eksempel: 12. dec";

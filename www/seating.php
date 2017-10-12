@@ -150,11 +150,11 @@ if ($access->auth(AUTH::SEAT))
     <form action='$php_self' method=post>
     <table border=1>
     <tr>
-      <th bgcolor=#A6CAF0>Edit</th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?id_project=".request('id_project')."&_sort=firstname,lastname\">Navn</a></th>
-      <th bgcolor=#A6CAF0>Instrument</th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?id_project=".request('id_project')."&_sort=position,list_order,firstname,lastname\">Plass</a></th>
-      <th bgcolor=#A6CAF0>Kommentar</th>
+      <th>Edit</th>
+      <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=firstname,lastname\">Navn</a></th>
+      <th>Instrument</th>
+      <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=position,list_order,firstname,lastname\">Plass</a></th>
+      <th>Kommentar</th>
       </tr>";
 
 

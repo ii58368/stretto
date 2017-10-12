@@ -71,15 +71,15 @@ echo "
     <tr>";
 if ($access->auth(AUTH::PRJ))
    echo "
-      <th bgcolor=#A6CAF0>Edit</th>";
+      <th>Edit</th>";
 echo "
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=name,id\" title=\"Sorter p&aring; prosjektnavn\">Prosjekt</a></th>
-      <th bgcolor=#A6CAF0 nowrap><a href=\"$php_self?_sort=year,semester+DESC,id\" title=\"Sorter p&aring; semester\">Sem</a></th>
-      <th bgcolor=#A6CAF0>Status</th>
-      <th bgcolor=#A6CAF0>På-/avm.frist</th>
-      <th bgcolor=#A6CAF0>Tutti</th>
-      <th bgcolor=#A6CAF0>På-/avmeld.</th>
-      <th bgcolor=#A6CAF0>Generell info</th>
+      <th><a href=\"$php_self?_sort=name,id\" title=\"Sorter p&aring; prosjektnavn\">Prosjekt</a></th>
+      <th nowrap><a href=\"$php_self?_sort=year,semester+DESC,id\" title=\"Sorter p&aring; semester\">Sem</a></th>
+      <th>Status</th>
+      <th>På-/avm.frist</th>
+      <th>Tutti</th>
+      <th>På-/avmeld.</th>
+      <th>Generell info</th>
     </tr>";
 
 

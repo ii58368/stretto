@@ -6,11 +6,11 @@ include 'framework.php';
 echo "<h1>Spilleplan for " . $whoami->name() . "</h1>\n";
 
 echo "<table><tr>
-      <th bgcolor=#A6CAF0>Dato</th>
-      <th bgcolor=#A6CAF0>Prøvetid</th>
-      <th bgcolor=#A6CAF0>Lokale</th>
-      <th bgcolor=#A6CAF0>Prosjekt</th>
-      <th bgcolor=#A6CAF0>Merknad</th>
+      <th>Dato</th>
+      <th>Prøvetid</th>
+      <th>Lokale</th>
+      <th>Prosjekt</th>
+      <th>Merknad</th>
     </tr>";
 
 

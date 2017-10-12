@@ -40,9 +40,9 @@ echo "
     <h2>".$prj['name']." ".$prj['semester']."-".$prj['year']."</h2>
     <table border=1>
     <tr>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?id_project=".request('id_project')."&_sort=firstname,lastname\">Navn</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?id_project=".request('id_project')."&_sort=list_order,firstname,lastname\">Instrument</a></th>
-      <th bgcolor=#A6CAF0>Status</th>\n";
+      <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=firstname,lastname\">Navn</a></th>
+      <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=list_order,firstname,lastname\">Instrument</a></th>
+      <th>Status</th>\n";
 
 $query = "select id, date from plan "
         . "where id_project = ".request('id_project')." "
@@ -54,9 +54,9 @@ foreach ($stmt as $e)
 {
    $rehersal = strftime('%a %e.%b', $e['date']);
    if ($access->auth(AUTH::ABS_RW))
-      echo "<th bgcolor=#A6CAF0><a href=\"absenceEdit.php?id_plan=".$e['id']."\" title=\"Klikk for å registrere fravær...\">$rehersal</a></th>";
+      echo "<th><a href=\"absenceEdit.php?id_plan=".$e['id']."\" title=\"Klikk for å registrere fravær...\">$rehersal</a></th>";
    else
-      echo "<th bgcolor=#A6CAF0>$rehersal</th>";
+      echo "<th>$rehersal</th>";
 }
 
 if ($access->auth(AUTH::ABS_ALL))

@@ -20,12 +20,12 @@ echo "
     <tr>";
 if ($access->auth(AUTH::GRP))
    echo "
-      <th bgcolor=#A6CAF0>Edit</th>";
+      <th>Edit</th>";
 echo "
-      <th bgcolor=#A6CAF0>Navn</th>
-      <th bgcolor=#A6CAF0>Ansvarlig</th>
-      <th bgcolor=#A6CAF0>Medlemmer/Instrumentgrupper</th>
-      <th bgcolor=#A6CAF0>Kommentar</th>
+      <th>Navn</th>
+      <th>Ansvarlig</th>
+      <th>Medlemmer/Instrumentgrupper</th>
+      <th>Kommentar</th>
       </tr>";
 
 function member_select($id_groups)

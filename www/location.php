@@ -19,13 +19,13 @@ echo "
     <tr>";
 if ($access->auth(AUTH::LOC))
    echo "
-      <th bgcolor=#A6CAF0>Edit</th>";
+      <th>Edit</th>";
 echo "
-      <th bgcolor=#A6CAF0>Lokale</th>
-      <th bgcolor=#A6CAF0>Adresse</th>
-      <th bgcolor=#A6CAF0>URL</th>
-      <th bgcolor=#A6CAF0>Kontaktperson</th>
-      <th bgcolor=#A6CAF0>Kommentar</th>
+      <th>Lokale</th>
+      <th>Adresse</th>
+      <th>URL</th>
+      <th>Kontaktperson</th>
+      <th>Kommentar</th>
       </tr>";
 
 if ($action == 'new')

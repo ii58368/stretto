@@ -19,15 +19,15 @@ echo "
     <tr>";
 if ($access->auth(AUTH::LEAVE_RW))
    echo "
-      <th bgcolor=#A6CAF0>Edit</th>";
+      <th>Edit</th>";
 echo "
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=ts_reg\">Registrert</a></th>
-      <th bgcolor=#A6CAF0>Navn</th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=status,ts_reg\">Status</a></th>
-      <th bgcolor=#A6CAF0>Endret</th>
-      <th bgcolor=#A6CAF0>Fra</th>
-      <th bgcolor=#A6CAF0>Til</th>
-      <th bgcolor=#A6CAF0>Tekst</th>
+      <th><a href=\"$php_self?_sort=ts_reg\">Registrert</a></th>
+      <th>Navn</th>
+      <th><a href=\"$php_self?_sort=status,ts_reg\">Status</a></th>
+      <th>Endret</th>
+      <th>Fra</th>
+      <th>Til</th>
+      <th>Tekst</th>
       </tr>";
 
 function select_person($selected)

@@ -71,13 +71,13 @@ echo "
     <input type=submit value=Lagre $style>
     <table border=1>
     <tr>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?id_plan=" . request('id_plan') . "&_sort=firstname,lastname\">Navn</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?id_plan=" . request('id_plan') . "&_sort=list_order,firstname,lastname\">Instrument</a></th>\n";
+      <th><a href=\"$php_self?id_plan=" . request('id_plan') . "&_sort=firstname,lastname\">Navn</a></th>
+      <th><a href=\"$php_self?id_plan=" . request('id_plan') . "&_sort=list_order,firstname,lastname\">Instrument</a></th>\n";
 
 for ($i = 0; $i < sizeof($db->abs_stat); $i++)
-   echo "<th bgcolor=#A6CAF0>" . $db->abs_stat[$i] . "</th>\n";
+   echo "<th>" . $db->abs_stat[$i] . "</th>\n";
 
-echo "<th bgcolor=#A6CAF0>Kommentar</th>\n</tr>\n";
+echo "<th>Kommentar</th>\n</tr>\n";
 
 $query = "SELECT participant.id_person as id_person, firstname, lastname, "
         . "person.status as status, instrument, plan.id as id_plan "

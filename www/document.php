@@ -102,11 +102,11 @@ echo "
     <tr>";
 if (this_access_rw())
    echo "
-      <th bgcolor=#A6CAF0>Edit</th>";
+      <th>Edit</th>";
 echo "
-      <th bgcolor=#A6CAF0>File</th>
-      <th bgcolor=#A6CAF0>Size</th>
-      <th bgcolor=#A6CAF0>Last modified</th>
+      <th>File</th>
+      <th>Size</th>
+      <th>Last modified</th>
       </tr>";
 
 if ($action == 'new')

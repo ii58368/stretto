@@ -30,10 +30,10 @@ $row = $stmt->fetch(PDO::FETCH_ASSOC);
   echo "</h1>".$row['comment']."<p>";
 
   echo "<table border=1>";
-  echo "<th bgcolor=#A6CAF0>Prosjekt</th>";
-  echo "<th bgcolor=#A6CAF0>Semester</th>";
-  echo "<th bgcolor=#A6CAF0>Status</th>";
-  echo "<th bgcolor=#A6CAF0>Kommentar</th>";
+  echo "<th>Prosjekt</th>";
+  echo "<th>Semester</th>";
+  echo "<th>Status</th>";
+  echo "<th>Kommentar</th>";
 
   $query = "select person.id as id_person, id_project, participant.stat_dir as status, participant.comment_dir as comment, " .
            "semester, year, project.name as name " .

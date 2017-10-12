@@ -45,9 +45,9 @@ function shift_list()
    echo "
     <table border=1>
     <tr>
-      <th bgcolor=#A6CAF0>Navn</th>
-      <th bgcolor=#A6CAF0>Instrument</th>
-      <th bgcolor=#A6CAF0>Mobil</th>
+      <th>Navn</th>
+      <th>Instrument</th>
+      <th>Mobil</th>
     </tr>";
 
 
@@ -115,11 +115,11 @@ Regissøren vil ikke ha beskjed dersom du ikke har anledning til å komme når h
 <p>
     <table border=1>
     <tr>
-      <th bgcolor=#A6CAF0>Dato</th>
-      <th bgcolor=#A6CAF0>Tid</th>
-      <th bgcolor=#A6CAF0>Sted</th>
-      <th bgcolor=#A6CAF0>Ansvarlig</th>
-      <th bgcolor=#A6CAF0>Hva skjer?</th>
+      <th>Dato</th>
+      <th>Tid</th>
+      <th>Sted</th>
+      <th>Ansvarlig</th>
+      <th>Hva skjer?</th>
     </tr>";
 
 

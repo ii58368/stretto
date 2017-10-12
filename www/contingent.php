@@ -8,13 +8,13 @@ echo "
     <h1>Medlemskontingent</h1>
     <table border=1>
     <tr>
-      <th bgcolor=#A6CAF0>
+      <th>
          <a href=\"$php_self?_sort=firstname,lastname\" title=\"Sorter p&aring; fornavn...\">Fornavn</a>/
          <a href=\"$php_self?_sort=lastname,firstname\" title=\"Sorter p&aring; etternavn...\">Etternavn</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=list_order,lastname,firstname\" title=\"Sorter p&aring; instrumentgruppe...\">Instrument</a></th>\n";
+      <th><a href=\"$php_self?_sort=list_order,lastname,firstname\" title=\"Sorter p&aring; instrumentgruppe...\">Instrument</a></th>\n";
 
 for ($i = $sel_year; $i <= $end_year; $i++)
-   echo "<th bgcolor=#A6CAF0>$i</td>\n";
+   echo "<th>$i</td>\n";
 echo "</tr>";
 
 if (is_null($sort))
@@ -31,8 +31,8 @@ $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
-   echo "<tr><td bgcolor=#A6CAF0>".$row['firstname']." ".$row['middlename']." ".$row['lastname']."</a>\n";
-   echo "</td><td bgcolor=#A6CAF0>".$row['instrument']."</td>\n";
+   echo "<tr><td>".$row['firstname']." ".$row['middlename']." ".$row['lastname']."</a>\n";
+   echo "</td><td>".$row['instrument']."</td>\n";
 
    for ($i = $sel_year; $i <= $end_year; $i++)
    {

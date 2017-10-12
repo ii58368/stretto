@@ -19,12 +19,12 @@ echo "
     <tr>";
 if ($access->auth(AUTH::INSTR))
    echo "
-      <th bgcolor=#A6CAF0>Edit</th>";
+      <th>Edit</th>";
 echo "
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=instrument,list_order\">Instrument</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=list_order\">Sortering</a></th>
-      <th bgcolor=#A6CAF0>Ansvarlig</th>
-      <th bgcolor=#A6CAF0>Kommentar</th>
+      <th><a href=\"$php_self?_sort=instrument,list_order\">Instrument</a></th>
+      <th><a href=\"$php_self?_sort=list_order\">Sortering</a></th>
+      <th>Ansvarlig</th>
+      <th>Kommentar</th>
       </tr>";
 
 function select_groups($selected)

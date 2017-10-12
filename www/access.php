@@ -24,10 +24,10 @@ echo "
     <h1>Tilgang</h1>
     <table border=1>
     <tr>
-      <th bgcolor=#A6CAF0><a href=$php_self?_sort=firstname,lastname,$sort_view title=\"Sorter p&aring; fornavn\">Fornavn</a>/
+      <th><a href=$php_self?_sort=firstname,lastname,$sort_view title=\"Sorter p&aring; fornavn\">Fornavn</a>/
                           <a href=$php_self?_sort=lastname,firstname,$sort_view title=\"Sorter p&aring; etternavn\">Etternavn</a></th>
-      <th bgcolor=#A6CAF0><a href=$php_self?_sort=list_order,lastname,firstname,$sort_view title=\"Sorter p&aring; instrumentgruppe\">Instrument</a></th>
-      <th bgcolor=#A6CAF0><a href=$php_self?_sort=status,list_order,lastname,firstname,$sort_view title=\"Sorter p&aring; status\">Status</a></th>";
+      <th><a href=$php_self?_sort=list_order,lastname,firstname,$sort_view title=\"Sorter p&aring; instrumentgruppe\">Instrument</a></th>
+      <th><a href=$php_self?_sort=status,list_order,lastname,firstname,$sort_view title=\"Sorter p&aring; status\">Status</a></th>";
  
 $query  = "SELECT name " .
           "FROM view " .
@@ -35,7 +35,7 @@ $query  = "SELECT name " .
 $stmt = $db->query($query);
 
 foreach($stmt as $row)
-  echo "<th bgcolor=#A6CAF0>".$row['name']."</td>";
+  echo "<th>".$row['name']."</td>";
 echo "</tr><tr>";
 
 $query  = "SELECT person.id as person_id, " .
@@ -55,9 +55,9 @@ foreach($stmt as $row)
 {
   if ($row['person_id'] != $prev_id)
   {
-    echo "</tr><tr><td bgcolor=#A6CAF0>".$row['firstname']." ".$row['lastname'];   
-    echo "</td><td bgcolor=#A6CAF0>".$row['instrument']."</td>";
-    echo "</td><td bgcolor=#A6CAF0>" . $db->per_stat[$row['status']] . "</td>";
+    echo "</tr><tr><td>".$row['firstname']." ".$row['lastname'];   
+    echo "</td><td>".$row['instrument']."</td>";
+    echo "</td><td>" . $db->per_stat[$row['status']] . "</td>";
     $prev_id = $row['person_id'];
   }
   $query  = "SELECT auth_person.ts as ts, "

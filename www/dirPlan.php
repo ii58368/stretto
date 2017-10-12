@@ -213,14 +213,14 @@ echo "
     <tr>";
 if ($access->auth(AUTH::DIR_RW))
    echo "
-      <th bgcolor=#A6CAF0>Edit</th>";
+      <th>Edit</th>";
 echo "
-      <th bgcolor=#A6CAF0>Dato</th>
-      <th bgcolor=#A6CAF0>Tid</th>
-      <th bgcolor=#A6CAF0>Sted</th>
-      <th bgcolor=#A6CAF0>Prosjekt</th>
-      <th bgcolor=#A6CAF0>Ansvarlig</th>
-      <th bgcolor=#A6CAF0>Merknad</th>
+      <th>Dato</th>
+      <th>Tid</th>
+      <th>Sted</th>
+      <th>Prosjekt</th>
+      <th>Ansvarlig</th>
+      <th>Merknad</th>
     </tr>";
 
 

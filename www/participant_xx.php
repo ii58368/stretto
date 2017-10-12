@@ -33,11 +33,11 @@ echo "
     <h1>Prosjektressurser</h1>
     <table border=1>
     <tr>
-      <th bgcolor=#A6CAF0>
+      <th>
          <a href=\"$php_self?_sort=firstname,lastname\" title=\"Sorter på fornavn...\">Fornavn</a>/
          <a href=\"$php_self?_sort=lastname,firstname\" title=\"Sorter på etternavn...\">Etternavn</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=list_order,lastname,firstname\" title=\"Sorter på instrumentgruppe...\">Instrument</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=status,list_order,lastname,firstname\" title=\"Sorter på medlemsstatus...\">Status</a></th>\n";
+      <th><a href=\"$php_self?_sort=list_order,lastname,firstname\" title=\"Sorter på instrumentgruppe...\">Instrument</a></th>
+      <th><a href=\"$php_self?_sort=status,list_order,lastname,firstname\" title=\"Sorter på medlemsstatus...\">Status</a></th>\n";
 
 $query = "SELECT id, name, semester, year " .
         "FROM project " .
@@ -46,7 +46,7 @@ $query = "SELECT id, name, semester, year " .
 $stmt = $db->query($query);
 
 foreach ($stmt as $row)
-   echo "<th bgcolor=#A6CAF0><a href=\"participant_x1.php?id=".$row['id']."\">".$row['name']."<br>".$row['semester'],$row['year']."</a></td>\n";
+   echo "<th><a href=\"participant_x1.php?id=".$row['id']."\">".$row['name']."<br>".$row['semester'],$row['year']."</a></td>\n";
 echo "</tr><tr>";
 
 if (is_null($sort))
@@ -71,9 +71,9 @@ foreach ($stmt as $row)
 {
    if ($row['person_id'] != $prev_id)
    {
-      echo "</tr><tr><td bgcolor=#A6CAF0 nowrap><a href=\"participant_1x.php?id=".$row['person_id']."\">".$row['firstname']." ".$row['lastname']."</a>\n";
-      echo "</td><td bgcolor=#A6CAF0> ".$row['instrument']." </td>\n";
-      echo "</td><td bgcolor=#A6CAF0> ".$db->per_stat[$row['status']]." </td>\n";
+      echo "</tr><tr><td nowrap><a href=\"participant_1x.php?id=".$row['person_id']."\">".$row['firstname']." ".$row['lastname']."</a>\n";
+      echo "</td><td> ".$row['instrument']." </td>\n";
+      echo "</td><td> ".$db->per_stat[$row['status']]." </td>\n";
       $prev_id = $row['person_id'];
    }
 

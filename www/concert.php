@@ -20,14 +20,14 @@ echo "
     <tr>";
 if ($access->auth(AUTH::CONS))
    echo "
-      <th bgcolor=#A6CAF0>Edit</th>";
+      <th>Edit</th>";
 echo "
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=ts\">Dato</a></th>
-      <th bgcolor=#A6CAF0>Tid</th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=id_project,ts\">Prosjekt</a></th>
-      <th bgcolor=#A6CAF0>Lokale</th>
-      <th bgcolor=#A6CAF0>Overskrift</th>
-      <th bgcolor=#A6CAF0>Tekst</th>
+      <th><a href=\"$php_self?_sort=ts\">Dato</a></th>
+      <th>Tid</th>
+      <th><a href=\"$php_self?_sort=id_project,ts\">Prosjekt</a></th>
+      <th>Lokale</th>
+      <th>Overskrift</th>
+      <th>Tekst</th>
       </tr>";
 
 function select_project($selected)

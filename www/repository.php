@@ -58,14 +58,14 @@ echo "
     <tr>";
 if ($access->auth(AUTH::REP))
    echo "
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=id+DESC&id_project=$id_project&search=$search\">Edit</a></th>";
+      <th><a href=\"$php_self?_sort=id+DESC&id_project=$id_project&search=$search\">Edit</a></th>";
 echo "
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=lastname,firstname,title&id_project=$id_project&search=$search\">Komponist</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=title,lastname,firstname&id_project=$id_project&search=$search\">Tittle</a></th>
-      <th bgcolor=#A6CAF0>Fra</th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=archive,tag&id_project=$id_project&search=$search\">Arkivref</a></th>
-      <th bgcolor=#A6CAF0>Kommentar</th>
-      <th bgcolor=#A6CAF0>\n";
+      <th><a href=\"$php_self?_sort=lastname,firstname,title&id_project=$id_project&search=$search\">Komponist</a></th>
+      <th><a href=\"$php_self?_sort=title,lastname,firstname&id_project=$id_project&search=$search\">Tittle</a></th>
+      <th>Fra</th>
+      <th><a href=\"$php_self?_sort=archive,tag&id_project=$id_project&search=$search\">Arkivref</a></th>
+      <th>Kommentar</th>
+      <th>\n";
 if ($access->auth(AUTH::REP))
    select_project();
 else

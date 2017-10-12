@@ -20,12 +20,12 @@ echo "
     <tr>";
 if ($access->auth(AUTH::ACCGRP))
    echo "
-      <th bgcolor=#A6CAF0>Edit</th>";
+      <th>Edit</th>";
 echo "
-      <th bgcolor=#A6CAF0>Navn</th>
-      <th bgcolor=#A6CAF0>Kommentar</th>";
+      <th>Navn</th>
+      <th>Kommentar</th>";
 for ($i = 0; $i < AUTH::NO_VIEWS; $i++)
-   echo "<th bgcolor=#A6CAF0>" . $i . "</th>";
+   echo "<th>" . $i . "</th>";
 echo "</tr>";
 
 if ($action == 'new')

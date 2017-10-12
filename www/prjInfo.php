@@ -39,10 +39,10 @@ echo "</table><p>\n";
 echo "<h3>Prøveplan</h3>
     <table border=0>
     <tr>
-      <th bgcolor=#A6CAF0>Dato</th>
-      <th bgcolor=#A6CAF0>Prøvetid</th>
-      <th bgcolor=#A6CAF0>Lokale</th>
-      <th bgcolor=#A6CAF0>Merknad</th>
+      <th>Dato</th>
+      <th>Prøvetid</th>
+      <th>Lokale</th>
+      <th>Merknad</th>
     </tr>";
 
 $query = "SELECT date, time, " .

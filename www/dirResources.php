@@ -59,17 +59,17 @@ echo "
     <tr>";
 if ($access->auth(AUTH::DIR_RW))
    echo "
-      <th bgcolor=#A6CAF0>Edit</th>";
+      <th>Edit</th>";
 echo "
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=list_order,lastname,firstname\">Instrument</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=firstname,lastname\">For</a>/
+      <th><a href=\"$php_self?_sort=list_order,lastname,firstname\">Instrument</a></th>
+      <th><a href=\"$php_self?_sort=firstname,lastname\">For</a>/
                           <a href=\"$php_self?_sort=lastname,firstname\">Etternavn</a></th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=email\">Mail</a>";
+      <th><a href=\"$php_self?_sort=email\">Mail</a>";
 echo "</th>
-      <th bgcolor=#A6CAF0>Mobil</th>
-      <th bgcolor=#A6CAF0><a href=\"$php_self?_sort=status,list_order,lastname,firstname\">Medlemsstatus</a></th>
-      <th bgcolor=#A6CAF0>Registatus</th>
-      <th bgcolor=#A6CAF0>Merknad</th>
+      <th>Mobil</th>
+      <th><a href=\"$php_self?_sort=status,list_order,lastname,firstname\">Medlemsstatus</a></th>
+      <th>Registatus</th>
+      <th>Merknad</th>
       </tr>";
 
 

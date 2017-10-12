@@ -262,7 +262,7 @@ echo "<a href=\"person.php\" title=\"Til adresselisten...\"><img src=\"images/in
 if ($access->auth(AUTH::MEMB_RW))
    echo "<a href=\"$php_self?_sort=$sort&_action=edit_pers\" title=\"Registrere ny person...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
 echo "<table border=0>
-    <tr bgcolor=#A6CAF0>
+    <tr>
       <th>Personalia</th>
       <form action='$php_self' method=post>";
 
@@ -364,7 +364,7 @@ if (!is_null($no))
    echo "
     <p>
     <table border=0>
-    <tr bgcolor=#A6CAF0>
+    <tr>
       <th>Innlogging</th>
       <form action='$php_self' method=post>";
 
@@ -425,11 +425,11 @@ echo "
     <tr>";
 if ($access->auth(AUTH::MEMB_RW))
    echo "
-      <th bgcolor=#A6CAF0>Edit</th>";
+      <th>Edit</th>";
 echo "
-      <th bgcolor=#A6CAF0>Dato</th>
-      <th bgcolor=#A6CAF0>Status</th>
-      <th bgcolor=#A6CAF0>Tekst</th>
+      <th>Dato</th>
+      <th>Status</th>
+      <th>Tekst</th>
       </tr>";
 
 $rno = request('_rno');

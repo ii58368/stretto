@@ -44,11 +44,11 @@ echo "
     <form action='$php_self' method=post>
     <table border=1>
     <tr>
-      <th bgcolor=#A6CAF0>Prosjekt</th>
-      <th bgcolor=#A6CAF0>Sem</th>
-      <th bgcolor=#A6CAF0>Status</th>
-      <th bgcolor=#A6CAF0>Påmelding-/persmisjonsfrist</th>
-      <th bgcolor=#A6CAF0>Tutti</th>
+      <th>Prosjekt</th>
+      <th>Sem</th>
+      <th>Status</th>
+      <th>Påmelding-/persmisjonsfrist</th>
+      <th>Tutti</th>
     </tr>";
 
 
