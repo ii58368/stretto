@@ -26,7 +26,8 @@ class PDF extends PDF_util
 
       $this->SetTextColor(0, 0, 200);
       $this->setFontSize(30);
-      $this->Cell(60, 20, "Gruppeoppsett ".$e['name']);
+      $text = "Gruppeoppsett ".$e['name'];
+      $this->Cell(60, 20, $this->sconv($text));
       $this->SetFontSize(20);
       $this->SetTextColor(0, 0, 0);
       $this->Ln();
@@ -35,7 +36,8 @@ class PDF extends PDF_util
       $stmt = $db->query($query);
       $e = $stmt->fetch(PDO::FETCH_ASSOC);
 
-      $this->Cell(60, 0, $e['name']." (".$e['semester']."-".$e['year']);
+      $text = $e['name']." (".$e['semester']."-".$e['year'].")";
+      $this->Cell(60, 0, $this->sconv($text));
 
       $this->Ln();
      
