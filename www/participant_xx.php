@@ -39,9 +39,16 @@ echo "
       <th><a href=\"$php_self?_sort=list_order,lastname,firstname\" title=\"Sorter på instrumentgruppe...\">Instrument</a></th>
       <th><a href=\"$php_self?_sort=status,list_order,lastname,firstname\" title=\"Sorter på medlemsstatus...\">Status</a></th>\n";
 
+$qperiod = "(project.year > " . $season->year() . " " .
+        "  or (project.year = " . $season->year() . " ";
+if ($season->semester() == 'H')
+   $qperiod .= "and project.semester = '" . $season->semester() . "' ";
+$qperiod .= "))";
+
+
 $query = "SELECT id, name, semester, year " .
         "FROM project " .
-        "where year >= " . $season->year() . " " .
+        "where $qperiod " .
         "order by year, semester DESC, project.id";
 $stmt = $db->query($query);
 
@@ -61,7 +68,7 @@ $query = "SELECT person.id as person_id, " .
         "FROM person, instruments, project " .
         "where instruments.id = id_instruments " .
         "and not person.status = $db->per_stat_quited " .
-        "and project.year >= " . $season->year() . " " .
+        "and $qperiod " .
         "order by $sort, year, semester DESC, project.id";
 $stmt = $db->query($query);
 
