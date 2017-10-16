@@ -146,7 +146,7 @@ class MENU
          $direction->add("Ressurser", "dirResources.php", AUTH::BOARD_RO);
          $direction->add("Turnus", "dirShift.php", AUTH::BOARD_RO);
          $direction->add("Prosjekt", "dirProject.php", AUTH::BOARD_RO);
-         $direction->add("Regiplan", "dirPlan.php?id_project=%", AUTH::BOARD_RO);
+         $direction->add("Regiplan", "dirPlan.php", AUTH::BOARD_RO);
       }
       {
          global $prj_name;
@@ -312,9 +312,11 @@ class MENU
          $last_year = $year;
       }
 
-      echo "<a href=\"$php_self" . $this->url() . "\" title=\"forrige semester...\" onClick=\"set_cookie('semester', '{$op_sem}.{$last_year}'); return true;\"><img src=\"images/left.gif\" height=20 border=0 ></a>\n";
-      echo $sem . $year;
-      echo "<a href=\"$php_self" . $this->url() . "\" title=\"neste semester...\" onClick=\"set_cookie('semester', '{$op_sem}.{$next_year}'); return true;\"><img src=\"images/right.gif\" height=20 border=0></a>\n";
+      echo "<table id=\"season\"><tr>";
+      echo "<td><a href=\"$php_self" . $this->url() . "\" title=\"forrige semester...\" onClick=\"set_cookie('semester', '{$op_sem}.{$last_year}'); return true;\"><img src=\"images/left.gif\" height=20 border=0 ></a></td>\n";
+      echo "<td>$sem$year</td>\n";
+      echo "<td><a href=\"$php_self" . $this->url() . "\" title=\"neste semester...\" onClick=\"set_cookie('semester', '{$op_sem}.{$next_year}'); return true;\"><img src=\"images/right.gif\" height=20 border=0></a></td>\n";
+      echo "</tr></table>";
    }
 
 }

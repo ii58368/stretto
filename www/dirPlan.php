@@ -2,6 +2,8 @@
 
 include 'framework.php';
 
+$id_project = request('id_project');
+
 function select_tsort($selected)
 {
    echo "<select name=tsort title=\"Sorteringsrekkef&oslash;lge dersom dette en av flere aktiviteter p&aring; samme dato\">";
@@ -240,7 +242,7 @@ if ($action == 'new')
    echo "<br><input type=text size=22 name=location>";
    echo "</td>
     <td>";
-   select_project(request('id_project'));
+   select_project($id_project);
    echo "
   </td>
     <td></td>
@@ -256,14 +258,14 @@ if ($action == 'update' && $access->auth(AUTH::DIR_RW))
    {
       if (is_null($no))
       {
-         $query2 = "select id_person from project where id = " . request('id_project');
+         $query2 = "select id_person from project where id = $id_project";
          $stmt = $db->query($query2);
          $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
          $query = "insert into plan (date, tsort, time, id_location, location, id_project, " .
                  "id_responsible, responsible, comment, event_type) " .
                  "values ($ts, " . request('tsort') . ", '" . request('time') . "', " .
-                 request('id_location') . ", " . $db->qpost('location') . ", " . request('id_project') . ", " . $row['id_person'] . ", " .
+                 request('id_location') . ", " . $db->qpost('location') . ", $id_project, " . $row['id_person'] . ", " .
                  "'Regikomité', " . $db->qpost('comment') . ", $db->plan_evt_direction)";
       }
       else
@@ -281,7 +283,7 @@ if ($action == 'update' && $access->auth(AUTH::DIR_RW))
                     "tsort = " . request('tsort') . "," .
                     "id_location = " . request('id_location') . "," .
                     "location = " . $db->qpost('location') . "," .
-                    "id_project = " . request('id_project') . "," .
+                    "id_project = $id_project," .
                     "id_responsible = " . request('id_responsible') . "," .
                     "responsible = " . $db->qpost('responsible') . "," .
                     "comment = " . $db->qpost('comment') . "," .
@@ -302,7 +304,7 @@ if ($action == 'add' && $access->auth(AUTH::DIR_RW))
            "from participant, project " .
            "where participant.id_project = project.id " .
            "and participant.stat_dir = $db->shi_stat_confirmed " .
-           "and project.id = " . request('id_project');
+           "and project.id = $id_project";
 
    $stmt = $db->query($query);
    foreach ($stmt as $row)
@@ -323,8 +325,6 @@ if ($action == 'add' && $access->auth(AUTH::DIR_RW))
    }
 }
 
-$cur_year = (request('id_project') == '%') ? date("Y") : 0;
-$event_type = request('rehearsal') ? "" : "and plan.event_type = $db->plan_evt_direction ";
 
 $query = "SELECT plan.id as id, date, time, tsort, id_project, event_type, " .
         "id_location, plan.location as location, location.name as lname, " .
@@ -333,11 +333,15 @@ $query = "SELECT plan.id as id, date, time, tsort, id_project, event_type, " .
         "FROM person, project, plan, location " .
         "where id_location = location.id " .
         "and id_project = project.id " .
-        "and id_responsible = person.id " .
-        "and plan.id_project like '" . request('id_project') . "' " .
-        $event_type .
-        "and project.year >= $cur_year " .
-        "order by date,tsort,time";
+        "and id_responsible = person.id ";
+if (!is_null($id_project))
+   $query .= "and plan.id_project = $id_project ";
+else
+   $query .= "and project.year = ".$season->year()." " .
+        "and project.semester = '".$season->semester()."' ";
+if (is_null(request('rehearsal')))
+   $query .= "and plan.event_type = $db->plan_evt_direction ";
+$query .= "order by date,tsort,time";
 
 $stmt = $db->query($query);
 
@@ -352,7 +356,7 @@ foreach ($stmt as $row)
          echo "<td><center>";
          if ($row['event_type'] == $db->plan_evt_direction)
             echo "
-               <a href=\"$php_self?_action=view&_no=" . $row['id'] . "&id_project=" . request('id_project') . "$reh\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>";
+               <a href=\"$php_self?_action=view&_no=" . $row['id'] . "&id_project=".$row['id_project']."$reh\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>";
          echo "</center></td>";
       }
       echo
