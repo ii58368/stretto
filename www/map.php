@@ -10,6 +10,9 @@ $id_groups = request('id_groups');
 $id_project = request('id_project');
 $id_template = request('template');
 
+if (is_null($id_template))
+   $id_template = 0;
+
 function draw_chair($img, $x, $y, $a, $w, $h, $ftext)
 {
    $black = imagecolorallocate($img, 0, 0, 0);

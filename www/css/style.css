@@ -8,6 +8,7 @@ h1 {
      	font-family: "Trebuchet MS", Arial, sans-serif;
 }
 */ 
+
 table, th, td {
 	border: 1px solid #D4E0EE;
 	border-collapse: collapse;
@@ -67,3 +68,9 @@ tfoot th, tfoot td {
 	font-size: 85%;
 }
 
+table#no_border td, tr {
+    color: inherit;
+    background-color: #fffcf5;
+    color: #b1aea6;
+    border: hidden;
+}

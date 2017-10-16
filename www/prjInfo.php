@@ -13,7 +13,7 @@ echo "<h1>Prosjektinfo</h1>
 echo str_replace("\n", "<br>\n", $prj['info']) . "\n";
 
 echo "<h3>Repertoar</h3>
-    <table border=0>\n";
+    <table id=\"no_border\">\n";
 
 $query = "SELECT title, work, firstname, lastname, "
         . " music.comment as comment, "
@@ -37,7 +37,7 @@ foreach ($stmt as $row)
 echo "</table><p>\n";
 
 echo "<h3>Prøveplan</h3>
-    <table border=0>
+    <table id=\"no_border\">
     <tr>
       <th>Dato</th>
       <th>Prøvetid</th>

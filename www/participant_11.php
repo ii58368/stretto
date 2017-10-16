@@ -55,7 +55,7 @@ echo "
     <h1>".$prj['name']." ".$prj['semester']."-".$prj['year']."</h1>\n";
 echo str_replace("\n", "<br>\n", $prj['info']) . "\n";
 echo "<h2>Spilleplan</h2>
-    <table border=0>
+    <table id=\"no_border\">
     <tr>
       <th>Dato</th>
       <th>Prøvetid</th>
@@ -97,7 +97,7 @@ echo "<form action=$php_self method=post>
    <input type=hidden name=_action value=update>
    <input type=hidden name=id_person value=$id_person>
    <input type=hidden name=id_project value=".request('id_project').">
-   <table border=0>
+   <table id=\"no_border\">
   <tr>
   <td>Navn:</td><td>".$pers['firstname']." ".$pers['lastname']."</td>
   </tr>

@@ -81,7 +81,7 @@ echo "<form action='$php_self' method=post>\n";
 
 if ($action == 'new')
 {
-   echo "<table border=0>
+   echo "<table id=\"no_border\">
     <tr>
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
@@ -158,7 +158,7 @@ foreach ($stmt as $row)
 {
    if ($row['id'] == $no)
    {
-      echo "<table border=0><tr>
+      echo "<table  id=\"no_border\"><tr>
     <td align=left><input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
     <input type=hidden name=_no value=$no>
@@ -193,7 +193,7 @@ foreach ($stmt as $row)
       }
       echo "  <tr>
     <font size=+2><b>" . $row['subject'] . "</b></font>
-    <table border=0><tr>
+    <table id=\"no_border\"><tr>
     <td><i>Fra:</i></td><td>" . $row['firstname'] . " " . $row['lastname'] . "</td>
     </tr><tr>
     <td><i>Dato:</i></td><td>" . strftime('%e.%b %Y', $row['ts_update']) . "</td>

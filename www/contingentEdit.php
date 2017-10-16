@@ -137,7 +137,7 @@ $ts = is_null(con('ts')) ? strtotime("now") : intval(con('ts'));
 echo "
     <h1><a href=contingent.php>Medlemskontingent " . request('year') . "</a></h1>
     <h2>" . $per['firstname'] . " " . $per['middlename'] . " " . $per['lastname'] . " (" . $per['instrument'] . ")</h2>
-    <table border=0>
+    <table id=\"no_border\">
       <form action='$php_self' method=post>
       <tr>
       <th colspan=2 align=left>

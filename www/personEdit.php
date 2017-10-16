@@ -261,7 +261,7 @@ echo "<h1>$person</h1>\n";
 echo "<a href=\"person.php\" title=\"Til adresselisten...\"><img src=\"images/index.gif\" border=0 hspace=5></a>\n";
 if ($access->auth(AUTH::MEMB_RW))
    echo "<a href=\"$php_self?_sort=$sort&_action=edit_pers\" title=\"Registrere ny person...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
-echo "<table border=0>
+echo "<table id=\"no_border\">
     <tr>
       <th>Personalia</th>
       <form action='$php_self' method=post>";
@@ -363,7 +363,7 @@ if (!is_null($no))
 {
    echo "
     <p>
-    <table border=0>
+    <table id=\"no_border\">
     <tr>
       <th>Innlogging</th>
       <form action='$php_self' method=post>";
@@ -421,7 +421,7 @@ if ($access->auth(AUTH::MEMB_RW))
     </form>";
 echo "
     <form action='$php_self' method=post>
-    <table border=1>
+    <table id=\"no_border\">
     <tr>";
 if ($access->auth(AUTH::MEMB_RW))
    echo "
