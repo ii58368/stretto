@@ -248,7 +248,10 @@ class MENU
 
       $q = "SELECT uid, firstname, lastname, instrument "
               . "FROM person, instruments "
-              . "where not person.status = $db->per_stat_quited "
+              . "where (person.status = $db->per_stat_member "
+              . "or person.status = $db->per_stat_standin "
+              . "or person.status = $db->per_stat_hired "
+              . "or person.status = $db->per_stat_eng) "
               . "and person.id_instruments = instruments.id "
               . "order by list_order, lastname, firstname";
       $s = $db->query($q);
