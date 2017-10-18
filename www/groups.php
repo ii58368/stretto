@@ -12,7 +12,7 @@ if ($access->auth(AUTH::GRP))
     <form action=\"$php_self\" method=post>
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=_action value=new>
-      <input type=submit value=\"Ny gruppe\">
+      <input type=submit value=\"Ny gruppe\" title=\"Definer en ny gruppe...\">
     </form>";
 echo "
     <form action='$php_self' method=post>
@@ -119,11 +119,11 @@ function person_select($selected)
 {
    global $db;
 
-   echo "<select name=id_person title=\"Angi hvem som er leder for gruppen\">";
+   echo "<select name=id_person title=\"Angi hvem som er leder/kontaktperson for gruppen\">";
 
    $q = "SELECT person.id as id, firstname, lastname, instrument FROM person, instruments " .
            "where person.id_instruments = instruments.id " .
-           "order by instrument, lastname, firstname";
+           "order by list_order, lastname, firstname";
 
    $s = $db->query($q);
 
@@ -164,15 +164,15 @@ if ($action == 'new')
    echo "  <tr>
     <td align=left><input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
-    <input type=submit value=ok></td>
-    <td><input type=text size=30 name=name></td>
+    <input type=submit value=ok title=\"Lagre ny gruppe\"></td>
+    <td><input type=text size=30 name=name title=\"Navn på gruppen\"></td>
     <td>";
    person_select(0);
    echo "</td><td>";
    member_select(0);
    echo "
     </td>
-    <td><textarea cols=60 rows=7 wrap=virtual name=comment></textarea></td>
+    <td><textarea cols=60 rows=7 wrap=virtual name=comment title=\"Fritekst\"></textarea></td>
   </tr>";
 }
 
@@ -263,16 +263,16 @@ foreach ($stmt as $row)
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
-    <th nowrap><input type=submit value=ok>
-      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette ".$row['name']."?');\"></th>
-    <th><input type=text size=30 name=name value=\"".$row['name']."\"></th>
-    <th>";
+    <td nowrap><input type=submit value=ok title=\"Lagre endringer\">
+      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette ".$row['name']."?');\" title=\"Slett gruppe\"></td>
+    <td><input type=text size=30 name=name value=\"".$row['name']."\" title=\"Navn på gruppen\"></td>
+    <td>";
       person_select($row['id_person']);
       echo "</td><td>";
       instruments_list($row['id']);
       member_select($no);
-      echo "</th>
-    <th><textarea cols=60 rows=7 wrap=virtual name=comment>".$row['comment']."</textarea></th>
+      echo "</td>
+    <td><textarea cols=60 rows=7 wrap=virtual name=comment title=\"Fritekst\">".$row['comment']."</textarea></td>
     </tr>";
    }
 }

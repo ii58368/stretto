@@ -21,7 +21,7 @@ function select_location($selected)
 {
    global $db;
 
-   echo "<select name=id_location>";
+   echo "<select name=id_location title=\"Velg prøvested fra listen over registrerte lokaler\">";
 
    $q = "SELECT id, name FROM location order by name";
    $s = $db->query($q);
@@ -40,7 +40,7 @@ function select_project($selected)
 {
    global $db;
 
-   echo "<select name=id_project>";
+   echo "<select name=id_project title=\"Velg hvilket prosjekt prøven gjelder for...\">";
 
    $year = date("Y");
    $q = "SELECT id, name, semester, year, orchestration FROM project " .
@@ -100,20 +100,20 @@ if ($action == 'new')
 {
    echo "<tr>
     <td align=left><input type=hidden name=_action value=update>
-    <input type=submit value=ok></td>
-    <th><input type=date size=10 name=date title=\"$hlp_date\"></th>
-    <th nowrap>";
+    <input type=submit value=ok title=\"Registrer...\"></td>
+    <td><input type=date size=10 name=date title=\"$hlp_date\"></td>
+    <td nowrap>";
    select_tsort(null);
-   echo "<input type=text size=11 name=time value=\"18:30-21:30\"></th>
-    <th>";
+   echo "<input type=text size=11 name=time value=\"18:30-21:30\" title=\"Prøvetid\"></td>
+    <td>";
    select_location(request('id_location'));
-   echo "<br><input type=text size=22 name=location>";
-   echo "</th>
-    <th>";
+   echo "<br><input type=text size=22 name=locationtitle=\"Prøvested som ikke finnes på listen som typisk bare skal benyttes en gang\">";
+   echo "</td>
+    <td>";
    select_project($id_project);
    echo "
-  </th>
-  <th><textarea cols=50 rows=6 wrap=virtual name=comment>Tutti</textarea></th>
+  </td>
+  <td><textarea cols=50 rows=6 wrap=virtual name=comment title=\"Fritekst\">Tutti</textarea></td>
   </tr>";
 }
 
@@ -210,15 +210,15 @@ foreach ($stmt as $row)
     <td><input type=date size=10 name=date value=\"" . date('j. M y', $row['date']) . "\" title=\"$hlp_date\"></td>
     <td nowrap>";
       select_tsort($row['tsort']);
-      echo "<input type=text size=11 name=time value=\"".$row['time']."\"></td>
+      echo "<input type=text size=11 name=time value=\"".$row['time']."\" title=\"Prøvetid\"></td>
     <td>";
       select_location($row['id_location']);
-      echo "<br><input type=text size=22 name=location value=\"".$row['location']."\">";
+      echo "<br><input type=text size=22 name=location value=\"".$row['location']."\" title=\"Prøvested som ikke finnes på listen som typisk bare skal benyttes en gang\">";
       echo "</td>
     <td>";
       select_project($row['id_project']);
       echo "</td>
-    <td><textarea cols=50 rows=6 wrap=virtual name=comment>".$row['comment']."</textarea></td>
+    <td><textarea cols=50 rows=6 wrap=virtual name=comment title=\"Fritekst\">".$row['comment']."</textarea></td>
     </tr>";
    }
 }

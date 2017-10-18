@@ -29,8 +29,8 @@
 .dl-menuwrapper button {
 	background: #ccc;
 	border: none;
-	width: 48px;
-	height: 45px;
+	width: 24px;
+	height: 22px;
 	text-indent: -900em;
 	overflow: hidden;
 	position: relative;
@@ -48,13 +48,13 @@
 	content: '';
 	position: absolute;
 	width: 68%;
-	height: 5px;
+	height: 2px;
 	background: #fff;
-	top: 10px;
+	top: 5px;
 	left: 16%;
 	box-shadow: 
-		0 10px 0 #fff, 
-		0 20px 0 #fff;
+		0 5px 0 #fff, 
+		0 10px 0 #fff;
 }
 
 .dl-menuwrapper ul {

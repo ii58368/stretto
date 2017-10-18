@@ -93,7 +93,9 @@ foreach ($stmt as $row)
 }
 echo "</table><p>\n";
 
-echo "<form action=$php_self method=post>
+$reg_header = ($prj['orchestration'] == $db->prj_orch_tutti) ? "Permisjonssøknad" : "Påmelding";
+echo "<h2>$reg_header</h2>"
+. "<form action=$php_self method=post>
    <input type=hidden name=_action value=update>
    <input type=hidden name=id_person value=$id_person>
    <input type=hidden name=id_project value=".request('id_project').">
@@ -108,14 +110,14 @@ echo "</td>
   </tr>
   <tr>
   <td>";
-echo ($prj['orchestration'] == $db->prj_orch_tutti) ? "Permisjonsfrist:" : "Påmeldingsprist:";
+echo ($prj['orchestration'] == $db->prj_orch_tutti) ? "Permisjonsfrist:" : "Påmeldingsfrist:";
 echo "</td><td>";
 echo ($prj['deadline'] < time()) ? "<font color=red>" . strftime('%a %e.%b %y', $prj['deadline']) . "</font>" :
         strftime('%a %e.%b %y', $prj['deadline']);
 echo "</td></tr>\n";
 echo "<tr><td>Registrert:</td><td>";
-if (isset($part))
-   echo (is_null(request('stat_self'))) ? strftime('%a %e.%b %y', $part['ts_self']) : "<font color=green>" . strftime('%a %e.%b %y', $part['ts_self']) . "</font> (Kommentar kan endres på frem til dato for permisjonsfrist)";
+if (isset($part) && $part['ts_self'] != 0)
+   echo (is_null(request('stat_self'))) ? strftime('%a %e.%b %Y', $part['ts_self']) : "<font color=green>" . strftime('%a %e.%b %Y', $part['ts_self']) . "</font> (Kommentar kan endres på frem til dato for permisjonsfrist)";
 echo "</td></tr>\n";
 if ($prj['deadline'] > time() && $pers['id'] == $whoami->id())
 {
@@ -131,7 +133,7 @@ if ($prj['deadline'] > time() && $pers['id'] == $whoami->id())
       }
    }
    echo "</td></tr>\n";
-   echo "<tr><td>Kommentar:</td><td><textarea cols=30 rows=5 wrap=virtual name=comment_self>".$part['comment_self']."</textarea></td></tr>\n";
+   echo "<tr><td>Kommentar:</td><td><textarea title=\"Registrer her eventuell tilleggsinformasjon...\"cols=30 rows=5 wrap=virtual name=comment_self>".$part['comment_self']."</textarea></td></tr>\n";
    echo "<tr><td></td><td><input type=submit value=Registrer></td></tr>";
 }
 else

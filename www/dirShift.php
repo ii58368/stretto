@@ -62,7 +62,7 @@ foreach ($stmt as $row)
 {
    if ($row['person_id'] != $prev_id)
    {
-      echo "</tr><tr><th><a href=myDirection.php?id_person=".$row['person_id']." title=\"".$row['comment']."\">".$row['firstname']." ".$row['lastname']."</a>";
+      echo "</tr><tr><th nowrap><a href=myDirection.php?id_person=".$row['person_id']." title=\"".$row['comment']."\">".$row['firstname']." ".$row['lastname']."</a>";
       if ($row['status_dir'] == $db->per_dir_nocarry)
          echo " <img src=\"images/chair-minus-icon.png\" border=0 title=\"Kan ikke l&oslash;fte bord\"></h2>";
       echo "</th><th>".$row['instrument']."</th>";

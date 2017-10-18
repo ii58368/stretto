@@ -11,7 +11,7 @@ if ($access->auth(AUTH::INSTR))
     <form action=\"$php_self\" method=post>
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=_action value=new>
-      <input type=submit value=\"Ny gruppe\">
+      <input type=submit value=\"Ny gruppe\" title=\"Definer ny instrumentgruppe...\">
     </form>";
 echo "
     <form action='$php_self' method=post>
@@ -31,7 +31,7 @@ function select_groups($selected)
 {
    global $db;
 
-   echo "<select name=id_groups title=\"Ansvarlig\">";
+   echo "<select name=id_groups title=\"Ansvarlig ledergruppe\">";
 
    $q = "SELECT id, name FROM groups " .
            "order by name";
@@ -53,13 +53,13 @@ if ($action == 'new')
    echo "  <tr>
     <td align=left><input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
-    <input type=submit value=ok></td>
-    <th><input type=text size=10 name=instrument>
-    <th><input type=text size=15 name=list_order></th>
-    <th>";
+    <input type=submit value=ok title=\"Lagre ny instrumentgruppe\"></td>
+    <td><input type=text size=10 name=instrument title=\"Navn på instrumentgruppe\"></td>
+    <td><input type=text size=15 name=list_order title=\"Sortering\"></td>
+    <td>";
    select_groups(0);
-   echo "</th>
-    <th><input type=text size=10 name=comment></th>
+   echo "</td>
+    <td><input type=text size=10 name=comment title=\"Fritekst\"></td>
   </tr>";
 }
 
@@ -123,14 +123,14 @@ foreach ($stmt as $row)
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
-    <th nowrap><input type=submit value=ok>
-      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette ".$row['instrument']."?');\"></th>
-    <th><input type=text size=10 name=instrument value=\"".$row['instrument']."\">
-    <th><input type=text size=15 name=list_order value=\"".$row['list_order']."\"></th>
-    <th>";
+    <td nowrap><input type=submit value=ok title=\"Lagre\">
+      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette ".$row['instrument']."?');\" title=\"Slette\"></td>
+    <td><input type=text size=10 name=instrument value=\"".$row['instrument']."\" title=\"Navn på instrumentgruppe\"></td>
+    <td><input type=text size=15 name=list_order value=\"".$row['list_order']."\" title=\"Sortering\"></td>
+    <td>";
       select_groups($row['id_groups']);
       echo "</td>
-    <th><input type=text size=10 name=comment value=\"".$row['comment']."\"></th>
+    <td><input type=text size=10 name=comment value=\"".$row['comment']."\" title=\"Fritekst\"></td>
     </tr>";
    }
 }

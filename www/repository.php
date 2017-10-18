@@ -75,24 +75,24 @@ echo "</th>
 
 if ($action == 'new')
 {
+   $s = $db->query("select max(tag) as max_tag from repository where archive = 'OSO'");
+   $e = $s->fetch(PDO::FETCH_ASSOC);
+   $arch_no =  isset($e['max_tag']) ? $e['max_tag'] + 1 : 0;
+
    echo "
   <tr>
     <td align=left><input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
     <input type=hidden name=search value=\"$search\">
     <input type=submit value=ok></td>
-    <th><input type=text size=30 name=firstname title=Fornavn>
-        <input type=text size=30 name=lastname title=Etternavn></th>
-    <th><input type=text size=30 name=title title=\"Navn på verk\"></th>
-    <th><input type=text size=30 name=work title=\"Navn på hovedverk hvis dette er et utdrag\"></th>
-    <th><input type=text size=8 name=archive value=OSO title=\"Referanse på hvor noter er leid eller lånt\">
-        <input type=text size=6 name=tag value=";
-   $s = $db->query("select max(tag) as max_tag from repository where archive = 'OSO'");
-   $e = $s->fetch(PDO::FETCH_ASSOC);
-   echo isset($e['max_tag']) ? $e['max_tag'] + 1 : 0;
-   echo " title=\"Eventuelt referansnummer\"></th>
-    <th><textarea cols=50 rows=7 wrap=virtual name=comment></textarea></th>
-    <th></th>
+    <td><input type=text size=30 name=firstname title=Fornavn>
+        <input type=text size=30 name=lastname title=Etternavn></td>
+    <td><input type=text size=30 name=title title=\"Navn på verk\"></td>
+    <td><input type=text size=30 name=work title=\"Navn på hovedverk hvis dette er et utdrag\"></td>
+    <td><input type=text size=8 name=archive value=OSO title=\"Referanse på hvor noter er leid eller lånt\">
+        <input type=text size=6 name=tag value=$arch_no title=\"Eventuelt referansnummer. ($arch_no er første ledige nummer i OSO arkivet)\"></td>
+    <td><textarea cols=50 rows=7 wrap=virtual name=comment title=\"Fritekst\"></textarea></td>
+    <td></td>
   </tr>\n";
 }
 
@@ -263,15 +263,15 @@ foreach ($stmt as $row)
     <input type=hidden name=id_project value=$id_project>
     <input type=hidden name=_no value='$no'>
     <input type=hidden name=_action value=update>
-    <td nowrap><input type=submit value=ok>
-      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette " . $row['title'] . "?');\"></td>
+    <td nowrap><input type=submit value=ok title=\"Lagre\">
+      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette " . $row['title'] . "?');\" title=\"Slette\"></td>
     <td><input type=text size=30 name=firstname value=\"" . $row['firstname'] . "\" title=\"Fornavn\">
          <input type=text size=30 name=lastname value=\"" . $row['lastname'] . "\" title=\"Etternavn\"></td>
-    <td><input type=text size=30 name=title value=\"" . $row['title'] . "\"></td>
-    <td><input type=text size=30 name=work value=\"" . $row['work'] . "\"></td>
-    <td><input type=text size=8 name=archive value=\"" . $row['archive'] . "\">
-         <input type=text size=6 name=tag value=\"" . $row['tag'] . "\"></td>
-    <td><textarea cols=50 rows=7 wrap=virtual name=comment>" . $row['comment'] . "</textarea></td>
+    <td><input type=text size=30 name=title value=\"" . $row['title'] . "\" title=\"Verk\"></td>
+    <td><input type=text size=30 name=work value=\"" . $row['work'] . "\" title=\"Navn på hovedverk hvis dette er et utdrag\"></td>
+    <td><input type=text size=8 name=archive value=\"" . $row['archive'] . "\" title=\"Referanse på hvor noter er leid eller lånt\">
+         <input type=text size=6 name=tag value=\"" . $row['tag'] . "\" title=\"Eventuelt referansenummer\"></td>
+    <td><textarea cols=50 rows=7 wrap=virtual name=comment title=\"Fritekst\">" . $row['comment'] . "</textarea></td>
     </tr>";
    }
 }

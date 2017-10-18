@@ -33,7 +33,7 @@ function select_filter()
    global $season;
 
    // Select status
-   echo "<select name=\"f_status[]\" multiple size=3 onChange=\"submit();\">\n";
+   echo "<select name=\"f_status[]\" multiple size=3 onChange=\"submit();\" title=\"Filter for medlemsstatus...\">\n";
 
    for ($i = 0; $i < count($db->per_stat); $i++)
    {
@@ -48,7 +48,7 @@ function select_filter()
    echo "</select>\n";
 
    // Instrument
-   echo "<select name=\"f_instrument[]\" multiple size=3 onChange=\"submit();\">\n";
+   echo "<select name=\"f_instrument[]\" multiple size=3 onChange=\"submit();\" title=\"Filter for instrumentgruppe...\">\n";
 
    $s = $db->query("select id, instrument from instruments");
    foreach ($s as $e)
@@ -64,7 +64,7 @@ function select_filter()
    echo "</select>\n";
 
 // Groups
-   echo "<select name=\"f_group[]\" multiple size=3 onChange=\"submit();\">\n";
+   echo "<select name=\"f_group[]\" multiple size=3 onChange=\"submit();\" title=\"Filter for gruppering registrert under grupper...\">\n";
 
    $s = $db->query("select id, name from groups, member "
            . "where groups.id = member.id_groups group by id order by name");
@@ -81,7 +81,7 @@ function select_filter()
    echo "</select>\n";
 
    // Project
-   echo "<select name=\"f_project[]\" multiple size=3 onChange=\"submit();\">\n";
+   echo "<select name=\"f_project[]\" multiple size=3 onChange=\"submit();\" title=\"Filter for prosjekt...\">\n";
 
    $s = $db->query("select id, name, year, semester from project "
            . "where year = ".$season->year()." "
@@ -173,7 +173,7 @@ echo "
       <th><a href=\"$php_self?_sort=address,lastname,firstname$f_filter\" title=\"Sorter på addresse...\">Adresse</a></th>
       <th><a href=\"$php_self?_sort=postcode,lastname,firstname$f_filter\" title=\"Sorter på postnummer...\">Postnr</a></th>
       <th><a href=\"$php_self?_sort=city,lastname,firstname$f_filter\" title=\"Sorter på sted...\">Sted</a></th>
-      <th><a href=\"$php_self?_sort=email$f_filter\" title=\"Sorter på email...\">Mail</a></th>
+      <th>Email</th>
       <th>Mobil</th>
       <th>Priv</th>
       <th>Arbeid</th>

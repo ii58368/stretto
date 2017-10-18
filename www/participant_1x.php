@@ -79,7 +79,7 @@ foreach ($stmt as $row)
    echo "<tr>
       <td>";
    if ($row['status'] == $db->prj_stat_real)
-      echo "<a href=\"participant_11.php?id_project=".$row['id']."&id_person=".$pers['id']."\" title=\"Påmelding eller søk om permisjon\">";
+      echo "<a href=\"participant_11.php?id_project=".$row['id']."&id_person=".$pers['id']."\" title=\"Klikk for påmelding eller søk om permisjon...\">";
    echo $row['name'];
    if ($row['status'] == $db->prj_stat_real)
       echo "</a>";
@@ -88,7 +88,7 @@ foreach ($stmt as $row)
    "<td align=center $bgcolor>";
    $tstat = $db->par_stat[$status];
    if (!is_null($blink))
-      $tstat .= " (under behandling i styret...)";
+      $tstat .= "\n(tilbakemeldingen er under behandling i styret...)";
    if ($row['status'] == $db->prj_stat_real)
       echo "<img src=\"images/part_stat_$status$blink.gif\" border=0 title=\"$tstat\">";
    echo "</td>\n";

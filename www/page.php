@@ -1,6 +1,6 @@
 <!-- Codrops top bar -->
 <div class="codrops-top clearfix">
-    <?php echo "<font face=\"Comic sans MS\" size=4>$prj_name</font>"; ?>
+    <?php echo "<font face=\"Comic sans MS\" size=2>$prj_name</font>"; ?>
     <span class="right"><strong><?php $menu->season(); ?></strong></span>
     <span class="right"><strong><?php $menu->whoami(); ?></strong></span>
 <!-- </div> --><!--/ Codrops top bar -->

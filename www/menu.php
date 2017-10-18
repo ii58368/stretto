@@ -284,13 +284,13 @@ class MENU
       if ($access->auth(AUTH::SU))
       {
          echo "<form action=\"$php_self" . $this->url() . "\" method=post>
-         <select name=set_eff_uid onChange=\"set_cookie('uid', this.form.set_eff_uid.value); submit();\">\n";
+         <select name=set_eff_uid onChange=\"set_cookie('uid', this.form.set_eff_uid.value); submit();\" title=\"Bytt bruker...\">\n";
          $this->select_person($whoami->uid());
          echo "</select>\n</form>\n";
       }
       else
       {
-         echo $whoami->name() . "(" . $whoami->instrument() . ")";
+         echo $whoami->name() . " (" . $whoami->instrument() . ")";
       }
    }
 

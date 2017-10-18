@@ -55,7 +55,7 @@ foreach($stmt as $row)
 {
   if ($row['person_id'] != $prev_id)
   {
-    echo "</tr><tr><td>".$row['firstname']." ".$row['lastname'];   
+    echo "</tr><tr><td nowrap>".$row['firstname']." ".$row['lastname'];   
     echo "</td><td>".$row['instrument']."</td>";
     echo "</td><td>" . $db->per_stat[$row['status']] . "</td>";
     $prev_id = $row['person_id'];

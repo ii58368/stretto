@@ -26,13 +26,13 @@ require_once 'auth.php';
     <link rel="stylesheet" type="text/css" href="css/default.css" />
     <link rel="stylesheet" type="text/css" href="css/component.css" />
     <link rel="stylesheet" type="text/css" href="css/style.css" />
-    <link href="http://www.oslo-symfoniorkester.org/templates/flexitemplate/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link href="images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <script src="js/modernizr.custom.js"></script>
 
     <title><?php echo $prj_name ?></title>
 
     <body>
-        <div class="container demo-1">	
+        <div class="container demo-5">	
 
             <?php
             require 'menu.php';

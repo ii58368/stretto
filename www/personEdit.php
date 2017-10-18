@@ -18,7 +18,7 @@ if (!$access->auth(AUTH::MEMB_RW))
 function select_instrument($selected)
 {
    global $db;
-   echo "<select name=id_instruments>";
+   echo "<select name=id_instruments title=\"Hovedinstrument (Dersom vedkommende spiller et annet instrument på et prosjekt, registreres dette i ressursplanen for det aktuelle prosjektet.\">";
 
    $q = "SELECT id, instrument FROM instruments order by list_order";
    $s = $db->query($q);
@@ -42,7 +42,7 @@ function select_status($selected)
       $selected = $db->per_stat_standin;
 
    echo "<input type=hidden name=status_old value=$selected>\n";
-   echo "<select name=status>\n";
+   echo "<select name=status title=\"Medlemsstatus\">\n";
 
    for ($i = 0; $i < count($db->per_stat); $i++)
    {
@@ -59,7 +59,7 @@ function select_status_log($selected)
 {
    global $db;
 
-   echo "<select name=status>";
+   echo "<select name=status title=\"Registreringsstatus.\nInfo: Synlig også vedkommende selv\">";
 
    for ($i = 0; $i < count($db->rec_stat); $i++)
    {
@@ -281,9 +281,9 @@ if ($action == 'edit_pers')
     </tr>
     <tr>
       <td>Navn:</td>
-      <td><input type=text name=firstname size=30 value=\"" . $row['firstname'] . "\">
-          <input type=text name=middlename size=30 value=\"" . $row['middlename'] . "\">
-          <input type=text name=lastname size=30 value=\"" . $row['lastname'] . "\"></td>
+      <td><input type=text name=firstname size=30 value=\"" . $row['firstname'] . "\" title=\"Fornavn\">
+          <input type=text name=middlename size=30 value=\"" . $row['middlename'] . "\" title=\"Mellomnavn\">
+          <input type=text name=lastname size=30 value=\"" . $row['lastname'] . "\" title=\"Etternavn\"></td>
     </tr>
     <tr>
       <td>Instrument:</td>
@@ -297,22 +297,22 @@ if ($action == 'edit_pers')
       </tr>
    <tr>
       <td>Adresse:</td>
-      <td><input type=text name=address size=30 value=\"" . $row['address'] . "\"></td>
+      <td><input type=text name=address size=30 value=\"" . $row['address'] . "\" title=\"Adresse\"></td>
     </tr>
     <tr>
       <td>Post:</td>
-      <td><input type=text name=postcode size=4 maxlength=4 value=\"$postcode\">
-          <input type=text name=city size=30 value=\"" . $row['city'] . "\"></td>
+      <td><input type=text name=postcode size=4 maxlength=4 value=\"$postcode\" title=\"Postnummer\">
+          <input type=text name=city size=30 value=\"" . $row['city'] . "\" title=\"Poststed\"></td>
     </tr>
     <tr>
      <td>Mail:</td>
-      <td><input type=text name=email size=40 value=\"" . $row['email'] . "\"></td>
+      <td><input type=text name=email size=40 value=\"" . $row['email'] . "\" title=\"Mailadresse\"></td>
     </tr>
     <tr>
       <td>Telefon:</td>
-      <td>mob:<input type=text name=phone1 size=12 value=\"" . $row['phone1'] . "\">
-          priv:<input type=text name=phone2 size=12 value=\"" . $row['phone2'] . "\">
-          jobb:<input type=text name=phone3 size=12 value=\"" . $row['phone3'] . "\"></td>
+      <td>mob:<input type=text name=phone1 size=12 value=\"" . $row['phone1'] . "\" title=\"Mobilnummer\">
+          priv:<input type=text name=phone2 size=12 value=\"" . $row['phone2'] . "\" title=\"Privat (fasttelefon)\">
+          jobb:<input type=text name=phone3 size=12 value=\"" . $row['phone3'] . "\" title=\"Evt. telefonnummer arbeidssted\"></td>
     </tr>
     <tr>
       <td>Status:</td>
@@ -330,7 +330,7 @@ if ($action == 'edit_pers')
     </tr>
     <tr>
       <td>Kommentar:</td>
-      <td><input type=text name=comment size=50 value=\"" . $row['comment'] . "\"></td>
+      <td><input type=text name=comment size=50 value=\"" . $row['comment'] . "\" title=\"Legg inn eventuell kommentar\"></td>
     </tr>
   ";
 } else
@@ -340,7 +340,7 @@ if ($action == 'edit_pers')
         <input type=hidden name=_sort value='$sort'>
         <input type=hidden name=_no value='$no'>
         <input type=hidden name=_action value=edit_pers>
-        <input type=submit value=\"Endre\">
+        <input type=submit value=\"Endre\" title=\"Klikk for for å endre personalia...\">
       </th>
     </tr>
     <tr><td>Navn:</td><td>" . $row['firstname'] . " " . $row['middlename'] . " " . $row['lastname'] . "</td></tr>
@@ -398,7 +398,7 @@ if (!is_null($no))
         <input type=hidden name=_sort value='$sort'>
         <input type=hidden name=_no value='$no'>
         <input type=hidden name=_action value=edit_pwd>
-        <input type=submit value=\"Endre\">
+        <input type=submit value=\"Endre\" title=\"Klikk for å endre brukernavn og/eller passord...\">
       </th>
     </tr>
     <tr><td>Bruker-id:</td><td>" . $row['uid'] . "</td></tr>
@@ -417,7 +417,7 @@ if ($access->auth(AUTH::MEMB_RW))
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=_no value='$no'>
       <input type=hidden name=_action value=new_log>
-      <input type=submit value=\"Legg til\">
+      <input type=submit value=\"Legg til\" title=\"Loggføring av medlemsinformasjon...\">
     </form>";
 echo "
     <form action='$php_self' method=post>
@@ -440,13 +440,13 @@ if ($action == 'new_log')
     <td align=left><input type=hidden name=_action value=update_log>
     <input type=hidden name=_sort value=\"$sort\">
     <input type=hidden name=_no value=$no>
-    <input type=submit value=ok></td>
-    <th><input type=date size=15 value=\"" . date('j. M y') . "\" name=ts></th>
-    <th>\n";
+    <input type=submit value=ok title=\"Klikk for registrering...\"></td>
+    <td><input type=date size=15 value=\"" . date('j. M y') . "\" name=ts title=\"Dato for registrering (Eks.: 17. oct 17)\"></td>
+    <td>\n";
    select_status_log(null);
    echo "
-   </th>
-    <th><textarea cols=60 rows=3 wrap=virtual name=comment></textarea></th>
+   </td>
+    <td><textarea cols=60 rows=3 wrap=virtual name=comment title=\"Logginfo\"></textarea></td>
   </tr>";
 }
 

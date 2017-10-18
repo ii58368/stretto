@@ -12,7 +12,7 @@ if ($access->auth(AUTH::ACCGRP))
     <form action=\"$php_self\" method=post>
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=_action value=new>
-      <input type=submit value=\"Ny tilgangsgruppe\">
+      <input type=submit value=\"Ny tilgangsgruppe\" title=\"Legg til ny tilgangsgruppe...\">
     </form>";
 echo "
     <form action='$php_self' method=post>
@@ -33,11 +33,11 @@ if ($action == 'new')
    echo "  <tr>
     <td align=left><input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
-    <input type=submit value=ok></td>
-    <th><input type=text size=30 name=name></th>
-    <th><input type=text size=30 name=comment></th>";
+    <input type=submit value=ok title=\"Lagre\"></td>
+    <td><input type=text size=30 name=name title=\"Navn på tilgangsgruppe\"></td>
+    <td><input type=text size=30 name=comment title=\"Kommentar\"></td>";
    for ($i = 0; $i < AUTH::NO_VIEWS; $i++)
-      echo "<th><input type=checkbox name=access$i></th>";
+      echo "<td><input type=checkbox name=access$i title=\"Angi tilgang, se liste\"></td>";
    echo "  </tr>";
 }
 
@@ -108,17 +108,17 @@ foreach ($stmt as $row)
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
-    <th nowrap><input type=submit value=ok>
-      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette " . $row['name'] . "?');\"></th>
-    <th><input type=text size=30 name=name value=\"" . $row['name'] . "\"></th>
-    <th><input type=text size=30 name=comment value=\"" . $row['comment'] . "\"></th>";
+    <td nowrap><input type=submit value=ok title=\"Lagre\">
+      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette " . $row['name'] . "?');\" title=\"Slett\"></td>
+    <td><input type=text size=30 name=name value=\"" . $row['name'] . "\" title=\"Navn på gruppe\"></td>
+    <td><input type=text size=30 name=comment value=\"" . $row['comment'] . "\" title=\"Kommentar\"></td>";
 
       for ($i = 0; $i < AUTH::NO_VIEWS; $i++)
       {
          echo "<td><input type=checkbox name=access$i value='*' ";
          if ($row['access'] & (1 << $i))
             echo "checked";
-         echo "></td>";
+         echo " title=\"Angi tilgang, se liste\"></td>";
       }
 
       echo "</tr>";
