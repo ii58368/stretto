@@ -20,7 +20,10 @@ function select_project()
    global $db;
    global $id_project;
 
-   echo "<select name=id_project onChange=\"submit();\">\n";
+   $htext = "Velg prosjekt som det skal knytes repertoar til. "
+           . "Trykk på knappene i kolonnen under for å legge til "
+           . "eller å slette repertoar til dette prosjektet.";
+   echo "<select name=id_project onChange=\"submit();\" title=\"$htext\">\n";
 
    $q = "select id, name, semester, year from project\n"
            . " where year >= " . date("Y")
@@ -165,10 +168,10 @@ function toggle_project($cno)
            . "and music.id_repository = $cno";
    $s = $db->query($q);
 
-   $title = '';
+   $title = "Spilt ved tidligere prosjekter:\n";
    foreach ($s as $e)
       if ($e['status'] == $db->mus_stat_yes)
-         $title = $title . $e['name'] . " (" . $e['semester'] . "-" . $e['year'] . "): " . $e['comment'] . "\n";
+         $title .= '* ' . $e['name'] . " (" . $e['semester'] . "-" . $e['year'] . "): " . $e['comment'] . "\n";
 
    echo "<td";
    foreach ($music as $e)
@@ -188,8 +191,8 @@ function toggle_project($cno)
             <input type=hidden name=search value=\"$search\">
             <input type=hidden name=id_project value=$id_project>
             <input type=hidden name=_no value='$no'>
-            <input type=submit value=ok>
-          <input type=text name=comment value=\"" . $e['comment'] . "\" size=20>\n";
+            <input type=submit value=ok title=\"Lagre\">
+          <input type=text name=comment value=\"" . $e['comment'] . "\" size=20 title=\"Tilleggsinformasjon som kun for dette prosjektet, f.eks: Kantate 1,2 og 3\">\n";
    }
    else
    {

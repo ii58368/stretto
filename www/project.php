@@ -7,7 +7,7 @@ if ($sort == NULL)
 
 function select_semester($selected)
 {
-   echo "<select name=semester>";
+   echo "<select name=semester title=\"Velg semester\">";
    echo "<option value=V";
    if ($selected == 'V')
       echo " selected";
@@ -27,7 +27,13 @@ function select_status($selected)
    if (is_null($selected))
       $selected = $db->prj_stat_draft;
 
-   echo "<select name=status>";
+   $htext = "Velg gjeldende status for prosjektet:\n"
+           . "* Draft: Kun synlig for styremedlemmer og MR. Lysegrå tekst\n"
+           . "* Tentativt: Synlig også for medlemmer, men med grå tekst\n"
+           . "* Internt: Kun synlig internt for styret og MR\n"
+           . "* Reelt: Vedtatt i styret. Mulig for medlemmer å melde seg/søke permisjon. Svart tekst.\n"
+           . "* Kanselert: Ikke lenger med på spilleplanen. Kun synlig for styret og MR.";
+   echo "<select name=status title=\"$htext\">";
 
    for ($i = 0; $i < count($db->prj_stat); $i++)
    {
@@ -44,7 +50,7 @@ function select_valid_par_stat($valid_par_stat)
 {
    global $db;
    
-   echo "<select size=" . sizeof($db->par_stat) . " name=\"valid_par_stat[]\" multiple title=\"Ctrl-click to select/unselect single\">";
+   echo "<select size=" . sizeof($db->par_stat) . " name=\"valid_par_stat[]\" multiple title=\"Merk av svaralternativer ved av-/påmelding.\nCtrl-click to select/unselect single\">";
 
    for ($i = 0; $i < sizeof($db->par_stat); $i++)
    {
@@ -88,23 +94,29 @@ if ($action == 'new')
    echo "  <tr>
     <td align=left><input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
-    <input type=submit value=ok title=\"Registrer prosjekt\" ></td>
-    <th><input type=text size=20 name=name></th>
-    <th nowrap>";
+    <input type=submit value=ok title=\"Lagre\"></td>
+    <td><input type=text size=20 name=name title=\"Navn på prosjekt\"></td>
+    <td nowrap>";
    select_semester(null);
    echo "
-    <input type=text size=4 maxlength=4 name=year value=" . date("Y") . "></th>
-    <th>";
+    <input type=text size=4 maxlength=4 name=year value=" . date("Y") . " title=\"Velg årstall\"></td>
+    <td>";
    select_status(null);
-   echo "</th>
-    <th><input type=date size=10 name=deadline value=\"" . 
-    date('j. M y', time() + 60*60*24*7*12) .    // Default dealine: 12 weeks from now
-    "\" title=\"Format: <dato>. <mnd> [<&aring;r>] Merk: M&aring;ned p&aring; engelsk. Eksempel: 12. dec\"></th>
-    <th><input type=checkbox name=orchestration></th>
-    <th>";
-   select_valid_par_stat((1 << $db->par_stat_no) | (1 << $db->par_stat_yes));
    echo "</td>
-     <th><textarea cols=44 rows=10 wrap=virtual name=info></textarea></th>
+    <td><input type=date size=10 name=deadline value=\"" . 
+    date('j. M y', time() + 60*60*24*7*12) .    // Default dealine: 12 weeks from now
+    "\" title=\"Frist for permisjon/påmelding.\nFormat: <dato>. <mnd> [<år>]\nMerk: Måned på engelsk. Eksempel: 12. dec\"></td>
+    <td><input type=checkbox name=orchestration title=\"Merk av hvis dette er et tutti-prosjekt der folk må søke permisjon for å melde seg av.\"></td>
+    <td>";
+   select_valid_par_stat((1 << $db->par_stat_no) | (1 << $db->par_stat_yes));
+   $hinfo = "Informasjon om prosjektet. Blir synlig på planen for prosjektinfo. "
+           . "Nyttig  info:\n"
+           . "* Dirigent\n"
+           . "* Konsertmester\n"
+           . "* Arrangør\n"
+           . "* Solister";
+   echo "</td>
+     <td><textarea cols=44 rows=10 wrap=virtual name=info title=\"$hinfo\"></textarea></td>
   </tr>";
 }
 
@@ -178,7 +190,7 @@ foreach ($stmt as $row)
       "<td>";
       if ($row['orchestration'] == $db->prj_orch_tutti)
          echo "<center><img src=\"images/tick2.gif\" border=0></center>";
-      echo "</td><td>";
+      echo "</td><td nowrap>";
       for ($i = 0; $i < sizeof($db->par_stat); $i++)
          if ($row['valid_par_stat'] & (1 << $i))
             echo "<img src=\"images/ballc_g1.gif\" border=0>" . $db->par_stat[$i] . "<br>\n";
@@ -193,23 +205,23 @@ foreach ($stmt as $row)
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
-    <th nowrap><input type=submit value=ok title=\"Lagere endring\" >
-    <input type=submit value=del name=_delete title=\"Slett prosjekt\" onClick=\"return confirm('Sikkert at du vil slette ".$row['name']."?');\"></th>
-    <th><input type=text size=20 name=name value=\"".$row['name']."\"></th>
-    <th nowrap>";
+    <td nowrap><input type=submit value=ok title=\"Lagere\" >
+    <input type=submit value=del name=_delete title=\"Slett\" onClick=\"return confirm('Sikkert at du vil slette ".$row['name']."?');\"></td>
+    <td><input type=text size=20 name=name value=\"".$row['name']."\" title=\"Navn på prosjekt\"></td>
+    <td nowrap>";
       select_semester($row['semester']);
-      echo "<input type=text size=4 maxlength=4 name=year value=\"".$row['year']."\"></th>
-    <th>";
+      echo "<input type=text size=4 maxlength=4 name=year value=\"".$row['year']."\" title=\"Årstall (4 siffer)\"></td>
+    <td>";
       select_status($row['status']);
       echo "</th>";
-      echo "<td><input type=date size=10 name=deadline value=\"" . date('j. M y', $row['deadline']) . "\"></td>";
-      echo "<th><input type=checkbox name=orchestration";
+      echo "<td><input type=date size=10 name=deadline value=\"" . date('j. M y', $row['deadline']) . "\" title=\"Permisjons-/påmeldingsfrist\"></td>";
+      echo "<td><input type=checkbox name=orchestration";
       if ($row['orchestration'] == $db->prj_orch_tutti)
          echo " checked";
-      echo "></th>\<td>";
+      echo " title=\"Merk av hvis dette er et tutti prosjekt\"></td>\<td>";
       select_valid_par_stat($row['valid_par_stat']);
       echo " </td>
-    <td><textarea cols=44 rows=10 wrap=virtual name=info>".$row['info']."</textarea></td>
+    <td><textarea cols=44 rows=10 wrap=virtual name=info title=\"Prosjektinfo\">".$row['info']."</textarea></td>
     </tr>";
    }
 }
