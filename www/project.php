@@ -30,7 +30,7 @@ function select_status($selected)
    $htext = "Velg gjeldende status for prosjektet:\n"
            . "* Draft: Kun synlig for styremedlemmer og MR. Lysegrå tekst\n"
            . "* Tentativt: Synlig også for medlemmer, men med grå tekst\n"
-           . "* Internt: Kun synlig internt for styret og MR\n"
+           . "* Internt: Kun synlig internt for de som er med på prosjektet\n"
            . "* Reelt: Vedtatt i styret. Mulig for medlemmer å melde seg/søke permisjon. Svart tekst.\n"
            . "* Kanselert: Ikke lenger med på spilleplanen. Kun synlig for styret og MR.";
    echo "<select name=status title=\"$htext\">";

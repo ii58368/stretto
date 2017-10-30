@@ -40,8 +40,8 @@ echo "
     <h2>".$prj['name']." ".$prj['semester']."-".$prj['year']."</h2>
     <table border=1>
     <tr>
-      <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=firstname,lastname\">Navn</a></th>
-      <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=list_order,firstname,lastname\">Instrument</a></th>
+      <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=firstname,lastname\" title=\"Sorter på fornavn, deretter etternavn\">Navn</a></th>
+      <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=list_order,firstname,lastname\" title=\"Sorter i partiturrekkefølge, deretter fornavn og deretter etternavn\">Instrument</a></th>
       <th>Status</th>\n";
 
 $query = "select id, date from plan "
@@ -54,7 +54,7 @@ foreach ($stmt as $e)
 {
    $rehersal = strftime('%a %e.%b', $e['date']);
    if ($access->auth(AUTH::ABS_RW))
-      echo "<th><a href=\"absenceEdit.php?id_plan=".$e['id']."\" title=\"Klikk for å registrere fravær...\">$rehersal</a></th>";
+      echo "<th><a href=\"absenceEdit.php?id_plan=".$e['id']."\" title=\"Registrere oppmøte...\">$rehersal</a></th>";
    else
       echo "<th>$rehersal</th>";
 }

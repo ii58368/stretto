@@ -21,7 +21,7 @@ function manage_instrument($selected, $row, $edit)
 
    if ($edit && $access->auth(AUTH::RES_INV))
    {
-      echo "<select name=id_instruments:$row>";
+      echo "<select name=id_instruments:$row title=\"Velg instrument som vedkommende skal spille på dette prosjektet\">";
 
       $q = "SELECT id, instrument FROM instruments order by list_order";
       $s = $db->query($q);
@@ -49,7 +49,7 @@ function stat_select($name, $selected, $valid_par_stat)
 {
    global $db;
 
-   echo "<select name=$name>";
+   echo "<select name=$name title=\"Velg ny ressursstatus\">";
 
    for ($i = 0; $i < count($db->par_stat); $i++)
    {
@@ -73,11 +73,11 @@ function manage_inv($part, $row, $pstat, $edit)
 
    if ($edit && $access->auth(AUTH::RES_INV))
    {
-      echo "<input type=checkbox name=stat_inv:$row";
+      echo "<input type=checkbox name=stat_inv:$row title=\"Merk av hvis denne ressursen er aktuell for dette prosjektet\"";
       if ((is_null($part) && $pstat == $db->per_stat_member) || (!is_null($part) && $part['stat_inv'] == $db->par_stat_yes))
          echo " checked";
       echo " value=$db->par_stat_yes>";
-      echo "<input type=hidden name=comment_inv:$row value=\"\">";
+      echo "<input type=hidden name=comment_inv:$row value=\"\" title=\"Legg inn eventuell tilleggskommentar\">";
       //   echo "<input type=text name=comment_inv:$row size=20 value=\"$part[comment_inv]\">";
    }
    else
@@ -122,7 +122,7 @@ function manage_reg($part, $row, $edit, $valid_par_stat)
       if ($edit && $access->auth(AUTH::RES_REG))
       {
          stat_select("stat_reg:$row", $part['stat_reg'], $valid_par_stat);
-         echo "<input type=text name=comment_reg:$row size=20 value=\"" . $part['comment_reg'] . "\">";
+         echo "<input type=text name=comment_reg:$row size=20 value=\"" . $part['comment_reg'] . "\" title=\"Legg inn eventuell tilleggskommentar\">";
       }
       else
       {
@@ -150,7 +150,7 @@ function manage_req($part, $row, $edit)
       if ($edit && $access->auth(AUTH::RES_REQ))
       {
          stat_select("stat_req:$row", $part['stat_req'], 0xff);
-         echo "<input type=text name=comment_req:$row size=20 value=\"" . $part['comment_req'] . "\">";
+         echo "<input type=text name=comment_req:$row size=20 value=\"" . $part['comment_req'] . "\" title=\"Legg inn eventuell tilleggskommentar\">";
       }
       else
       {
@@ -180,8 +180,8 @@ function manage_final($part, $row, $edit)
          echo "<input type=checkbox name=stat_final:$row";
          if ($part['stat_final'] == $db->par_stat_yes)
             echo " checked";
-         echo " value=" . $db->par_stat_yes . ">";
-         echo "<input type=text name=comment_final:$row size=20 value=\"" . $part['comment_final'] . "\">";
+         echo " value=" . $db->par_stat_yes . " title=\"Merk av dersom vedkommende er tatt ut til å delta på prosjektet\">";
+         echo "<input type=text name=comment_final:$row size=20 value=\"" . $part['comment_final'] . "\" title=\"Legg inn eventuell tilleggskommentar\">";
       } else
       {
          if ($part['stat_final'] != $db->par_stat_void)
@@ -196,26 +196,29 @@ function manage_final($part, $row, $edit)
    echo "</td>";
 }
 
-function manage_col($col)
+function manage_col($col, $htxt)
 {
    global $php_self;
+   global $sort;
 
    if (request('col') == $col)
    {
-      echo "<input type=submit value=lagre>"
-      . "<input type=hidden name=col value=$col>";
+      echo "<input type=submit value=lagre title=\"Lagre\">"
+      . "<input type=hidden name=col value=$col>"
+      . "<input type=hidden name=_sort value=$sort>";
    }
    else
    {
-      echo "<a href=\"$php_self?id=" . request('id') . "&col=$col\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>";
+      echo "<a href=\"$php_self?id=" . request('id') . "&col=$col&_sort=$sort\"><img src=\"images/cross_re.gif\" border=0 title=\"$htxt\"></a>";
    }
 }
 
 function reset_col($col)
 {
    global $php_self;
+   global $sort;
    
-   echo "<a href=\"$php_self?id=" . request('id') . "&col=$col&_action=reset\" onClick=\"return confirm('Sikkert at du vil nullstille hele kolonnen?');\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for reset...\"></a>";   
+   echo "<a href=\"$php_self?id=" . request('id') . "&col=$col&_action=reset&_sort=$sort\" onClick=\"return confirm('Sikkert at du vil nullstille hele kolonnen?');\"><img src=\"images/cross_re.gif\" border=0 title=\"Nullstill vedtaket...\"></a>";   
 }
 
 function view_leave($id_person, $year, $semester)
@@ -376,22 +379,22 @@ echo "
       <th><a href=\"$php_self?id=".request('id')."&_sort=list_order,lastname,firstname\">Instrument</a></th>
       <th>";
 if ($access->auth(AUTH::RES_INV))
-   manage_col("inv");
+   manage_col("inv", "Besetningsliste. \nMerk av alle som må ta stilling til om de skal være med på prosjektet.");
 echo "Bes</th>
       <th>Permisjon</th>
       <th>Egen</th>
       <th>";
 if ($access->auth(AUTH::RES_REG))
-   manage_col("reg");
+   manage_col("reg", "Tilbakemelding via styret/sekretær");
 echo "Sekretær</th>
       <th>";
 if ($access->auth(AUTH::RES_REQ))
-   manage_col("req");
+   manage_col("req", "Instilling fra MR");
 echo "MR</th>
       <th>";
 if ($access->auth(AUTH::RES_FIN))
 {
-   manage_col("final");
+   manage_col("final", "Vedtatt av styret");
    reset_col("final");
 }
 echo "Styret</th>
@@ -416,12 +419,13 @@ foreach ($stmt as $row)
         <td><center>";
       if ($row['id'] == $no)
       {
-         echo "<input type=submit value = lagre>"
-         . "<input type=hidden name=_no value=$no>";
+         echo "<input type=submit value=lagre title=Lagre>"
+         . "<input type=hidden name=_no value=$no>"
+         . "<input type=hidden name=_sort value=$sort>";
       }
       else
       {
-         echo "<a href=\"$php_self?_no=" . $row['id'] . "&id=" . request('id') . "\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>";
+         echo "<a href=\"$php_self?_no=" . $row['id'] . "&id=" . request('id') . "&_sort=$sort\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>";
       }
       echo "</center></td>";
    }

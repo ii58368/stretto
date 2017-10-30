@@ -53,7 +53,7 @@ $query = "SELECT id, name, semester, year " .
 $stmt = $db->query($query);
 
 foreach ($stmt as $row)
-   echo "<th><a href=\"participant_x1.php?id=".$row['id']."\">".$row['name']."<br>".$row['semester'],$row['year']."</a></td>\n";
+   echo "<th><a href=\"participant_x1.php?id=".$row['id']."\" title=\"Administrasjon av ressurser for ".$row['name']." prosjektet...\">".$row['name']."<br>".$row['semester'],$row['year']."</a></td>\n";
 echo "</tr><tr>";
 
 if (is_null($sort))
@@ -78,7 +78,7 @@ foreach ($stmt as $row)
 {
    if ($row['person_id'] != $prev_id)
    {
-      echo "</tr><tr><td nowrap><a href=\"participant_1x.php?id=".$row['person_id']."\">".$row['firstname']." ".$row['lastname']."</a>\n";
+      echo "</tr><tr><td nowrap><a href=\"participant_1x.php?id=".$row['person_id']."\" title=\"Ressursstatus for ".$row['firstname']." ".$row['lastname']."...\">".$row['firstname']." ".$row['lastname']."</a>\n";
       echo "</td><td> ".$row['instrument']." </td>\n";
       echo "</td><td> ".$db->per_stat[$row['status']]." </td>\n";
       $prev_id = $row['person_id'];
@@ -95,9 +95,11 @@ foreach ($stmt as $row)
    if ($lstatus == $db->lea_stat_rejected)
       $bgcolor = 'bgcolor=pink';
 
+   $htext = is_null($blink) ? '' : 'Forløpig ';
+   
    echo "<td align=center $bgcolor><a href=\"participant_11.php?id_person=".$row['person_id']."&id_project=".$row['project_id']."\">"
       . "<img src=\"images/part_stat_$status$blink.gif\" "
-      . "border=0 title=\"{$db->par_stat[$status]}\"></a></td>\n";
+      . "border=0 title=\"$htext{$db->par_stat[$status]}\"></a></td>\n";
 }
 ?>  
 </tr>

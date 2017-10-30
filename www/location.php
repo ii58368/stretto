@@ -11,7 +11,7 @@ if ($access->auth(AUTH::LOC))
     <form action=\"$php_self\" method=post>
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=_action value=new>
-      <input type=submit value=\"Nytt lokale\">
+      <input type=submit value=\"Nytt lokale\" title=\"Legg til nytt lokale...\">
     </form>";
 echo "
     <form action='$php_self' method=post>
@@ -33,12 +33,12 @@ if ($action == 'new')
    echo "  <tr>
     <td align=left><input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
-    <input type=submit value=ok></td>
-    <th><input type=text size=30 name=name></th>
-    <th><input type=text size=30 name=address></th>
-    <th><input type=text size=50 name=url></th>
-    <th><textarea cols=20 rows=7 wrap=virtual name=contact></textarea></th>
-    <th><textarea cols=60 rows=7 wrap=virtual name=comment></textarea></th>
+    <input type=submit value=ok title=\"Lagre\"></td>
+    <td><input type=text size=30 name=name title=\"Navn på lokalet\"></td>
+    <td><input type=text size=30 name=address title=\"Adresse\"></td>
+    <td><input type=text size=50 name=url title=\"Spesifiser eventuell URL for dette lokalet\"></td>
+    <td><textarea cols=20 rows=7 wrap=virtual name=contact title=\"Kontaktperson for dette lokalet\"></textarea></td>
+    <td><textarea cols=60 rows=7 wrap=virtual name=comment title=\"Fritekst\"></textarea></td>
   </tr>";
 }
 
@@ -110,13 +110,13 @@ foreach ($stmt as $row)
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
-    <th nowrap><input type=submit value=ok>
-      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette ".$row['name']."?');\"></th>
-    <th><input type=text size=30 name=name value=\"".$row['name']."\"></th>
-    <th><input type=text size=30 name=address value=\"".$row['address']."\"></th>
-    <th><input type=text size=50 name=url value=\"".$row['url']."\"></th>
-    <th><textarea cols=20 rows=7 wrap=virtual name=contact>".$row['contact']."</textarea></th>
-    <th><textarea cols=60 rows=7 wrap=virtual name=comment>".$row['comment']."</textarea></th>
+    <td nowrap><input type=submit value=ok title=\"Lagre\">
+      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette ".$row['name']."?');\" title=\"Slett...\"></td>
+    <td><input type=text size=30 name=name value=\"".$row['name']."\" title=\"Navn på lokalet\"></td>
+    <td><input type=text size=30 name=address value=\"".$row['address']."\" title=\"Adresse\"></td>
+    <td><input type=text size=50 name=url value=\"".$row['url']."\" title=\"Spesifiser eventuel URL\"></td>
+    <td><textarea cols=20 rows=7 wrap=virtual name=contact title=\"Kontaktperson\">".$row['contact']."</textarea></td>
+    <td><textarea cols=60 rows=7 wrap=virtual name=comment title=\"Fritekst\">".$row['comment']."</textarea></td>
     </tr>";
    }
 }

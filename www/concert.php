@@ -11,8 +11,8 @@ if ($access->auth(AUTH::CONS))
     <form action=\"$php_self\" method=post>
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=_action value=new>
-      <input type=submit value=\"Ny konsert\">
-      <a href=calender.php title=\"Vis kalender...\"><img src=images/text2.gif border=0></a>
+      <input type=submit value=\"Ny konsert\" title=\"Registrer ny konsert...\">
+      <a href=calender.php title=\"Vis kalender slik den ser ut på eksternsiden...\"><img src=images/text2.gif border=0></a>
     </form>";
 echo "
     <form action='$php_self' method=post>
@@ -22,9 +22,9 @@ if ($access->auth(AUTH::CONS))
    echo "
       <th>Edit</th>";
 echo "
-      <th><a href=\"$php_self?_sort=ts\">Dato</a></th>
+      <th><a href=\"$php_self?_sort=ts\" title=\"Sorter på konsertdato\">Dato</a></th>
       <th>Tid</th>
-      <th><a href=\"$php_self?_sort=id_project,ts\">Prosjekt</a></th>
+      <th><a href=\"$php_self?_sort=project.name\" title=\"Sortet på prosjektnavn\">Prosjekt</a></th>
       <th>Lokale</th>
       <th>Overskrift</th>
       <th>Tekst</th>
@@ -35,7 +35,7 @@ function select_project($selected)
    global $db;
    global $season;
 
-   echo "<select name=id_project title=\"Prosjekt\">";
+   echo "<select name=id_project title=\"Velg aktuelt prosjekt...\">";
 
    $q = "SELECT id, name, semester, year "
            . "FROM project "
@@ -58,7 +58,7 @@ function select_location($selected)
 {
    global $db;
 
-   echo "<select name=id_location title=\"Prosjekt\">";
+   echo "<select name=id_location title=\"Velg aktuelt konsertlokasjon...\">";
 
    $q = "SELECT id, name "
            . "FROM location "
@@ -81,17 +81,17 @@ if ($action == 'new')
    echo "  <tr>
     <td align=left><input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
-    <input type=submit value=ok></td>
-    <td><input type=date size=10 name=ts>
-    <td><input type=text size=5 maxlength=5 name=time>
+    <input type=submit value=ok title=\"Lagre\"></td>
+    <td><input type=date size=10 name=ts title=\"Konsertdato, format: eks: 23. dec 2018\">
+    <td><input type=text size=5 maxlength=5 name=time title=\"Klokkeslett, fritt format\">
     <td>";
    select_project(null);
    echo "</td>
        <td>";
    select_location(null);
-   echo "<td><input type=text size=30 name=heading>\n";
+   echo "<td><input type=text size=30 name=heading title=\"Konsertoverskrift\">\n";
    echo "</td>
-    <td><textarea name=text wrap=virtual cols=60 rows=10></textarea></td>
+    <td><textarea name=text wrap=virtual cols=60 rows=10 title=\"Konsertinformasjon, fritekst\"></textarea></td>
   </tr>";
 }
 
@@ -172,18 +172,18 @@ foreach ($stmt as $row)
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
-    <td nowrap><input type=submit value=ok>
-      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette " . strftime('%a %e.%b %y', $row['ts']) . "?');\"></td>
-    <td><input type=text size=10 name=ts value=\"" . date('j. M y', $row['ts']) . "\"></td>
-    <td><input type=text size=5 maxlength=5 name=time value=\"".$row['time']."\">
+    <td nowrap><input type=submit value=ok title=\"Lagre\">
+      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette " . strftime('%a %e.%b %y', $row['ts']) . "?');\" title=\"Slette...\"></td>
+    <td><input type=text size=10 name=ts value=\"" . date('j. M y', $row['ts']) . "\" title=\"Konsertdato\"></td>
+    <td><input type=text size=5 maxlength=5 name=time value=\"".$row['time']."\" title=\"Klokkeslett\">
     <td>";
       select_project($row['id_project']);
       echo "</td>
     <td>";
       select_location($row['id_location']);
       echo "</td>
-    <td><input type=text size=30 name=heading value=\"".$row['heading']."\">
-    <td><textarea cols=60 rows=10 wrap=virtual name=text>".$row['text']."</textarea></td>
+    <td><input type=text size=30 name=heading value=\"".$row['heading']."\" title=\"Konsertoverskrift\">
+    <td><textarea cols=60 rows=10 wrap=virtual name=text title=\"Konsertinformasjon, fritekst\">".$row['text']."</textarea></td>
     </tr>";
    }
 }

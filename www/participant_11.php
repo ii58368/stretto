@@ -94,8 +94,10 @@ foreach ($stmt as $row)
 echo "</table><p>\n";
 
 $reg_header = ($prj['orchestration'] == $db->prj_orch_tutti) ? "Permisjonssøknad" : "Påmelding";
-echo "<h2>$reg_header</h2>"
-. "<form action=$php_self method=post>
+echo "<h2>$reg_header</h2>";
+if ($prj['orchestration'] == $db->prj_orch_tutti)
+   echo "Dette er et tuttiprosjekt. Dersom du ikke søker om permisjon vil du automatisk bli påmeldt når permisjonsfristen går ut.<p>\n";
+echo "<form action=$php_self method=post>
    <input type=hidden name=_action value=update>
    <input type=hidden name=id_person value=$id_person>
    <input type=hidden name=id_project value=".request('id_project').">

@@ -11,7 +11,7 @@ if ($access->auth(AUTH::LEAVE_RW))
     <form action=\"$php_self\" method=post>
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=_action value=new>
-      <input type=submit value=\"Ny permisjon\">
+      <input type=submit value=\"Ny permisjon\" title=\"Registrer ny permisjonssøknad...\">
     </form>";
 echo "
     <form action='$php_self' method=post>
@@ -21,9 +21,9 @@ if ($access->auth(AUTH::LEAVE_RW))
    echo "
       <th>Edit</th>";
 echo "
-      <th><a href=\"$php_self?_sort=ts_reg\">Registrert</a></th>
+      <th><a href=\"$php_self?_sort=ts_reg\"title=\"Sorter på registreringsdato...\">Registrert</a></th>
       <th>Navn</th>
-      <th><a href=\"$php_self?_sort=status,ts_reg\">Status</a></th>
+      <th><a href=\"$php_self?_sort=status,ts_reg\"title=\"Sorter på søknadsstatus, deretter registreringsdato...\">Status</a></th>
       <th>Endret</th>
       <th>Fra</th>
       <th>Til</th>
@@ -34,7 +34,7 @@ function select_person($selected)
 {
    global $db;
 
-   echo "<select name=id_person title=\"Velg medlem\">";
+   echo "<select name=id_person title=\"Velg medlem permisjonssøknaden skal gjelde for\">";
 
    $q = "SELECT id, firstname, middlename, lastname "
            . "FROM person "
@@ -60,7 +60,7 @@ function select_status($selected)
    if (is_null($selected))
       $selected = $db->lea_stat_registered;
 
-   echo "<select name=status>";
+   echo "<select name=status title=\"Status på permisjonssøknad\">";
 
    for ($i = 0; $i < count($db->lea_stat); $i++)
    {
@@ -78,16 +78,16 @@ if ($action == 'new')
    echo "  <tr>
     <td align=left><input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
-    <input type=submit value=ok></td>
+    <input type=submit value=ok title=\"Lagre\"></td>
     <td>" . strftime('%a %e.%b %y') . "</td>\n<td>";
    select_person(null);
    echo "</td>\n<td>";
    select_status(null);
    echo "</td>
     <td>" . strftime('%a %e.%b %y') . "</td>
-    <td><input type=date size=10 name=ts_from></td>
-    <td><input type=date size=10 name=ts_to></td>
-    <td><textarea name=text wrap=virtual cols=60 rows=10></textarea></td>
+    <td><input type=date size=10 name=ts_from title=\"Dato permisjonssøknaden gjelder fra. Format: eks: 3. dec 2017\"></td>
+    <td><input type=date size=10 name=ts_to title=\"Dato permisjonssøknaden gjelder til. Format: eks: 3. dec 2017\"></td>
+    <td><textarea name=text wrap=virtual cols=60 rows=10 title=\"Fritekst\"></textarea></td>
   </tr>";
 }
 
@@ -184,8 +184,8 @@ foreach ($stmt as $row)
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
-    <td nowrap><input type=submit value=ok>
-      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette " . date('D j.M y', $row['ts_reg']) . "?');\"></td>
+    <td nowrap><input type=submit value=ok title=Lagre>
+      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette " . date('D j.M y', $row['ts_reg']) . "?');\" title=\"Slett...\"></td>
     <td>" . strftime('%e.%m.%y', $row['ts_reg']) . "</td>
     <td>";
       select_person($row['id_person']);
@@ -194,9 +194,9 @@ foreach ($stmt as $row)
       select_status($row['status']);
       echo "</td>
     <td>" . strftime('%e.%m.%y') . "</td>
-    <td><input type=date size=10 name=ts_from value=\"" . date('j. M y', $row['ts_from']) . "\"></td>
-    <td><input type=date size=10 name=ts_to value=\"" . date('j. M y', $row['ts_to']) . "\"></td>
-     <td><textarea cols=60 rows=10 wrap=virtual name=text>".$row['text']."</textarea></td>
+    <td><input type=date size=10 name=ts_from value=\"" . date('j. M y', $row['ts_from']) . "\" title=\"Dato permisjonssøknaden gjelder fra. Format: eks: 3. dec 2017\"></td>
+    <td><input type=date size=10 name=ts_to value=\"" . date('j. M y', $row['ts_to']) . "\" title=\"Dato permisjonssøknaden gjelder til. Format: eks: 3. dec 2017\"></td>
+     <td><textarea cols=60 rows=10 wrap=virtual name=text title=Fritekst>".$row['text']."</textarea></td>
     </tr>";
    }
 }

@@ -38,7 +38,7 @@ function select_status($selected)
    if (is_null($selected))
       $selected = $db->con_stat_payed;
 
-   echo "<select name=status>";
+   echo "<select name=status title=\"Angi status for betaling...\">";
 
    for ($i = 0; $i < count($db->con_stat); $i++)
    {
@@ -135,7 +135,7 @@ function con($key = null)
 $ts = is_null(con('ts')) ? strtotime("now") : intval(con('ts'));
 
 echo "
-    <h1><a href=contingent.php>Medlemskontingent " . request('year') . "</a></h1>
+    <h1><a href=contingent.php title=\"Tilbake til liste\">Medlemskontingent " . request('year') . "</a></h1>
     <h2>" . $per['firstname'] . " " . $per['middlename'] . " " . $per['lastname'] . " (" . $per['instrument'] . ")</h2>
     <table id=\"no_border\">
       <form action='$php_self' method=post>
@@ -147,22 +147,22 @@ echo "
         <input type=hidden name=year value=" . request('year') . ">
         <input type=hidden name=_action value=update>\n";
 if (!is_null($no) || !is_null($delete))
-   echo "<input type=button value=Ny onClick=\"location.href='$php_self?id_person=" . request('id_person') . "&year=" . request('year') . "';\">\n";
+   echo "<input type=button value=Ny onClick=\"location.href='$php_self?id_person=" . request('id_person') . "&year=" . request('year') . "';\" title=\"Registrer ny betaling...\">\n";
 if (is_null($delete))
-   echo "<input type=submit value=Lagre $style>\n";
+   echo "<input type=submit value=Lagre title=\"Lagre endring\" $style>\n";
 if (!is_null(con()))
-   echo "<input type=submit name=_delete value=slett>\n";
+   echo "<input type=submit name=_delete value=slett title=\"Slett betailng...\" onClick=\"return confirm('Sikkert at du vil slette denne betalingen?');\">\n";
 echo "</th>
     </tr>\n";
 if (is_null($delete))
 {
    echo "<tr>
       <td>Dato:</td>
-      <td><input type=date name=date size=10 value=\"" . date('j. M y', $ts) . "\"></td>
+      <td><input type=date name=date size=10 value=\"" . date('j. M y', $ts) . "\" title=\"Dato for registrering. Format: eks: 23. dec\"></td>
     </tr>
     <tr>
       <td>Beløp:</td>
-      <td><input type=text name=amount size=5 value=\"" . con('amount') . "\"></td>
+      <td><input type=text name=amount size=5 value=\"" . con('amount') . "\" title=\"Beløp i hele kroner\"></td>
     </tr>
     <tr>
        <td>Status:</td>
@@ -172,11 +172,11 @@ if (is_null($delete))
     </tr>
     <tr>
       <td>Billag:</td>
-      <td><input type=text name=archive length=10 value=\"" . con('archive') . "\"></td>
+      <td><input type=text name=archive length=10 value=\"" . con('archive') . "\" title=\"Bilagskode\"></td>
    </tr>
    <tr>
       <td>Kommentar:</td>
-      <td><input type=text name=comment size=50 value=\"" . con('comment') . "\"></td>
+      <td><input type=text name=comment size=50 value=\"" . con('comment') . "\" title=\"Fritekst\"></td>
     </tr>\n";
 }
 echo "</form>

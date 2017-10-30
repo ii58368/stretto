@@ -68,11 +68,11 @@ echo "
     <input type=hidden name=id_plan value=" . request('id_plan') . ">
     <input type=hidden name=_sort value=$sort>
     <input type=hidden name=_action value=update>
-    <input type=submit value=Lagre $style>
+    <input type=submit value=Lagre $style  title=\"Lagre\">
     <table border=1>
     <tr>
-      <th><a href=\"$php_self?id_plan=" . request('id_plan') . "&_sort=firstname,lastname\">Navn</a></th>
-      <th><a href=\"$php_self?id_plan=" . request('id_plan') . "&_sort=list_order,firstname,lastname\">Instrument</a></th>\n";
+      <th><a href=\"$php_self?id_plan=" . request('id_plan') . "&_sort=firstname,lastname\" title=\"Sorter på fornavn, deretter etternavn\">Navn</a></th>
+      <th><a href=\"$php_self?id_plan=" . request('id_plan') . "&_sort=list_order,firstname,lastname\" title=\"Sorter på instrument, fornavn, etternavn\">Instrument</a></th>\n";
 
 for ($i = 0; $i < sizeof($db->abs_stat); $i++)
    echo "<th>" . $db->abs_stat[$i] . "</th>\n";
@@ -113,7 +113,7 @@ foreach ($stmt as $row)
       echo "></td>\n";
    }
 
-   echo "<td><input type=text name=\"comment:" . $row['id_person'] . "\" value=\"" . $e['comment'] . "\" size=30></td>\n";
+   echo "<td><input type=text name=\"comment:" . $row['id_person'] . "\" value=\"" . $e['comment'] . "\" size=30 title=\"Eventuell tilleggskommentar\"></td>\n";
    echo "</tr>";
 }
 

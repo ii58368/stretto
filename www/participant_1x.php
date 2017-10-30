@@ -78,10 +78,15 @@ foreach ($stmt as $row)
 
    echo "<tr>
       <td>";
-   if ($row['status'] == $db->prj_stat_real)
+   
+   $request = ($row['status'] == $db->prj_stat_real && 
+           $status != $db->par_stat_void && 
+           $lstatus != $db->lea_stat_granted);
+      
+   if ($request)
       echo "<a href=\"participant_11.php?id_project=".$row['id']."&id_person=".$pers['id']."\" title=\"Klikk for påmelding eller søk om permisjon...\">";
    echo $row['name'];
-   if ($row['status'] == $db->prj_stat_real)
+   if ($request)
       echo "</a>";
    echo "</td>\n" .
       "<td>".$row['semester']." ".$row['year']."</td>" .

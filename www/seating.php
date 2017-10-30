@@ -68,7 +68,7 @@ function select_template($selected)
        "Cello, 8 pulter",
        "Cello, 7,5 pulter"
    );
-   echo "<select name=template onChange=\"submit();\">\n";
+   echo "<select name=template onChange=\"submit();\"  title=\"Velg aktuell template for dette prosjektet\">\n";
    for ($i = 0; $i < sizeof($opt); $i++)
    {
       echo "<option value=$i";
@@ -151,9 +151,9 @@ if ($access->auth(AUTH::SEAT))
     <table border=1>
     <tr>
       <th>Edit</th>
-      <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=firstname,lastname\">Navn</a></th>
+      <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=firstname,lastname\" title=\"Sorter på fornavn, deretter etternavn\">Navn</a></th>
       <th>Instrument</th>
-      <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=position,list_order,firstname,lastname\">Plass</a></th>
+      <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=position,list_order,firstname,lastname\" title=\"Sorter på plassnummer\">Plass</a></th>
       <th>Kommentar</th>
       </tr>";
 
@@ -175,7 +175,7 @@ if ($access->auth(AUTH::SEAT))
       {
          echo "<tr>
          <td><center>
-           <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."&id_project=".request('id_project')."\"><img src=\"images/cross_re.gif\" border=0></a>
+           <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."&id_project=".request('id_project')."\" title=\"Endre...\"><img src=\"images/cross_re.gif\" border=0></a>
              </center></td>" .
          "<td>".$row['firstname']." ".$row['lastname']."</td>" .
          "<td>".$row['instrument']."</td>" .
@@ -189,11 +189,11 @@ if ($access->auth(AUTH::SEAT))
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
     <input type=hidden name=id_project value=".request('id_project').">
-    <th nowrap><input type=submit value=ok>
+    <th nowrap><input type=submit value=ok title=\"Lagre\">
     <td>".$row['firstname']." ".$row['lastname']."</td>
     <td>".$row['instrument']."</td>
-    <th><input type=text size=2 name=position value=\"".$row['position']."\"></th>
-    <th><input type=text size=30 name=comment_pos value=\"".$row['comment_pos']."\"></th>
+    <th><input type=text size=2 name=position value=\"".$row['position']."\" title=\"Plassnummer\"></th>
+    <th><input type=text size=30 name=comment_pos value=\"".$row['comment_pos']."\" title=\"Fritekst, kun synlig for gruppeleder\"></th>
     </tr>";
       }
    }

@@ -95,7 +95,7 @@ if (this_access_rw())
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=_action value=new>
       <input type=hidden name=path value=\"$path\">
-      <input type=submit value=\"Nytt dokument\">
+      <input type=submit value=\"Nytt dokument\" title=\"Last opp nytt dokument...\">
     </form>";
 echo "
     <table border=1>
@@ -116,8 +116,8 @@ if ($action == 'new')
     <td align=left><input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
     <input type=hidden name=path value=\"$path\">
-    <input type=submit value=ok></td>
-    <th colspan=3><input type=file name=filename id=filename</th>
+    <input type=submit value=ok title=Lagre></td>
+    <td colspan=3><input type=file name=filename id=filename title=\"Velg lokal fil som skal lastes opp...\"></td>
     </form>
   </tr>";
 }
@@ -175,10 +175,10 @@ if (is_dir($path))
          {
             if (this_access_rw())
                echo "<td><center>
-           <a href=\"$php_self?_sort=$sort&_action=view&_no=" . urlencode($file) . "&path=$path\"><img src=\"images/cross_re.gif\" border=0></a>
+           <a href=\"$php_self?_sort=$sort&_action=view&_no=" . urlencode($file) . "&path=$path\" title=\"Endre navn eller slette...\" ><img src=\"images/cross_re.gif\" border=0></a>
              </center></td>";
             echo "
-             <td><a href=\"$abs_file\">$file</a></td>";
+             <td><a href=\"$abs_file\" title=\"Klikk for å laste ned dokument\">$file</a></td>";
          }
          else
          {
@@ -189,9 +189,9 @@ if (is_dir($path))
     <input type=hidden name=_filename value='$file'>
     <input type=hidden name=path value=\"$path\">
     <input type=hidden name=_no value=\"$no\">
-    <td nowrap><input type=submit value=ok>
-      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette $file?');\"></td>
-    <td><input type=text size=30 name=file value=\"$file\"></td>
+    <td nowrap><input type=submit value=ok title=Lagre>
+      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette $file?');\" title=\"Slett...\"></td>
+    <td><input type=text size=30 name=file value=\"$file\" title=\"Angi nytt filnavn...\"></td>
          </form>";
          }
          echo "<td>" . (int) ($stat['size'] / 1024) . "K</td>" .
