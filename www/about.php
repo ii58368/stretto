@@ -25,6 +25,7 @@ Er du regissør, er du ansvarlig for:
   <li>å holde ajour alle regiplaner for alle kommende prosjekter.</li>
   <li>Legge inn informasjon om prøvelokaler og konsertlokaler</li>
   <li>å allokere ressurser til regikomitéer og informere disse forventet ansvar</li>
+  <li>å holde orden på OSOs notearkiv (sammen med kunstnerisk leder)</li>
 </ul>
 ";
 
@@ -58,6 +59,7 @@ if ($access->auth(AUTH::ABS_RO))
 Er du gruppeleder, er du ansvarlig for:
 <ul>
   <li>å registrere fravær på prøvene.</li>
+  <li>legge ut øvingsnoter</li>
 </ul>
 ";
 
@@ -67,8 +69,12 @@ if ($access->auth(AUTH::BOARD_RO))
 Er du sekretær, er du ansvarlig for:
 <ul>
   <li>å holde medlemslisten ajour</li>
+  <li>å gi medlemmene riktig tilgang (autorisasjon)</li>
+  <li>å holde orden på listen med grupper</li>
   <li>å registrere og holde orden på permisjoner og påmeldinger</li>
+  <li>at ressursene som skal være med på de ulike prosjektene er korrekt</li>
   <li>distribuere viktig informasjon gjennem fellesmail og \"Hva skjer...?\"</li>
+  <li>at viktige dokumenter som vedtekter, generalforsamplingspapirer etc. er tilgjengeliget</li>
 </ul>
 ";
 
@@ -78,6 +84,15 @@ if ($access->auth(AUTH::BOARD_RO))
 Er du kasserer, er du ansvarlig for:
 <ul>
   <li>registrere innbetalinger som kontigenter o.l.</li>
+</ul>
+";
+
+if ($access->auth(AUTH::BOARD_RO))
+    echo "
+<h2>Kvalitetssikring</h2>
+Er du styreleder, er du ansvarlig for:
+<ul>
+  <li>generelt å kontrollere at informasjonen som ligger er korrekt til enhver tid</li>
 </ul>
 ";
 
