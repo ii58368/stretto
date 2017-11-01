@@ -204,7 +204,7 @@ if ($access->auth(AUTH::SEAT))
 </form>";
 }
 
-echo "<img src=\"map.php?id_groups=$grp_id&id_project=".request('id_project')."&template=".$seat['template']."\"><br>\n";
+echo "<img src=\"map.php?id_groups=$grp_id&id_project=".request('id_project')."&template=".$seat['template']."&uid=".$whoami->uid()."\" width=500><br>\n";
 
 if (!is_null($seat))
    echo $seat['firstname']."/" . strftime('%e.%b %y', $seat['ts']) . "\n";

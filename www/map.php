@@ -28,12 +28,12 @@ function draw_chair($img, $x, $y, $a, $w, $h, $ftext)
    );
 
    $atext = explode("*", $ftext);
-   
+
    if (isset($atext[1]))
       imagefilledpolygon($img, $p, 4, $green);
-   
+
    imagepolygon($img, $p, 4, $black);
-   
+
    $font = "Avenir.ttc";
    $text = $atext[0];
 
@@ -43,7 +43,7 @@ function draw_chair($img, $x, $y, $a, $w, $h, $ftext)
    $tx = $x + (($w - $tw) * cos($a) - ($h + $th) * sin($a)) / 2;
    $ty = $y + (($h + $th) * cos($a) + ($w - $tw) * sin($a)) / 2;
 
-   imagefttext($img, $fsize, -$a*360/(2* pi()), $tx, $ty, $col, $font, $text);
+   imagefttext($img, $fsize, -$a * 360 / (2 * pi()), $tx, $ty, $col, $font, $text);
 }
 
 function draw_desk($img, $x0, $y0, $a, $no, $text0, $text1)
@@ -73,14 +73,16 @@ function draw_desk($img, $x0, $y0, $a, $no, $text0, $text1)
 
 function get_txt($part, $pos)
 {
-   global $whoami;
    global $access;
+
+   if (($uid = request('uid')) == null)
+      $uid = 'unknown';
 
    foreach ($part as $p)
    {
       if ($p['position'] == $pos)
       {
-         $tag = ($p['uid'] == $whoami->uid()) ? $tag = '*x' : '';
+         $tag = ($p['uid'] == $uid) ? $tag = '*x' : '';
          return $p['firstname'] . " " . mb_substr($p['lastname'], 0, 1, 'utf-8') . $tag;
       }
    }
@@ -153,9 +155,9 @@ $v1_15 = array(
 );
 
 $v2_18 = array(
-    2, 350, 20,  30,
+    2, 350, 20, 30,
     2, 400, 200, 25,
-    2, 200, 80,  32,
+    2, 200, 80, 32,
     2, 430, 360, 25,
     2, 240, 255, 30,
     2, 50, 140, 33,
@@ -165,9 +167,9 @@ $v2_18 = array(
 );
 
 $vla_18 = array(
-    -2, 20, 100,  -30,
+    -2, 20, 100, -30,
     -2, 20, 210, -25,
-    -2, 220, 110,  -32,
+    -2, 220, 110, -32,
     -2, 20, 360, -25,
     -2, 240, 255, -30,
     -2, 440, 150, -33,
