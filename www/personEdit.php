@@ -169,14 +169,14 @@ function update_pwd($no)
 {
    global $db;
 
-   $s = $db->query("select id from person where not id = $no and uid = " . request('uid'));
+   $s = $db->query("select id from person where not id = $no and uid = '".request('uid2')."'");
    if ($s->rowCount() > 0)
    {
       echo "<font color=red>Ikke oppdatert, brukeren finnes fra før!</font>";
       return;
    }
 
-   if (strlen(request('uid')) < 2)
+   if (strlen(request('uid2')) < 2)
    {
       echo "<font color=red>Ikke oppdatert, brukeren må bestå av minst 2 bokstaver!</font>";
       return;
@@ -194,13 +194,13 @@ function update_pwd($no)
       return;
    }
 
-   if (preg_match("/[^A-Za-z0-9]/", request('uid')))
+   if (preg_match("/[^A-Za-z0-9]/", request('uid2')))
    {
       echo "<font color=red>Ugyldig brukernavn. Gyldige tegn: A-Z, a-z, 0-9</font>";
       return;
    }
 
-   $query = "update person set uid = " . $db->qpost('uid') . ", password = MD5(" . $db->qpost('pwd1') . ")" .
+   $query = "update person set uid = " . $db->qpost('uid2') . ", password = MD5(" . $db->qpost('pwd1') . ")" .
            "where id = $no";
    try
    {
@@ -380,7 +380,7 @@ if (!is_null($no))
     </tr>
     <tr>
       <td>Bruker-id:</td>
-      <td><input type=text name=uid size=30 value=\"" . $row['uid'] . "\"></td>
+      <td><input type=text name=uid2 size=30 value=\"" . $row['uid'] . "\"></td>
     </tr>
     <tr>
       <td>Nytt passord:</td>
