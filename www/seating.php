@@ -162,6 +162,7 @@ if ($access->auth(AUTH::SEAT))
            . "FROM person, participant, instruments, groups "
            . "where person.id = participant.id_person "
            . "and participant.id_project = ".request('id_project')." "
+           . "and participant.stat_final = $db->par_stat_yes "
            . "and participant.id_instruments = instruments.id "
            . "and instruments.id_groups = groups.id "
            . "and groups.id = $grp_id "

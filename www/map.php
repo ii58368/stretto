@@ -105,6 +105,7 @@ function draw_group($img, $lineup)
            . "where person.id = participant.id_person "
            . "and participant.id_project = $id_project "
            . "and participant.id_instruments = instruments.id "
+           . "and participant.stat_final = $db->par_stat_yes "
            . "and instruments.id_groups = groups.id "
            . "and groups.id = $id_groups "
            . "order by participant.position";
