@@ -86,7 +86,7 @@ function get_txt($part, $pos)
          return $p['firstname'] . " " . mb_substr($p['lastname'], 0, 1, 'utf-8') . $tag;
       }
    }
-   if ($access->auth(AUTH::SEAT))
+   if ($access->auth_uid($uid, AUTH::SEAT))
       return $pos;
    return "";
 }

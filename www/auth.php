@@ -57,7 +57,7 @@ class AUTH
    {
       global $whoami;
 
-      $this->access = $this->auth_uid($whoami->real_uid());
+      $this->access = $this->auth_access($whoami->real_uid());
 
       $su_bit = $this->bit(self::SU);
 
@@ -87,7 +87,7 @@ class AUTH
       return $acc;
    }
 
-   private function auth_uid($uid)
+   private function auth_access($uid)
    {
       global $db;
       
@@ -137,7 +137,20 @@ class AUTH
 
       return $this->auth_bit($auth);
    }
+   
+   public function auth_uid()
+   {
+      $uid = func_get_arg(0);
+      $access = $this->auth_access($uid);
+      
+      $auth = 0;
 
+      for ($i = 1; $i < func_num_args(); $i++)
+         $auth |= (1 << func_get_arg($i));
+
+      return ($access & $auth);
+   }
+   
 }
 
 class ACCESS extends AUTH
