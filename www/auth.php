@@ -190,7 +190,6 @@ class ACCESS extends AUTH
 
       echo "<h1>Permission denied</h1>";
       echo "Kontakt <a href=\"mailto:sekretar@oslo-symfoniorkester.org\">Sekretæren</a> for å få nødvendig tilgang";
-      phpinfo();
       exit(0);
    }
 
