@@ -65,7 +65,7 @@ if ($access->auth(AUTH::ABS_ALL))
            . "person.status as status, instrument, plan.id as id_plan "
            . "FROM person, participant, instruments, plan "
            . "where participant.id_project = ".request('id_project')." "
-           . "and person.id_instruments = instruments.id "
+           . "and participant.id_instruments = instruments.id "
            . "and participant.stat_final = $db->par_stat_yes "
            . "and person.id = participant.id_person "
            . "and plan.id_project = ".request('id_project')." "
