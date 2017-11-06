@@ -174,7 +174,7 @@ foreach ($stmt as $row)
     <input type=hidden name=_no value='$no'>
     <td nowrap><input type=submit value=ok title=\"Lagre\">
       <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette " . strftime('%a %e.%b %y', $row['ts']) . "?');\" title=\"Slette...\"></td>
-    <td><input type=text size=10 name=ts value=\"" . date('j. M y', $row['ts']) . "\" title=\"Konsertdato\"></td>
+    <td><input type=date size=10 name=ts value=\"" . date('Y-m-d', $row['ts']) . "\" title=\"Konsertdato\"></td>
     <td><input type=text size=5 maxlength=5 name=time value=\"".$row['time']."\" title=\"Klokkeslett\">
     <td>";
       select_project($row['id_project']);

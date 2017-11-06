@@ -194,8 +194,8 @@ foreach ($stmt as $row)
       select_status($row['status']);
       echo "</td>
     <td>" . strftime('%e.%m.%y') . "</td>
-    <td><input type=date size=10 name=ts_from value=\"" . date('j. M y', $row['ts_from']) . "\" title=\"Dato permisjonssøknaden gjelder fra. Format: eks: 3. dec 2017\"></td>
-    <td><input type=date size=10 name=ts_to value=\"" . date('j. M y', $row['ts_to']) . "\" title=\"Dato permisjonssøknaden gjelder til. Format: eks: 3. dec 2017\"></td>
+    <td><input type=date size=10 name=ts_from value=\"" . date('Y-m-d', $row['ts_from']) . "\" title=\"Dato permisjonssøknaden gjelder fra. Format: eks: 3. dec 2017\"></td>
+    <td><input type=date size=10 name=ts_to value=\"" . date('Y-m-d', $row['ts_to']) . "\" title=\"Dato permisjonssøknaden gjelder til. Format: eks: 3. dec 2017\"></td>
      <td><textarea cols=60 rows=10 wrap=virtual name=text title=Fritekst>".$row['text']."</textarea></td>
     </tr>";
    }

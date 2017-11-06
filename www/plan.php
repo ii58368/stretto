@@ -207,7 +207,7 @@ foreach ($stmt as $row)
     <input type=hidden name=_no value='$no'>
     <td nowrap><input type=submit value=ok>
     <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette" . strftime('%e.%m.%y', $row['date']) . "?');\"></td>
-    <td><input type=date size=10 name=date value=\"" . date('j. M y', $row['date']) . "\" title=\"$hlp_date\"></td>
+    <td><input type=date size=10 name=date value=\"" . date('Y-m-d', $row['date']) . "\" title=\"$hlp_date\"></td>
     <td nowrap>";
       select_tsort($row['tsort']);
       echo "<input type=text size=11 name=time value=\"".$row['time']."\" title=\"Prøvetid\"></td>

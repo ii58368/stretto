@@ -326,7 +326,7 @@ if ($action == 'edit_pers')
       </tr>
     <tr>
       <td>Fødselsdag:</td>
-      <td><input type=date name=birthday size=15 value=\"" . date('j. M Y', $row['birthday']) . "\" title=\"(frivillig) Eks: 10 jan 2017\"></td>
+      <td><input type=date name=birthday size=15 value=\"" . date('Y-m-d', $row['birthday']) . "\" title=\"(frivillig) Eks: 10 jan 2017\"></td>
     </tr>
     <tr>
       <td>Kommentar:</td>
@@ -441,7 +441,7 @@ if ($action == 'new_log')
     <input type=hidden name=_sort value=\"$sort\">
     <input type=hidden name=_no value=$no>
     <input type=submit value=ok title=\"Klikk for registrering...\"></td>
-    <td><input type=date size=15 value=\"" . date('j. M y') . "\" name=ts title=\"Dato for registrering (Eks.: 17. oct 17)\"></td>
+    <td><input type=date size=15 value=\"" . date('Y-m-d') . "\" name=ts title=\"Dato for registrering (Eks.: 17. oct 17)\"></td>
     <td>\n";
    select_status_log(null);
    echo "

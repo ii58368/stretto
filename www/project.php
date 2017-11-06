@@ -214,7 +214,7 @@ foreach ($stmt as $row)
     <td>";
       select_status($row['status']);
       echo "</th>";
-      echo "<td><input type=date size=10 name=deadline value=\"" . date('j. M y', $row['deadline']) . "\" title=\"Permisjons-/påmeldingsfrist\"></td>";
+      echo "<td><input type=date size=10 name=deadline value=\"" . date('Y-m-d', $row['deadline']) . "\" title=\"Permisjons-/påmeldingsfrist\"></td>";
       echo "<td><input type=checkbox name=orchestration";
       if ($row['orchestration'] == $db->prj_orch_tutti)
          echo " checked";

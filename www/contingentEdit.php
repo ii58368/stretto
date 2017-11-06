@@ -158,7 +158,7 @@ if (is_null($delete))
 {
    echo "<tr>
       <td>Dato:</td>
-      <td><input type=date name=date size=10 value=\"" . date('j. M y', $ts) . "\" title=\"Dato for registrering. Format: eks: 23. dec\"></td>
+      <td><input type=date name=date size=10 value=\"" . date('Y-m-d', $ts) . "\" title=\"Dato for registrering. Format: eks: 23. dec\"></td>
     </tr>
     <tr>
       <td>Beløp:</td>
