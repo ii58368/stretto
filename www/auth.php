@@ -63,7 +63,7 @@ class AUTH
 
       if ($whoami->uid() != $whoami->real_uid())
       {
-         $this->access = ($this->access & $su_bit) | ($this->auth_uid($whoami->uid()) & ~$su_bit);
+         $this->access = ($this->access & $su_bit) | ($this->auth_access($whoami->uid()) & ~$su_bit);
       }
    }
 
