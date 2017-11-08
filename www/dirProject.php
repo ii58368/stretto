@@ -143,7 +143,8 @@ $query = "SELECT project.id as id, name, semester, year, id_person, project.stat
         "FROM person, project, instruments " .
         "where project.id_person = person.id " .
         "and id_instruments = instruments.id " .
-        "and project.year >= " . $season->year() . " " .
+        "and project.year = " . $season->year() . " " .
+        "and project.semester = '" . $season->semester() . "' " .
         "order by $sort";
 
 $stmt = $db->query($query);

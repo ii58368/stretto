@@ -167,7 +167,8 @@ if ($action == 'update' && $access->auth(AUTH::PRJ))
 $query = "SELECT project.id as id, name, semester, year, status, " .
         "deadline, orchestration, valid_par_stat, info " .
         "FROM project " .
-        "where project.year >= " . $season->year() . " " .
+        "where project.year = " . $season->year() . " " .
+        "and project.semester = '" . $season->semester() . "' " .
         "order by $sort";
 
 $stmt = $db->query($query);
