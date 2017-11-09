@@ -91,13 +91,12 @@ if ($action == 'new')
   </tr>";
 }
 
-
 function update_db()
 {
    global $db;
    global $no;
    global $delete;
-   
+
    if (($ts_from = strtotime(request('ts_from'))) == false)
    {
       echo "<font color=red>Illegal time format: " . request('ts_from') . "</font>";
@@ -116,12 +115,14 @@ function update_db()
    {
       $query = "insert into `leave` (ts_reg, id_person, status, ts_proc, ts_from, ts_to, text)
               values ($ts_now, " . request('id_person') . ", " . request('status') . ", $ts_now, $ts_from, $ts_to, " . $db->qpost('text') . ")";
-   } else
+   }
+   else
    {
       if (!is_null($delete))
       {
          $query = "DELETE FROM `leave` WHERE id = $no";
-      } else
+      }
+      else
       {
          $query = "update `leave` set " .
                  "id_person = " . request('id_person') . "," .
@@ -140,6 +141,9 @@ function update_db()
 if ($action == 'update' && $access->auth(AUTH::LEAVE_RW))
    update_db();
 
+$ts_min = $season->ts()[0];
+$ts_max = $season->ts()[1];
+
 $query = "select leave.id as id, "
         . "leave.ts_reg as ts_reg, "
         . "person.id as id_person, "
@@ -152,7 +156,10 @@ $query = "select leave.id as id, "
         . "from `leave`, person, instruments "
         . "where leave.id_person = person.id "
         . "and person.id_instruments = instruments.id "
-        . "and leave.ts_to >= " . strtotime("1. jan ".$season->year()) . " "
+        . "and ((leave.ts_from >= $ts_min and leave.ts_to <= $ts_max) "
+        . "or (leave.ts_from < $ts_min and leave.ts_to > $ts_min) "
+        . "or (leave.ts_from < $ts_max and leave.ts_to > $ts_max) "
+        . "or (leave.ts_from < $ts_min and leave.ts_to > $ts_max)) "
         . "order by $sort";
 
 $stmt = $db->query($query);
@@ -165,11 +172,11 @@ foreach ($stmt as $row)
       if ($access->auth(AUTH::LEAVE_RW))
          echo "
          <td><center>
-           <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."&ts_reg=".$season->year()."\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
+           <a href=\"$php_self?_sort=$sort&_action=view&_no=" . $row['id'] . "&ts_reg=" . $season->year() . "\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
              </center></td>";
       echo
       "<td>" . strftime('%a %e.%b %y', $row['ts_reg']) . "</td>" .
-      "<td>".$row['firstname']." ".$row['middlename']." ".$row['lastname']." (".$row['instrument'].")</td>" .
+      "<td>" . $row['firstname'] . " " . $row['middlename'] . " " . $row['lastname'] . " (" . $row['instrument'] . ")</td>" .
       "<td>" . $db->lea_stat[$row['status']] . "</td>" .
       "<td>" . strftime('%a %e.%b %y', $row['ts_proc']) . "</td>" .
       "<td>" . strftime('%a %e.%b %y', $row['ts_from']) . "</td>" .
@@ -196,7 +203,7 @@ foreach ($stmt as $row)
     <td>" . strftime('%e.%m.%y') . "</td>
     <td><input type=date size=10 name=ts_from value=\"" . date('Y-m-d', $row['ts_from']) . "\" title=\"Dato permisjonssøknaden gjelder fra. Format: eks: 3. dec 2017\"></td>
     <td><input type=date size=10 name=ts_to value=\"" . date('Y-m-d', $row['ts_to']) . "\" title=\"Dato permisjonssøknaden gjelder til. Format: eks: 3. dec 2017\"></td>
-     <td><textarea cols=60 rows=10 wrap=virtual name=text title=Fritekst>".$row['text']."</textarea></td>
+     <td><textarea cols=60 rows=10 wrap=virtual name=text title=Fritekst>" . $row['text'] . "</textarea></td>
     </tr>";
    }
 }
