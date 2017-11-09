@@ -107,7 +107,7 @@ if ($action == 'new')
    echo "<input type=text size=11 name=time value=\"18:30-21:30\" title=\"Prøvetid\"></td>
     <td>";
    select_location(request('id_location'));
-   echo "<br><input type=text size=22 name=locationtitle=\"Prøvested som ikke finnes på listen som typisk bare skal benyttes en gang\">";
+   echo "<br><input type=text size=22 name=location title=\"Prøvested som ikke finnes på listen som typisk bare skal benyttes en gang\">";
    echo "</td>
     <td>";
    select_project($id_project);
