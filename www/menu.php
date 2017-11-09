@@ -220,7 +220,7 @@ class MENU
             $project->add(($e['orchestration'] == $db->prj_orch_tutti) ? "Permisjonssøknad" : "Påmelding", "participant_11.php?id_project=$pid", AUTH::RES_SELF);
             $project->add("Fravær", "absence.php?id_project=$pid", AUTH::ABS_RO);
             $project->add("Prosjektressurser", "participant_x1.php?id=$pid", AUTH::RES);
-            $project->add("Konsertannonse", "calender.php?id_project=$pid");
+            $project->add("Konsertreklame", "calender.php?id_project=$pid");
          }
       }
 
