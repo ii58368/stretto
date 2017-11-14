@@ -258,6 +258,10 @@ $person = is_null($no) ? "Ny person" : $row['firstname'] . " " . $row['middlenam
 $postcode = sprintf("%04d", $row['postcode']);
 
 echo "<h1>$person</h1>\n";
+
+echo "Oversikt over dine personopplysninger. Disse kan du oppdatere forløpende. 
+	Her bestemmer du brukernavn og passord for din bruker. <p>";
+
 echo "<a href=\"person.php\" title=\"Til adresselisten...\"><img src=\"images/index.gif\" border=0 hspace=5></a>\n";
 if ($access->auth(AUTH::MEMB_RW))
    echo "<a href=\"$php_self?_sort=$sort&_action=edit_pers\" title=\"Registrere ny person...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";

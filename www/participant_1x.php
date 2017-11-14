@@ -41,6 +41,13 @@ $pers = $stmt->fetch(PDO::FETCH_ASSOC);
 
 echo "
     <h1>Prosjekter for " . $pers['firstname'] . " " . $pers['lastname'] . " (" . $pers['instrument'] . ")</h1>
+    Dette er oversikten over alle orkesterets prosjekter og hvilke av disse du skal være med på. 
+    Kolonnen Tutti viser om prosjektet er et tuttiprosjekt 
+    for alle eller om det er et prosjekt med redusert besetning. 
+
+    Under status ser du status for uttaket, 
+    om styret har vedtatt hvem som skal være med etc. 
+<p>
     <form action='$php_self' method=post>
     <table border=1>
     <tr>

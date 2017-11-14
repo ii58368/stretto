@@ -22,7 +22,6 @@ function participant_status($person_id, $project_id)
    if (is_null($part))
       return array($status, $blink);
 
-   echo "got part: $project_id, $person_id";
    if (isset($part['stat_final']))
       $status = $part['stat_final'];
 

@@ -28,7 +28,13 @@ $row = $stmt->fetch(PDO::FETCH_ASSOC);
   if ($row['status_dir'] == $db->per_dir_nocarry)
     echo "<img src=\"images/chair-minus-icon.png\" border=0 title=\"Kan ikke l&oslash;fte bord\">";
   echo "</h1>".$row['comment']."<p>";
-
+  
+  echo "Oversikt over hvem som er regikomité for prosjektene. 
+     Under <i>status</i> ser du hvilket prosjekt du er valgt ut å være regikomité for.
+     Klikker du deg inn på prosjektet ser du hva du må gjøre og hva som forventes av deg
+     når du sitter i regikomiteen. Du får også oversikt og kontaktinfo til regikomitéen, 
+     samt oversikt over møtetider og -sted. <p>";
+  
   echo "<table border=1>";
   echo "<th>Prosjekt</th>";
   echo "<th>Semester</th>";

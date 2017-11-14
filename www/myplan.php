@@ -3,7 +3,10 @@
 include 'framework.php';
 
 
-echo "<h1>Spilleplan for " . $whoami->name() . "</h1>\n";
+echo "<h1>Spilleplan for " . $whoami->name() . "</h1>
+     Dette er din individuelle spilleplan basert på de prosjekter 
+     du skal være med på. 
+     <p>";
 
 echo "<table><tr>
       <th>Dato</th>

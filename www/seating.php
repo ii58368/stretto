@@ -40,6 +40,7 @@ function get_groups()
       $stmt = $db->query($query);
       $grp = $stmt->fetch(PDO::FETCH_ASSOC);
    }
+
    return $grp['id'];
 }
 

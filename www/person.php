@@ -124,7 +124,10 @@ function get_filter_as_url()
 }
 
 echo "
-    <h1>Adresseliste</h1>\n";
+    <h1>Adresseliste</h1>
+    Oversikt og kontaktinformasjon til orkesterets medlemmer. 
+    Ønsker du å skrive ut listen trykker du på pdf-ikonet 
+    til venstre over listen. <p>";
 if (!is_null(request('f_project')))
 {
    $query = "select name, semester, year from project where ";

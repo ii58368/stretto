@@ -55,6 +55,7 @@ if ($category == "project")
 
    $heading = $row['name'] . " (" . $row['semester'] . $row['year'] . ")";
    $heading2 = $var_arr[$variant];
+   $info_text = "";
 
    $variant_keys = array_keys($var_arr);
    for ($variant_idx = 0; $variant_idx < count($variant_keys); $variant_idx++)
@@ -65,6 +66,9 @@ if ($category == "project")
 if ($category == "common")
 {
    $heading = "Generelle dokumenter";
+   $info_text = "Her finner du dokumenter som omhandler orkesteret. 
+           Eksempelvis vedtekter, sakspapirer generalforsamling, 
+           informasjon til nye medlemmer, instruks for musikalsk råd etc.";
 }
 
 if (is_null($heading))
@@ -88,7 +92,9 @@ function this_access_rw()
 
 echo "
     <h1>$heading</h1>
-    <h2>$heading2</h2>";
+    <h2>$heading2</h2>
+    $info_text<p>";
+
 if (this_access_rw())
    echo "
     <form action=\"$php_self\" method=post>
