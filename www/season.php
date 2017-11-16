@@ -34,6 +34,16 @@ class SEASON
       $this->semester = (date('n') <= 6) ? 'V' : 'H';
       $this->year = date('Y');
    }
+   
+   public function set_year($year)
+   {
+      $this->year = $year;
+   }
+
+   public function set_semester($semester)
+   {
+      $this->semester = $semester;
+   }
 
    public function ts()
    {

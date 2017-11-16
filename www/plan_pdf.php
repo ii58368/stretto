@@ -48,8 +48,8 @@ class PDF extends PDF_util
               "where id_location = location.id " .
               "and id_project = project.id " .
               "and plan.event_type = $db->plan_evt_rehearsal " .
-              "and project.year = ".$season->year()." " .
-              "and project.semester = '".$season->semester()."' " .
+              "and project.year = " . $season->year() . " " .
+              "and project.semester = '" . $season->semester() . "' " .
               "and (project.status = $db->prj_stat_real ";
       if ($access->auth(AUTH::PRJ_RO))
          $query .= "or project.status = $db->prj_stat_draft ";
@@ -62,7 +62,7 @@ class PDF extends PDF_util
       $this->SetTextColor(0, 0, 0);
       $this->setFontSize(12);
       $hight = 3;
-      
+
       $last_date = '';
       $last_time = '';
 
@@ -76,7 +76,7 @@ class PDF extends PDF_util
          $this->SetTextColor($tcolor, $tcolor, $tcolor);
 
          $idx = 0;
-         
+
          $date = ($e['date'] != $last_date) ? strftime('%a %e.%b', $e['date']) : '';
          $this->Cell($tab[$idx++], $hight, $this->sconv($date));
          $time = ($e['date'] != $last_date || $e['time'] != $last_time) ? $e['time'] : '';
@@ -97,7 +97,7 @@ class PDF extends PDF_util
       $this->SetFont('Arial', 'I', 8);
       $this->Cell(0, 30, "* : redusert besetning", 0, 0, 'LB');
    }
-   
+
    public function repertoire()
    {
       global $db;
@@ -114,11 +114,11 @@ class PDF extends PDF_util
       $this->Cell(60, 0, $this->sconv($semester_text));
 
       $this->Line(10, 38, 200, 38);
- 
+
       $query = "select id, name, info, status, orchestration "
               . "from project "
-              . "where project.year = ".$season->year()." "
-              . "and project.semester = '".$season->semester()."' "
+              . "where project.year = " . $season->year() . " "
+              . "and project.semester = '" . $season->semester() . "' "
               . "and (project.status = $db->prj_stat_real ";
       if ($access->auth(AUTH::PRJ_RO))
          $query .= "or project.status = $db->prj_stat_draft ";
@@ -126,7 +126,7 @@ class PDF extends PDF_util
               . "order by project.id";
 
       $stmt = $db->query($query);
-      
+
       $this->SetY(40);
       $this->SetLineWidth(0.3);
       $this->SetDrawColor(0, 0, 0);
@@ -141,42 +141,42 @@ class PDF extends PDF_util
          if ($prj['status'] == $db->prj_stat_draft)
             $tcolor = 200;
          $this->SetTextColor($tcolor, $tcolor, $tcolor);
-         
+
          $q = "select "
-              . "concert.ts as ts, "
-              . "location.name as lname "
-              . "from concert, location "
-              . "where concert.id_project = ".$prj['id']." "
-              . "and concert.id_location = location.id "
-              . "order by concert.ts";
+                 . "concert.ts as ts, "
+                 . "location.name as lname "
+                 . "from concert, location "
+                 . "where concert.id_project = " . $prj['id'] . " "
+                 . "and concert.id_location = location.id "
+                 . "order by concert.ts";
 
          $s = $db->query($q);
-         
+
          $h2 = "";
          if ($prj['orchestration'] == $db->prj_orch_reduced)
             $h2 = "* ";
-         $h2 .= $prj['name']." ";
+         $h2 .= $prj['name'] . " ";
          foreach ($s as $e)
-           $h2 .= ', ' . $e['lname'] . ' ' . strftime('%A %e. %B', $e['ts']);
+            $h2 .= ', ' . $e['lname'] . ' ' . strftime('%A %e. %B', $e['ts']);
          $this->Cell(100, 5, $this->sconv($h2), "B");
- 
+
          $this->Ln(7);
 
          $q = "select "
-              . "title, firstname, lastname, work, "
-              . "repository.comment as r_comment, "
-              . "music.comment as m_comment "
-              . "from music, repository "
-              . "where music.id_project = ".$prj['id']." "
-              . "and music.id_repository = repository.id "
-              . "and music.status = $db->mus_stat_yes";
-         
+                 . "title, firstname, lastname, work, "
+                 . "repository.comment as r_comment, "
+                 . "music.comment as m_comment "
+                 . "from music, repository "
+                 . "where music.id_project = " . $prj['id'] . " "
+                 . "and music.id_repository = repository.id "
+                 . "and music.status = $db->mus_stat_yes";
+
          $s = $db->query($q);
-         
+
          foreach ($s as $e)
          {
-            $this->Cell(50, 5, $this->sconv($e['lastname'].", ".$e['firstname']));
-            $this->Cell(50, 5, $this->sconv($e['title'].", ".$e['work']." ".$e['r_comment']));
+            $this->Cell(50, 5, $this->sconv($e['lastname'] . ", " . $e['firstname']));
+            $this->Cell(50, 5, $this->sconv($e['title'] . ", " . $e['work'] . " " . $e['r_comment']));
             $this->Ln();
             if (strlen($e['m_comment']) > 0)
             {
@@ -185,7 +185,7 @@ class PDF extends PDF_util
                $this->Ln();
             }
          }
-         
+
          $this->Ln(4);
          $this->MultiCell(100, 5, $this->sconv($prj['info']));
          $this->Ln(7);
@@ -196,6 +196,11 @@ class PDF extends PDF_util
    }
 
 }
+
+if (($year = request('year')) != null)
+   $season->set_year($year);
+if (($semester = request('semester')) != null)
+   $season->set_semester($semester);
 
 $pdf = new PDF();
 $pdf->AliasNbPages();
