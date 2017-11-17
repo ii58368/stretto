@@ -62,7 +62,7 @@ class PDF extends PDF_util
       $w = array(30, 30, 30, 50);
       $h = array("Dato", "Prøvetid", "Lokale", "Merknad");
 
-      $this->setFillColor(0xA6, 0xCA, 0xF0);
+      $this->setFillColor(0xE0, 0xE0, 0xE0);
       for ($i = 0; $i < count($w); $i++)
          $this->Cell($w[$i], 5, $this->sconv($h[$i]), 0, 0, "L", true);
       $this->Ln();
@@ -107,7 +107,8 @@ class PDF extends PDF_util
       $stmt = $db->query($query);
 
       $this->header1("Musikere");
-
+      $this->Ln(2);
+      
       $this->colStart();
       $last_instrument = '';
       
@@ -117,15 +118,15 @@ class PDF extends PDF_util
          {
             $this->colLn();            
             if ($this->GetY() > $this->GetPageHeight() - 30)
-               $this->colNext(35);
+               $this->colNext(45);
             $this->bold($e['instrument'].":");
             $this->colLn(2);
          }
          $name = $e['firstname']." ".$e['lastname'];
          $this->Cell(0, 4, $this->sconv($name));
          $this->colLn();
-         if ($this->GetY() > $this->GetPageHeight())
-            $this->colNext(35);
+         if ($this->GetY() > $this->GetPageHeight() - 30)
+            $this->colNext(45);
          $last_instrument = $e['instrument'];
       }
    }
