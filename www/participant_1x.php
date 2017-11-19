@@ -71,7 +71,7 @@ $query = "SELECT project.id as id, name, semester, year, status, " .
         "and (status = $db->prj_stat_real " .
         "or status = $db->prj_stat_tentative) " .
         "order by $sort";
-echo $query;
+
 $stmt = $db->query($query);
 
 foreach ($stmt as $row)
