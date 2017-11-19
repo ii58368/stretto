@@ -102,7 +102,7 @@ class PDF extends PDF_util
               . " and participant.id_instruments = instruments.id"
               . " and participant.id_person = person.id"
               . " and participant.stat_final = $db->par_stat_yes"
-              . " order by instruments.list_order, participant.position";
+              . " order by instruments.list_order, -participant.position DESC";
 
       $stmt = $db->query($query);
 

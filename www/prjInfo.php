@@ -83,7 +83,7 @@ $query = "select firstname, lastname, instrument, stat_inv, stat_final"
         . " and participant.id_instruments = instruments.id"
         . " and participant.id_person = person.id"
         . " and participant.stat_final = $db->par_stat_yes"
-        . " order by instruments.list_order, participant.position";
+        . " order by instruments.list_order, -participant.position DESC";
 $stmt = $db->query($query);
 
 $last_instrument = '';

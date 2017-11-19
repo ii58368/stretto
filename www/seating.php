@@ -119,7 +119,9 @@ if (is_null($sort))
 
 if ($action == 'update')
 {
-   $position = is_null(request('position')) ? 'NULL' : request('position');
+   $position = request('position');
+   if (empty($position))
+      $position = 'NULL';
    $query = "update participant set position = $position," .
            "comment_pos = " . $db->qpost('comment_pos') . " " .
            "where id_person = $no " .
