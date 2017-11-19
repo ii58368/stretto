@@ -58,16 +58,20 @@ echo "
       <th>Tutti</th>
     </tr>";
 
-
+$qperiod = "(project.year > " . $season->year() . " " .
+        "  or (project.year = " . $season->year() . " ";
+if ($season->semester() == 'H')
+   $qperiod .= "and project.semester = '" . $season->semester() . "' ";
+$qperiod .= "))";
 
 $query = "SELECT project.id as id, name, semester, year, status, " .
         "deadline, orchestration " .
         "FROM project " .
-        "where project.year >= " . $season->year() . " " .
-        "and status = $db->prj_stat_real " .
-        "or status = $db->prj_stat_tentative " .
+        "where $qperiod " .
+        "and (status = $db->prj_stat_real " .
+        "or status = $db->prj_stat_tentative) " .
         "order by $sort";
-
+echo $query;
 $stmt = $db->query($query);
 
 foreach ($stmt as $row)
