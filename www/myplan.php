@@ -36,7 +36,7 @@ $query = "SELECT plan.id as id, "
         . "and participant.id_person = ".$whoami->id()." "
         . "and participant.stat_final = $db->par_stat_yes "
         . "and plan.event_type = $db->plan_evt_rehearsal "
-        . "and plan.date > " . strtotime('now') . " "
+        . "and plan.date >= " . strtotime('today') . " "
         . "order by plan.date,plan.tsort,plan.time";
 
 $stmt = $db->query($query);
