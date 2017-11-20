@@ -39,16 +39,25 @@ class PDF extends PDF_util
       $stmt = $db->query($query);
 
       $this->header1("Repertoar");
+      $col1 = 40;
 
       foreach ($stmt as $row)
       {
-         $this->Cell(50, 5, $this->sconv($row['firstname']." ".$row['lastname'].":"));
-         $this->Cell(50, 5, $this->sconv($row['title']));
+         $this->Cell($col1, 5, $this->sconv($row['firstname']." ".$row['lastname'].":"));
+         $this->Cell(80, 5, $this->sconv($row['title']));
          if (strlen($row['work']) > 0)
             $this->Cell(60, 5, $this->sconv("fra ".$row['work']));
-         $this->Cell(50, 5, $this->sconv($row['r_comment']));
-         $this->Cell(50, 5, $this->sconv($row['comment']));
          $this->Ln();
+         if (strlen($row['r_comment']) > 0)
+         {
+            $this->Cell($col1, 5);
+            $this->MultiCell(100, 5, trim($this->sconv($row['r_comment'])));
+         }
+         if (strlen($row['comment']) > 0)
+         {
+            $this->Cell($col1, 5);
+            $this->MultiCell(100, 5, trim($this->sconv($row['comment'])));
+         }
       }
       $this->Ln();
    }
@@ -118,7 +127,7 @@ class PDF extends PDF_util
          {
             $this->colLn();            
             if ($this->GetY() > $this->GetPageHeight() - 30)
-               $this->colNext(45);
+               $this->colNext(43);
             $this->bold($e['instrument'].":");
             $this->colLn(2);
          }
@@ -126,7 +135,7 @@ class PDF extends PDF_util
          $this->Cell(0, 4, $this->sconv($name));
          $this->colLn();
          if ($this->GetY() > $this->GetPageHeight() - 30)
-            $this->colNext(45);
+            $this->colNext(43);
          $last_instrument = $e['instrument'];
       }
    }

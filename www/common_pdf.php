@@ -86,6 +86,12 @@ class PDF_util extends FPDF
    function colNext($x = 25)
    {
       $this->col += $x;
+      if ($this->col > $this->GetPageWidth())
+      {
+         $this->col = 0;
+         $this->line = 0;
+         $this->AddPage();
+      }
       $this->SetXY($this->col, $this->line);
    }
 
