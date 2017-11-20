@@ -103,8 +103,15 @@ foreach ($stmt as $row)
       "<td>".$row['semester']." ".$row['year']."</td>" .
    "<td align=center $bgcolor>";
    $tstat = $db->par_stat[$status];
-   if (!is_null($blink))
+   if (!is_null($blink) && strtotime('today') > $row['deadline'])
       $tstat .= "\n(tilbakemeldingen er under behandling i styret...)";
+   if (!is_null($blink) && strtotime('today') <= $row['deadline'])
+   {
+      if ($row['orchestration'] == $db->prj_orch_tutti)
+         $tstat .= "\n(Du blir automatisk meldt på dersom du ikke søker permisjon innen fristen...)";
+      else
+         $tstat .= "\n(Påmeldingsprosjekt, du må melde deg på for å bli med...)";
+   }
    if ($row['status'] == $db->prj_stat_real)
       echo "<img src=\"images/part_stat_$status$blink.gif\" border=0 title=\"$tstat\">";
    echo "</td>\n";
