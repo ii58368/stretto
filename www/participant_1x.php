@@ -108,7 +108,7 @@ foreach ($stmt as $row)
    if (!is_null($blink) && strtotime('today') <= $row['deadline'])
    {
       if ($row['orchestration'] == $db->prj_orch_tutti)
-         $tstat .= "\n(Du blir automatisk meldt på dersom du ikke søker permisjon innen fristen...)";
+         $tstat .= "\nTutti. (Du må søke permisjon hvis du ikke kan være med på dette prosjektet...)";
       else
          $tstat .= "\n(Påmeldingsprosjekt, du må melde deg på for å bli med...)";
    }
