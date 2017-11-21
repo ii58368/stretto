@@ -121,7 +121,7 @@ function manage_reg($part, $row, $edit, $valid_par_stat)
    {
       if ($edit && $access->auth(AUTH::RES_REG))
       {
-         stat_select("stat_reg:$row", $part['stat_reg'], $valid_par_stat);
+         stat_select("stat_reg:$row", $part['stat_reg'], $valid_par_stat | (1 << $db->par_stat_void));
          echo "<input type=text name=comment_reg:$row size=20 value=\"" . $part['comment_reg'] . "\" title=\"Legg inn eventuell tilleggskommentar\">";
       }
       else
