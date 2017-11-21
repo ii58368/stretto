@@ -62,7 +62,7 @@ function select_template($selected)
 {
    $opt = array(
        "Blank",
-       "Violin 1, 8 pulter",
+       "Violin 1, 9 pulter",
        "Violin 1, 7,5 pulter",
        "Violin 2, 9 pulter",
        "Viola, 9 pulter",
