@@ -32,8 +32,9 @@ function select_filter()
    global $sort;
    global $season;
 
+   $gen_htxt = "Ctrl-klikk for å velge/velge bort flere valg samtidig.";
    // Select status
-   echo "<select name=\"f_status[]\" multiple size=3 onChange=\"submit();\" title=\"Filter for medlemsstatus...\">\n";
+   echo "<select name=\"f_status[]\" multiple size=3 onChange=\"submit();\" title=\"Filter for medlemsstatus...\nMerk: default valg er medlem og engasjert\n$gen_htxt\">\n";
 
    for ($i = 0; $i < count($db->per_stat); $i++)
    {
@@ -48,7 +49,7 @@ function select_filter()
    echo "</select>\n";
 
    // Instrument
-   echo "<select name=\"f_instrument[]\" multiple size=3 onChange=\"submit();\" title=\"Filter for instrumentgruppe...\">\n";
+   echo "<select name=\"f_instrument[]\" multiple size=3 onChange=\"submit();\" title=\"Filter for instrumentgruppe...\n$gen_htxt\">\n";
 
    $s = $db->query("select id, instrument from instruments");
    foreach ($s as $e)
@@ -64,7 +65,7 @@ function select_filter()
    echo "</select>\n";
 
 // Groups
-   echo "<select name=\"f_group[]\" multiple size=3 onChange=\"submit();\" title=\"Filter for gruppering registrert under grupper...\">\n";
+   echo "<select name=\"f_group[]\" multiple size=3 onChange=\"submit();\" title=\"Filter for gruppering registrert under grupper...\n$gen_htxt\">\n";
 
    $s = $db->query("select id, name from groups, member "
            . "where groups.id = member.id_groups group by id order by name");
@@ -81,7 +82,7 @@ function select_filter()
    echo "</select>\n";
 
    // Project
-   echo "<select name=\"f_project[]\" multiple size=3 onChange=\"submit();\" title=\"Filter for prosjekt...\">\n";
+   echo "<select name=\"f_project[]\" multiple size=3 onChange=\"submit();\" title=\"Filter for prosjekt...\n$gen_htxt\">\n";
 
    $s = $db->query("select id, name, year, semester from project "
            . "where year = ".$season->year()." "
