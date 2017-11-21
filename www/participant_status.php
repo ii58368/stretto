@@ -39,9 +39,9 @@ function participant_status($person_id, $project_id)
    }
 
    if ($part['stat_final'] != $db->par_stat_void)
-      if ($part['ts_self'] > $part['ts_final'] ||
-              $part['ts_reg'] > $part['ts_final'] ||
-              $part['ts_req'] > $part['ts_final'])
+      if (($part['stat_self'] != $db->par_stat_void && $part['ts_self'] > $part['ts_final']) ||
+          ($part['stat_reg'] != $db->par_stat_void && $part['ts_reg'] > $part['ts_final']) ||
+          ($part['stat_req'] != $db->par_stat_void && $part['ts_req'] > $part['ts_final']))
          $blink = 'b';
 
    return array($status, $blink);
