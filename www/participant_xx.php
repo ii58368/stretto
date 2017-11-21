@@ -46,14 +46,20 @@ if ($season->semester() == 'H')
 $qperiod .= "))";
 
 
-$query = "SELECT id, name, semester, year " .
+$query = "SELECT id, name, semester, year, status " .
         "FROM project " .
         "where $qperiod " .
         "order by year, semester DESC, project.id";
 $stmt = $db->query($query);
 
 foreach ($stmt as $row)
-   echo "<th><a href=\"participant_x1.php?id=".$row['id']."\" title=\"Administrasjon av ressurser for ".$row['name']." prosjektet...\">".$row['name']."<br>".$row['semester'],$row['year']."</a></td>\n";
+{
+   $text = $row['name']."<br>".$row['semester'].$row['year'];
+   if ($row['status'] == $db->prj_stat_real)
+      echo "<th><a href=\"participant_x1.php?id=".$row['id']."\" title=\"Administrasjon av ressurser for ".$row['name']." prosjektet...\">$text</a></td>\n";
+   else
+      echo "<th>$text</th>\n";
+}
 echo "</tr><tr>";
 
 if (is_null($sort))
