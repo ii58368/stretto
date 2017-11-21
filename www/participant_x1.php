@@ -166,7 +166,7 @@ function manage_req($part, $row, $edit)
    echo "</td>";
 }
 
-function manage_final($part, $row, $edit)
+function manage_final($part, $row, $edit, $orchestration)
 {
    global $db;
    global $access;
@@ -178,7 +178,11 @@ function manage_final($part, $row, $edit)
       if ($edit && $access->auth(AUTH::RES_FIN))
       {
          echo "<input type=checkbox name=stat_final:$row";
-         if ($part['stat_final'] == $db->par_stat_yes)
+         if ($part['stat_final'] == $db->par_stat_yes || 
+                 ($part['stat_final'] == $db->par_stat_void && 
+                 $part['stat_inv'] == $db->par_stat_yes &&
+                 $orchestration == $db->prj_orch_tutti &&
+                 $part['stat_req'] != $db->par_stat_no))
             echo " checked";
          echo " value=" . $db->par_stat_yes . " title=\"Merk av dersom vedkommende er tatt ut til å delta på prosjektet\">";
          echo "<input type=text name=comment_final:$row size=20 value=\"" . $part['comment_final'] . "\" title=\"Legg inn eventuell tilleggskommentar\">";
@@ -440,7 +444,7 @@ foreach ($stmt as $row)
    manage_self($part, $row['id'], false);
    manage_reg($part, $row['id'], $row['id'] == $no || request('col') == "reg", $prj['valid_par_stat']);
    manage_req($part, $row['id'], $row['id'] == $no || request('col') == "req");
-   manage_final($part, $row['id'], $row['id'] == $no || request('col') == "final");
+   manage_final($part, $row['id'], $row['id'] == $no || request('col') == "final", $prj['orchestration']);
 
    echo "</tr>";
 }
