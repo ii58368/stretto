@@ -89,7 +89,7 @@ class PDF extends PDF_util
          $this->Cell($tab[$idx++], $hight, $this->sconv($e['firstname'] . " " . $e['middlename']));
          $this->Cell($tab[$idx++], $hight, $this->sconv($e['address']));
          $this->Cell($tab[$idx++], $hight, $this->sconv(sprintf("%04d", $e['postcode']) . " " . $e['city']));
-         $this->Cell($tab[$idx++], $hight, format_phone($e['phone1']));
+         $this->Cell($tab[$idx++], $hight, $this->format_phone($e['phone1']));
          $this->Cell($tab[$idx++], $hight, $e['email']);
          $this->Ln();
       }
