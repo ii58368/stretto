@@ -199,7 +199,7 @@ class PDF extends PDF_util
 
 if (($year = request('year')) != null)
    $season->set_year($year);
-if (($semester = request('semester')) != null)
+if (!is_null($semester = $_GET['semester']))
    $season->set_semester($semester);
 
 $pdf = new PDF();
