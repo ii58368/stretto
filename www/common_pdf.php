@@ -88,9 +88,9 @@ class PDF_util extends FPDF
       $this->col += $x;
       if ($this->col > $this->GetPageWidth())
       {
-         $this->col = 0;
-         $this->line = 0;
          $this->AddPage();
+         $this->col = $this->GetX();
+         $this->line = $this->GetY();
       }
       $this->SetXY($this->col, $this->line);
    }

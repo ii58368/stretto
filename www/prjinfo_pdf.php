@@ -127,7 +127,7 @@ class PDF extends PDF_util
          {
             $this->colLn();            
             if ($this->GetY() > $this->GetPageHeight() - 30)
-               $this->colNext(43);
+               $this->colNext(41);
             $this->bold($e['instrument'].":");
             $this->colLn(2);
          }
@@ -135,7 +135,7 @@ class PDF extends PDF_util
          $this->Cell(0, 4, $this->sconv($name));
          $this->colLn();
          if ($this->GetY() > $this->GetPageHeight() - 30)
-            $this->colNext(43);
+            $this->colNext(41);
          $last_instrument = $e['instrument'];
       }
    }
