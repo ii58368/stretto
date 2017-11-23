@@ -267,6 +267,9 @@ function update_cell($id_person, $col, $status, $comment, $id_instruments)
 {
    global $db;
 
+   if (is_null($comment))
+      return;
+   
    $id_project = request('id');
    $ts = strtotime("now");
 
@@ -306,7 +309,7 @@ if ($action == 'update')
       $id_instruments = request("id_instruments:$no");
 
       $stat_inv = request("stat_inv:$no");
-      update_cell($no, "inv", $stat_inv, null, $id_instruments);
+      update_cell($no, "inv", $stat_inv, "", $id_instruments);
 
       $stat_req = request("stat_req:$no");
       $comment_req = request("comment_req:$no");
