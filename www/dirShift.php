@@ -52,6 +52,7 @@ $query = "SELECT person.id as person_id, " .
         "FROM person, instruments, project " .
         "where instruments.id = id_instruments " .
         "and person.status = $db->per_stat_member " .
+        "and person.status_dir != $db->per_dir_exempt " .
         "and $qperiod " .
         "order by $sort, year, semester DESC, project.id";
 $stmt = $db->query($query);
@@ -62,10 +63,10 @@ foreach ($stmt as $row)
 {
    if ($row['person_id'] != $prev_id)
    {
-      echo "</tr><tr><th nowrap><a href=myDirection.php?id_person=".$row['person_id']." title=\"".$row['comment']."\">".$row['firstname']." ".$row['lastname']."</a>";
+      echo "</tr><tr><th align=left nowrap><a href=myDirection.php?id_person=".$row['person_id']." title=\"".$row['comment']."\">".$row['firstname']." ".$row['lastname']."</a>";
       if ($row['status_dir'] == $db->per_dir_nocarry)
          echo " <img src=\"images/chair-minus-icon.png\" border=0 title=\"Kan ikke l&oslash;fte bord\"></h2>";
-      echo "</th><th>".$row['instrument']."</th>";
+      echo "</th><th align=left>".$row['instrument']."</th>";
       $prev_id = $row['person_id'];
    }
    $query = "SELECT stat_dir, stat_final, comment_dir from participant " .

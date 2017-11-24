@@ -104,7 +104,7 @@ foreach ($stmt as $row)
            <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
              </center></td>";
       echo "<td>".$row['instrument']."</td>" .
-      "<td><a href=history.php?id_person=".$row['id'].">".$row['firstname']." " .
+      "<td><a href=myDirection.php?id_person=".$row['id'].">".$row['firstname']." " .
       $row['lastname']."</a></td>" .
       "<td><a href=\"mailto:".$row['email']."?subject=OSO - regi\">".$row['email']."</a></td>" .
       "<td nowrap>" . format_phone($row['phone1']) . "</a></td>" .
@@ -115,7 +115,7 @@ foreach ($stmt as $row)
       if ($row['status_dir'] == $db->per_dir_nocarry)
          echo "<center><img src=\"images/chair-minus-icon.png\" border=0 title=\"" . $db->per_dir[$row['status_dir']] . "\"></center>";
       if ($row['status_dir'] == $db->per_dir_exempt)
-         echo "<center><img src=\"images/answer_empty.gif\" border=0 title=\"" . $db->per_dir[$row['status_dir']] . "\"></center>";
+         echo "<center><img src=\"images/answer_empty.gif\" border=0 title=\"" . $db->per_dir[$row['status_dir']] . "\" height=18></center>";
       echo "</td>" .
       "<td>".$row['comment_dir']."</td>" .
       "</tr>";

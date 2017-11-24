@@ -27,7 +27,7 @@ $row = $stmt->fetch(PDO::FETCH_ASSOC);
   echo "<h1>Regiprosjekter for ".$row['firstname']." ".$row['middlename']." ".$row['lastname']." (".$row['instrument'].") ";
   if ($row['status_dir'] == $db->per_dir_nocarry)
     echo "<img src=\"images/chair-minus-icon.png\" border=0 title=\"Kan ikke l&oslash;fte bord\">";
-  echo "</h1>".$row['comment']."<p>";
+  echo "</h1><b>".$row['comment']."</b><p>";
   
   echo "Oversikt over hvem som er regikomité for prosjektene. 
      Under <i>status</i> ser du hvilket prosjekt du er valgt ut å være regikomité for.
