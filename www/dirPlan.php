@@ -205,7 +205,7 @@ if ($access->auth(AUTH::DIR_RW))
       <input type=hidden name=id_project value=" . request('id_project') . ">
       <input type=checkbox name=rehearsal title=\"Vis også prøveplan\" onChange=\"submit();\"";
    if (request('rehearsal'))
-      echo "checked ";
+      echo " checked";
    echo ">
     </form>";
 }
@@ -349,7 +349,8 @@ foreach ($stmt as $row)
 {
    if ($row['id'] != $no || $action != 'view')
    {
-      echo "<tr>";
+      $style = ($row['event_type'] != $db->plan_evt_direction) ? "style=\"background-color: #EEEEEE;\"" : "";
+      echo "<tr $style>";
       if ($access->auth(AUTH::DIR_RW))
       {
          $reh = request('rehearsal') ? "&rehearsal=true" : "";
@@ -377,7 +378,7 @@ foreach ($stmt as $row)
       echo "</td><td>";
       echo str_replace("\n", "<br>\n", $row['comment']);
       echo "</td>" .
-      "</tr>";
+      "</tr>\n";
    }
    else
    {
