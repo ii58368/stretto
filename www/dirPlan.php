@@ -201,9 +201,10 @@ if ($access->auth(AUTH::DIR_RW))
       <input type=hidden name=id_location value=" . request('id_location') . ">
       <input type=submit value=\"Ny aktivitet\">
     </form>
-    <form action='$php_self' method=post>
-      <input type=hidden name=id_project value=" . request('id_project') . ">
-      <input type=checkbox name=rehearsal title=\"Vis også prøveplan\" onChange=\"submit();\"";
+    <form action='$php_self' method=post>\n";
+   if (!is_null($id_project))
+      echo "<input type=hidden name=id_project value=" . request('id_project') . ">\n";
+   echo "<input type=checkbox name=rehearsal title=\"Vis også prøveplan\" onChange=\"submit();\"";
    if (request('rehearsal'))
       echo " checked";
    echo ">
