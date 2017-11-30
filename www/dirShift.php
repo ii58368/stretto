@@ -41,7 +41,7 @@ foreach ($stmt as $row)
 echo "</tr><tr>";
 
 if (is_null($sort))
-   $sort = "(select IFNULL(max(id_project), 0) from participant where id_person = person.id and stat_dir = $db->shi_stat_confirmed), list_order, lastname, firstname ";
+   $sort = "(select IFNULL(max(id_project), 0) from participant where id_person = person.id and (stat_dir = $db->shi_stat_confirmed or stat_dir = $db->shi_stat_responsible)), list_order, lastname, firstname ";
 
 $query = "SELECT person.id as person_id, " .
         "person.status_dir as status_dir, " .
