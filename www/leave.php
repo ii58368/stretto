@@ -36,10 +36,11 @@ function select_person($selected)
 
    echo "<select name=id_person title=\"Velg medlem permisjonssøknaden skal gjelde for\">";
 
-   $q = "SELECT id, firstname, middlename, lastname "
-           . "FROM person "
-           . "where status = $db->per_stat_member "
-           . "order by lastname, firstname";
+   $q = "SELECT person.id as id, firstname, middlename, lastname, instrument "
+           . "FROM person, instruments "
+           . "where person.status = $db->per_stat_member "
+           . "and person.id_instruments = instruments.id "
+           . "order by list_order, lastname, firstname";
 
    $s = $db->query($q);
 
@@ -48,7 +49,7 @@ function select_person($selected)
       echo "<option value=\"" . $e['id'] . "\"";
       if ($e['id'] == $selected)
          echo " selected";
-      echo ">" . $e['firstname'] . " " . $e['middlename'] . " " . $e['lastname'] . "</option>";
+      echo ">" . $e['firstname'] . " " . $e['lastname'] . " (". $e['instrument'] . ")</option>";
    }
    echo "</select>";
 }
