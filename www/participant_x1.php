@@ -138,7 +138,7 @@ function manage_reg($part, $row, $edit, $valid_par_stat)
    echo "</td>";
 }
 
-function manage_req($part, $row, $edit)
+function manage_req($part, $row, $edit, $orchestration)
 {
    global $db;
    global $access;
@@ -149,7 +149,22 @@ function manage_req($part, $row, $edit)
    {
       if ($edit && $access->auth(AUTH::RES_REQ))
       {
-         stat_select("stat_req:$row", $part['stat_req'], 0xff);
+         if ($orchestration == $db->prj_orch_tutti)
+         {
+            $htext = "Kryss av for å anbefale permisjon";
+            $val = $db->par_stat_no;
+         }
+         else
+         {
+            $htext = "Kryss av for å innstille";
+            $val = $db->par_stat_yes;
+         }
+         echo "<input type=checkbox name=stat_req:$row title=\"$htext\"";
+         if (($part['stat_req'] == $db->par_stat_no && $orchestration == $db->prj_orch_tutti)
+          || ($part['stat_req'] == $db->par_stat_yes && $orchestration == $db->prj_orch_reduced))
+            echo " checked";
+         echo " value=$val>";
+         
          echo "<input type=text name=comment_req:$row size=20 value=\"" . $part['comment_req'] . "\" title=\"Legg inn eventuell tilleggskommentar\">";
       }
       else
@@ -313,6 +328,8 @@ if ($action == 'update')
 
       $stat_req = request("stat_req:$no");
       $comment_req = request("comment_req:$no");
+      if ($stat_req == null && strlen($comment_req) > 0)
+        $stat_req = $db->par_stat_tentative;
       update_cell($no, "req", $stat_req, $comment_req, $id_instruments);
 
       $stat_reg = request("stat_reg:$no");
@@ -446,7 +463,7 @@ foreach ($stmt as $row)
    view_leave($row['id'], $prj['year'], $prj['semester']);
    manage_self($part, $row['id'], false);
    manage_reg($part, $row['id'], $row['id'] == $no || request('col') == "reg", $prj['valid_par_stat']);
-   manage_req($part, $row['id'], $row['id'] == $no || request('col') == "req");
+   manage_req($part, $row['id'], $row['id'] == $no || request('col') == "req", $prj['orchestration']);
    manage_final($part, $row['id'], $row['id'] == $no || request('col') == "final", $prj['orchestration']);
 
    echo "</tr>";
