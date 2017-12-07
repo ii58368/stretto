@@ -19,7 +19,7 @@ function manage_instrument($selected, $row, $edit)
 
    echo "<td>";
 
-   if ($edit && $access->auth(AUTH::RES_INV))
+   if ($edit && $access->auth(AUTH::RES_INV, AUTH::RES_REQ))
    {
       echo "<select name=id_instruments:$row title=\"Velg instrument som vedkommende skal spille på dette prosjektet\">";
 
@@ -37,7 +37,7 @@ function manage_instrument($selected, $row, $edit)
    }
    else
    {
-      $q = "SELECT instrument FROM instruments where id = $selected";
+      $q = "SELECT id, instrument FROM instruments where id = $selected";
       $s = $db->query($q);
       $e = $s->fetch(PDO::FETCH_ASSOC);
       echo $e['instrument'];
@@ -284,63 +284,72 @@ function update_cell($id_person, $col, $status, $comment, $id_instruments)
 
    if (is_null($comment))
       return;
-   
+
    $id_project = request('id');
    $ts = strtotime("now");
+   $def_status = is_null($status) ? $db->par_stat_void : $status;
 
-   if (is_null($status))
-      $status = $db->par_stat_void;
-
-   $q = "select * from participant where id_project=$id_project and id_person=$id_person";
-   $stmt = $db->query($q);
-   if ($stmt->rowCount() == 0)
-   {
-      if ($status == $db->par_stat_void)
-         return;
-      $query = "insert into participant (id_person, id_project, stat_$col, ts_$col, comment_$col, id_instruments) " .
-              "values ($id_person, $id_project, $status, $ts, " . $db->quote($comment) . ", $id_instruments)";
-   } else
-   {
-      $e = $stmt->fetch(PDO::FETCH_ASSOC);
-      $query = "update participant set " .
-              "stat_$col = $status, ";
-      if ($status != $e["stat_$col"])
-         $query .= "ts_$col = $ts, ";
-      $query .= "comment_$col = " . $db->quote($comment) . ", " .
-              "id_instruments = $id_instruments " .
-              "where id_person = $id_person " .
-              "and id_project = $id_project";
-   }
+   $query = "insert into participant (id_person, id_project, stat_$col, ts_$col, comment_$col, id_instruments) " .
+              "values ($id_person, $id_project, $def_status, $ts, " . $db->quote($comment) . ", $id_instruments) " .
+              "on duplicate key update ";
+   if (!is_null($status))
+      $query .= 
+              "stat_$col = $status, " .
+              "ts_$col = $ts, ";
+   $query .= "comment_$col = " . $db->quote($comment) . "," .
+              "id_instruments = $id_instruments";
+   
    $db->query($query);
 }
 
 if ($sort == NULL)
    $sort = 'status,list_order,lastname,firstname';
 
+$query = "select name, semester, year, deadline, orchestration, valid_par_stat"
+        . " from project where id=" . request('id');
+$stmt = $db->query($query);
+$prj = $stmt->fetch(PDO::FETCH_ASSOC);
+
 if ($action == 'update')
 {
+
    if (!is_null($no))
    {
-      $id_instruments = request("id_instruments:$no");
+      $part = get_participant($no);
+      if (is_null($id_instruments = request("id_instruments:$no")))
+         $id_instruments = $part['id_instruments'];
 
-      $stat_inv = request("stat_inv:$no");
-      update_cell($no, "inv", $stat_inv, "", $id_instruments);
+      if (is_null(($stat_inv = request("stat_inv:$no"))))
+         $stat_inv = $db->par_stat_no;       
+      $comment_inv = request("comment_inv:$no");
+      update_cell($no, "inv", $stat_inv, $comment_inv, $id_instruments);
 
-      $stat_req = request("stat_req:$no");
-      $comment_req = request("comment_req:$no");
-      if ($stat_req == null && strlen($comment_req) > 0)
-        $stat_req = $db->par_stat_tentative;
-      update_cell($no, "req", $stat_req, $comment_req, $id_instruments);
-
-      $stat_reg = request("stat_reg:$no");
+      if (($stat_reg = request("stat_reg:$no")) == $part['stat_reg'])
+         $stat_reg = $db->par_stat_void;
       $comment_reg = request("comment_reg:$no");
       update_cell($no, "reg", $stat_reg, $comment_reg, $id_instruments);
+
+      $comment_req = request("comment_req:$no");
+      if (is_null($stat_req = request("stat_req:$no")))
+         $stat_req = $db->par_stat_void;
+      if ($stat_req == null && strlen($comment_req) > 0)
+        $stat_req = $db->par_stat_tentative;
+      if ($stat_req == $part['stat_req'])
+         $stat_req = null;
+      update_cell($no, "req", $stat_req, $comment_req, $id_instruments);
 
       $stat_final = request("stat_final:$no");
       if (is_null($stat_final))
          $stat_final = $db->par_stat_no;
       if (is_null($stat_inv))
          $stat_final = $db->par_stat_void;
+      if ($prj['orchestration'] == $db->prj_orch_reduced &&
+          $part['stat_self'] == $db->par_stat_void &&
+          $part['stat_reg'] == $db->par_stat_void &&
+          $stat_final == $db->par_stat_no)
+         $stat_final = $db->par_stat_void;
+      if ($stat_final == $part['stat_final'])
+         $stat_final = null;
       $comment_final = request("comment_final:$no");
       update_cell($no, "final", $stat_final, $comment_final, $id_instruments);
 
@@ -355,10 +364,21 @@ if ($action == 'update')
             list($field, $pid) = explode(':', $key);
             if ($field == "comment_$col")
             {
+               $part = get_participant($pid);
                $stat = request("stat_$col:$pid");
+               if (is_null($id_instruments = request("id_instruments:$pid")))
+                  $id_instruments = $part['id_instruments'];
+              
                if ($col == 'final' && is_null($stat))
-                  $stat = $db->par_stat_no;
-               update_cell($pid, $col, $stat, $val, request("id_instruments:$pid"));
+                  $stat = ($prj['orchestration'] == $db->prj_orch_reduced &&
+                           $part['stat_self'] == $db->par_stat_void &&
+                           $part['stat_reg'] == $db->par_stat_void) ? 
+                       $db->par_stat_void : $db->par_stat_no;
+               if ($col == 'req' && is_null($stat))
+                  $stat = (strlen($val) > 0) ? $db->par_stat_tentative : $db->par_stat_void;
+               if ($stat == $part["stat_$col"])
+                  $stat = null;
+               update_cell($pid, $col, $stat, $val, $id_instruments);
             }
          }
       }
@@ -376,11 +396,6 @@ if ($action == 'reset')
    $_REQUEST['col'] = null;
 }
 
-$query = "select name, semester, year, deadline, orchestration, valid_par_stat"
-        . " from project where id=" . request('id');
-$stmt = $db->query($query);
-$prj = $stmt->fetch(PDO::FETCH_ASSOC);
-
 echo "
     <h1>Deltagelse " . $prj['name'] . " (" . $prj['semester'] . "-" . $prj['year'] . ")</h1>
     <h2>";
@@ -388,7 +403,7 @@ if ($prj['orchestration'] == $db->prj_orch_tutti)
    echo "Permisjonsfrist: ";
 else
    echo "Påmeldingsfrist: ";
-echo strftime('%e.%m.%y', $prj['deadline']) . "</h2>
+echo strftime('%e. %b %Y', $prj['deadline']) . "</h2>
     <form action='$php_self' method=post>
     <input type=hidden name=_action value=update>
     <input type=hidden name=id value=" . request('id') . ">
