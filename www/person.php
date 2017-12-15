@@ -181,7 +181,10 @@ echo "
       <th>Mobil</th>
       <th>Priv</th>
       <th>Arbeid</th>
-      <th><a href=\"$php_self?_sort=status,list_order,lastname,firstname$f_filter\" title=\"Sorter på status...\">Status</a></th>
+      <th><a href=\"$php_self?_sort=status,list_order,lastname,firstname$f_filter\" title=\"Sorter på status...\">Status</a></th>";
+      if ($access->auth(AUTH::MEMB_RW))
+        echo "<th>Født</th>";
+      echo "
       <th>Kommentar</th>
       </tr>";
 
@@ -206,7 +209,10 @@ foreach ($result as $row)
    "<td nowrap>" . format_phone($row['phone1']) . "</td>" .
    "<td>".$row['phone2']."</td>" .
    "<td>".$row['phone3']."</td>" .
-   "<td>".$db->per_stat[$row['status']]."</td>" .
+   "<td>".$db->per_stat[$row['status']]."</td>";
+   if ($access->auth(AUTH::MEMB_RW))
+      echo "<td>".strftime('%e. %b %Y', $row['birthday'])."</td>";
+   echo
    "<td>".$row['comment']."</td>" .
    "</tr>";
 }

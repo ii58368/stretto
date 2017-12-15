@@ -9,7 +9,7 @@ function person_query()
    
    $query = "SELECT person.id as id, instruments.id as id_instruments, instrument, firstname, middlename, lastname, "
            . "address, postcode, city, "
-           . "email, phone1, phone2, phone3, person.status as status, person.comment as comment "
+           . "email, phone1, phone2, phone3, birthday, person.status as status, person.comment as comment "
            . "FROM person, instruments ";
    if (!is_null(request('f_project')))
       $query .= ", participant, project ";
