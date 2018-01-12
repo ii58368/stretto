@@ -26,7 +26,7 @@ function select_project()
    echo "<select name=id_project onChange=\"submit();\" title=\"$htext\">\n";
 
    $q = "select id, name, semester, year from project\n"
-           . " where year >= " . date("Y")
+           . " where year >= " . $season->year()
            . " order by year,semester DESC, id";
    $s = $db->query($q);
 
