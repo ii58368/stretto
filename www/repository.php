@@ -19,13 +19,14 @@ function select_project()
 {
    global $db;
    global $id_project;
+   global $season;
 
    $htext = "Velg prosjekt som det skal knytes repertoar til. "
            . "Trykk på knappene i kolonnen under for å legge til "
            . "eller å slette repertoar til dette prosjektet.";
    echo "<select name=id_project onChange=\"submit();\" title=\"$htext\">\n";
 
-   $q = "select id, name, semester, year from project\n"
+   $q = "select id, name, semester, year from project"
            . " where year >= " . $season->year()
            . " order by year,semester DESC, id";
    $s = $db->query($q);
