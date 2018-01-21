@@ -22,7 +22,7 @@ function participant_status($person_id, $project_id)
    if (is_null($part))
       return array($status, $blink);
    
-   if ($part['stat_inv'] == $db->par_stat_void)
+   if ($part['stat_inv'] == $db->par_stat_void || $part['stat_inv'] == $db->par_stat_no)
       return array($status, $blink);
 
    if (isset($part['stat_final']))
