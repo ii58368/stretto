@@ -136,9 +136,9 @@ if ($action == 'update' && this_access_rw())
          mkdir($path, 0755, true);
 
       $dst_file = $path . "/" . $_FILES['filename']['name'];
-      if ($_FILES['filename']['size'] > 10 * 1024 * 1024)
+      if ($_FILES['filename']['size'] > 100 * 1024 * 1024)
       {
-         echo "<font color=red>File too large! (>10MB)</font>";
+         echo "<font color=red>File too large! (>100MB)</font>";
       }
       else
       {
