@@ -136,9 +136,9 @@ if ($action == 'update' && this_access_rw())
          mkdir($path, 0755, true);
 
       $dst_file = $path . "/" . $_FILES['filename']['name'];
-      if ($_FILES['filename']['size'] > 100 * 1024 * 1024)
+      if ($_FILES['filename']['size'] > 20 * 1024 * 1024)
       {
-         echo "<font color=red>File too large! (>100MB)</font>";
+         echo "<font color=red>File too large! (>20MB)</font>";
       }
       else
       {
@@ -200,7 +200,8 @@ if (is_dir($path))
     <td><input type=text size=30 name=file value=\"$file\" title=\"Angi nytt filnavn...\"></td>
          </form>";
          }
-         echo "<td>" . (int) ($stat['size'] / 1024) . "K</td>" .
+         $tsize = ($stat['size']/1024 > 1024) ? (int)($stat['size'] / (1024*1024)) . "M" : (int)($stat['size'] / 1024) . "K";
+         echo "<td>$tsize</td>" .
          "<td>" . strftime('%a %e.%b %y', $stat['mtime']) . "</td>" .
          "</tr>";
       }
