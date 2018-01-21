@@ -279,7 +279,7 @@ if ($action == 'edit_pers')
         <input type=hidden name=_action value=update_pers>
         <input type=submit value=\"Lagre\">\n";
    if ($no != null && $access->auth(AUTH::MEMB_RW))
-      echo "<input type=hidden name=uid value=\"$row[uid]\">
+      echo "<input type=hidden name=uid value=\"".$row['uid']."\">
         <input type=submit name=_delete value=slett title=\"Kan slettes fra medlemsregisteret dersom vedkommende ikke har vært med på noen prosjekter\">\n";
    echo "</th>
     </tr>

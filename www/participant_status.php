@@ -9,7 +9,7 @@ function participant_status($person_id, $project_id)
    $status = $db->par_stat_void;
    $blink = null;
 
-   $q = "select stat_self, stat_reg, stat_req, stat_final, "
+   $q = "select stat_inv, stat_self, stat_reg, stat_req, stat_final, "
            . "ts_self, ts_reg, ts_req, ts_final, "
            . "orchestration "
            . "from participant, project "
@@ -20,6 +20,9 @@ function participant_status($person_id, $project_id)
    $part = $s->fetch(PDO::FETCH_ASSOC);
 
    if (is_null($part))
+      return array($status, $blink);
+   
+   if ($part['stat_inv'] == $db->par_stat_void)
       return array($status, $blink);
 
    if (isset($part['stat_final']))
