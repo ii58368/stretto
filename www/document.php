@@ -200,9 +200,9 @@ if (is_dir($path))
     <td><input type=text size=30 name=file value=\"$file\" title=\"Angi nytt filnavn...\"></td>
          </form>";
          }
-         $tsize = ($stat['size']/1024 > 1024) ? (int)($stat['size'] / (1024*1024)) . "M" : (int)($stat['size'] / 1024) . "K";
+         $tsize = ($stat['size']/1024 > 1024) ? (int)($stat['size'] / (1024*1024)) . "MB" : (int)($stat['size'] / 1024) . "KB";
          echo "<td>$tsize</td>" .
-         "<td>" . strftime('%a %e.%b %y', $stat['mtime']) . "</td>" .
+         "<td>" . strftime('%a %e.%b %Y', $stat['mtime']) . "</td>" .
          "</tr>";
       }
 
