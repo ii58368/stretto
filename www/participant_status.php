@@ -11,7 +11,7 @@ function participant_status($person_id, $project_id)
 
    $q = "select stat_inv, stat_self, stat_reg, stat_req, stat_final, "
            . "ts_self, ts_reg, ts_req, ts_final, "
-           . "orchestration "
+           . "orchestration, deadline "
            . "from participant, project "
            . "where participant.id_project = $project_id "
            . "and participant.id_person = $person_id "
@@ -19,10 +19,18 @@ function participant_status($person_id, $project_id)
    $s = $db->query($q);
    $part = $s->fetch(PDO::FETCH_ASSOC);
 
+   // Return void if unknown participant
    if (is_null($part))
       return array($status, $blink);
    
+   // Return void if not part of the line-up
    if ($part['stat_inv'] == $db->par_stat_void || $part['stat_inv'] == $db->par_stat_no)
+      return array($status, $blink);
+   
+   // Return void if deadline is passed and no reply from member
+   if ($part['stat_final'] == $db->par_stat_void &&
+      $part['orchestration'] == $db->prj_orch_reduced &&
+      strtotime('today') > $part['deadline'])
       return array($status, $blink);
 
    if (isset($part['stat_final']))
