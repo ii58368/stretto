@@ -320,12 +320,12 @@ if ($action == 'update')
          $id_instruments = $part['id_instruments'];
 
       if (is_null(($stat_inv = request("stat_inv:$no"))))
-         $stat_inv = $db->par_stat_void;       
+         $stat_inv = $db->par_stat_no;       
       $comment_inv = request("comment_inv:$no");
       update_cell($no, "inv", $stat_inv, $comment_inv, $id_instruments);
 
       if (($stat_reg = request("stat_reg:$no")) == $part['stat_reg'])
-         $stat_reg = $db->par_stat_void;
+         $stat_reg = null;
       $comment_reg = request("comment_reg:$no");
       update_cell($no, "reg", $stat_reg, $comment_reg, $id_instruments);
 
