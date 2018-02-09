@@ -51,7 +51,7 @@ function select_filter()
    // Instrument
    echo "<select name=\"f_instrument[]\" multiple size=3 onChange=\"submit();\" title=\"Filter for instrumentgruppe...\n$gen_htxt\">\n";
 
-   $s = $db->query("select id, instrument from instruments");
+   $s = $db->query("select id, instrument from instruments order by list_order");
    foreach ($s as $e)
    {
       echo "<option value=".$e['id'];
