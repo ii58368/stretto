@@ -50,10 +50,19 @@ if ($action == 'update')
          list($field, $id_person) = explode(':', $key);
          if ($field == "status")
          {
-            $query = "replace into absence "
+            if (is_null(request('clear')))
+            {
+               $query = "replace into absence "
                     . "(id_person, id_plan, status, comment) "
                     . "values "
                     . "($id_person, " . request('id_plan') . ", $val, " . $db->qpost("comment:$id_person") . ")";
+            }
+            else
+            {
+               $query = "delete from absence "
+                       . "where id_plan = " . request('id_plan') . " "
+                       . "and id_person = $id_person";
+            }
             $db->query($query);
          }
       }
@@ -69,6 +78,7 @@ echo "
     <input type=hidden name=_sort value=$sort>
     <input type=hidden name=_action value=update>
     <input type=submit value=Lagre $style  title=\"Lagre\">
+    <input type=submit name= clear value=Slett  title=\"Slett alt som er registrert for denne prøven\" onClick=\"return confirm('Sikkert at du vil slette alt for denne prøven?');\">
     <table border=1>
     <tr>
       <th><a href=\"$php_self?id_plan=" . request('id_plan') . "&_sort=firstname,lastname\" title=\"Sorter på fornavn, deretter etternavn\">Navn</a></th>
