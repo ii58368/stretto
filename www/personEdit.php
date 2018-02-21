@@ -514,7 +514,7 @@ foreach ($stmt as $row)
     <input type=hidden name=_no value=$no>
     <th nowrap><input type=submit value=ok>
       <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette?');\"></th>
-    <th><input type=date size=15 name=ts value=\"" . date('j. M y', $row['ts']) . "\" title=\"Eks: 10 dec 201\"></th>\n";
+    <th><input type=date size=15 name=ts value=\"" . date('Y-m-d', $row['ts']) . "\" title=\"Eks: 10 dec 201\"></th>\n";
       echo "<td>";
       select_status_log($row['status']);
       echo "</td>
