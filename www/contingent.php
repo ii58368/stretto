@@ -21,7 +21,7 @@ if (is_null($sort))
    $sort = "list_order,lastname,firstname";
 
 $query = "SELECT person.id as id_person, " .
-        "firstname, middlename, lastname, instrument " .
+        "firstname, middlename, lastname, instrument, email " .
         "FROM person, instruments " .
         "where instruments.id = person.id_instruments " .
         "and person.status = $db->per_stat_member " .
@@ -31,7 +31,7 @@ $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
-   echo "<tr><td>".$row['firstname']." ".$row['middlename']." ".$row['lastname']."</a>\n";
+   echo "<tr><td><a href=\"mailto:".$row['email']."?subject=OSO:\">".$row['firstname']." ".$row['middlename']." ".$row['lastname']."</a>\n";
    echo "</td><td>".$row['instrument']."</td>\n";
 
    for ($i = $sel_year; $i <= $end_year; $i++)

@@ -135,7 +135,7 @@ function con($key = null)
 $ts = is_null(con('ts')) ? strtotime("now") : intval(con('ts'));
 
 echo "
-    <h1><a href=contingent.php title=\"Tilbake til liste\">Medlemskontingent " . request('year') . "</a></h1>
+    <h1>Medlemskontingent</h1>
     <h2>" . $per['firstname'] . " " . $per['middlename'] . " " . $per['lastname'] . " (" . $per['instrument'] . ")</h2>
     <table id=\"no_border\">
       <form action='$php_self' method=post>
@@ -152,13 +152,14 @@ if (is_null($delete))
    echo "<input type=submit value=Lagre title=\"Lagre endring\" $style>\n";
 if (!is_null(con()))
    echo "<input type=submit name=_delete value=slett title=\"Slett betailng...\" onClick=\"return confirm('Sikkert at du vil slette denne betalingen?');\">\n";
+echo "<input type=button value=Tilbake onClick=\"location.href='contingent.php?year=" . request('year') . "';\" title=\"Tilbake til liste...\">\n";
 echo "</th>
     </tr>\n";
 if (is_null($delete))
 {
    echo "<tr>
       <td>Dato:</td>
-      <td><input type=date name=date size=10 value=\"" . date('Y-m-d', $ts) . "\" title=\"Dato for registrering. Format: eks: 23. dec\"></td>
+      <td><input type=text name=date size=10 value=\"" . date('j M y', $ts) . "\" title=\"Dato for registrering. Format: eks: 23. dec\" autofocus onFocus=\"this.select()\"></td>
     </tr>
     <tr>
       <td>Beløp:</td>
