@@ -55,10 +55,11 @@ $style = '';
 
 if ($action == 'update')
 {
-   if (($ts = strtotime(request('date'))) == false)
+   if (($dtime = DateTime::createFromFormat("d.m.Y", request('date'))) == false)
       echo "<font color=red>Illegal time format: " . request('date') . "</font>";
    else
    {
+      $ts = $dtime->getTimestamp();
       try
       {
          if ($no == null)
@@ -159,7 +160,7 @@ if (is_null($delete))
 {
    echo "<tr>
       <td>Dato:</td>
-      <td><input type=text name=date size=10 value=\"" . date('j M y', $ts) . "\" title=\"Dato for registrering. Format: eks: 23. dec\" autofocus onFocus=\"this.select()\"></td>
+      <td><input type=text name=date size=10 value=\"" . date('d.m.Y', $ts) . "\" title=\"Dato for registrering. Format: eks: 23. dec\" autofocus onFocus=\"this.select()\"></td>
     </tr>
     <tr>
       <td>Beløp:</td>
