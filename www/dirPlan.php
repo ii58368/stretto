@@ -372,7 +372,9 @@ foreach ($stmt as $row)
       echo "</td><td>" . $row['pname'] . "</td><td nowrap>";
       if ($row['event_type'] == $db->plan_evt_direction)
       {
-         echo "<b>" . $row['firstname'] . " " . $row['lastname'] . "</b><a href=\"$php_self?_action=add&_no=" . $row['id'] . "&id_project=" . request('id_project') . "\"><img src=\"images/user_male_add2.png\" border=0 title=\"Legg til regigruppen\"></a><br>";
+         echo "<b>" . $row['firstname'] . " " . $row['lastname'] . "</b><a href=\"$php_self?_action=add&_no=" . $row['id'] . "&id_project=" . request('id_project') . "\">";
+//         echo "<img src=\"images/user_male_add2.png\" border=0 title=\"Legg til regigruppen\"></a>";
+         echo "<br>\n";
          direction_list($row['id']);
          echo $row['responsible'];
       }
