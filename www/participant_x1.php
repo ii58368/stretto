@@ -246,8 +246,8 @@ function view_leave($id_person, $year, $semester)
 
    echo "<td>";
 
-   $date_min = ($semester == 'V') ? "1. jan" : "1. jul";
-   $date_max = ($semester == 'V') ? "30. jun" : "31. dec";
+   $date_min = ($semester == 'V') ? "1. jan" : "1. aug";
+   $date_max = ($semester == 'V') ? "1. aug" : "31. dec";
 
    $ts_min = strtotime("$date_min $year");
    $ts_max = strtotime("$date_max $year");
