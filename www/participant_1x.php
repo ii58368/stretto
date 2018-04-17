@@ -5,33 +5,6 @@ include_once 'participant_status.php';
 if (is_null($sort))
    $sort = 'year,semester DESC,id';
 
-function on_leave($id_person, $semester, $year)
-{
-   global $db; 
-   
-   $date_min = ($semester == 'V') ? "1. jan" : "1. jul";
-   $date_max = ($semester == 'V') ? "30. jun" : "31. dec";
-   
-   $ts_min = strtotime("$date_min " . $year);
-   $ts_max = strtotime("$date_max " . $year);
-
-   $query = "select ts_from, ts_to, status "
-           . "from `leave` "
-           . "where id_person = $id_person "
-           . "and ((ts_from >= $ts_min and ts_to <= $ts_max) "
-           . "or (ts_from < $ts_min and ts_to > $ts_min) "
-           . "or (ts_from < $ts_max and ts_to > $ts_max) "
-           . "or (ts_from < $ts_min and ts_to > $ts_max)) "
-           . "order by status";
-
-   $stmt = $db->query($query);
-   
-   foreach ($stmt as $p)
-      return $p['status'];
-   
-   return $db->lea_stat_unknown;
-}
-
 $query = "select person.id as id, firstname, lastname, instrument"
         . " from person, instruments"
         . " where person.id = " . request('id') . " "
