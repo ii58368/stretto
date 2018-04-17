@@ -6,7 +6,7 @@ if ($action == 'update' && $access->auth(AUTH::DIR_RW))
    $next_status = intval(request('stat_dir')) + 1;
    if ($next_status == $db->shi_stat_leave) // deprecated
       $next_status++;
-   if ($next_status > 4)
+   if ($next_status > 2)
       $next_status = 0;
 
    $query = "update participant set stat_dir = $next_status " .
