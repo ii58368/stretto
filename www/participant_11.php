@@ -167,11 +167,6 @@ echo "<h2>Deltakerstatus</h2>";
 
 $lstatus = on_leave($id_person, $prj['semester'], $prj['year']);
 
-if ($lstatus == $db->lea_stat_unknown)
-{
-   echo "<img border=0 src=\"images/ballc_g1.gif\">";
-   echo "Du har en søknad om langtidspermisjon med ukjent status i samme semester som prosjektet pågår.<br>\n";
-}
 if ($lstatus == $db->lea_stat_registered)
 {
    echo "<img border=0 src=\"images/yellball.gif\">";
