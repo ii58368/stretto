@@ -186,7 +186,6 @@ echo "
       if ($access->auth(AUTH::MEMB_RW))
         echo "<th>Født</th>";
       echo "
-      <th>Kommentar</th>
       </tr>";
 
 reset($result);
@@ -214,7 +213,6 @@ foreach ($result as $row)
    if ($access->auth(AUTH::MEMB_RW))
       echo "<td>".strftime('%e. %b %Y', $row['birthday'])."</td>";
    echo
-   "<td>".$row['comment']."</td>" .
    "</tr>";
 }
 ?>
