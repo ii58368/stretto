@@ -63,6 +63,8 @@ function select_project($selected)
 {
    global $db;
 
+   if (is_null($selected))
+      $selected = -1;
    echo "<select name=id_project>";
 
    $year = date("Y");
@@ -195,9 +197,10 @@ if ($access->auth(AUTH::DIR_RW))
 {
    echo "
     <form action='$php_self' method=post>
-      <input type=hidden name=rehearsal value=true>
-      <input type=hidden name=_action value=new>
-      <input type=hidden name=id_project value=" . request('id_project') . ">
+    <input type=hidden name=_action value=new>";
+   if (!is_null(request('rehearsal')))
+      echo "<input type=hidden name=rehearsal value=true>";
+   echo "
       <input type=hidden name=id_location value=" . request('id_location') . ">
       <input type=submit value=\"Ny aktivitet\">
     </form>
@@ -205,7 +208,7 @@ if ($access->auth(AUTH::DIR_RW))
    if (!is_null($id_project))
       echo "<input type=hidden name=id_project value=" . request('id_project') . ">\n";
    echo "<input type=checkbox name=rehearsal title=\"Vis også prøveplan\" onChange=\"submit();\"";
-   if (request('rehearsal'))
+   if (!is_null(request('rehearsal')))
       echo " checked";
    echo ">
     </form>";
@@ -229,7 +232,7 @@ echo "
 
 if ($action == 'new')
 {
-   if (request('rehearsal'))
+   if (!is_null(request('rehearsal')))
       echo "<input type=hidden name=rehearsal value=true>";
    echo "<tr>
     <td align=left><input type=hidden name=_action value=update>
