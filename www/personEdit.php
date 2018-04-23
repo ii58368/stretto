@@ -252,6 +252,13 @@ if (!is_null($no))
 
    $stmt = $db->query($query);
    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+   
+   $query2 = "select view.name as name "
+           . "from view, auth_person, person "
+           . "where view.id = auth_person.id_view "
+           . "and auth_person.id_person = person.id "
+           . "and person.id = $no";
+   $stmt2 = $db->query($query2);
 }
 
 $person = is_null($no) ? "Ny person" : $row['firstname'] . " " . $row['middlename'] . " " . $row['lastname'];
@@ -285,9 +292,15 @@ if ($action == 'edit_pers')
     </tr>
     <tr>
       <td>Navn:</td>
-      <td><input type=text name=firstname size=30 value=\"" . $row['firstname'] . "\" title=\"Fornavn\">
+      <td>";
+   if ($access->auth(AUTH::MEMB_RW))
+      echo "
+          <input type=text name=firstname size=30 value=\"" . $row['firstname'] . "\" title=\"Fornavn\">
           <input type=text name=middlename size=30 value=\"" . $row['middlename'] . "\" title=\"Mellomnavn\">
-          <input type=text name=lastname size=30 value=\"" . $row['lastname'] . "\" title=\"Etternavn\"></td>
+          <input type=text name=lastname size=30 value=\"" . $row['lastname'] . "\" title=\"Etternavn\">";
+   else
+      echo $row['firstname'] . " <i>" . $row['middlename'] . "</i> " . $row['lastname'];
+   echo "</td>
     </tr>
     <tr>
       <td>Instrument:</td>
@@ -406,7 +419,10 @@ if (!is_null($no))
       </th>
     </tr>
     <tr><td>Bruker-id:</td><td>" . $row['uid'] . "</td></tr>
-    <tr><td>Passord:</td><td>************</td></tr>";
+    <tr><td>Passord:</td><td>************</td></tr>
+    <tr><td>Tilgangsgruppe(r):</td><td>";
+    foreach ($stmt2 as $acc)
+       echo $acc['name'] . "<br>";
    }
    echo "</form>
         </table>";
