@@ -444,7 +444,8 @@ echo "Styret</th>
 $query = "SELECT person.id as id, firstname, lastname, status, id_instruments " .
         "FROM person, instruments " .
         "where id_instruments = instruments.id " .
-        "and not status = $db->per_stat_quited " .
+        "and not (status = $db->per_stat_quited " .
+        "or status = $db->per_stat_apply) " .
         "order by $sort";
 
 $stmt = $db->query($query);
