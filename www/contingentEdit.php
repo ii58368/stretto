@@ -136,7 +136,7 @@ function con($key = null)
 $ts = is_null(con('ts')) ? strtotime("now") : intval(con('ts'));
 
 echo "
-    <h1>Medlemskontingent</h1>
+    <h1>Medlemskontingent - " . request('year') . "</h1>
     <h2>" . $per['firstname'] . " " . $per['middlename'] . " " . $per['lastname'] . " (" . $per['instrument'] . ")</h2>
     <table id=\"no_border\">
       <form action='$php_self' method=post>
