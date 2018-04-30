@@ -271,7 +271,10 @@ echo "Oversikt over dine personopplysninger. Disse kan du oppdatere forløpende.
 
 echo "<a href=\"person.php\" title=\"Til adresselisten...\"><img src=\"images/index.gif\" border=0 hspace=5></a>\n";
 if ($access->auth(AUTH::MEMB_RW))
+{
    echo "<a href=\"$php_self?_sort=$sort&_action=edit_pers\" title=\"Registrere ny person...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
+   echo "<a href=\"access.php?f_person=$no\" title=\"Endre tilgang...\"><img src=\"images/stop_red.gif\" border=0 hspace=5 vspace=5></a>\n";
+}
 echo "<table id=\"no_border\">
     <tr>
       <th>Personalia</th>
@@ -421,8 +424,9 @@ if (!is_null($no))
     <tr><td>Bruker-id:</td><td>" . $row['uid'] . "</td></tr>
     <tr><td>Passord:</td><td>************</td></tr>
     <tr><td>Tilgangsgruppe(r):</td><td>";
-    foreach ($stmt2 as $acc)
-       echo $acc['name'] . "<br>";
+      $warn = ($row['status'] == $db->per_stat_quited) ? "<img src=images/caution.gif height=17>" : "";
+      foreach ($stmt2 as $acc)
+         echo $acc['name'] . "$warn<br>";
    }
    echo "</form>
         </table>";
