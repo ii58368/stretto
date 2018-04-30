@@ -89,13 +89,14 @@ class PDF extends PDF_util
 
       $stmt = $db->query($query);
 
+      $height = 4;
       foreach ($stmt as $row)
       {
-         $this->Cell($w[0], 5, $this->sconv(strftime('%a %e.%b', $row['date'])));
-         $this->Cell($w[1], 5, $row['time']);
-         $this->Cell($w[2], 5, $this->sconv($row['lname']));
-         $this->Cell($w[3], 5, $this->sconv($row['comment']));
-         $this->Ln();
+         $this->Cell($w[0], $height, $this->sconv(strftime('%a %e.%b', $row['date'])));
+         $this->Cell($w[1], $height, $row['time']);
+         $this->Cell($w[2], $height, $this->sconv($row['lname']));
+         $this->MultiCell($w[3], $height, $this->sconv($row['comment']));
+         $this->Ln(1);
       }
       $this->Ln();
    }

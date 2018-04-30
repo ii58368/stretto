@@ -61,7 +61,7 @@ class PDF extends PDF_util
 
       $this->SetTextColor(0, 0, 0);
       $this->setFontSize(12);
-      $hight = 3;
+      $hight = 4;
 
       $last_date = '';
       $last_time = '';
@@ -91,7 +91,7 @@ class PDF extends PDF_util
             $project .= '*';
          $this->Cell($tab[$idx++], $hight, $project);
          $this->MultiCell($tab[$idx++], $hight, $this->sconv($e['comment']));
-         $this->Ln(3);
+         $this->Ln(2);
       }
 
       $this->SetFont('Arial', 'I', 8);
