@@ -452,7 +452,7 @@ if ($access->auth(AUTH::MEMB_RW))
       <th>Edit</th>";
 echo "
       <th>Dato</th>
-      <th>Status</th>
+      <th>Type</th>
       <th>Tekst</th>
       </tr>";
 
