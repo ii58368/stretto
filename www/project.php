@@ -99,7 +99,7 @@ if ($action == 'new')
     <td nowrap>";
    select_semester(null);
    echo "
-    <input type=text size=4 maxlength=4 name=year value=" . date("Y") . " title=\"Velg årstall\"></td>
+    <input type=text size=4 maxlength=4 name=year value=" . $season->year() . " title=\"Velg årstall\"></td>
     <td>";
    select_status(null);
    echo "</td>
