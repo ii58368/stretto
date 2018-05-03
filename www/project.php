@@ -97,7 +97,7 @@ if ($action == 'new')
     <input type=submit value=ok title=\"Lagre\"></td>
     <td><input type=text size=20 name=name title=\"Navn på prosjekt\"></td>
     <td nowrap>";
-   select_semester(null);
+   select_semester($season->semester());
    echo "
     <input type=text size=4 maxlength=4 name=year value=" . $season->year() . " title=\"Velg årstall\"></td>
     <td>";
@@ -108,7 +108,7 @@ if ($action == 'new')
     "\" title=\"Frist for permisjon/påmelding.\nFormat: <dato>. <mnd> [<år>]\nMerk: Måned på engelsk. Eksempel: 12. dec\"></td>
     <td><input type=checkbox name=orchestration title=\"Merk av hvis dette er et tutti-prosjekt der folk må søke permisjon for å melde seg av.\"></td>
     <td>";
-   select_valid_par_stat((1 << $db->par_stat_no) | (1 << $db->par_stat_yes));
+   select_valid_par_stat(1 << $db->par_stat_no);
    $hinfo = "Informasjon om prosjektet. Blir synlig på planen for prosjektinfo. "
            . "Nyttig  info:\n"
            . "* Dirigent\n"
