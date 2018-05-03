@@ -33,24 +33,21 @@ $prj = $stmt->fetch(PDO::FETCH_ASSOC);
 if (request('stat_self'))
 {
    $ts = strtotime("now");
-
-   $q = "select * from participant where id_project=" . request('id_project') . " and id_person=$id_person";
-   $stmt = $db->query($q);
-   if ($stmt->rowCount() == 0)
+   $stat_self = $db->par_stat_void;
+   $comment_self = "''";
+   
+   if (is_null(request('del')))  
    {
-      $query = "insert into participant (id_person, id_project, stat_self, ts_self, comment_self, id_instruments) " .
-              "values ($id_person, " . request('id_project') . ", " . request('stat_self') . ", $ts, "
-              . $db->qpost('comment_self') . ", " . $pers['id_instruments'] . ")";
+      $stat_self = request('stat_self');
+      $comment_self = $db->qpost('comment_self');
    }
-   else
-   {
-      $query = "update participant set " .
-              "stat_self = " . request('stat_self') . ", " .
+   
+   $query = "update participant set " .
+              "stat_self = $stat_self, " .
               "ts_self = $ts, " .
-              "comment_self = " . $db->qpost('comment_self') . " " .
+              "comment_self = $comment_self " .
               "where id_person = $id_person " .
               "and id_project = " . request('id_project');
-   }
    $db->query($query);
 }
 
@@ -148,7 +145,8 @@ if ($prj['deadline'] > time() && $pers['id'] == $whoami->id())
    }
    echo "</td></tr>\n";
    echo "<tr><td>Kommentar:</td><td><textarea title=\"Registrer her eventuell tilleggsinformasjon...\"cols=30 rows=5 wrap=virtual name=comment_self>" . $part['comment_self'] . "</textarea></td></tr>\n";
-   echo "<tr><td></td><td><input type=submit value=Registrer></td></tr>";
+   echo "<tr><td></td><td><input type=submit value=Registrer title=\"Lagre tilbakemelding...\">";
+   echo "<input type=submit name=del value=Slett title=\"Slett tilbakemelding...\" onClick=\"return confirm('Sikkert at du vil slette?');\"></td></tr>";
 }
 else
 {
