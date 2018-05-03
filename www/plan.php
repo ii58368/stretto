@@ -170,11 +170,14 @@ $query = "SELECT plan.id as id, date, time, tsort, id_project, " .
         "and plan.id_project like '$id_project' " .
         "and plan.event_type = $db->plan_evt_rehearsal ";
 if ($id_project == '%')
-   $query .= "and project.year = " . $season->year() . " " .
-           "and project.semester = '" . $season->semester() . "' ";
+   $query .= "and plan.date >= " . $season->ts()[0] . " " .
+        "and plan.date < " . $season->ts()[1] . " ";
 $query .= "order by date,tsort,time";
 
 $stmt = $db->query($query);
+
+$last_date = 0;
+$last_time = '';
 
 foreach ($stmt as $row)
 {
@@ -185,8 +188,13 @@ foreach ($stmt as $row)
         <td><center>
             <a href=\"$php_self?_action=view&_no=".$row['id']."&id_project=$id_project\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
              </center></td>";
-      echo "<td>" . strftime('%a %e.%b %y', $row['date']) . "</td>" .
-      "<td>".$row['time']."</td><td>";
+      echo "<td>";
+      if ($access->auth(AUTH::PLAN_RW) || $row['date'] != $last_date)
+        echo strftime('%a %e.%b %y', $row['date']);
+      echo "</td><td>";
+      if ($access->auth(AUTH::PLAN_RW) || $row['date'] != $last_date || $row['time'] != $last_time)
+         echo $row['time'];
+      echo "</td><td>";
       if (strlen($row['url']) > 0)
          echo "<a href=\"".$row['url']."\">".$row['lname']."</a>";
       else
@@ -221,6 +229,8 @@ foreach ($stmt as $row)
     <td><textarea cols=50 rows=6 wrap=virtual name=comment title=\"Fritekst\">".$row['comment']."</textarea></td>
     </tr>";
    }
+   $last_date = $row['date'];
+   $last_time = $row['time'];
 }
 
 echo "</table>

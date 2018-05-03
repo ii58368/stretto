@@ -341,8 +341,8 @@ $query = "SELECT plan.id as id, date, time, tsort, id_project, event_type, " .
 if (!is_null($id_project))
    $query .= "and plan.id_project = $id_project ";
 else
-   $query .= "and project.year = ".$season->year()." " .
-        "and project.semester = '".$season->semester()."' ";
+   $query .= "and plan.date >= " . $season->ts()[0] . " " .
+        "and plan.date < " . $season->ts()[1] . " ";
 if (is_null(request('rehearsal')))
    $query .= "and plan.event_type = $db->plan_evt_direction ";
 $query .= "order by date,tsort,time";

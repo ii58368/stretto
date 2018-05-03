@@ -48,8 +48,8 @@ class PDF extends PDF_util
               "where id_location = location.id " .
               "and id_project = project.id " .
               "and plan.event_type = $db->plan_evt_rehearsal " .
-              "and project.year = " . $season->year() . " " .
-              "and project.semester = '" . $season->semester() . "' " .
+              "and plan.date >= " . $season->ts()[0] . " " .
+              "and plan.date < " . $season->ts()[1] . " " .
               "and (project.status = $db->prj_stat_real ";
       if ($access->auth(AUTH::PRJ_RO))
          $query .= "or project.status = $db->prj_stat_draft ";
@@ -63,7 +63,7 @@ class PDF extends PDF_util
       $this->setFontSize(12);
       $hight = 4;
 
-      $last_date = '';
+      $last_date = 0;
       $last_time = '';
 
       foreach ($stmt as $e)
@@ -80,7 +80,7 @@ class PDF extends PDF_util
          $date = ($e['date'] != $last_date) ? strftime('%a %e.%b', $e['date']) : '';
          $this->Cell($tab[$idx++], $hight, $this->sconv($date));
          $time = ($e['date'] != $last_date || $e['time'] != $last_time) ? $e['time'] : '';
-         $this->Cell($tab[$idx++], $hight, $e['time']);
+         $this->Cell($tab[$idx++], $hight, $time);
 
          $last_date = $e['date'];
          $last_time = $e['time'];
