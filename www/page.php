@@ -1,18 +1,14 @@
 <!-- Codrops top bar -->
 <div class="codrops-top clearfix">
-    <?php echo "<font face=\"Comic sans MS\" size=2>$prj_name</font>"; ?>
-    <span class="right"><strong><?php $menu->season(); ?></strong></span>
-    <span class="right"><strong><?php $menu->whoami(); ?></strong></span>
-<!-- </div> --><!--/ Codrops top bar -->
-<!-- <div class="main clearfix">  -->
-<!--    <div class="column">   -->
-        <div id="dl-menu" class="dl-menuwrapper">
-            <button class="dl-trigger">Open Menu</button>
-            <?php
-            $menu->generate();
-            ?>
-        </div><!-- /dl-menuwrapper -->
-<!--    </div>  -->
+   <div id="dl-menu" class="dl-menuwrapper">
+      <button class="dl-trigger">Open Menu</button>
+      <?php
+         $menu->generate();
+      ?>
+  </div><!-- /dl-menuwrapper -->
+  <span class="codrops-top-title"><?php echo "$prj_name"; ?></span>
+  <span class="codrops-top-season"><strong><?php $menu->season(); ?></strong></span>
+  <span class="codrops-top-name"><strong><?php $menu->whoami(); ?></strong></span>
 </div>
 
 <script src="js/jquery.min.js"></script>

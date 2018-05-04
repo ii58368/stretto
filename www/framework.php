@@ -32,7 +32,7 @@ require_once 'auth.php';
     <title><?php echo $prj_name ?></title>
 
     <body>
-        <div class="container demo-5">	
+        <div class="container demo-6">	
 
             <?php
             require 'menu.php';

@@ -211,11 +211,11 @@ foreach ($stmt as $row)
       echo "  <tr>
     <font size=+2><b>" . $row['subject'] . "</b></font>
     <table id=\"no_border\"><tr>
-    <td><i>Fra:</i></td><td>" . $row['firstname'] . " " . $row['lastname'] . "</td>
+    <td align=right><i>Fra:</i></td><td>" . $row['firstname'] . " " . $row['lastname'] . "</td>
     </tr><tr>
-    <td><i>Dato:</i></td><td>" . strftime('%e.%b %Y', $row['ts_update']) . "</td>
+    <td align=right><i>Dato:</i></td><td>" . strftime('%e.%b %Y', $row['ts_update']) . "</td>
     </tr><tr>
-    <td><i>Prosjekt:</i></td><td>";
+    <td align=right><i>Prosjekt:</i></td><td>";
       if ($row['id_project'] > 0)
       {
          $s = $db->query("select name, semester, year from project where id=" . $row['id_project']);
@@ -225,14 +225,14 @@ foreach ($stmt as $row)
 
       echo "</td>
      </tr><tr>
-     <td><i>Viktighetsgrad:</i></td><td>" .
+     <td align=right><i>Grad:</i></td><td>" .
       $db->evt_importance[$row['importance']] .
       "</td>
      </tr>
-     </table>";
+     </table><br>";
       $body = str_replace("\n", "<br>\n", $row['body']);
       $body = replace_links($body);
-      echo ($row['status'] == $db->evt_status_draft) ? "<font color=grey>$body</font>" : $body;
+      echo ($row['status'] == $db->evt_status_draft) ? "$body" : $body;
    }
    echo "<p>";
 }

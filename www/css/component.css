@@ -31,6 +31,8 @@
 	border: none;
 	width: 24px;
 	height: 22px;
+        top: 5px;
+        left: 10px;
 	text-indent: -900em;
 	overflow: hidden;
 	position: relative;
@@ -49,12 +51,12 @@
 	position: absolute;
 	width: 68%;
 	height: 2px;
-	background: #fff;
+	background: #b1aea6;
 	top: 5px;
 	left: 16%;
 	box-shadow: 
-		0 5px 0 #fff, 
-		0 10px 0 #fff;
+		0 5px 0 #b1aea6, 
+		0 10px 0 #b1aea6;
 }
 
 .dl-menuwrapper ul {
@@ -819,5 +821,16 @@ All this is done for any sub-level being entered.
 .demo-5 .dl-menuwrapper button:hover,
 .demo-5 .dl-menuwrapper button.dl-active,
 .demo-5 .dl-menuwrapper ul {
+	background: #643771;
+}
+
+/* Demo 6 */
+.demo-6 .dl-menuwrapper button {
+	background: #ffffff;
+}
+
+.demo-6 .dl-menuwrapper button:hover,
+.demo-6 .dl-menuwrapper button.dl-active,
+.demo-6 .dl-menuwrapper ul {
 	background: #643771;
 }

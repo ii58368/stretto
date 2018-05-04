@@ -13,7 +13,8 @@ table, th, td {
 	border: 1px solid #D4E0EE;
 	border-collapse: collapse;
 	font-family: "Trebuchet MS", Arial, sans-serif;
-	color: #555;
+	color: #444;
+        vertical-align: top;
 }
 
 caption {
@@ -28,6 +29,7 @@ td, th {
 
 th {
     background-color: #E6EDF5;
+    text-align: left;
 }
 
 tr:hover {
@@ -71,6 +73,7 @@ tfoot th, tfoot td {
 table#no_border td, tr {
     color: inherit;
     background-color: #fffcf5;
-    color: #b1aea6;
+/*    color: #b1aea6; */
+    
     border: hidden;
 }
