@@ -163,20 +163,20 @@ a:hover {
         position: absolute;
         font-family: Chalkduster, fantasy;
         font-size: 15px;
-        left: 70px;
+        left: 40px;
         top: 0px;
 }
 
 .codrops-top-season {
         position: absolute;
-        left: 30%;
+        left: 20%;
         top: 5px;
 }
 
 .codrops-top-name {
         position: absolute;
         font-size: 15px;
-        right: 50px;
+        right: 1%;
         top: 5px;
 }
 
