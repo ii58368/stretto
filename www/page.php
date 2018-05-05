@@ -8,7 +8,7 @@
   </div><!-- /dl-menuwrapper -->
   <span class="codrops-top-title"><?php echo "$prj_name"; ?></span>
   <span class="codrops-top-season"><strong><?php $menu->season(); ?></strong></span>
-  <span class="codrops-top-name"><strong><?php $menu->whoami(); ?></strong></span>
+  <span class="codrops-top-name"><?php $menu->whoami(); ?></span>
 </div>
 
 <script src="js/jquery.min.js"></script>

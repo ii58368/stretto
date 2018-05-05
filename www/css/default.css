@@ -177,7 +177,7 @@ a:hover {
         position: absolute;
         font-size: 15px;
         right: 1%;
-        top: 5px;
+        top: 0px;
 }
 
 @media screen and (max-width: 46.0625em) {
