@@ -290,7 +290,7 @@ class MENU
       }
       else
       {
-         echo $whoami->name() . " (" . $whoami->instrument() . ")";
+         echo $whoami->name();
       }
    }
 
