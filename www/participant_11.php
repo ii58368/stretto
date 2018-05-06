@@ -206,7 +206,7 @@ if ($part['stat_inv'] == $db->par_stat_yes)
          echo strftime('%e.%m', $part['ts_final']);
       echo " Styret:</b> ";
       if ($part['stat_final'] == $db->par_stat_void)
-         echo "Du er ikke aktuell ressurs på dette prosjektet.<br>\n";
+         echo "Styret vil ta ut endelig besetning når permisjonsfrosten går ut.<br>\n";
       if ($part['stat_final'] == $db->par_stat_no)
          echo "Du har fått innvilget permisjon til dette prosjektet.<br>\n";
       if ($part['stat_final'] == $db->par_stat_yes)
