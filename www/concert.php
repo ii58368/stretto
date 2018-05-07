@@ -163,7 +163,9 @@ foreach ($stmt as $row)
       "<td>".$row['lname']."</td>" .
       "<td>".$row['heading']."</td>" .
       "<td>";
-      echo str_replace("\n", "<br>\n", $row['text']);
+      $body = str_replace("\n", "<br>\n", $row['text']);
+      $body = replace_links($body);
+      echo $body;
       echo "</td>" .
       "</tr>";
    } else

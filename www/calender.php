@@ -41,6 +41,9 @@ foreach ($stmt as $row)
    echo "<h3> " . strftime('%A %e. %b %Y', $row['ts']) . " kl. " . $row['time'] . 
            " - " . $row['lname'] . "</h3>\n";
    
-   echo str_replace("\n", "<br>\n", $row['text']);
+   $body = str_replace("\n", "<br>\n", $row['text']);
+   $body = replace_links($body);
+
+   echo $body;
 }
 
