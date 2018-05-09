@@ -37,7 +37,7 @@ $query = "SELECT plan.id as id, "
         . "and participant.id_person = ".$whoami->id()." "
         . "and participant.stat_inv = $db->par_stat_yes "
         . "and plan.event_type = $db->plan_evt_rehearsal "
-        . "and plan.date >= " . strtotime('-200 day') . " "
+        . "and plan.date >= " . strtotime('today') . " "
         . "and project.status = $db->prj_stat_real "
         . "order by plan.date,plan.tsort,plan.time";
 
