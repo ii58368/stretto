@@ -28,36 +28,65 @@ $query = "SELECT plan.id as id, "
         . "project.name as pname, "
         . "location.url as url, "
         . "plan.comment as comment, "
-        . "orchestration "
+        . "orchestration, "
+        . "participant.stat_final as stat_final "
         . "FROM project, plan, location, participant "
         . "where plan.id_location = location.id "
         . "and plan.id_project = project.id "
         . "and participant.id_project = project.id "
         . "and participant.id_person = ".$whoami->id()." "
-        . "and participant.stat_final = $db->par_stat_yes "
+        . "and participant.stat_inv = $db->par_stat_yes "
         . "and plan.event_type = $db->plan_evt_rehearsal "
-        . "and plan.date >= " . strtotime('today') . " "
+        . "and plan.date >= " . strtotime('-200 day') . " "
+        . "and project.status = $db->prj_stat_real "
         . "order by plan.date,plan.tsort,plan.time";
 
 $stmt = $db->query($query);
 
+$gfont = "<font color=lightgrey>";
+
 foreach ($stmt as $row)
 {
-   echo "<tr>\n";
-   echo "<td align=right nowrap>" . strftime('%a %e.%b', $row['date']) . "</td>" .
-   "<td>" . $row['time'] . "</td><td>";
-   if (strlen($row['url']) > 0)
-      echo "<a href=\"" . $row['url'] . "\">" . $row['lname'] . "</a>";
+   if ($row['stat_final'] == $db->par_stat_no)
+      continue;
+   
+   $date = strftime('%a %e.%b', $row['date']);
+   $time = $row['time'];
+   $url = $row['url'];
+   $lname = $row['lname'];
+   $location = $row['location'];
+   $pname = $row['pname'];
+   $comment = str_replace("\n", "<br>\n", $row['comment']);
+   
+   echo "<tr>";
+   
+   if ($row['stat_final'] == $db->par_stat_void)
+   {
+      echo "<td align=right nowrap>$gfont$date</font></td>"
+              . "<td>$gfont$time</font></td>"
+              . "<td>$gfont$lname$location</font></td>"
+              . "<td>$gfont$pname";
+      if ($row['orchestration'] == $db->prj_orch_reduced)
+         echo '*';
+      echo "</font></td>"
+      . "<td>$gfont$comment</font></td>";
+   }
    else
-      echo $row['lname'];
-   echo $row['location'];
-   echo "</td><td><a href=\"prjInfo.php?id=".$row['id_project']."\">" . $row['pname'] . "</a>";
-   if ($row['orchestration'] == $db->prj_orch_reduced)
-      echo '*';
-   echo "</td><td>";
-   echo str_replace("\n", "<br>\n", $row['comment']);
-   echo "</td>" .
-   "</tr>";
+   {
+      echo "<td align=right nowrap>$date</td>"
+              . "<td>$time</td>";
+      if (strlen($url) > 0)
+         echo "<td><a href=\"$url\">$lname</a>$location</td>";
+      else
+         echo "<td>$lname$location</td>";
+      echo "<td><a href=\"prjInfo.php?id=".$row['id_project']."\">$pname</a>";
+      if ($row['orchestration'] == $db->prj_orch_reduced)
+         echo '*';
+      echo "</td>"
+      . "<td>$comment</td>";     
+   }
+     
+   echo "</tr>";
 }
 
 echo "</table>";
