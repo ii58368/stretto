@@ -6,6 +6,22 @@ if ($access->auth(AUTH::CONS))
    
 $id_project = request('id_project');
 
+function get_img($id_project)
+{
+   $path = "project/" . $id_project . "/img/";
+   
+   if ($handle = opendir($path))
+   {
+      while (($file = readdir($handle)))
+      {
+         if (is_file($path . $file))
+            $abs_file = $path . $file;
+      }
+      closedir($handle);
+   }
+   return $abs_file;
+}
+
 if (!$id_project)
    echo "<h1>Konsertkalender</h1><hr>";
 
@@ -14,7 +30,8 @@ $query = "SELECT concert.id as id, "
         . "concert.time as time, "
         . "location.name as lname, "
         . "concert.heading as heading, "
-        . "concert.text as text "
+        . "concert.text as text, "
+        . "project.id as id_project "
         . "from concert, location, project "
         . "where concert.id_project = project.id "
         . "and concert.id_location = location.id ";
@@ -37,7 +54,9 @@ foreach ($stmt as $row)
    $first_time = false;
    
    echo "<h1>" . $row['heading'] . "</h1>\n";
-   
+   $img = get_img($row['id_project']);
+   if (!is_null($img))
+      echo "<img src=\"$img\" height=150>";
    echo "<h3> " . strftime('%A %e. %b %Y', $row['ts']) . " kl. " . $row['time'] . 
            " - " . $row['lname'] . "</h3>\n";
    

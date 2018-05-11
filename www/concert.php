@@ -15,7 +15,6 @@ if ($access->auth(AUTH::CONS))
       <a href=calender.php title=\"Vis kalender slik den ser ut på eksternsiden...\"><img src=images/text2.gif border=0></a>
     </form>";
 echo "
-    <form action='$php_self' method=post>
     <table border=1>
     <tr>";
 if ($access->auth(AUTH::CONS))
@@ -76,10 +75,105 @@ function select_location($selected)
    echo "</select>";
 }
 
+function get_img($id_project)
+{
+   $path = "project/" . $id_project . "/img/";
+   $abs_file = "images/image2.gif";
+   
+   if ($handle = opendir($path))
+   {
+      while (($file = readdir($handle)))
+      {
+         if (is_file($path . $file))
+            $abs_file = $path . $file;
+      }
+      closedir($handle);
+   }
+   return $abs_file;
+}
+
+function del_img($id_project)
+{
+   $path = "project/" . $id_project . "/img/";
+   
+   if ($handle = opendir($path))
+   {
+      while (($file = readdir($handle)))
+      {
+         if (is_file($path . $file))
+            unlink($path . $file);
+      }
+      closedir($handle);
+   }
+}
+
+function new_img()
+{
+   global $sort;
+   global $php_self;
+   global $no;
+   
+   echo "
+    <form action=$php_self method=post enctype=multipart/form-data>
+    <input type=hidden name=_action value=img_upload>
+    <input type=hidden name=_sort value=\"$sort\">
+    <input type=hidden name=_no value=\"$no\">
+    <input type=file name=filename id=filename title=\"Velg ny figur som skal lastes opp...\"><br>
+    <input type=submit value=\"Last opp\" title=\"Last opp figuren som er valgt med knappen over. Den forrige figuren vil bli overskrevet.\">
+    </form>"; 
+}
+
+function store_img($id_project)
+{
+   $path = "project/" . $id_project . "/img";
+
+   if (!is_dir($path))
+      mkdir($path, 0755, true);
+
+   $dst_file = $path . "/" . $_FILES['filename']['name'];
+
+   if ($_FILES['filename']['size'] > 20 * 1024 * 1024)
+   {
+      echo "<font color=red>File too large! (>20MB)</font>";
+   }
+   else
+   {
+      if (!move_uploaded_file($_FILES['filename']['tmp_name'], $dst_file))
+      {
+         echo "<font color=red>Failed to upload!</font>";
+      }
+   }
+}
+
+function manage_img($id_project, $cno)
+{
+   global $action;
+   global $sort;
+   global $php_self;
+   global $no;
+   
+   if ($no == $cno && $action == 'img_new')
+   {
+      new_img();
+   }
+   else 
+   {
+      if ($no == $cno && $action == 'img_upload')
+      {
+         del_img($id_project);
+         store_img($id_project);
+      }
+      $fname = get_img($id_project);
+      echo "<a href=\"$php_self?_sort=$sort&_action=img_new&_no=$cno\" title=\"Klikk for å laste opp ny figur...\"><img src=\"$fname\" height=30></a>";
+   }
+}
+
 if ($action == 'new')
 {
    echo "  <tr>
-    <td align=left><input type=hidden name=_action value=update>
+    <form action='$php_self' method=post>
+    <td align=left>
+    <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
     <input type=submit value=ok title=\"Lagre\"></td>
     <td><input type=date size=10 name=ts title=\"Konsertdato, format: eks: 23. dec 2018\">
@@ -92,7 +186,8 @@ if ($action == 'new')
    echo "<td><input type=text size=30 name=heading title=\"Konsertoverskrift\">\n";
    echo "</td>
     <td><textarea name=text wrap=virtual cols=60 rows=10 title=\"Konsertinformasjon, fritekst\"></textarea></td>
-  </tr>";
+    </form>
+</tr>";
 }
 
 if ($action == 'update' && $access->auth(AUTH::CONS))
@@ -148,29 +243,10 @@ $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
-   if ($row['id'] != $no)
-   {
-      echo "<tr>";
-      if ($access->auth(AUTH::CONS))
-         echo "
-         <td><center>
-           <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
-             </center></td>";
-      echo
-      "<td>" . strftime('%a %e.%b %y', $row['ts']) . "</td>" .
-      "<td>".$row['time']."</td>" .
-      "<td>".$row['pname']." (".$row['semester'].$row['year'].")</td>" .
-      "<td>".$row['lname']."</td>" .
-      "<td>".$row['heading']."</td>" .
-      "<td>";
-      $body = str_replace("\n", "<br>\n", $row['text']);
-      $body = replace_links($body);
-      echo $body;
-      echo "</td>" .
-      "</tr>";
-   } else
+   if ($row['id'] == $no && $action == 'view')
    {
       echo "<tr>
+    <form action='$php_self' method=post>
     <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
@@ -186,10 +262,34 @@ foreach ($stmt as $row)
       echo "</td>
     <td><input type=text size=30 name=heading value=\"".$row['heading']."\" title=\"Konsertoverskrift\">
     <td><textarea cols=60 rows=10 wrap=virtual name=text title=\"Konsertinformasjon, fritekst\">".$row['text']."</textarea></td>
+    </form>
     </tr>";
    }
+   else
+   {
+      echo "<tr>";
+      if ($access->auth(AUTH::CONS))
+         echo "
+         <td><center>
+           <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
+             </center></td>";
+      echo
+      "<td>" . strftime('%a %e.%b %y', $row['ts']) . "</td>" .
+      "<td>".$row['time']."</td>" .
+      "<td>".$row['pname']." (".$row['semester'].$row['year'].")</td>" .
+      "<td>".$row['lname']."</td>" .
+      "<td>".$row['heading'].
+      "<br>";
+      manage_img($row['id_project'], $row['id']);
+      echo "</td><td>";
+      $body = str_replace("\n", "<br>\n", $row['text']);
+      $body = replace_links($body);
+      echo $body;
+      echo "</td>" .
+      "</tr>";
+   } 
 }
 ?> 
 
 </table>
-</form>
+
