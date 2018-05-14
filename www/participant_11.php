@@ -190,13 +190,13 @@ if ($part['stat_inv'] == $db->par_stat_yes)
          echo "<img border=0 src=\"images/part_stat_" . $part['stat_reg'] . ".gif\">";
          echo "<b>" . strftime('%e.%m', $part['ts_reg']) . " Sekretær:</b> ";
          if ($part['stat_reg'] == $db->par_stat_no)
-            echo ": Permisjonssøknad mottat: " . $part['comment_reg'];
+            echo ": Permisjonssøknad mottatt: " . $part['comment_reg'];
          if ($part['stat_reg'] == $db->par_stat_tentative)
             echo ": Tentativt: " . $part['comment_reg'];
          if ($part['stat_reg'] == $db->par_stat_can)
             echo ": Kan være med hvis behov: " . $part['comment_reg'];
          if ($part['stat_reg'] == $db->par_stat_yes)
-            echo ": Vil gjørne være med på prosjektet: " . $part['comment_reg'];
+            echo ": Vil gjærne være med på prosjektet: " . $part['comment_reg'];
          echo "<br>\n";
       }
 
@@ -206,7 +206,7 @@ if ($part['stat_inv'] == $db->par_stat_yes)
          echo strftime('%e.%m', $part['ts_final']);
       echo " Styret:</b> ";
       if ($part['stat_final'] == $db->par_stat_void)
-         echo "Endelig besetning vil bli bestemt når permisjonsfrosten går ut.<br>\n";
+         echo "Endelig besetning vil bli bestemt når permisjonsfristen går ut.<br>\n";
       if ($part['stat_final'] == $db->par_stat_no)
          echo "Du har fått innvilget permisjon til dette prosjektet.<br>\n";
       if ($part['stat_final'] == $db->par_stat_yes)
@@ -226,7 +226,7 @@ if ($part['stat_inv'] == $db->par_stat_yes)
          if ($part['stat_reg'] == $db->par_stat_can)
             echo ": Kan være med hvis behov: " . $part['comment_reg'];
          if ($part['stat_reg'] == $db->par_stat_yes)
-            echo ": Vil gjørne være med på prosjektet: " . $part['comment_reg'];
+            echo ": Vil gjerne være med på prosjektet: " . $part['comment_reg'];
          echo "<br>\n";
       }
 
