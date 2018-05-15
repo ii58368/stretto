@@ -32,7 +32,7 @@ function get_groups()
 }
 
 if ($sort == NULL)
-   $sort = 'list_order,firstname,lastname';
+   $sort = 'list_order,position,firstname,lastname';
 
 $prj = get_project();
 $grp = get_groups();
@@ -82,7 +82,7 @@ echo "
     <table border=1>
     <tr>
       <th><a href=\"$php_self?id_plan=" . request('id_plan') . "&_sort=firstname,lastname\" title=\"Sorter på fornavn, deretter etternavn\">Navn</a></th>
-      <th><a href=\"$php_self?id_plan=" . request('id_plan') . "&_sort=list_order,firstname,lastname\" title=\"Sorter på instrument, fornavn, etternavn\">Instrument</a></th>\n";
+      <th><a href=\"$php_self?id_plan=" . request('id_plan') . "&_sort=list_order,position,firstname,lastname\" title=\"Sorter på instrument, fornavn, etternavn\">Instrument</a></th>\n";
 
 for ($i = 0; $i < sizeof($db->abs_stat); $i++)
    echo "<th>" . $db->abs_stat[$i] . "</th>\n";

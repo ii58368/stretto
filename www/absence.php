@@ -30,7 +30,7 @@ function get_groups()
 }
 
 if ($sort == NULL)
-   $sort = 'list_order,firstname,lastname';
+   $sort = 'list_order,position,firstname,lastname';
 
 $grp = get_groups();
 $prj = get_project();
@@ -41,7 +41,7 @@ echo "
     <table border=1>
     <tr>
       <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=firstname,lastname\" title=\"Sorter på fornavn, deretter etternavn\">Navn</a></th>
-      <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=list_order,firstname,lastname\" title=\"Sorter i partiturrekkefølge, deretter fornavn og deretter etternavn\">Instrument</a></th>
+      <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=list_order,position,firstname,lastname\" title=\"Sorter i partiturrekkefølge, deretter fornavn og deretter etternavn\">Instrument</a></th>
       <th>Status</th>\n";
 
 $query = "select id, date from plan "
