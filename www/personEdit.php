@@ -149,6 +149,11 @@ if ($action == 'update_pers')
 
 function update_htpasswd($usr, $pwd)
 {
+   if (is_null($usr))
+      return;
+   if (strlen($usr) == 0)
+      return;
+   
    $fname = "conf/.htpasswd";
    $fr = fopen($fname, "r");
    $fw = fopen("{$fname}~", "w");
