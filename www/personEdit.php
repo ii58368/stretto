@@ -274,7 +274,7 @@ echo "Oversikt over dine personopplysninger. Disse kan du oppdatere forløpende.
 
 if ($access->auth(AUTH::MEMB_RW))
 {
-   echo "<a href=\"person.php?_sort=$sort&f_status[]=1&f_status[]=2&f_status[]=4\" title=\"Til adresselisten...\"><img src=\"images/index.gif\" border=0 hspace=5></a>\n";
+   echo "<a href=\"person.php?_sort=$sort&f_status[]=$db->per_stat_member&f_status[]=$db->per_stat_eng&f_status[]=$db->per_stat_standin\" title=\"Til adresselisten...\"><img src=\"images/index.gif\" border=0 hspace=5></a>\n";
    echo "<a href=\"$php_self?_sort=$sort&_action=edit_pers\" title=\"Registrere ny person...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
    echo "<a href=\"access.php?f_person=$no\" title=\"Endre tilgang...\"><img src=\"images/stop_red.gif\" border=0 hspace=5 vspace=5></a>\n";
 }
