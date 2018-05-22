@@ -115,10 +115,13 @@ if ($action == 'update_pers')
          }
          else
          {
-            $query = "update person set " .
+            $query = "update person set ";
+            if ($access->auth(AUTH::MEMB_RW))
+               $query .= 
                     "firstname = " . $db->qpost('firstname') . "," .
                     "middlename = " . $db->qpost('middlename') . "," .
-                    "lastname = " . $db->qpost('lastname') . "," .
+                    "lastname = " . $db->qpost('lastname') . ",";
+            $query .=
                     "address = " . $db->qpost('address') . "," .
                     "postcode = " . request('postcode') . "," .
                     "city = " . $db->qpost('city') . "," .
