@@ -96,6 +96,24 @@ echo "
     $info_text<p>";
 
 if (this_access_rw())
+{
+   echo "For å legge til nye dokumenter:"
+           . "<ul>"
+           . "<li>Velg \"Nytt dokument\"</li>"
+           . "<li>Velg \"Browse\" og velg derette lokal fil som skal lastes opp</li>"
+           . "<li>Velg \"ok\" for å laste opp</li>"
+           . "</ul>"
+           . "For å endre navn på eksisterende dokumenter:"
+           . "<ul>"
+           . "<li>Velg \"Edit-knapp\" for aktuelt dokument</li>"
+           . "<li>Endre navn i navnetekst</li>"
+           . "<li>Velg \"ok\""
+           . "</ul>"
+           . "For å slette eksisterende dokument:"
+           . "<ul>"
+           . "<li>Velg \"Edit-knapp\" for aktuelt dokument</li>"
+           . "<li>Velg \"Del\"</li>"
+           . "</ul>";
    echo "
     <form action=\"$php_self\" method=post>
       <input type=hidden name=_sort value=\"$sort\">
@@ -103,6 +121,7 @@ if (this_access_rw())
       <input type=hidden name=path value=\"$path\">
       <input type=submit value=\"Nytt dokument\" title=\"Last opp nytt dokument...\">
     </form>";
+}
 echo "
     <table border=1>
     <tr>";
@@ -202,7 +221,7 @@ if (is_dir($path))
          }
          $tsize = ($stat['size']/1024 > 1024) ? (int)($stat['size'] / (1024*1024)) . "MB" : (int)($stat['size'] / 1024) . "KB";
          echo "<td>$tsize</td>" .
-         "<td>" . strftime('%a %e.%b %Y', $stat['mtime']) . "</td>" .
+         "<td>" . strftime('%e.%b %Y', $stat['mtime']) . "</td>" .
          "</tr>";
       }
 
