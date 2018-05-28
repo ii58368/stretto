@@ -100,7 +100,7 @@ if (this_access_rw())
    echo "For å legge til nye dokumenter:"
            . "<ul>"
            . "<li>Velg \"Nytt dokument\"</li>"
-           . "<li>Velg \"Browse\" og velg derette lokal fil som skal lastes opp</li>"
+           . "<li>Velg \"Browse\" og velg deretter lokal fil som skal lastes opp</li>"
            . "<li>Velg \"ok\" for å laste opp</li>"
            . "</ul>"
            . "For å endre navn på eksisterende dokumenter:"
