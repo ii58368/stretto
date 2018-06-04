@@ -191,7 +191,7 @@ class DB extends myPDO
    public $abs_stat = array("Tilstede", "Delvis fravær", "Syk", "Opptatt", "Skulk", "Annet");
 // table: event
    public $evt_importance_low = 0;
-   public $evt_inportance_norm = 1;
+   public $evt_importance_norm = 1;
    public $evt_importance_high = 2;
    public $evt_importance = array("Lav", "<b>Normal</b>", "<font color=red>Høy</font>");
    public $evt_status_draft = 0;

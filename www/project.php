@@ -106,7 +106,7 @@ if ($action == 'new')
     <td><input type=date size=10 name=deadline value=\"" . 
     date('j. M y', time() + 60*60*24*7*12) .    // Default dealine: 12 weeks from now
     "\" title=\"Frist for permisjon/påmelding.\nFormat: <dato>. <mnd> [<år>]\nMerk: Måned på engelsk. Eksempel: 12. dec\"></td>
-    <td><input type=checkbox name=orchestration title=\"Merk av hvis dette er et tutti-prosjekt der folk må søke permisjon for å melde seg av.\"></td>
+    <td><input type=checkbox name=orchestration checked title=\"Merk av hvis dette er et tutti-prosjekt der folk må søke permisjon for å melde seg av.\"></td>
     <td>";
    select_valid_par_stat(1 << $db->par_stat_no);
    $hinfo = "Informasjon om prosjektet. Blir synlig på planen for prosjektinfo. "
@@ -184,7 +184,7 @@ foreach ($stmt as $row)
             <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
              </center></td>";
       echo
-      "<td><a href=\"plan.php?id_project=".$row['id']."\">".$row['name']."</a></td>" .
+      "<td><a href=\"prjInfo.php?id=".$row['id']."\">".$row['name']."</a></td>" .
       "<td>".$row['semester']."-".$row['year']."</td>" .
       "<td>" . $db->prj_stat[$row['status']] . "</td>" .
       "<td>" . strftime('%a %e.%b %y', $row['deadline']) . "</td>" .

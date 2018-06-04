@@ -7,38 +7,76 @@ if ($sort == NULL)
 $id_project = is_null(request('id_project')) ? 0 : request('id_project');
 $search = request('search');
 
-if ($id_project == 0)
-{
-   $s = $db->query("select max(id) as id from project");
-   $e = $s->fetch(PDO::FETCH_ASSOC);
-   if (isset($e['id']))
-      $id_project = $e['id'];
-}
 
-function select_project()
+function get_projectname($id_project)
 {
    global $db;
-   global $id_project;
-   global $season;
 
-   $htext = "Velg prosjekt som det skal knytes repertoar til. "
-           . "Trykk på knappene i kolonnen under for å legge til "
-           . "eller å slette repertoar til dette prosjektet.";
-   echo "<select name=id_project onChange=\"submit();\" title=\"$htext\">\n";
+   $s = $db->query("select name, semester, year from project where id = $id_project");
+   $e = $s->fetch(PDO::FETCH_ASSOC);
+   
+   return $e['name'] . " (" . $e['semester'] . $e['year'] . ")";
+}
 
-   $q = "select id, name, semester, year from project"
-           . " where year >= " . $season->year()
-           . " order by year,semester DESC, id";
+if ($action == 'rep_update' && $access->auth(AUTH::REP))
+{
+   $status = is_null($delete) ? $db->mus_stat_yes : $db->mus_stat_no;
+   $query = "replace into music (id_repository, id_project, status, comment) values ($no, $id_project, $status, " . $db->qpost('comment') . ")";
+   $db->query($query);
+   $no = null;
+}
+
+if ($id_project > 0)
+{
+   echo "
+    <h1>Repertoar: ".get_projectname($id_project)."</h1>
+    <form action='$php_self' method=post>
+    <table>
+    <tr>
+    <th>Edit</th>
+    <th>Komponist</th>
+    <th>Tittel</th>
+    <th>Info som gjelder dette prosjektet</th>
+    </tr>
+    <tr>";
+
+   $q = "select repository.id as id_repository,"
+           . "firstname, lastname, title,"
+           . "music.comment as comment "
+           . "from repository, music "
+           . "where repository.id = music.id_repository "
+           . "and music.status = $db->mus_stat_yes "
+           . "and music.id_project = $id_project ";
    $s = $db->query($q);
-
    foreach ($s as $e)
    {
-      echo "<option value=" . $e['id'];
-      if ($id_project == $e['id'])
-         echo " selected";
-      echo ">" . $e['name'] . " (" . $e['semester'] . $e['year'] . ")</option>\n";
+      echo "<tr>";
+      if ($action != 'rep_view' || $e['id_repository'] != $no)
+      {
+         echo "<td><center>
+           <a href=\"$php_self?_sort=$sort&_action=rep_view&_no=" . $e['id_repository'] . "&id_project=$id_project&search=$search\"><img src=\"images/cross_re.gif\" border=0></a>
+             </center></td>"
+          . "<td>".$e['firstname']." ".$e['lastname']."</td>"
+          . "<td>".$e['title']."</td>"
+          . "<td>".$e['comment']."</td>"
+          . "</tr>";
+      }
+      else
+      {
+         echo "<input type=hidden name=_action value=rep_update>
+            <input type=hidden name=_sort value='$sort'>
+            <input type=hidden name=search value=\"$search\">
+            <input type=hidden name=id_project value=$id_project>
+            <input type=hidden name=_no value='$no'>
+            <td><input type=submit value=ok title=\"Lagre endring\">
+                <input type=submit value=del name=_delete title=\"Slette fra repertoarlisten\"></td>"
+          . "<td>".$e['firstname']." ".$e['lastname']."</td>"
+          . "<td>".$e['title']."</td>"
+          . "<td><input type=text name=comment value=\"" . $e['comment'] . "\" size=30 title=\"Tilleggsinformasjon som kun for dette prosjektet, f.eks: Kantate 1,2 og 3\"></td>\n";      
+      }
+      echo "</tr>";
    }
-   echo "</select>\n";
+   echo "</table></form>";
 }
 
 echo "
@@ -48,7 +86,7 @@ echo "
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=id_project value=$id_project>
       <img src=\"images/search.png\" height=20>
-      <input type=text name=search value=\"$search\" title=\"Søk for komponist eller tittel og trykk enter\">
+      <input type=text name=search value=\"$search\" title=\"Søk på hele eller deler av komponistnavn eller tittel og trykk enter\">
     </form>";
 
 if ($access->auth(AUTH::REP))
@@ -62,18 +100,15 @@ echo "
     <tr>";
 if ($access->auth(AUTH::REP))
    echo "
-      <th><a href=\"$php_self?_sort=id+DESC&id_project=$id_project&search=$search\">Edit</a></th>";
+      <th><a href=\"$php_self?_sort=id+DESC&id_project=$id_project&search=$search\" title=\"Sorter i omvendt registreringsrekkefølge\">Edit</a></th>";
 echo "
-      <th><a href=\"$php_self?_sort=lastname,firstname,title&id_project=$id_project&search=$search\">Komponist</a></th>
-      <th><a href=\"$php_self?_sort=title,lastname,firstname&id_project=$id_project&search=$search\">Tittle</a></th>
+      <th><a href=\"$php_self?_sort=lastname,firstname,title&id_project=$id_project&search=$search\" title=\"Sorter på komponistnavn\">Komponist</a></th>
+      <th><a href=\"$php_self?_sort=title,lastname,firstname&id_project=$id_project&search=$search\" title=\"Sorter på tittel\">Tittle</a></th>
       <th>Fra</th>
-      <th><a href=\"$php_self?_sort=archive,tag&id_project=$id_project&search=$search\">Arkivref</a></th>
+      <th><a href=\"$php_self?_sort=archive,tag&id_project=$id_project&search=$search\" title=\"Sorter på arkivreferanse\">Arkivref</a></th>
       <th>Kommentar</th>
       <th>\n";
-if ($access->auth(AUTH::REP))
-   select_project();
-else
-   echo "Prosjekt";
+echo "Prosjekt";
 echo "</th>
       </tr>";
 
@@ -136,92 +171,39 @@ if ($action == 'update' && $access->auth(AUTH::REP))
    $db->query($query);
 }
 
-if ($action == 'toggle_update' && $access->auth(AUTH::REP))
-{
-   $q = "select status, comment from music where id_project=$id_project and id_repository=$no";
-   $s = $db->query($q);
-   $e = $s->fetch(PDO::FETCH_ASSOC);
-   $status = ($e['status'] == $db->mus_stat_yes) ? $db->mus_stat_no : $db->mus_stat_yes;
-   $comment = is_null(request('comment')) ? $e['comment'] : request('comment');
-   $query = "replace into music (id_repository, id_project, status, comment) values ($no, $id_project, $status, " . $db->quote($comment) . ")";
-   $db->query($query);
-   $no = null;
-}
 
 $query = "select id_repository, comment, status from music where id_project=$id_project";
 $stmt = $db->query($query);
 $music = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-function toggle_project($cno)
-{
-   global $music;
-   global $db;
-   global $action;
-   global $no;
-   global $sort;
-   global $php_self;
-   global $id_project;
-   global $search;
-
-   $q = "select name, semester, year, music.status as status, music.comment as comment "
-           . "from project, music "
-           . "where music.id_project = project.id "
-           . "and music.id_repository = $cno";
-   $s = $db->query($q);
-
-   $title = "Spilt ved tidligere prosjekter:\n";
-   foreach ($s as $e)
-      if ($e['status'] == $db->mus_stat_yes)
-         $title .= '* ' . $e['name'] . " (" . $e['semester'] . "-" . $e['year'] . "): " . $e['comment'] . "\n";
-
-   echo "<td";
-   foreach ($music as $e)
-      if ($e['id_repository'] == $cno)
-         break;
-   $id_repository = isset($e['id_repository']) ? $e['id_repository'] : 0;
-   $status = isset($e['status']) ? $e['status'] : 0;
-
-   if ($id_repository == $cno && $status == $db->mus_stat_yes)
-      echo " bgcolor=lightgreen";
-
-   echo ">";
-   if ($action == 'toggle' && $no == $cno)
-   {
-      echo "<input type=hidden name=_action value=toggle_update>
-            <input type=hidden name=_sort value='$sort'>
-            <input type=hidden name=search value=\"$search\">
-            <input type=hidden name=id_project value=$id_project>
-            <input type=hidden name=_no value='$no'>
-            <input type=submit value=ok title=\"Lagre\">
-          <input type=text name=comment value=\"" . $e['comment'] . "\" size=20 title=\"Tilleggsinformasjon som kun for dette prosjektet, f.eks: Kantate 1,2 og 3\">\n";
-   }
-   else
-   {
-      $act = ($status == $db->mus_stat_yes) ? 'toggle_update' : 'toggle';
-      echo "<a href=\"$php_self?_action=$act&_no=$cno&_sort=$sort&id_project=$id_project&id_repository=$cno&search=$search\"><img src=\"images/cross_re.gif\" border=0 title=\"$title\"></a>";
-      if ($id_repository == $cno && $status == $db->mus_stat_yes)
-         echo $e['comment'];
-   }
-   echo "</td>\n";
-}
 
 function view_project($cno)
 {
    global $db;
+   global $id_project;
 
-   $q = "select name, semester, year, music.status as status, music.comment as comment "
+   $q = "select name, semester, year, music.status as status, music.comment as comment, "
+           . "project.id as id_project "
            . "from project, music "
            . "where music.id_project = project.id "
            . "and music.id_repository = $cno";
    $s = $db->query($q);
 
-   echo "<td>";
-
+   $is_included = false;
+   
    foreach ($s as $e)
+   {
       if ($e['status'] == $db->mus_stat_yes)
-         echo $e['name'] . " (" . $e['semester'] . "-" . $e['year'] . "): " . $e['comment'] . "<br>\n";
-
-   echo "</td>\n";
+      {
+         if ($e['id_project'] == $id_project)
+            $is_included = true;
+         echo "<a href=\"prjInfo.php?id=".$e['id_project']."\" title=\"Se prosjektinfo...\">" . $e['name'] . " (" . $e['semester'] . "-" . $e['year'] . ")</a>";
+         if (strlen($e['comment']) > 0)
+            echo ": " . $e['comment'];
+         echo "<br>\n";
+      }
+   }
+   return $is_included;
 }
 
 $query = "SELECT id, firstname, lastname, title, work, tag, archive, comment "
@@ -253,12 +235,11 @@ foreach ($stmt as $row)
       "<td>" . $row['archive'] . ":" . $row['tag'] . "</td>" .
       "<td>";
       echo str_replace("\n", "<br>\n", $row['comment']);
-      echo "</td>";
-      if ($access->auth(AUTH::REP))
-         toggle_project($row['id']);
-      else
-         view_project($row['id']);
-      echo "</tr>";
+      echo "</td><td>";
+      $is_included = view_project($row['id']);
+      if ($access->auth(AUTH::REP) && !$is_included && $id_project > 0)
+         echo "<a href=\"$php_self?_action=rep_update&_no=" . $row['id'] . "&_sort=$sort&id_project=$id_project&search=$search\"><img src=\"images/folder.open.gif\" border=0 title=\"Legg til dette verket i repertoarlisten\"></a>";
+      echo "</td></tr>";
    } else
    {
       echo "<tr>
@@ -276,7 +257,9 @@ foreach ($stmt as $row)
     <td><input type=text size=8 name=archive value=\"" . $row['archive'] . "\" title=\"Referanse på hvor noter er leid eller lånt\">
          <input type=text size=6 name=tag value=\"" . $row['tag'] . "\" title=\"Eventuelt referansenummer\"></td>
     <td><textarea cols=50 rows=7 wrap=virtual name=comment title=\"Fritekst\">" . $row['comment'] . "</textarea></td>
-    </tr>";
+    <td>";
+    view_project($row['id']);
+    echo "</td></tr>";
    }
 }
 ?> 
