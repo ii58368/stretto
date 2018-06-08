@@ -147,34 +147,6 @@ if ($action == 'update_pers')
    }
 }
 
-// Deprecated
-/*
-function update_htpasswd($usr, $pwd)
-{
-   if (is_null($usr))
-      return;
-   if (strlen($usr) == 0)
-      return;
-   
-   $fname = "conf/.htpasswd";
-   $fr = fopen($fname, "r");
-   $fw = fopen("{$fname}~", "w");
-
-   while (($ln = fgets($fr, 1024)) != null)
-   {
-      $e = explode(':', $ln);
-      if ($usr != $e[0])
-         fwrite($fw, "$ln");
-   }
-   if (!is_null($pwd))
-      fwrite($fw, "$usr:" . crypt($pwd, base64_encode($pwd)) . "\n");
-
-   fclose($fr);
-   fclose($fw);
-
-   rename("$fname~", $fname);
-}
-*/
 
 function update_htpasswd()
 {
@@ -188,26 +160,6 @@ function update_htpasswd()
          fwrite($fw, $e['uid'] . ":" . $e['password'] . "\n");
  
    fclose($fw);
-}
-
-
-function do_once()
-{
-   global $db;
-  
-   $fname = "conf/.htpasswd";
-   $fr = fopen($fname, "r");
-   
-   while (($ln = fgets($fr, 1024)) != null)
-   {
-      $e = explode(':', substr($ln, 0, -1));
-      $q = "update person set password = " . $db->quote($e[1]) .
-           " where uid = '".$e[0]."'";
-      echo "$q<br>";
-      $db->query($q);
-   }
-
-   fclose($fr);
 }
 
 
@@ -260,8 +212,6 @@ function update_pwd($no)
    $stmt = $db->query("select uid from person where id = $no");
    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-   if (request('uid2') == 'jor')
-      do_once();
    update_htpasswd();
 }
 
