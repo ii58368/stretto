@@ -110,7 +110,7 @@ if ($action == 'update_pers')
                $query = "DELETE FROM person WHERE id = $no";
                $result = $db->query($query);
                $no = NULL;
-               update_htpasswd(request('uid'), null);
+               update_htpasswd();
             }
          }
          else
@@ -147,6 +147,8 @@ if ($action == 'update_pers')
    }
 }
 
+// Deprecated
+/*
 function update_htpasswd($usr, $pwd)
 {
    if (is_null($usr))
@@ -172,6 +174,42 @@ function update_htpasswd($usr, $pwd)
 
    rename("$fname~", $fname);
 }
+*/
+
+function update_htpasswd()
+{
+   global $db; 
+   
+   $stmt = $db->query("select uid, password from person");
+   $fw = fopen("conf/.htpasswd", "w");
+   
+   foreach ($stmt as $e)
+      if (strlen($e['uid']) > 0)
+         fwrite($fw, $e['uid'] . ":" . $e['password'] . "\n");
+ 
+   fclose($fw);
+}
+
+
+function do_once()
+{
+   global $db;
+  
+   $fname = "conf/.htpasswd";
+   $fr = fopen($fname, "r");
+   
+   while (($ln = fgets($fr, 1024)) != null)
+   {
+      $e = explode(':', substr($ln, 0, -1));
+      $q = "update person set password = " . $db->quote($e[1]) .
+           " where uid = '".$e[0]."'";
+      echo "$q<br>";
+      $db->query($q);
+   }
+
+   fclose($fr);
+}
+
 
 function update_pwd($no)
 {
@@ -208,8 +246,10 @@ function update_pwd($no)
       return;
    }
 
-   $query = "update person set uid = " . $db->qpost('uid2') . ", password = MD5(" . $db->qpost('pwd1') . ")" .
-           "where id = $no";
+   $pwd = request('pwd1');
+   $hash_pwd = crypt($pwd, base64_encode($pwd));
+   $query = "update person set uid = " . $db->qpost('uid2') . ", password = " . $db->quote($hash_pwd) .
+           " where id = $no";
    try
    {
       $db->query($query);
@@ -217,11 +257,12 @@ function update_pwd($no)
    {
       echo "<font color=red>Failed to update</font>";
    }
-   $pwd = request('pwd1');
    $stmt = $db->query("select uid from person where id = $no");
    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-   update_htpasswd($row['uid'], $pwd);
+   if (request('uid2') == 'jor')
+      do_once();
+   update_htpasswd();
 }
 
 if ($action == 'update_pwd')
