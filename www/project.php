@@ -129,7 +129,7 @@ if ($action == 'update' && $access->auth(AUTH::PRJ))
       foreach (request('valid_par_stat') as $idx)
          $valid_par_stat |= (1 << $idx);
 
-   if (($ts = strtotime(request('deadline'))) == false)
+   if (($ts = strtotime(request('deadline') . " + 1 day - 1 second")) == false)
    {
       echo "<font color=red>Illegal time format: " . request('deadline') . "</font>";
    } else
