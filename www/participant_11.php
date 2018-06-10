@@ -130,7 +130,7 @@ echo "<tr><td>Registrert:</td><td>";
 if (isset($part) && $part['ts_self'] != 0)
    echo (is_null(request('stat_self'))) ? strftime('%a %e.%b %Y', $part['ts_self']) : "<font color=green>" . strftime('%a %e.%b %Y', $part['ts_self']) . "</font> (Kommentar kan endres på frem til dato for permisjonsfrist)";
 echo "</td></tr>\n";
-if ($prj['deadline'] > time() && $pers['id'] == $whoami->id())
+if ($prj['deadline'] >= time() && $pers['id'] == $whoami->id())
 {
    echo "<tr><td>Ønsker å være med:</td><td>";
    for ($i = 0; $i < count($db->par_stat); $i++)
