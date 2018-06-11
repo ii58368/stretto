@@ -29,6 +29,8 @@ function participant_status($person_id, $project_id)
    
    // Return void if deadline is passed and no reply from member
    if ($part['stat_final'] == $db->par_stat_void &&
+      $part['stat_self'] == $db->par_stat_void &&
+      $part['stat_reg'] == $db->par_stat_void &&
       $part['orchestration'] == $db->prj_orch_reduced &&
       strtotime('today') > $part['deadline'])
       return array($status, $blink);
@@ -49,6 +51,7 @@ function participant_status($person_id, $project_id)
          $status = $part['stat_reg'];
    }
 
+   // If status has changed after the board has made a decition
    if ($part['stat_final'] != $db->par_stat_void)
       if (($part['stat_self'] != $db->par_stat_void && $part['ts_self'] > $part['ts_final']) ||
           ($part['stat_reg'] != $db->par_stat_void && $part['ts_reg'] > $part['ts_final']) ||
