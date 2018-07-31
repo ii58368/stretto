@@ -163,7 +163,8 @@ if ($action == 'update' && $access->auth(AUTH::PLAN_RW))
 $query = "SELECT plan.id as id, date, time, tsort, id_project, " .
         "id_location, plan.location as location, location.name as lname, " .
         "project.name as pname, location.url as url, " .
-        "plan.comment as comment, orchestration " .
+        "plan.comment as comment, orchestration, " .
+        "project.status as pstatus " .
         "FROM project, plan, location " .
         "where id_location = location.id " .
         "and id_project = project.id " .
@@ -171,8 +172,13 @@ $query = "SELECT plan.id as id, date, time, tsort, id_project, " .
         "and plan.event_type = $db->plan_evt_rehearsal ";
 if ($id_project == '%')
    $query .= "and plan.date >= " . $season->ts()[0] . " " .
-        "and plan.date < " . $season->ts()[1] . " ";
-$query .= "order by date,tsort,time";
+        "and plan.date < " . $season->ts()[1] . " " .
+        "and (project.status = $db->prj_stat_real ";
+if ($access->auth(AUTH::PRJ_RO))
+    $query .= "or project.status = $db->prj_stat_draft ";
+$query .= "or project.status = $db->prj_stat_tentative "
+       . "or project.status = $db->prj_stat_internal) "
+       . "order by date,tsort,time";
 
 $stmt = $db->query($query);
 
@@ -183,29 +189,35 @@ foreach ($stmt as $row)
 {
    if ($row['id'] != $no || $action != 'view')
    {
+      $gfont = '<font>';
+      if ($row['pstatus'] == $db->prj_stat_tentative)
+         $gfont = "<font color=lightgrey>";
+      if ($row['pstatus'] == $db->prj_stat_draft)
+         $gfont = "<font color=lightgrey>";
+
       if ($access->auth(AUTH::PLAN_RW))
          echo "<tr>
         <td><center>
             <a href=\"$php_self?_action=view&_no=".$row['id']."&id_project=$id_project\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
              </center></td>";
-      echo "<td>";
+      echo "<td>$gfont";
       if ($access->auth(AUTH::PLAN_RW) || $row['date'] != $last_date)
         echo strftime('%a %e.%b %y', $row['date']);
-      echo "</td><td>";
+      echo "</font></td><td>$gfont";
       if ($access->auth(AUTH::PLAN_RW) || $row['date'] != $last_date || $row['time'] != $last_time)
          echo $row['time'];
-      echo "</td><td>";
+      echo "</font></td><td>$gfont";
       if (strlen($row['url']) > 0)
          echo "<a href=\"".$row['url']."\">".$row['lname']."</a>";
       else
          echo $row['lname'];
       echo " ".$row['location'];
-      echo "</td><td>".$row['pname'];
+      echo "</font></td><td>$gfont".$row['pname'];
       if ($row['orchestration'] == $db->prj_orch_reduced)
          echo '*';
-      echo "</td><td>";
+      echo "</font></td><td>$gfont";
       echo str_replace("\n", "<br>\n", $row['comment']);
-      echo "</td>" .
+      echo "</font></td>" .
       "</tr>";
    }
    else
