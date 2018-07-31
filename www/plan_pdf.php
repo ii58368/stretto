@@ -41,6 +41,7 @@ class PDF extends PDF_util
       $this->Ln();
 
       $query = "select date, time, location.name as lname, " .
+              "plan.location as location, " .
               "project.name as pname, " .
               "plan.comment as comment, orchestration, " .
               "project.status as status " .
@@ -85,7 +86,7 @@ class PDF extends PDF_util
          $last_date = $e['date'];
          $last_time = $e['time'];
 
-         $this->Cell($tab[$idx++], $hight, $this->sconv($e['lname']));
+         $this->Cell($tab[$idx++], $hight, $this->sconv($e['lname']." ".$e['location']));
          $project = $this->sconv($e['pname']);
          if ($e['orchestration'] == $db->prj_orch_reduced)
             $project .= '*';

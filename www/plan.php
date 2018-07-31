@@ -199,7 +199,7 @@ foreach ($stmt as $row)
          echo "<a href=\"".$row['url']."\">".$row['lname']."</a>";
       else
          echo $row['lname'];
-      echo $row['location'];
+      echo " ".$row['location'];
       echo "</td><td>".$row['pname'];
       if ($row['orchestration'] == $db->prj_orch_reduced)
          echo '*';
