@@ -145,6 +145,7 @@ $query = "SELECT project.id as id, name, semester, year, id_person, project.stat
         "and id_instruments = instruments.id " .
         "and project.year = " . $season->year() . " " .
         "and project.semester = '" . $season->semester() . "' " .
+        "and not project.status = " . $db->prj_stat_internal . " " .
         "order by $sort";
 
 $stmt = $db->query($query);
