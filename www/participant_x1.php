@@ -305,7 +305,7 @@ function update_cell($id_person, $col, $status, $comment, $id_instruments)
 if ($sort == NULL)
    $sort = 'status,list_order,lastname,firstname';
 
-$query = "select name, semester, year, deadline, orchestration, valid_par_stat"
+$query = "select name, semester, year, deadline, orchestration, valid_par_stat, status"
         . " from project where id=" . request('id');
 $stmt = $db->query($query);
 $prj = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -352,6 +352,8 @@ if ($action == 'update')
          $stat_final = null;
       $comment_final = request("comment_final:$no");
       update_cell($no, "final", $stat_final, $comment_final, $id_instruments);
+      if ($prj['status'] == $db->prj_stat_internal)
+         update_cell($no, "final", $stat_reg, $comment_reg, $id_instruments);
 
       $no = null;
    }
@@ -425,13 +427,16 @@ echo "Bes</th>
       <th>";
 if ($access->auth(AUTH::RES_REG))
    manage_col("reg", "Tilbakemelding via styret/sekretær");
-echo "Sekretær</th>
-      <th>";
-if ($access->auth(AUTH::RES_REQ))
-   manage_col("req", "Instilling fra MR");
-echo "MR</th>
-      <th>";
-if ($access->auth(AUTH::RES_FIN))
+echo "Sekretær</th>";
+if ($prj['status'] != $db->prj_stat_internal)
+{
+   echo "<th>";
+   if ($access->auth(AUTH::RES_REQ))
+      manage_col("req", "Instilling fra MR");
+   echo "MR</th>";
+}
+echo "<th>";
+if ($access->auth(AUTH::RES_FIN) && $prj['status'] != $db->prj_stat_internal)
 {
    manage_col("final", "Vedtatt av styret");
    reset_col("final");
@@ -479,8 +484,9 @@ foreach ($stmt as $row)
    view_leave($row['id'], $prj['year'], $prj['semester']);
    manage_self($part, $row['id'], false);
    manage_reg($part, $row['id'], $row['id'] == $no || request('col') == "reg", $prj['valid_par_stat']);
-   manage_req($part, $row['id'], $row['id'] == $no || request('col') == "req", $prj['orchestration']);
-   manage_final($part, $row['id'], $row['id'] == $no || request('col') == "final", $prj['orchestration']);
+   if ($prj['status'] != $db->prj_stat_internal)
+      manage_req($part, $row['id'], $row['id'] == $no || request('col') == "req", $prj['orchestration']);
+   manage_final($part, $row['id'], ($row['id'] == $no || request('col') == "final") && $prj['status'] != $db->prj_stat_internal, $prj['orchestration']);
 
    echo "</tr>";
 }

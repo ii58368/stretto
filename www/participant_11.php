@@ -45,8 +45,11 @@ if (request('stat_self'))
    $query = "update participant set " .
               "stat_self = $stat_self, " .
               "ts_self = $ts, " .
-              "comment_self = $comment_self " .
-              "where id_person = $id_person " .
+              "comment_self = $comment_self ";
+   if ($prj['status'] == $db->prj_stat_internal)
+      $query .= ", stat_final = $stat_self, " .
+              "ts_final = $ts ";
+   $query .=  "where id_person = $id_person " .
               "and id_project = " . request('id_project');
    $db->query($query);
 }
@@ -128,7 +131,7 @@ echo ($prj['deadline'] < time()) ? "<font color=red>" . strftime('%a %e.%b %y', 
 echo "</td></tr>\n";
 echo "<tr><td>Registrert:</td><td>";
 if (isset($part) && $part['ts_self'] != 0)
-   echo (is_null(request('stat_self'))) ? strftime('%a %e.%b %Y', $part['ts_self']) : "<font color=green>" . strftime('%a %e.%b %Y', $part['ts_self']) . "</font> (Kommentar kan endres på frem til dato for permisjonsfrist)";
+   echo (is_null(request('stat_self'))) ? strftime('%a %e.%b %Y', $part['ts_self']) : "<font color=green>" . strftime('%a %e.%b %Y', $part['ts_self']) . "</font> (Kommentar kan endres på frem til og med dato for registreringsfrist)";
 echo "</td></tr>\n";
 if ($prj['deadline'] >= time() && $pers['id'] == $whoami->id())
 {
@@ -236,7 +239,12 @@ if ($part['stat_inv'] == $db->par_stat_yes)
          echo strftime('%e.%m', $part['ts_final']);
       echo " Styret:</b> ";
       if ($part['stat_final'] == $db->par_stat_void)
-         echo "Orkesteruttaket er ikke ferdigbehandlet.<br>\n";
+      {
+         if ($prj['status'] == $db->prj_stat_internal)
+            echo "Vi ser frem til å høre fra deg...";
+         else
+            echo "Orkesteruttaket er ikke ferdigbehandlet.<br>\n";
+      }
       if ($part['stat_final'] == $db->par_stat_no)
          echo ": Du er ikke tatt ut for å være med på dette prosjektet.<br>\n";
       if ($part['stat_final'] == $db->par_stat_yes)

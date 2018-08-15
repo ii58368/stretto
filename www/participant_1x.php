@@ -42,7 +42,8 @@ $query = "SELECT project.id as id, name, semester, year, status, " .
         "FROM project " .
         "where $qperiod " .
         "and (status = $db->prj_stat_real " .
-        "or status = $db->prj_stat_tentative) " .
+        "or status = $db->prj_stat_tentative " .
+        "or status = $db->prj_stat_internal) " .
         "order by $sort";
 
 $stmt = $db->query($query);
@@ -65,7 +66,8 @@ foreach ($stmt as $row)
    
    $request = ($row['status'] == $db->prj_stat_real && 
            $status != $db->par_stat_void && 
-           $lstatus != $db->lea_stat_granted);
+           $lstatus != $db->lea_stat_granted) ||
+           $row['status'] == $db->prj_stat_internal;
       
    if ($request)
       echo "<a href=\"participant_11.php?id_project=".$row['id']."&id_person=".$pers['id']."\" title=\"Klikk for påmelding eller søk om permisjon...\">";
@@ -85,7 +87,7 @@ foreach ($stmt as $row)
       else
          $tstat .= "\n(Påmeldingsprosjekt, du må melde deg på for å bli med...)";
    }
-   if ($row['status'] == $db->prj_stat_real)
+   if ($row['status'] == $db->prj_stat_real || $row['status'] == $db->prj_stat_internal)
       echo "<img src=\"images/part_stat_$status$blink.gif\" border=0 title=\"$tstat\">";
    echo "</td>\n";
    echo "<td>" . strftime('%a %e.%b %y', $row['deadline']) . "</td>" .

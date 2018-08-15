@@ -64,7 +64,7 @@ foreach ($stmt as $row)
    {
       echo "<td align=right nowrap>$gfont$date</font></td>"
               . "<td>$gfont$time</font></td>"
-              . "<td>$gfont$lname$location</font></td>"
+              . "<td>$gfont$lname $location</font></td>"
               . "<td>$gfont$pname";
       if ($row['orchestration'] == $db->prj_orch_reduced)
          echo '*';
@@ -76,9 +76,9 @@ foreach ($stmt as $row)
       echo "<td align=right nowrap>$date</td>"
               . "<td>$time</td>";
       if (strlen($url) > 0)
-         echo "<td><a href=\"$url\">$lname</a>$location</td>";
+         echo "<td><a href=\"$url\">$lname</a> $location</td>";
       else
-         echo "<td>$lname$location</td>";
+         echo "<td>$lname $location</td>";
       echo "<td><a href=\"prjInfo.php?id=".$row['id_project']."\">$pname</a>";
       if ($row['orchestration'] == $db->prj_orch_reduced)
          echo '*';

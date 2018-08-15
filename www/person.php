@@ -87,7 +87,8 @@ function select_filter()
    $s = $db->query("select id, name, year, semester from project "
            . "where year = ".$season->year()." "
            . "and semester = '".$season->semester()."' "
-           . "and status = $db->prj_stat_real "
+           . "and (status = $db->prj_stat_real "
+           . "or status = $db->prj_stat_internal) "
            . "order by id");
    foreach ($s as $e)
    {

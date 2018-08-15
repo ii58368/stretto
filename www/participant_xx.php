@@ -28,7 +28,7 @@ $stmt = $db->query($query);
 foreach ($stmt as $row)
 {
    $text = $row['name']."<br>".$row['semester'].$row['year'];
-   if ($row['status'] == $db->prj_stat_real)
+   if ($row['status'] == $db->prj_stat_real || $row['status'] == $db->prj_stat_internal)
       echo "<th><a href=\"participant_x1.php?id=".$row['id']."\" title=\"Administrasjon av ressurser for ".$row['name']." prosjektet...\">$text</a></td>\n";
    else
       echo "<th>$text</th>\n";
