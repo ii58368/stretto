@@ -165,7 +165,7 @@ echo "<h1>Medlemskontingent</h1>";
 
 echo "<form action=\"$php_self\" method=post>\n";
 select_filter();
-echo count($result) . " treff\n";
+echo "<font color=green>" . count($result) . " treff</font>\n";
 echo "</form>\n";
 
 $f_filter = get_filter_as_url();

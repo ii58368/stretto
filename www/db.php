@@ -173,7 +173,7 @@ class DB extends myPDO
    public $par_stat_tentative = 2;
    public $par_stat_can = 3;
    public $par_stat_yes = 4;
-   public $par_stat = array("Udefinert", "Nei, søker permisjon", "Tentativt", "Kan hvis behov", "Ja");
+   public $par_stat = array("Udefinert", "Nei", "Tentativt", "Kan hvis behov", "Ja");
 // table: contigent
    public $con_stat_unknown = 0;
    public $con_stat_unpayed = 1;

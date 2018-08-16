@@ -126,8 +126,8 @@ echo "</td>
   <td>";
 echo ($prj['orchestration'] == $db->prj_orch_tutti) ? "Permisjonsfrist:" : "Påmeldingsfrist:";
 echo "</td><td>";
-echo ($prj['deadline'] < time()) ? "<font color=red>" . strftime('%a %e.%b %y', $prj['deadline']) . "</font>" :
-        strftime('%a %e.%b %y', $prj['deadline']);
+echo ($prj['deadline'] < time()) ? "<font color=red>" . strftime('%a %e.%b %Y', $prj['deadline']) . "</font>" :
+        strftime('%a %e.%b %Y', $prj['deadline']);
 echo "</td></tr>\n";
 echo "<tr><td>Registrert:</td><td>";
 if (isset($part) && $part['ts_self'] != 0)

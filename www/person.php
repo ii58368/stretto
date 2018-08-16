@@ -161,7 +161,7 @@ if ($access->auth(AUTH::MEMB_RW, AUTH::MEMB_GREP))
    send_mail($result);
    echo "<form action=\"$php_self\" method=post>\n";
    select_filter();
-   echo count($result) . " treff\n";
+   echo "<font color=green>" . count($result) . " treff</font>\n";
    echo "</form>\n";
 }
 
