@@ -32,13 +32,14 @@ $prj = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (request('stat_self'))
 {
-   $ts = strtotime("now");
+   $ts = 0;
    $stat_self = $db->par_stat_void;
    $comment_self = "''";
    
    if (is_null(request('del')))  
    {
       $stat_self = request('stat_self');
+      $ts = strtotime("now");
       $comment_self = $db->qpost('comment_self');
    }
    

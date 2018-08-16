@@ -38,7 +38,8 @@ $query = "SELECT plan.id as id, "
         . "and participant.stat_inv = $db->par_stat_yes "
         . "and plan.event_type = $db->plan_evt_rehearsal "
         . "and plan.date >= " . strtotime('today') . " "
-        . "and project.status = $db->prj_stat_real "
+        . "and (project.status = $db->prj_stat_real "
+        . " or project.status = $db->prj_stat_internal) "
         . "order by plan.date,plan.tsort,plan.time";
 
 $stmt = $db->query($query);
