@@ -172,8 +172,8 @@ $query = "SELECT plan.id as id, date, time, tsort, id_project, " .
         "and plan.event_type = $db->plan_evt_rehearsal ";
 if ($id_project == '%')
    $query .= "and plan.date >= " . $season->ts()[0] . " " .
-        "and plan.date < " . $season->ts()[1] . " " .
-        "and (project.status = $db->prj_stat_real ";
+        "and plan.date < " . $season->ts()[1] . " ";
+$query .= "and (project.status = $db->prj_stat_real ";
 if ($access->auth(AUTH::PRJ_RO))
     $query .= "or project.status = $db->prj_stat_draft ";
 $query .= "or project.status = $db->prj_stat_tentative "
