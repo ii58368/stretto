@@ -32,7 +32,7 @@ $qperiod .= "))";
 
 $query = "SELECT id, name, semester, year " .
         "FROM project " .
-        "where not status = $db->prj_stat_internal "  .
+        "where status = $db->prj_stat_real "  .
         "and $qperiod " .
         "order by year, semester DESC, project.id";
 $stmt = $db->query($query);
