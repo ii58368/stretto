@@ -54,7 +54,7 @@ $query = "SELECT person.id as person_id, " .
         "where instruments.id = id_instruments " .
         "and person.status = $db->per_stat_member " .
         "and person.status_dir != $db->per_dir_exempt " .
-        "and not project.status = $db->prj_stat_internal " .
+        "and project.status = $db->prj_stat_real " .
         "and $qperiod " .
         "order by $sort, year, semester DESC, project.id";
 $stmt = $db->query($query);
