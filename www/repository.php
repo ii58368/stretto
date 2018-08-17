@@ -123,6 +123,7 @@ if ($action == 'new')
     <td align=left><input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
     <input type=hidden name=search value=\"$search\">
+    <input type=hidden name=id_project value=\"$id_project\">
     <input type=submit value=ok></td>
     <td><input type=text size=30 name=firstname title=Fornavn>
         <input type=text size=30 name=lastname title=Etternavn></td>
