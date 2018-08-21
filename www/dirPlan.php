@@ -200,6 +200,8 @@ if ($access->auth(AUTH::DIR_RW))
     <input type=hidden name=_action value=new>";
    if (!is_null(request('rehearsal')))
       echo "<input type=hidden name=rehearsal value=true>";
+   if (!is_null($id_project))
+      echo "<input type=hidden name=id_project value=" . request('id_project') . ">\n";
    echo "
       <input type=hidden name=id_location value=" . request('id_location') . ">
       <input type=submit value=\"Ny aktivitet\">
