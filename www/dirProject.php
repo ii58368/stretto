@@ -27,9 +27,9 @@ function list_group($id)
          echo "<strike>";
       echo $e['firstname'] . " " . $e['lastname'] . " (" . $e['instrument'] . ")";
       if ($e['status'] == $db->shi_stat_failed)
-         echo "</font>";
-      if ($e['status'] == $db->shi_stat_tentative)
          echo "</strike>";
+      if ($e['status'] == $db->shi_stat_tentative)
+         echo "</font>";
       if ($e['status_dir'] == $db->per_dir_nocarry)
          echo "<image src=images/chair-minus-icon.png border=0 title=\"Kan ikke løfte bord\">";
       echo "<br>";
