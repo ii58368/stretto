@@ -34,7 +34,7 @@ function draw_chair($img, $x, $y, $a, $w, $h, $ftext)
 
    imagepolygon($img, $p, 4, $black);
 
-   $font = "Avenir.ttc";
+   $font = __DIR__."/Avenir.ttc";
    $text = $atext[0];
 
    $box = @imageTTFBbox($fsize, 0, $font, $text);
