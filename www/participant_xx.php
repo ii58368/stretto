@@ -18,10 +18,14 @@ if ($season->semester() == 'H')
    $qperiod .= "and project.semester = '" . $season->semester() . "' ";
 $qperiod .= "))";
 
+$qstat = "(project.status = $db->prj_stat_real " .
+        "or project.status = $db->prj_stat_tentative " .
+        "or project.status = $db->prj_stat_internal)";
 
 $query = "SELECT id, name, semester, year, status " .
         "FROM project " .
         "where $qperiod " .
+        "and $qstat " .
         "order by year, semester DESC, project.id";
 $stmt = $db->query($query);
 
@@ -48,6 +52,7 @@ $query = "SELECT person.id as person_id, " .
         "where instruments.id = id_instruments " .
         "and not (person.status = $db->per_stat_quited " .
         "or person.status = $db->per_stat_apply) " .
+        "and $qstat " .
         "and $qperiod " .
         "order by $sort, year, semester DESC, project.id";
 $stmt = $db->query($query);
