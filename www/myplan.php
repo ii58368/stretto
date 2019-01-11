@@ -22,6 +22,7 @@ $query = "SELECT plan.id as id, "
         . "plan.time as time, "
         . "plan.tsort as sort, "
         . "project.id as id_project, "
+        . "project.deadline as deadline, "
         . "id_location, "
         . "plan.location as location, "
         . "location.name as lname, "
@@ -36,6 +37,7 @@ $query = "SELECT plan.id as id, "
         . "and participant.id_project = project.id "
         . "and participant.id_person = ".$whoami->id()." "
         . "and participant.stat_inv = $db->par_stat_yes "
+        . "and not participant.stat_final = $db->par_stat_no "
         . "and plan.event_type = $db->plan_evt_rehearsal "
         . "and plan.date >= " . strtotime('today') . " "
         . "and (project.status = $db->prj_stat_real "
@@ -47,10 +49,7 @@ $stmt = $db->query($query);
 $gfont = "<font color=lightgrey>";
 
 foreach ($stmt as $row)
-{
-   if ($row['stat_final'] == $db->par_stat_no)
-      continue;
-   
+{   
    $date = strftime('%a %e.%b', $row['date']);
    $time = $row['time'];
    $url = $row['url'];
@@ -63,6 +62,8 @@ foreach ($stmt as $row)
    
    if ($row['stat_final'] == $db->par_stat_void)
    {
+      if ($row['orchestration'] == $db->prj_orch_reduced && time() > $row['deadline'])
+         continue;
       echo "<td align=right nowrap>$gfont$date</font></td>"
               . "<td>$gfont$time</font></td>"
               . "<td>$gfont$lname $location</font></td>"
