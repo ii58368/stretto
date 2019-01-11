@@ -16,9 +16,10 @@ foreach (request('p') as $id)
    $stmt = $db->query($query);
    $e = $stmt->fetch(PDO::FETCH_ASSOC);
 
-   echo $e['firstname'] . "\t" . $e['middlename'] . "\t" . $e['lastname'] . "\t" .
+   $str = $e['firstname'] . "\t" . $e['middlename'] . "\t" . $e['lastname'] . "\t" .
         $e['instrument'] . "\t" . $db->per_stat[$e['status']] . "\t" .
         $e['email'] . "\t" . $e['phone1'] . "\t";
+   echo mb_convert_encoding($str, 'UTF-8');
    
    $q2 = "select * from contingent where id_person = " . $e['id'];
    $s2 = $db->query($q2);
