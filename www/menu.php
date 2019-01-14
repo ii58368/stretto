@@ -175,7 +175,7 @@ class MENU
 
          if ($access->auth(AUTH::PRJM))
          {
-            $q = "select id, name, semester, year, orchestration, docs_avail "
+            $q = "select id, name, semester, year, orchestration, docs_avail, deadline "
                     . "from project "
                     . "where (status = $db->prj_stat_real ";
             if ($access->auth(AUTH::PRJ_RO))
@@ -188,7 +188,7 @@ class MENU
          else
          {
             $q = "select project.id as id, project.name as name, semester, "
-                    . "year, orchestration, docs_avail "
+                    . "year, orchestration, docs_avail, deadline "
                     . "from project, participant, person "
                     . "where project.id = participant.id_project "
                     . "and participant.id_person = person.id "
@@ -217,7 +217,8 @@ class MENU
             if ($e['docs_avail'] & (1 << $db->prj_docs_avail_doc) || $access->auth(AUTH::PRJDOC))
                $project->add("Dokumenter", "document.php?path=project/$pid/doc");
             $project->add("Regikomité", "direction.php?id_project=$pid", AUTH::DIR_RO);
-            $project->add(($e['orchestration'] == $db->prj_orch_tutti) ? "Permisjonssøknad" : "Påmelding", "participant_11.php?id_project=$pid", AUTH::RES_SELF);
+            if (time() < $e['deadline'])
+               $project->add(($e['orchestration'] == $db->prj_orch_tutti) ? "Permisjonssøknad" : "Påmelding", "participant_11.php?id_project=$pid", AUTH::RES_SELF);
             $project->add("Fravær", "absence.php?id_project=$pid", AUTH::ABS_RO);
             $project->add("Prosjektressurser", "participant_x1.php?id=$pid", AUTH::RES);
             $c = $db->query("select id from concert where id_project=$pid");
