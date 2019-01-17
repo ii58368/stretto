@@ -39,12 +39,13 @@ function select_location($selected)
 function select_project($selected)
 {
    global $db;
+   global $season;
 
    echo "<select name=id_project title=\"Velg hvilket prosjekt prøven gjelder for...\">";
 
    $year = date("Y");
    $q = "SELECT id, name, semester, year, orchestration FROM project " .
-           "where year >= $year " .
+           "where year >= " . $season->year() . " " .
            "or id = '$selected' " .
            "order by year, semester DESC";
    $s = $db->query($q);
