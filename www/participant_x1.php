@@ -423,11 +423,11 @@ if ($access->auth(AUTH::RES_INV))
    manage_col("inv", "Besetningsliste. \nMerk av alle som må ta stilling til om de skal være med på prosjektet.");
 echo "Bes</th>
       <th>Permisjon</th>
-      <th>Egen</th>
-      <th>";
+      <th>Egen</th>";
+/* echo "<th>";
 if ($access->auth(AUTH::RES_REG))
    manage_col("reg", "Tilbakemelding via styret/sekretær");
-echo "Sekretær</th>";
+echo "Sekretær</th>"; */
 if ($prj['status'] != $db->prj_stat_internal)
 {
    echo "<th>";
@@ -483,7 +483,7 @@ foreach ($stmt as $row)
    manage_inv($part, $row['id'], $row['status'], $row['id'] == $no || request('col') == "inv");
    view_leave($row['id'], $prj['year'], $prj['semester']);
    manage_self($part, $row['id'], false);
-   manage_reg($part, $row['id'], $row['id'] == $no || request('col') == "reg", $prj['valid_par_stat']);
+//   manage_reg($part, $row['id'], $row['id'] == $no || request('col') == "reg", $prj['valid_par_stat']);
    if ($prj['status'] != $db->prj_stat_internal)
       manage_req($part, $row['id'], $row['id'] == $no || request('col') == "req", $prj['orchestration']);
    manage_final($part, $row['id'], ($row['id'] == $no || request('col') == "final") && $prj['status'] != $db->prj_stat_internal, $prj['orchestration']);
