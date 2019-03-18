@@ -3,7 +3,7 @@
 require 'framework.php';
 
 if ($sort == NULL)
-   $sort = 'year,semester DESC';
+   $sort = 'year,semester+DESC';
 
 function select_semester($selected)
 {
@@ -169,7 +169,7 @@ $query = "SELECT project.id as id, name, semester, year, status, " .
         "FROM project " .
         "where project.year = " . $season->year() . " " .
         "and project.semester = '" . $season->semester() . "' " .
-        "order by $sort";
+        "order by " . str_replace("+", " ", $sort);
 
 $stmt = $db->query($query);
 

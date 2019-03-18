@@ -32,7 +32,7 @@ function get_groups()
 }
 
 if ($sort == NULL)
-   $sort = 'list_order,position,firstname,lastname';
+   $sort = 'list_order,-position+DESC,-def_pos+DESC,firstname,lastname';
 
 $prj = get_project();
 $grp = get_groups();
@@ -82,7 +82,7 @@ echo "
     <table border=1>
     <tr>
       <th><a href=\"$php_self?id_plan=" . request('id_plan') . "&_sort=firstname,lastname\" title=\"Sorter på fornavn, deretter etternavn\">Navn</a></th>
-      <th><a href=\"$php_self?id_plan=" . request('id_plan') . "&_sort=list_order,position,firstname,lastname\" title=\"Sorter på instrument, fornavn, etternavn\">Instrument</a></th>\n";
+      <th><a href=\"$php_self?id_plan=" . request('id_plan') . "&_sort=list_order,-position+DESC,-def_pos+DESC,firstname,lastname\" title=\"Sorter på instrument, fornavn, etternavn\">Instrument</a></th>\n";
 
 for ($i = 0; $i < sizeof($db->abs_stat); $i++)
    echo "<th>" . $db->abs_stat[$i] . "</th>\n";
@@ -99,7 +99,7 @@ $query = "SELECT participant.id_person as id_person, firstname, lastname, "
         . "and participant.stat_final = $db->par_stat_yes "
         . "and person.id = participant.id_person "
         . "and plan.id = " . request('id_plan') . " "
-        . "order by $sort";
+        . "order by " . str_replace("+", " ", $sort);
 
 $stmt = $db->query($query);
 

@@ -7,6 +7,8 @@ function person_query()
    global $db;
    global $sort;
    
+   $qsort = str_replace("+", " ", $sort);
+   
    $query = "SELECT person.id as id, instruments.id as id_instruments, instrument, firstname, middlename, lastname, "
            . "address, postcode, city, "
            . "email, phone1, phone2, phone3, birthday, person.status as status, person.comment as comment "
@@ -49,7 +51,7 @@ function person_query()
          $query .= "instruments.id = $f_instrument or ";
       $query .= "false) ";
    }
-   $query .= "group by person.id order by $sort";
+   $query .= "group by person.id order by $qsort";
 
    return $query;
 }

@@ -30,7 +30,7 @@ function get_groups()
 }
 
 if ($sort == NULL)
-   $sort = 'list_order,position,firstname,lastname';
+   $sort = 'list_order,-position+DESC,-def_pos+DESC,firstname,lastname';
 
 $grp = get_groups();
 $prj = get_project();
@@ -41,7 +41,7 @@ echo "
     <table border=1>
     <tr>
       <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=firstname,lastname\" title=\"Sorter på fornavn, deretter etternavn\">Navn</a></th>
-      <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=list_order,position,firstname,lastname\" title=\"Sorter i partiturrekkefølge, deretter fornavn og deretter etternavn\">Instrument</a></th>
+      <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=list_order,-position+DESC,-def_pos+DESC,firstname,lastname\" title=\"Sorter i partiturrekkefølge, deretter fornavn og deretter etternavn\">Instrument</a></th>
       <th>Status</th>\n";
 
 $query = "select id, date from plan "
@@ -70,7 +70,7 @@ if ($access->auth(AUTH::ABS_ALL))
            . "and person.id = participant.id_person "
            . "and plan.id_project = ".request('id_project')." "
            . "and plan.event_type = $db->plan_evt_rehearsal "
-           . "order by $sort,plan.date";
+           . "order by " . str_replace("+", " ", $sort) . ",plan.date";
 }
 else
 {
@@ -85,7 +85,7 @@ else
            . "and person.id = participant.id_person "
            . "and plan.id_project = ".request('id_project')." "
            . "and plan.event_type = $db->plan_evt_rehearsal "
-           . "order by $sort,plan.date";
+           . "order by " . str_replace("+", " ", $sort) . ",plan.date";
 
 }
 

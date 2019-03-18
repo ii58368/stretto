@@ -303,7 +303,7 @@ function update_cell($id_person, $col, $status, $comment, $id_instruments)
 }
 
 if ($sort == NULL)
-   $sort = 'status,list_order,lastname,firstname';
+   $sort = 'status,list_order,-def_pos+desc,lastname,firstname';
 
 $query = "select name, semester, year, deadline, orchestration, valid_par_stat, status"
         . " from project where id=" . request('id');
@@ -416,8 +416,8 @@ if ($access->auth(AUTH::RES_INV, AUTH::RES_REG, AUTH::RES_REQ, AUTH::RES_FIN))
       <th>Edit</th>";
 echo "
       <th><a href=\"$php_self?id=".request('id')."&_sort=lastname,firstname\">Navn</a></th>
-      <th><a href=\"$php_self?id=".request('id')."&_sort=status,list_order,lastname,firstname\">Status</a></th>
-      <th><a href=\"$php_self?id=".request('id')."&_sort=list_order,lastname,firstname\">Instrument</a></th>
+      <th><a href=\"$php_self?id=".request('id')."&_sort=status,list_order,-def_pos+desc,lastname,firstname\">Status</a></th>
+      <th><a href=\"$php_self?id=".request('id')."&_sort=list_order,-def_pos+desc,lastname,firstname\">Instrument</a></th>
       <th>";
 if ($access->auth(AUTH::RES_INV))
    manage_col("inv", "Besetningsliste. \nMerk av alle som må ta stilling til om de skal være med på prosjektet.");
@@ -451,7 +451,7 @@ $query = "SELECT person.id as id, firstname, lastname, status, id_instruments " 
         "where id_instruments = instruments.id " .
         "and not (status = $db->per_stat_quited " .
         "or status = $db->per_stat_apply) " .
-        "order by $sort";
+        "order by " . str_replace("+", " ", $sort);
 
 $stmt = $db->query($query);
 

@@ -2,7 +2,7 @@
 require 'framework.php';
 
 if (is_null($sort))
-   $sort = 'year,semester DESC';
+   $sort = 'year,semester+DESC';
 
 function list_group($id)
 {
@@ -146,7 +146,7 @@ $query = "SELECT project.id as id, name, semester, year, id_person, project.stat
         "and project.year = " . $season->year() . " " .
         "and project.semester = '" . $season->semester() . "' " .
         "and not project.status = " . $db->prj_stat_internal . " " .
-        "order by $sort";
+        "order by " . str_replace("+", " ", $sort);
 
 $stmt = $db->query($query);
 

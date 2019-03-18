@@ -115,7 +115,7 @@ if ($action == 'template')
 
 
 if (is_null($sort))
-   $sort = 'list_order,position,firstname,lastname';
+   $sort = 'list_order,-position+DESC,-def_pos+DESC,firstname,lastname';
 
 if ($action == 'update')
 {
@@ -156,7 +156,7 @@ if ($access->auth(AUTH::SEAT))
       <th>Edit</th>
       <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=firstname,lastname\" title=\"Sorter på fornavn, deretter etternavn\">Navn</a></th>
       <th>Instrument</th>
-      <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=list_order,position,firstname,lastname\" title=\"Sorter på plassnummer\">Plass</a></th>
+      <th><a href=\"$php_self?id_project=".request('id_project')."&_sort=list_order,-position+DESC,-def_pos+DESC,firstname,lastname\" title=\"Sorter på plassnummer\">Plass</a></th>
       <th>Kommentar</th>
       </tr>";
 
@@ -169,7 +169,7 @@ if ($access->auth(AUTH::SEAT))
            . "and participant.id_instruments = instruments.id "
            . "and instruments.id_groups = groups.id "
            . "and groups.id = $grp_id "
-           . "order by $sort";
+           . "order by " . str_replace("+", " ", $sort);
 
    $stmt = $db->query($query);
 

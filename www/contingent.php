@@ -2,7 +2,7 @@
 require 'framework.php';
 
 if (is_null($sort))
-   $sort = 'list_order,lastname,firstname';
+   $sort = 'list_order,-def_pos+desc,lastname,firstname';
 
 function send_mail($r)
 {
@@ -134,7 +134,7 @@ function person_query()
          $query .= "person.status = $f_status or ";
       $query .= "false) ";
    }
-   $query .= "group by person.id order by $sort";
+   $query .= "group by person.id order by " . str_replace("+", " ", $sort);
 
    return $query;
 }
@@ -180,15 +180,12 @@ echo "
       <th>
          <a href=\"$php_self?_sort=firstname,lastname$f_filter\" title=\"Sorter p&aring; fornavn...\">Fornavn</a>/
          <a href=\"$php_self?_sort=lastname,firstname$f_filter\" title=\"Sorter p&aring; etternavn...\">Etternavn</a></th>
-      <th><a href=\"$php_self?_sort=list_order,lastname,firstname$f_filter\" title=\"Sorter etter instrumentgruppe...\">Instrument</a></th>\n
-      <th><a href=\"$php_self?_sort=person.status,list_order,lastname,firstname$f_filter\" title=\"Sorter etter medlemsstatus...\">Status</a></th>\n";
+      <th><a href=\"$php_self?_sort=list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter etter instrumentgruppe...\">Instrument</a></th>\n
+      <th><a href=\"$php_self?_sort=person.status,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter etter medlemsstatus...\">Status</a></th>\n";
 
 for ($i = $sel_year; $i <= $end_year; $i++)
    echo "<th>$i</td>\n";
 echo "</tr>";
-
-if (is_null($sort))
-   $sort = "list_order,lastname,firstname";
 
 reset($result);
 

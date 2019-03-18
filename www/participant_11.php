@@ -210,7 +210,7 @@ if ($part['stat_inv'] == $db->par_stat_yes)
          echo strftime('%e.%m', $part['ts_final']);
       echo " Styret:</b> ";
       if ($part['stat_final'] == $db->par_stat_void)
-         echo "Endelig besetning vil bli bestemt når permisjonsfristen går ut.<br>\n";
+         echo "Endelig besetning vil bli bestemt når styret har behandlet saken etter at permisjonsfristen har gått ut.<br>\n";
       if ($part['stat_final'] == $db->par_stat_no)
          echo "Du har fått innvilget permisjon til dette prosjektet.<br>\n";
       if ($part['stat_final'] == $db->par_stat_yes)

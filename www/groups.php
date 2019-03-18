@@ -234,7 +234,7 @@ $query = "SELECT groups.id as id, groups.name as name, firstname, lastname, inst
         "FROM groups, person, instruments " .
         "where person.id = groups.id_person " .
         "and instruments.id = person.id_instruments " .
-        "order by $sort";
+        "order by " . str_replace("+", " ", $sort);
 
 $stmt = $db->query($query);
 

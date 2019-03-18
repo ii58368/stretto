@@ -5,7 +5,7 @@ require 'person_query.php';
 $pedit = "personEdit.php";
 
 if (is_null($sort))
-   $sort = 'list_order,lastname,firstname';
+   $sort = 'list_order,-def_pos+desc,lastname,firstname';
 
 function send_mail($r)
 {
@@ -154,7 +154,7 @@ $f_filter = get_filter_as_url();
 if ($access->auth(AUTH::MEMB_RW))
    echo "<a href=\"$pedit?_sort=$sort&_action=edit_pers$f_filter\" title=\"Registrer ny person...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
 
-echo "<a href=\"person_pdf.php?_sort=list_order,lastname,firstname$f_filter\" title=\"PDF versjon...\"><img src=images/pdf.jpeg height=22 border=0 hspace=5 vspace=5></a>\n";
+echo "<a href=\"person_pdf.php?_sort=list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"PDF versjon...\"><img src=images/pdf.jpeg height=22 border=0 hspace=5 vspace=5></a>\n";
 
 if ($access->auth(AUTH::MEMB_RW, AUTH::MEMB_GREP))
 {
@@ -173,7 +173,7 @@ if ($access->auth(AUTH::MEMB_RW))
    echo "
       <th>Edit</th>";
 echo "
-      <th><a href=\"$php_self?_sort=list_order,lastname,firstname$f_filter\" title=\"Sorter på instrumentgruppe...\">Instrument</a></th>
+      <th><a href=\"$php_self?_sort=list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på instrumentgruppe...\">Instrument</a></th>
       <th><a href=\"$php_self?_sort=firstname,lastname$f_filter\" title=\"Sorter på fornavn...\">For</a>/
                           <a href=\"$php_self?_sort=lastname,firstname$f_filter\" title=\"Sorter på etternavn...\">Etternavn</a></th>
       <th><a href=\"$php_self?_sort=address,lastname,firstname$f_filter\" title=\"Sorter på addresse...\">Adresse</a></th>
@@ -183,7 +183,7 @@ echo "
       <th>Mobil</th>
       <th>Priv</th>
       <th>Arbeid</th>
-      <th><a href=\"$php_self?_sort=status,list_order,lastname,firstname$f_filter\" title=\"Sorter på status...\">Status</a></th>";
+      <th><a href=\"$php_self?_sort=status,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på status...\">Status</a></th>";
       if ($access->auth(AUTH::MEMB_RW))
         echo "<th>Født</th>";
       echo "

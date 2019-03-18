@@ -12,7 +12,8 @@ function request($key)
 }
 
 $sort = request('_sort');
-str_replace("|", ",", $sort);
+if (!is_null($sort))
+   $sort = str_replace(" ", "+", $sort);
 
 $action = request('_action');
 $no = request('_no');

@@ -9,8 +9,8 @@ echo "
       <th>
          <a href=\"$php_self?_sort=firstname,lastname\" title=\"Sorter på fornavn...\">Fornavn</a>/
          <a href=\"$php_self?_sort=lastname,firstname\" title=\"Sorter på etternavn...\">Etternavn</a></th>
-      <th><a href=\"$php_self?_sort=list_order,lastname,firstname\" title=\"Sorter på instrumentgruppe...\">Instrument</a></th>
-      <th><a href=\"$php_self?_sort=status,list_order,lastname,firstname\" title=\"Sorter på medlemsstatus...\">Status</a></th>\n";
+      <th><a href=\"$php_self?_sort=list_order,-def_pos+desc,lastname,firstname\" title=\"Sorter på instrumentgruppe...\">Instrument</a></th>
+      <th><a href=\"$php_self?_sort=status,list_order,-def_pos+desc,lastname,firstname\" title=\"Sorter på medlemsstatus...\">Status</a></th>\n";
 
 $qperiod = "(project.year > " . $season->year() . " " .
         "  or (project.year = " . $season->year() . " ";
@@ -40,7 +40,8 @@ foreach ($stmt as $row)
 echo "</tr><tr>";
 
 if (is_null($sort))
-   $sort = "list_order,lastname,firstname";
+   $sort = "list_order,-def_pos+desc,lastname,firstname";
+   
 
 $query = "SELECT person.id as person_id, " .
         "project.id as project_id,  " .
@@ -54,7 +55,7 @@ $query = "SELECT person.id as person_id, " .
         "or person.status = $db->per_stat_apply) " .
         "and $qstat " .
         "and $qperiod " .
-        "order by $sort, year, semester DESC, project.id";
+        "order by " . str_replace("+", " ", $sort) . ", year, semester DESC, project.id";
 $stmt = $db->query($query);
 
 $prev_id = 0;

@@ -4,7 +4,7 @@ include 'framework.php';
 $personList = "person.php";
 
 if ($sort == NULL)
-   $sort = 'list_order,lastname,firstname';
+   $sort = 'list_order,-def_pos+desc,lastname,firstname';
 
 if (!$access->auth(AUTH::MEMB_RW))
 {
@@ -55,6 +55,25 @@ function select_status($selected)
    echo "</select>";
 }
 
+function select_def_pos($selected)
+{
+   global $db;
+
+   echo "<select name=def_pos title=\"Standard stemme/plassering, gjelder typisk blåsere\">\n";
+
+   echo "<option value=null>N/A</option>";
+   
+   for ($i = 1; $i < 5; $i++)
+   {
+      echo "<option value=$i";
+      if ($selected == $i)
+         echo " selected";
+      echo ">$i</option>\n";
+   }
+
+   echo "</select>";
+}
+
 function select_status_log($selected)
 {
    global $db;
@@ -82,12 +101,13 @@ if ($action == 'update_pers')
       if ($no == NULL)
       {
          $query = "insert into person (id_instruments, firstname, middlename, lastname, address, 
-              postcode, city, email, uid, password,
+              postcode, city, email, uid, password, def_pos, 
               phone1, phone2, phone3, status, birthday, comment)
               values (" . request('id_instruments') . ", " . $db->qpost('firstname') . ", 
                       " . $db->qpost('middlename') . ", " . $db->qpost('lastname') . ", " . $db->qpost('address') . ",
                       " . request('postcode') . ", " . $db->qpost('city') . ", " . $db->qpost('email') . ",
                       " . $db->qpost('email') . ", MD5('OSO'),
+                      " . request('def_pos') . ",
                       " . $db->qpost('phone1') . ", " . $db->qpost('phone2') . ", " . $db->qpost('phone3') . ", 
                       " . $db->qpost('status') . ", $birthday, " . $db->qpost('comment') . ")";
          $db->query($query);
@@ -124,6 +144,7 @@ if ($action == 'update_pers')
             $query .=
                     "address = " . $db->qpost('address') . "," .
                     "postcode = " . request('postcode') . "," .
+                    "def_pos = " . request('def_pos') . "," .
                     "city = " . $db->qpost('city') . "," .
                     "email = " . $db->qpost('email') . "," .
                     "phone1 = " . $db->qpost('phone1') . "," .
@@ -242,7 +263,7 @@ $row = array(
 if (!is_null($no))
 {
    $query = "SELECT person.id as id, id_instruments, instrument, firstname, middlename, lastname, " .
-           "uid, address, postcode, city, " .
+           "uid, address, postcode, city, def_pos, " .
            "email, phone1, phone2, phone3, status, person.comment as comment, " .
            "comment_dir, status_dir, birthday " .
            "FROM person, instruments " .
@@ -308,9 +329,12 @@ if ($action == 'edit_pers')
       <td>Instrument:</td>
       <td>";
    if ($access->auth(AUTH::MEMB_RW))
+   {
+      select_def_pos($row['def_pos']);
       select_instrument($row['id_instruments']);
+   }
    else
-      echo $row['instrument'];
+      echo (is_null($row['def_pos']) ? "" : $row['def_pos'] . ". ") . $row['instrument'];
    echo
    "     </td>
       </tr>
@@ -363,7 +387,7 @@ if ($action == 'edit_pers')
       </th>
     </tr>
     <tr><td>Navn:</td><td>" . $row['firstname'] . " " . $row['middlename'] . " " . $row['lastname'] . "</td></tr>
-    <tr><td>Instrument:</td><td>" . $row['instrument'] . "</td></tr>
+    <tr><td>Instrument:</td><td>" . (is_null($row['def_pos']) ? "" : $row['def_pos'] . ". ") . $row['instrument'] . "</td></tr>
     <tr><td>Adresse:</td><td>" . $row['address'] . "</td></tr>
     <tr><td>Post:</td><td>$postcode " . $row['city'] . "</td></tr>
     <tr><td>Mail:</td><td>" . $row['email'] . "</td></tr>
