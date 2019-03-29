@@ -1,4 +1,3 @@
-
 <?php
 
 require 'framework.php';
@@ -80,6 +79,49 @@ function shift_list()
   }
 
   echo "</table>";
+}
+
+function lineup()
+{
+   global $db;
+
+   echo "
+    <table border=1>
+    <tr>
+      <th>Gruppe</th>
+      <th>Musikere</th>
+      <th>Stativer</th>
+    </tr>";
+
+   $qc ="(select count(*) "
+           . "from instr_grp as igrp, instruments, participant, person "
+           . "where participant.stat_final = " . $db->par_stat_yes . " "
+           . "and participant.id_project = " . request('id_project') . " "
+           . "and participant.id_person = person.id "
+           . "and person.id_instruments = instruments.id "
+           . "and instruments.id_instr_grp = igrp.id "
+           . "and igrp.id = instr_grp.id) as gpart "; 
+          
+   $q = "select name, stand, $qc from instr_grp order by id";
+   
+   $s = $db->query($q);
+
+   $sstands = 0;
+   $sgpart = 0;
+   
+   foreach ($s as $e)
+   {
+      $stand = (int)$e['stand'];
+      $gpart = (int)$e['gpart'];
+      $stands = round($gpart / $stand);
+      $sstands += $stands;
+      $sgpart += $gpart;
+      echo "<tr><td>" . $e['name'] . "</td><td>" . $e['gpart'] . "</td><td>" . $stands . "</td></tr>";
+   }
+   
+   echo "<tr><td>Sum</td><td>$sgpart</td><td>$sstands</td></tr>";
+
+   echo "</table>";
 }
 
 $query  = "SELECT name, semester, year, info_dir from project where id = " . request('id_project');
@@ -169,5 +211,7 @@ foreach ($stmt as $row)
 echo "</table>
      <h2>Regikomité</h2>";
 shift_list();
+echo "<h2>Rigg</h2>";
+lineup();
 echo "<h2>Generell prosjekt info</h2>";
 echo $project_info;
