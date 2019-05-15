@@ -94,11 +94,10 @@ function lineup()
     </tr>";
 
    $qc ="(select count(*) "
-           . "from instr_grp as igrp, instruments, participant, person "
+           . "from instr_grp as igrp, instruments, participant "
            . "where participant.stat_final = " . $db->par_stat_yes . " "
            . "and participant.id_project = " . request('id_project') . " "
-           . "and participant.id_person = person.id "
-           . "and person.id_instruments = instruments.id "
+           . "and participant.id_instruments = instruments.id "
            . "and instruments.id_instr_grp = igrp.id "
            . "and igrp.id = instr_grp.id) as gpart "; 
           
