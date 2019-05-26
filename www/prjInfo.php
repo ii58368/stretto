@@ -77,11 +77,12 @@ echo "</table><p>\n";
 
 echo "<h3>Musikere</h3>\n";
 
-$query = "select firstname, lastname, instrument, stat_inv, stat_final"
+$query = "select firstname, lastname, instrument, stat_final"
         . " from person, instruments, participant"
         . " where participant.id_project=".request('id')
         . " and participant.id_instruments = instruments.id"
         . " and participant.id_person = person.id"
+        . " and participant.stat_inv = $db->par_stat_yes"
         . " and participant.stat_final = $db->par_stat_yes"
         . " order by instruments.list_order, -participant.position DESC, -person.def_pos DESC";
 $stmt = $db->query($query);

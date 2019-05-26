@@ -111,6 +111,7 @@ class PDF extends PDF_util
               . " where participant.id_project=$id_project"
               . " and participant.id_instruments = instruments.id"
               . " and participant.id_person = person.id"
+              . " and participant.stat_inv = $db->par_stat_yes"
               . " and participant.stat_final = $db->par_stat_yes"
               . " order by instruments.list_order, -participant.position DESC, -person.def_pos DESC";
 

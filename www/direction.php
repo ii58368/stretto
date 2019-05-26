@@ -96,6 +96,7 @@ function lineup()
    $qc ="(select count(*) "
            . "from instr_grp as igrp, instruments, participant "
            . "where participant.stat_final = " . $db->par_stat_yes . " "
+           . "and participant.stat_inv = " . $db->par_stat_yes . " "
            . "and participant.id_project = " . request('id_project') . " "
            . "and participant.id_instruments = instruments.id "
            . "and instruments.id_instr_grp = igrp.id "

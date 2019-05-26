@@ -22,6 +22,7 @@ function person_query()
    {
       $query .= "and participant.id_person = person.id "
               . "and participant.id_project = project.id "
+              . "and participant.stat_inv = $db->par_stat_yes "
               . "and participant.stat_final = $db->par_stat_yes "
               . "and (";
       foreach (request('f_project') as $f_project)

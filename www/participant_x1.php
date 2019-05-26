@@ -188,7 +188,7 @@ function manage_final($part, $row, $edit, $orchestration)
 
    echo "<td>";
 
-   if (!is_null($part) && ($part['stat_inv'] == $db->par_stat_yes || $part['stat_final'] != $db->par_stat_void))
+   if (!is_null($part) && $part['stat_inv'] == $db->par_stat_yes && $part['stat_final'] != $db->par_stat_void)
    {
       if ($edit && $access->auth(AUTH::RES_FIN))
       {
@@ -298,7 +298,6 @@ function update_cell($id_person, $col, $status, $comment, $id_instruments)
               "ts_$col = $ts, ";
    $query .= "comment_$col = " . $db->quote($comment) . "," .
               "id_instruments = $id_instruments";
-   
    $db->query($query);
 }
 
@@ -378,6 +377,8 @@ if ($action == 'update')
                        $db->par_stat_void : $db->par_stat_no;
                if ($col == 'req' && is_null($stat))
                   $stat = (strlen($val) > 0) ? $db->par_stat_tentative : $db->par_stat_void;
+               if ($col == 'inv' && is_null($stat))
+                  $stat = $db->par_stat_void;
                if ($stat == $part["stat_$col"])
                   $stat = null;
                update_cell($pid, $col, $stat, $val, $id_instruments);

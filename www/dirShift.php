@@ -71,7 +71,7 @@ foreach ($stmt as $row)
       echo "</th><th align=left>".$row['instrument']."</th>";
       $prev_id = $row['person_id'];
    }
-   $query = "SELECT stat_dir, stat_final, comment_dir from participant " .
+   $query = "SELECT stat_dir, stat_final, stat_inv, comment_dir from participant " .
            "where id_project = ".$row['project_id']." " .
            "and id_person = ".$row['person_id']." " .
            "and (stat_final = $db->par_stat_yes or not stat_dir = $db->shi_stat_free)";
@@ -80,7 +80,7 @@ foreach ($stmt as $row)
    foreach ($stmt2 as $row2)
    {
       $status = $row2['stat_dir'];
-      if ($row2['stat_dir'] != $db->shi_stat_free && $row2['stat_final'] != $db->par_stat_yes)
+      if ($row2['stat_dir'] != $db->shi_stat_free && ($row2['stat_final'] != $db->par_stat_yes || $row2['stat_inv'] != $db->par_stat_yes))
          $status = $db->shi_stat_dropout;
       $comment = $row2['comment_dir'];
       $img = "<img src=\"images/shift_status_{$status}.gif\" border=0 title=\"{$db->shi_stat[$status]} (".$row['project_name'].") {$comment}\">";
