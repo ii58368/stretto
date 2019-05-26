@@ -189,7 +189,7 @@ class ACCESS extends AUTH
          return;
 
       echo "<h1>Permission denied</h1>";
-      echo "Kontakt <a href=\"mailto:sekretar@oslo-symfoniorkester.org\">Sekretæren</a> for å få nødvendig tilgang";
+      echo "Kontakt <a href=\"mailto:sekretar@oslosymfoniorkester.no\">Sekretæren</a> for å få nødvendig tilgang";
       exit(0);
    }
 
