@@ -96,9 +96,8 @@ if ($action == 'new')
      <td><i>Viktighetsgrad:</i></td><td>";
    select_importance(null);
    echo "</td>
-     </tr><tr>
-     <td><i>Status:</i></td><td>";
-   select_status(null);
+     </tr><tr>";
+   echo "<input type=hidden name=status value=".$db->evt_status_public.">";
    echo "</td>
      </tr></table>
     <textarea cols=60 rows=15 wrap=virtual name=body></textarea>
@@ -178,9 +177,8 @@ foreach ($stmt as $row)
      <td><i>Viktighetsgrad:</i></td><td>";
       select_importance($row['importance']);
       echo "</td>
-     </tr><tr>
-     <td><i>Status:</i></td><td>";
-      select_status($row['status']);
+     </tr><tr>";
+     echo "<input type=hidden name=status value=".$db->evt_status_public.">";
       echo "</td>
      </tr></table>
     <textarea cols=60 rows=15 wrap=virtual name=body>" . $row['body'] . "</textarea>\n";
