@@ -188,7 +188,8 @@ function manage_final($part, $row, $edit, $orchestration)
 
    echo "<td>";
 
-   if (!is_null($part) && $part['stat_inv'] == $db->par_stat_yes && $part['stat_final'] != $db->par_stat_void)
+   if (!is_null($part) && ($part['stat_inv'] == $db->par_stat_yes || $part['stat_final'] != $db->par_stat_void))    
+//   if (!is_null($part) && $part['stat_inv'] == $db->par_stat_yes && $part['stat_final'] != $db->par_stat_void)
    {
       if ($edit && $access->auth(AUTH::RES_FIN))
       {
