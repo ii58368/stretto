@@ -148,9 +148,9 @@ $query = "select event.id as id, subject, ts_create, ts_update, importance, body
 if ($id_project)
    $query .= "and event.id_project = $id_project ";
 else
-   $query .= "and ts_update > " . $season->ts()[0] . " "
-           . "and ts_update < " . $season->ts()[1] . " ";
-$query .= "order by ts_update desc";
+   $query .= "and ts_create > " . $season->ts()[0] . " "
+           . "and ts_create < " . $season->ts()[1] . " ";
+$query .= "order by ts_create desc";
 $stmt = $db->query($query);
 
 foreach ($stmt as $row)
@@ -194,7 +194,7 @@ foreach ($stmt as $row)
     <table id=\"no_border\"><tr>
     <td align=right><i>Fra:</i></td><td>" . $row['firstname'] . " " . $row['lastname'] . "</td>
     </tr><tr>
-    <td align=right><i>Dato:</i></td><td>" . strftime('%e.%b %Y', $row['ts_update']) . "</td>
+    <td align=right><i>Dato:</i></td><td>" . strftime('%e.%b %Y', $row['ts_create']) . "</td>
     </tr><tr>
     <td align=right><i>Prosjekt:</i></td><td>";
       if ($row['id_project'] > 0)
