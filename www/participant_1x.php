@@ -27,7 +27,7 @@ echo "
       <th>Prosjekt</th>
       <th>Sem</th>
       <th>Status</th>
-      <th>Påmelding-/persmisjonsfrist</th>
+      <th>Påmelding-/permisjonsfrist</th>
       <th>Tutti</th>
     </tr>";
 
