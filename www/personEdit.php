@@ -140,11 +140,11 @@ if ($action == 'update_pers')
                $query .= 
                     "firstname = " . $db->qpost('firstname') . "," .
                     "middlename = " . $db->qpost('middlename') . "," .
-                    "lastname = " . $db->qpost('lastname') . ",";
+                    "lastname = " . $db->qpost('lastname') . "," .
+                    "def_pos = " . request('def_pos') . ",";
             $query .=
                     "address = " . $db->qpost('address') . "," .
                     "postcode = " . request('postcode') . "," .
-                    "def_pos = " . request('def_pos') . "," .
                     "city = " . $db->qpost('city') . "," .
                     "email = " . $db->qpost('email') . "," .
                     "phone1 = " . $db->qpost('phone1') . "," .
