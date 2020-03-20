@@ -138,6 +138,7 @@ class MENU
          $my_pages->add("Mine prosjekter", "participant_1x.php?id=" . $whoami->id(), AUTH::MYPRJ);
          $my_pages->add("Min spilleplan", "myplan.php?id_person=" . $whoami->id(), AUTH::MYPLAN);
          $my_pages->add("Min regi", "myDirection.php", AUTH::MYDIR);
+         $my_pages->add("Mine tilbakemeldinger", "feedback.php", AUTH::FEEDBACK);
          $my_pages->add("Mine personopplysninger", "personEdit.php?_no=" . $whoami->id(), AUTH::PERS, AUTH::MEMB_RW);
       }
       {
@@ -155,13 +156,23 @@ class MENU
          $menu->add("Admin", $admin);
          $admin->add("Medlemsliste", "person.php?f_status[]=$db->per_stat_member&f_status[]=$db->per_stat_eng", AUTH::MEMB_RO);
          $admin->add("Spilleplan", "plan.php", AUTH::PLAN_RO);
-         $admin->add("Grupper", "groups.php", AUTH::BOARD_RO);
-         $admin->add("Instrumenter", "instruments.php", AUTH::BOARD_RO);
-         $admin->add("Tilgang", "access.php", AUTH::BOARD_RO);
-         $admin->add("Tilgangsgrupper", "view.php", AUTH::BOARD_RO);
+         {
+            $groups = new SUBMENU("class=\"dl-submenu\"");
+            $admin->add("Tilgang/grupper", $groups, AUTH::BOARD_RO);
+            $groups->add("Grupper", "groups.php", AUTH::BOARD_RO);
+            $groups->add("Instrumenter", "instruments.php", AUTH::BOARD_RO);
+            $groups->add("Tilgang", "access.php", AUTH::BOARD_RO);
+            $groups->add("Tilgangsgrupper", "view.php", AUTH::BOARD_RO);
+         }
          $admin->add("Notearkiv", "repository.php", AUTH::BOARD_RO);
-         $admin->add("Prosjekter", "project.php", AUTH::BOARD_RO);
-         $admin->add("Lokale", "location.php", AUTH::BOARD_RO);
+         {
+            $project = new SUBMENU("class=\"dl-submenu\"");
+            $admin->add("Prosjekt", $project, AUTH::BOARD_RO);
+            $project->add("Prosjekter", "project.php", AUTH::BOARD_RO);
+            $project->add("Tilbakemeldingstekst", "feedbackProj.php", AUTH::FEEDBACK_R);
+            $project->add("Tilbakemeldinger", "feedbackList.php", AUTH::FEEDBACK_R);
+            $project->add("Lokaler", "location.php", AUTH::BOARD_RO);
+         }
          $admin->add("Ressurser", "participant_xx.php", AUTH::RES);
          $admin->add("Permisjoner", "leave.php", AUTH::LEAVE_RO);
          $admin->add("Dokumenter", "document.php?path=common", AUTH::DOC_RO);
@@ -208,19 +219,20 @@ class MENU
             $project->add("Prosjektinfo", "prjInfo.php?id=$pid");
             $project->add("Beskjeder", "pevent.php?id_project=$pid");
             $project->add("Gruppeoppsett", "seating.php?id_project=$pid");
+            $project->add("Tilbakemelding", "feedbackReg.php?id_project=$pid");
             $project->add("Repertoar", "repository.php?id_project=$pid", AUTH::REP);
             $project->add("Musikere", "person.php?f_project[]=$pid");
+            $project->add("Regikomité", "direction.php?id_project=$pid", AUTH::DIR_RO);
+            $project->add("Fravær", "absence.php?id_project=$pid", AUTH::ABS_RO);
+            $project->add("Prosjektressurser", "participant_x1.php?id=$pid", AUTH::RES);
             if (($e['docs_avail'] & (1 << $db->prj_docs_avail_sheet)) || $access->auth(AUTH::PRJDOC))
                $project->add("Noter", "document.php?path=project/$pid/sheet");
             if ($e['docs_avail'] & (1 << $db->prj_docs_avail_rec) || $access->auth(AUTH::PRJDOC))
                $project->add("Innspilling", "document.php?path=project/$pid/rec");
             if ($e['docs_avail'] & (1 << $db->prj_docs_avail_doc) || $access->auth(AUTH::PRJDOC))
                $project->add("Dokumenter", "document.php?path=project/$pid/doc");
-            $project->add("Regikomité", "direction.php?id_project=$pid", AUTH::DIR_RO);
             if (time() < $e['deadline'])
                $project->add(($e['orchestration'] == $db->prj_orch_tutti) ? "Permisjonssøknad" : "Påmelding", "participant_11.php?id_project=$pid", AUTH::RES_SELF);
-            $project->add("Fravær", "absence.php?id_project=$pid", AUTH::ABS_RO);
-            $project->add("Prosjektressurser", "participant_x1.php?id=$pid", AUTH::RES);
             $c = $db->query("select id from concert where id_project=$pid");
             if ($c->rowCount() > 0)
                $project->add("Konsertreklame", "calender.php?id_project=$pid");

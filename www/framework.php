@@ -3,6 +3,8 @@ require_once 'request.php';
 require_once 'conf/opendb.php';
 require_once 'auth.php';
 require_once 'common.php';
+require_once 'table.php';
+require_once 'form.php';
 ?>
 
 <html>

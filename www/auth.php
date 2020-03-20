@@ -48,8 +48,11 @@ class AUTH
    const EVENT = 39; // What´s on?
    const RES_INV = 40; // Resources line-up, registered by art director r/w
    const LEAVE_RW = 41; // Leave, r/w
+   const FEEDBACK = 42; // Feedback, register own
+   const FEEDBACK_R = 43; // Feedback, admin r/o
+   const FEEDBACK_W = 44; // Feedback, admin r/w
    const ALL = 0x7fffffffffffffff; // 63 bits enabled
-   const NO_VIEWS = 42;
+   const NO_VIEWS = 45;
 
    private $access;
 

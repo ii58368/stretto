@@ -153,6 +153,7 @@ add_li("Meny", 1);
       add_li("Mine prosjekter", 0, AUTH::MYPRJ, AUTH::MYPRJ, "Oversikt og status over kommende prosjeker. Mulighet for å melde på/søke permisjon");
       add_li("Min prøveplan", 0, AUTH::MYPLAN, false, "Oversikt over min egen prøveplan");
       add_li("Min regi", 0, AUTH::MYDIR, false, "Oversikt over egne regioppgaver");
+      add_li("Mine tilbakemeldinger", 0, AUTH::FEEDBACK, AUTH::FEEDBACK, "Oversikt og registrering av mine tilbakemeldinger");
       add_li("Mine personopplysninger", -1, AUTH::BOARD_RO, AUTH::PERS);
    }
    add_li("Regi", 1, AUTH::BOARD_RO);
@@ -166,13 +167,21 @@ add_li("Meny", 1);
    {
       add_li("Medlemsliste", 0, AUTH::MEMB_RO, AUTH::MEMB_RW, "Medlemsliste/musikere. <font color=green>" . AUTH::MEMB_GREP . "</font>: Filter for å filtrere ut musikere.");
       add_li("Prøveplan", 0, AUTH::PLAN_RO, AUTH::PLAN_RW, "Prøveplan, alle prosjekter");
-      add_li("Grupper", 0, AUTH::BOARD_RO, AUTH::GRP, "Faste medlemsgrupper som styret og instrumentgrupper");
-      add_li("Instrumenter", 0, AUTH::BOARD_RO, AUTH::INSTR, "Liste over instrumentgrupper. Alle musikerne må tilhøre en instrumentgruppe");
-      add_li("Tilgang", 0, AUTH::BOARD_RO, AUTH::ACC, "Liste over tilganger for hver enkelt musiker");
-      add_li("Tilgangsgrupper", 0, AUTH::BOARD_RO, AUTH::ACCGRP, "Definering av tilgangsgrupper");
+      add_li("Tilgang/grupper", 1, AUTH::BOARD_RO);
+      {
+         add_li("Grupper", 0, AUTH::BOARD_RO, AUTH::GRP, "Faste medlemsgrupper som styret og instrumentgrupper");
+         add_li("Instrumenter", 0, AUTH::BOARD_RO, AUTH::INSTR, "Liste over instrumentgrupper. Alle musikerne må tilhøre en instrumentgruppe");
+         add_li("Tilgang", 0, AUTH::BOARD_RO, AUTH::ACC, "Liste over tilganger for hver enkelt musiker");
+         add_li("Tilgangsgrupper", -1, AUTH::BOARD_RO, AUTH::ACCGRP, "Definering av tilgangsgrupper");
+      }
       add_li("Notearkiv", 0, AUTH::BOARD_RO, AUTH::REP, "Oversikt over notearkiv");
-      add_li("Prosjekter", 0, AUTH::PRJ_RO, AUTH::PRJ, "Overordnet administrasjon/oversikt over planlagte prosjekter");
-      add_li("Lokale", 0, AUTH::BOARD_RO, AUTH::LOC, "Informasjon om lokaliteter for øvelser og konsert");
+      add_li("Prosjekt", 1, AUTH::BOARD_RO);
+      {
+         add_li("Prosjekter", 0, AUTH::PRJ_RO, AUTH::PRJ, "Overordnet administrasjon/oversikt over planlagte prosjekter");
+         add_li("Tilbakemeldingstekst", 0, AUTH::FEEDBACK_R, AUTH::FEEDBACK_W, "Tilbakemeldingstekst per prosjekt");
+         add_li("Tilbakemeldinger", 0, AUTH::FEEDBACK_R, AUTH::FEEDBACK_W, "Liste over alle registrerte tilbakemeldinger");
+         add_li("Lokale", -1, AUTH::BOARD_RO, AUTH::LOC, "Informasjon om lokaliteter for øvelser og konsert");
+      }
       add_li("Ressurser", 0, AUTH::RES, false, "Oversikt over status på ressurser pr. prosjekt");
       add_li("Permisjoner", 0, AUTH::LEAVE_RO, AUTH::LEAVE_RW, "Oversikt over langtidspermisjoner");
       add_li("Dokumenter", 0, AUTH::DOC_RO, AUTH::DOC_RW, "Tilgang til generelle dokumenter som vedtekter, generalforsamlingspapirer, ol.");
@@ -188,15 +197,16 @@ add_li("Meny", 1);
          add_li("Prosjektinfo");
          add_li("Beskjeder", 0, false, false, "Meldinger fra Hva skjer? som gjelder spesifikt for dette prosjektet");
          add_li("Gruppeoppsett", 0, false, AUTH::SEAT, "Kart over plassering av musikere pr. instrumentgruppe");
+         add_li("Tilbakemelding", 0, AUTH::FEEDBACK, AUTH::FEEDBACK, "Registrering av tilbakemelding per prosjekt");
          add_li("Repertoar", 0, AUTH::REP, AUTH::REP, "Legge inn akttuelt repertoar");
          add_li("Musikere", 0, false, AUTH::MEMB_RW, "Adresseliste over musikere for dette prosjektet");
+         add_li("Regikomité", 0, AUTH::DIR_RO, false, "Full oversikt over gjeldende regiprosjekt");
+         add_li("Fravær", 0, AUTH::ABS_RO, AUTH::ABS_RW, AUTH::ABS_ALL . " gir kunne fraværsoversikt for alle prosjektdeltagere, ikke bare en gruppe som f.eks. 1 fele. Oversikt over fravær for alle ressurser for et prosjekt og registrering av fravær pr. gruppe ");
+         add_li("Prosjektressurser", 0, AUTH::RES, "Besetning: " . AUTH::RES_INV . " Sekretær: " . AUTH::RES_REG . ", MR: " . AUTH::RES_REQ . ", Styret: " . AUTH::RES_FIN, "Registrering av prosjektressurser");
          add_li("Noter", 0, false, AUTH::PRJDOC, "Oversikt/administrajon av øvingsnoter");
          add_li("Innspilling", 0, false, AUTH::PRJDOC, "Oversikt/administrajon av egne opptak og andre innspillinger");
          add_li("Dokumenter", 0, false, AUTH::PRJDOC, "Oversikt/administrajon av prosjektdokumenter");
-         add_li("Regikomité", 0, AUTH::DIR_RO, false, "Full oversikt over gjeldende regiprosjekt");
          add_li("Permisjonssøknad/Påmelding", 0, AUTH::RES_SELF, AUTH::RES_SELF, "Registrere påmelding eller søke om persmisjon for gjeldende prosjekt");
-         add_li("Fravær", 0, AUTH::ABS_RO, AUTH::ABS_RW, AUTH::ABS_ALL . " gir kunne fraværsoversikt for alle prosjektdeltagere, ikke bare en gruppe som f.eks. 1 fele. Oversikt over fravær for alle ressurser for et prosjekt og registrering av fravær pr. gruppe ");
-         add_li("Prosjektressurser", 0, AUTH::RES, "Besetning: " . AUTH::RES_INV . " Sekretær: " . AUTH::RES_REG . ", MR: " . AUTH::RES_REQ . ", Styret: " . AUTH::RES_FIN, "Registrering av prosjektressurser");
          add_li("Konsertkalender", -2, AUTH::BOARD_RO, AUTH::CONS, "Redigering av konsertkalender");
       }
    }

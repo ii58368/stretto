@@ -210,4 +210,9 @@ class DB extends myPDO
    public $rec_stat_info = 0;
    public $rec_stat_board = 0;
    public $rec_stat = array("Info", "For styret");
+// table: feedback
+   public $fbk_stat_new = 0;
+   public $fbk_stat_read = 1;
+   public $fbk_stat_discarded = 2;
+   public $fbk_stat = array("Ny", "Lest", "Forkastet");
 }

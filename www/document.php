@@ -203,7 +203,7 @@ if (is_dir($path))
            <a href=\"$php_self?_sort=$sort&_action=view&_no=" . urlencode($file) . "&path=$path\" title=\"Endre navn eller slette...\" ><img src=\"images/cross_re.gif\" border=0></a>
              </center></td>";
             echo "
-             <td><a href=\"$abs_file\" title=\"Klikk for å laste ned dokument\">$file</a></td>";
+             <td><a href=\"$abs_file\" target=\"_blank\" title=\"Klikk for å laste ned dokument\">$file</a></td>";
          }
          else
          {
