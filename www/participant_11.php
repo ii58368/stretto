@@ -98,7 +98,7 @@ foreach ($stmt as $row)
       echo "<a href=\"" . $row['url'] . "\">" . $row['lname'] . "</a>";
    else
       echo $row['lname'];
-   echo $row['location'];
+   echo ' ' . $row['location'];
    echo "</td><td>";
    echo str_replace("\n", "<br>\n", $row['comment']);
    echo "</td>" .
