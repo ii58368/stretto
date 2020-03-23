@@ -9,6 +9,8 @@ $id_project = request('id_project');
 function get_img($id_project)
 {
    $path = "project/" . $id_project . "/img/";
+   if (!file_exists($path))
+      return null;
    
    if ($handle = opendir($path))
    {
@@ -19,7 +21,7 @@ function get_img($id_project)
       }
       closedir($handle);
    }
-   return $abs_file;
+   return null;
 }
 
 if (!$id_project)

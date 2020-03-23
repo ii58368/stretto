@@ -12,7 +12,7 @@ if ($access->auth(AUTH::CONS))
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=_action value=new>
       <input type=submit value=\"Ny konsert\" title=\"Registrer ny konsert...\">
-      <a href=calender.php title=\"Vis kalender slik den ser ut på eksternsiden...\"><img src=images/text2.gif border=0></a>
+      <a href=calendar.php title=\"Vis kalender slik den ser ut på eksternsiden...\"><img src=images/text2.gif border=0></a>
     </form>";
 echo "
     <table border=1>
@@ -48,7 +48,7 @@ function select_project($selected)
       echo "<option value=\"" . $e['id'] . "\"";
       if ($e['id'] == $selected)
          echo " selected";
-      echo ">".$e['name']." (".$e['semester'].$e['year'].")</option>";
+      echo ">" . $e['name'] . " (" . $e['semester'] . $e['year'] . ")</option>";
    }
    echo "</select>";
 }
@@ -70,7 +70,7 @@ function select_location($selected)
       echo "<option value=\"" . $e['id'] . "\"";
       if ($e['id'] == $selected)
          echo " selected";
-      echo ">".$e['name']."</option>";
+      echo ">" . $e['name'] . "</option>";
    }
    echo "</select>";
 }
@@ -79,15 +79,18 @@ function get_img($id_project)
 {
    $path = "project/" . $id_project . "/img/";
    $abs_file = "images/image2.gif";
-   
-   if ($handle = opendir($path))
+
+   if (file_exists($path))
    {
-      while (($file = readdir($handle)))
+      if ($handle = opendir($path))
       {
-         if (is_file($path . $file))
-            $abs_file = $path . $file;
+         while (($file = readdir($handle)))
+         {
+            if (is_file($path . $file))
+               $abs_file = $path . $file;
+         }
+         closedir($handle);
       }
-      closedir($handle);
    }
    return $abs_file;
 }
@@ -95,7 +98,7 @@ function get_img($id_project)
 function del_img($id_project)
 {
    $path = "project/" . $id_project . "/img/";
-   
+
    if ($handle = opendir($path))
    {
       while (($file = readdir($handle)))
@@ -112,7 +115,7 @@ function new_img()
    global $sort;
    global $php_self;
    global $no;
-   
+
    echo "
     <form action=$php_self method=post enctype=multipart/form-data>
     <input type=hidden name=_action value=img_upload>
@@ -120,7 +123,7 @@ function new_img()
     <input type=hidden name=_no value=\"$no\">
     <input type=file name=filename id=filename title=\"Velg ny figur som skal lastes opp...\"><br>
     <input type=submit value=\"Last opp\" title=\"Last opp figuren som er valgt med knappen over. Den forrige figuren vil bli overskrevet.\">
-    </form>"; 
+    </form>";
 }
 
 function store_img($id_project)
@@ -151,12 +154,12 @@ function manage_img($id_project, $cno)
    global $sort;
    global $php_self;
    global $no;
-   
+
    if ($no == $cno && $action == 'img_new')
    {
       new_img();
    }
-   else 
+   else
    {
       if ($no == $cno && $action == 'img_upload')
       {
@@ -199,20 +202,22 @@ if ($action == 'update' && $access->auth(AUTH::CONS))
       if (is_null($no))
       {
          $query = "insert into concert (ts, time, id_project, id_location, heading, text)
-              values ($ts, '".$_POST['time']."', ".$_POST['id_project'].", ".$_POST['id_location'].", ".$db->qpost('heading').", ".$db->qpost('text').")";
-      } else
+              values ($ts, '" . $_POST['time'] . "', " . $_POST['id_project'] . ", " . $_POST['id_location'] . ", " . $db->qpost('heading') . ", " . $db->qpost('text') . ")";
+      }
+      else
       {
          if (!is_null($delete))
          {
             $query = "DELETE FROM concert WHERE id = $no";
-         } else
+         }
+         else
          {
             $query = "update concert set ts = $ts," .
-                    "time = '".$_POST['time']."'," .
-                    "id_project = ".$_POST['id_project']."," .
-                    "id_location = ".$_POST['id_location']."," .
-                    "heading = ".$db->qpost('heading').", " .
-                    "text = ".$db->qpost('text')." " .
+                    "time = '" . $_POST['time'] . "'," .
+                    "id_project = " . $_POST['id_project'] . "," .
+                    "id_location = " . $_POST['id_location'] . "," .
+                    "heading = " . $db->qpost('heading') . ", " .
+                    "text = " . $db->qpost('text') . " " .
                     "where id = $no";
          }
          $no = NULL;
@@ -253,15 +258,15 @@ foreach ($stmt as $row)
     <td nowrap><input type=submit value=ok title=\"Lagre\">
       <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette " . strftime('%a %e.%b %y', $row['ts']) . "?');\" title=\"Slette...\"></td>
     <td><input type=date size=10 name=ts value=\"" . date('Y-m-d', $row['ts']) . "\" title=\"Konsertdato\"></td>
-    <td><input type=text size=5 maxlength=5 name=time value=\"".$row['time']."\" title=\"Klokkeslett\">
+    <td><input type=text size=5 maxlength=5 name=time value=\"" . $row['time'] . "\" title=\"Klokkeslett\">
     <td>";
       select_project($row['id_project']);
       echo "</td>
     <td>";
       select_location($row['id_location']);
       echo "</td>
-    <td><input type=text size=30 name=heading value=\"".$row['heading']."\" title=\"Konsertoverskrift\">
-    <td><textarea cols=60 rows=10 wrap=virtual name=text title=\"Konsertinformasjon, fritekst\">".$row['text']."</textarea></td>
+    <td><input type=text size=30 name=heading value=\"" . $row['heading'] . "\" title=\"Konsertoverskrift\">
+    <td><textarea cols=60 rows=10 wrap=virtual name=text title=\"Konsertinformasjon, fritekst\">" . $row['text'] . "</textarea></td>
     </form>
     </tr>";
    }
@@ -271,14 +276,14 @@ foreach ($stmt as $row)
       if ($access->auth(AUTH::CONS))
          echo "
          <td><center>
-           <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
+           <a href=\"$php_self?_sort=$sort&_action=view&_no=" . $row['id'] . "\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for å editere...\"></a>
              </center></td>";
       echo
       "<td>" . strftime('%a %e.%b %y', $row['ts']) . "</td>" .
-      "<td>".$row['time']."</td>" .
-      "<td>".$row['pname']." (".$row['semester'].$row['year'].")</td>" .
-      "<td>".$row['lname']."</td>" .
-      "<td>".$row['heading'].
+      "<td>" . $row['time'] . "</td>" .
+      "<td>" . $row['pname'] . " (" . $row['semester'] . $row['year'] . ")</td>" .
+      "<td>" . $row['lname'] . "</td>" .
+      "<td>" . $row['heading'] .
       "<br>";
       manage_img($row['id_project'], $row['id']);
       echo "</td><td>";
@@ -287,7 +292,7 @@ foreach ($stmt as $row)
       echo $body;
       echo "</td>" .
       "</tr>";
-   } 
+   }
 }
 ?> 
 

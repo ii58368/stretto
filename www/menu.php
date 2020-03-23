@@ -235,7 +235,7 @@ class MENU
                $project->add(($e['orchestration'] == $db->prj_orch_tutti) ? "Permisjonssøknad" : "Påmelding", "participant_11.php?id_project=$pid", AUTH::RES_SELF);
             $c = $db->query("select id from concert where id_project=$pid");
             if ($c->rowCount() > 0)
-               $project->add("Konsertreklame", "calender.php?id_project=$pid");
+               $project->add("Konsertreklame", "calendar.php?id_project=$pid");
          }
       }
 
