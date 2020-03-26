@@ -10,8 +10,8 @@ class SEASON
    {
       $this->reset();
 
-      if (isset($_COOKIE['semester']))
-         list($this->semester, $this->year) = explode('.', $_COOKIE['semester']);
+      if (isset($_COOKIE['_semester']))
+         list($this->semester, $this->year) = explode('.', $_COOKIE['_semester']);
    }
 
    public function semester($opt = 0)

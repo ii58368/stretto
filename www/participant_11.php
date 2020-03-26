@@ -35,23 +35,23 @@ if (request('stat_self'))
    $ts = 0;
    $stat_self = $db->par_stat_void;
    $comment_self = "''";
-   
-   if (is_null(request('del')))  
+
+   if (is_null(request('del')))
    {
       $stat_self = request('stat_self');
       $ts = strtotime("now");
       $comment_self = $db->qpost('comment_self');
    }
-   
+
    $query = "update participant set " .
-              "stat_self = $stat_self, " .
-              "ts_self = $ts, " .
-              "comment_self = $comment_self ";
+           "stat_self = $stat_self, " .
+           "ts_self = $ts, " .
+           "comment_self = $comment_self ";
    if ($prj['status'] == $db->prj_stat_internal)
       $query .= ", stat_final = $stat_self, " .
               "ts_final = $ts ";
-   $query .=  "where id_person = $id_person " .
-              "and id_project = " . request('id_project');
+   $query .= "where id_person = $id_person " .
+           "and id_project = " . request('id_project');
    $db->query($query);
 }
 
@@ -67,14 +67,15 @@ if ($stmt->rowCount() > 0)
 echo "
     <h1>" . $prj['name'] . " " . $prj['semester'] . "-" . $prj['year'] . "</h1>\n";
 echo str_replace("\n", "<br>\n", $prj['info']) . "\n";
-echo "<h2>Spilleplan</h2>
-    <table id=\"no_border\">
-    <tr>
-      <th>Dato</th>
-      <th>Prøvetid</th>
-      <th>Lokale</th>
-      <th>Merknad</th>
-    </tr>";
+echo "<h2>Spilleplan</h2>\n";
+
+$tb = new TABLE('id=no_border');
+
+$tb->th('Dato');
+$tb->th('Prøvetid');
+$tb->th('Lokale');
+$tb->th('Merknad');
+$tb->tr();
 
 $query = "SELECT date, time, " .
         "plan.location as location, location.name as lname, " .
@@ -91,79 +92,83 @@ $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
-   echo "<tr>
-       <td>" . strftime('%a %e.%b %y', $row['date']) . "</td>" .
-   "<td>" . $row['time'] . "</td><td>";
-   if (strlen($row['url']) > 0)
-      echo "<a href=\"" . $row['url'] . "\">" . $row['lname'] . "</a>";
-   else
-      echo $row['lname'];
-   echo ' ' . $row['location'];
-   echo "</td><td>";
-   echo str_replace("\n", "<br>\n", $row['comment']);
-   echo "</td>" .
-   "</tr>\n";
+   $tb->tr();
+   $tb->td(strftime('%a %e.%b %y', $row['date']));
+   $tb->td($row['time']);
+   $lname = (strlen($row['url']) > 0) ? "<a href=\"" . $row['url'] . "\">" . $row['lname'] . "</a>" : $row['lname'];
+   $tb->td($lname . ' ' . $row['location']);
+   $tb->td(str_replace("\n", "<br>\n", $row['comment']));
 }
-echo "</table><p>\n";
+unset($tb);
+echo "<p>\n";
 
-$reg_header = ($prj['orchestration'] == $db->prj_orch_tutti) ? "Permisjonssøknad" : "Påmelding";
+$isTutti = ($prj['orchestration'] == $db->prj_orch_tutti);
+$reg_header = ($isTutti) ? "Permisjonssøknad" : "Påmelding";
 echo "<h2>$reg_header</h2>";
-if ($prj['orchestration'] == $db->prj_orch_tutti)
+if ($isTutti)
    echo "Dette er et tuttiprosjekt. Dersom du ikke søker om permisjon vil du automatisk bli påmeldt når permisjonsfristen går ut.<p>\n";
 echo "<form action=$php_self method=post>
    <input type=hidden name=_action value=update>
    <input type=hidden name=id_person value=$id_person>
-   <input type=hidden name=id_project value=" . request('id_project') . ">
-   <table id=\"no_border\">
-  <tr>
-  <td>Navn:</td><td>" . $pers['firstname'] . " " . $pers['lastname'] . "</td>
-  </tr>
-  <tr>
-  <td>Instrument:</td><td>";
-echo (isset($part)) ? $part['instrument'] : $pers['instrument'];
-echo "</td>
-  </tr>
-  <tr>
-  <td>";
-echo ($prj['orchestration'] == $db->prj_orch_tutti) ? "Permisjonsfrist:" : "Påmeldingsfrist:";
-echo "</td><td>";
-echo ($prj['deadline'] < time()) ? "<font color=red>" . strftime('%a %e.%b %Y', $prj['deadline']) . "</font>" :
-        strftime('%a %e.%b %Y', $prj['deadline']);
-echo "</td></tr>\n";
-echo "<tr><td>Registrert:</td><td>";
+   <input type=hidden name=id_project value=" . request('id_project') . ">\n";
+
+$tb = new TABLE('id=no_border');
+
+$tb->td('Navn:');
+$tb->td($pers['firstname'] . " " . $pers['lastname']);
+$tb->tr();
+$tb->td('Instrument:');
+$tb->td(isset($part) ? $part['instrument'] : $pers['instrument']);
+$tb->tr();
+$tb->td(($isTutti) ? "Permisjonsfrist:" : "Påmeldingsfrist:");
+$tb->td($prj['deadline'] < time()) ? "<font color=red>" . strftime('%a %e.%b %Y', $prj['deadline']) . "</font>" :
+                strftime('%a %e.%b %Y', $prj['deadline']);
+$tb->tr();
+$tb->td('Registrert:');
 if (isset($part) && $part['ts_self'] != 0)
-   echo (is_null(request('stat_self'))) ? strftime('%a %e.%b %Y', $part['ts_self']) : "<font color=green>" . strftime('%a %e.%b %Y', $part['ts_self']) . "</font> (Kommentar kan endres på frem til og med dato for registreringsfrist)";
-echo "</td></tr>\n";
+   $tb->td(is_null(request('stat_self')) ?
+                   strftime('%a %e.%b %Y', $part['ts_self']) :
+                   "<font color=green>" . strftime('%a %e.%b %Y', $part['ts_self']) .
+                   "</font> (Opplysningene kan endres på frem til og med dato for registreringsfrist)");
+$tb->tr();
 if ($prj['deadline'] >= time() && $pers['id'] == $whoami->id())
 {
-   echo "<tr><td>Ønsker å være med:</td><td>";
+   $tb->td('Ønsker å være med:');
+   $radio = '';
    for ($i = 0; $i < count($db->par_stat); $i++)
    {
       if ($prj['valid_par_stat'] & (1 << $i))
       {
-         echo "<input type=radio name=stat_self value=$i";
+         $radio .= "<input type=radio name=stat_self value=$i";
          if (isset($part) && $part['stat_self'] == $i)
-            echo " checked";
-         echo ">" . $db->par_stat[$i] . "<br>\n";
+            $radio .= " checked";
+         $radio .= ">" . $db->par_stat[$i] . "<br>\n";
       }
    }
-   echo "</td></tr>\n";
-   echo "<tr><td>Kommentar:</td><td><textarea title=\"Registrer her eventuell tilleggsinformasjon...\"cols=30 rows=5 wrap=virtual name=comment_self>" . $part['comment_self'] . "</textarea></td></tr>\n";
-   echo "<tr><td></td><td><input type=submit value=Registrer title=\"Lagre tilbakemelding...\">";
-   echo "<input type=submit name=del value=Slett title=\"Slett tilbakemelding...\" onClick=\"return confirm('Sikkert at du vil slette?');\"></td></tr>";
+   $tb->td($radio);
+   $tb->tr();
+   $error = ($isTutti && strlen($part['comment_self']) < 4) ? "<br><font color=red>Permisjonsbegrunnelse mangler!</font>" : '';
+   $description = $isTutti ? "Begrunnelse:$error" : "Kommentar:";
+   $placeholder = $isTutti ? "Angi begrunnelse for å søke permisjon." : "Oppgi eventuell tillegsinformasjon som du ønsker skal bli tatt med i vurderingen";
+   $tb->td($description);
+   $tb->td("<textarea title=\"$placeholder\" placeholder=\"$placeholder\" cols=30 rows=5 wrap=virtual name=comment_self>" . $part['comment_self'] . "</textarea>");
+   $tb->tr();
+   $tb->td();
+   $tb->td("<input type=submit value=Registrer title=\"Lagre tilbakemelding...\">"
+           . "<input type=submit name=del value=Slett title=\"Slett tilbakemelding...\" onClick=\"return confirm('Sikkert at du vil slette?');\">");
 }
 else
 {
-   echo "<tr><td>Registrert svar:</td><td><b>";
+   $tb->td("Registrert svar:");
    if (isset($part))
-      echo $db->par_stat[$part['stat_self']];
-   echo "</b></td></tr>\n";
-   echo "<tr><td>Kommentar:</td><td><b>";
+      $tb->td('<b>' . $db->par_stat[$part['stat_self']] . '</b>');
+   $tb->tr();
+   $tb->td('Kommentar:');
    if (isset($part))
-      echo str_replace("\n", "<br>\n", $part['comment_self']);
-   echo "</b></td></tr>\n";
+      $tb->td('<b>' . str_replace("\n", "<br>\n", $part['comment_self']) . '</b>');
 }
-echo "</table>\n</form>";
+unset($tb);
+echo "</form>";
 
 echo "<h2>Deltakerstatus</h2>";
 
@@ -258,6 +263,3 @@ else
    echo "<b>Styret:</b> ";
    echo "Du er ikke en del av besetningen på dette prosjektet.<br>\n";
 }
-
-if (!is_null($blink))
-   echo "Tilbakemeldingen din er under behandling i styret.<br>\n";

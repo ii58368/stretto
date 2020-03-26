@@ -23,7 +23,7 @@ function select_semester($selected)
 function select_status($selected)
 {
    global $db;
-   
+
    if (is_null($selected))
       $selected = $db->prj_stat_draft;
 
@@ -49,7 +49,7 @@ function select_status($selected)
 function select_valid_par_stat($valid_par_stat)
 {
    global $db;
-   
+
    echo "<select size=" . sizeof($db->par_stat) . " name=\"valid_par_stat[]\" multiple title=\"Merk av svaralternativer ved av-/påmelding.\nCtrl-click to select/unselect single\">";
 
    for ($i = 0; $i < sizeof($db->par_stat); $i++)
@@ -103,9 +103,9 @@ if ($action == 'new')
     <td>";
    select_status(null);
    echo "</td>
-    <td><input type=date size=10 name=deadline value=\"" . 
-    date('j. M y', time() + 60*60*24*7*12) .    // Default dealine: 12 weeks from now
-    "\" title=\"Frist for permisjon/påmelding.\nFormat: <dato>. <mnd> [<år>]\nMerk: Måned på engelsk. Eksempel: 12. dec\"></td>
+    <td><input type=date size=10 name=deadline value=\"" .
+   date('j. M y', time() + 60 * 60 * 24 * 7 * 12) . // Default dealine: 12 weeks from now
+   "\" title=\"Frist for permisjon/påmelding.\nFormat: <dato>. <mnd> [<år>]\nMerk: Måned på engelsk. Eksempel: 12. dec\"></td>
     <td><input type=checkbox name=orchestration checked title=\"Merk av hvis dette er et tutti-prosjekt der folk må søke permisjon for å melde seg av.\"></td>
     <td>";
    select_valid_par_stat(1 << $db->par_stat_no);
@@ -132,30 +132,32 @@ if ($action == 'update' && $access->auth(AUTH::PRJ))
    if (($ts = strtotime(request('deadline') . " + 1 day - 1 second")) == false)
    {
       echo "<font color=red>Illegal time format: " . request('deadline') . "</font>";
-   } else
+   }
+   else
    {
       if ($no == NULL)
       {
          $query = "insert into project (name, semester, year, status, deadline, orchestration, info, id_person, valid_par_stat) " .
-                 "values (".$db->qpost('name').", '".request('semester')."', " .
-                 request('year').", ".request('status').", $ts, $orchestration, ".$db->qpost('info').", 1, $valid_par_stat)";
+                 "values (" . $db->qpost('name') . ", '" . request('semester') . "', " .
+                 request('year') . ", " . request('status') . ", $ts, $orchestration, " . $db->qpost('info') . ", 1, $valid_par_stat)";
          $db->query($query);
-      } 
+      }
       else
       {
          if ($delete != NULL)
          {
             $query = "DELETE from project WHERE project.id = $no";
-         } else
+         }
+         else
          {
-            $query = "update project set name = ".$db->qpost('name')."," .
-                    "semester = '".request('semester')."'," .
-                    "year = ".request('year')."," .
-                    "status = ".request('status')."," .
+            $query = "update project set name = " . $db->qpost('name') . "," .
+                    "semester = '" . request('semester') . "'," .
+                    "year = " . request('year') . "," .
+                    "status = " . request('status') . "," .
                     "deadline = $ts, " .
                     "orchestration = $orchestration, " .
                     "valid_par_stat = $valid_par_stat, " .
-                    "info = ".$db->qpost('info')." " .
+                    "info = " . $db->qpost('info') . " " .
                     "where id = $no";
          }
          $db->query($query);
@@ -181,11 +183,11 @@ foreach ($stmt as $row)
       if ($access->auth(AUTH::PRJ))
          echo "
         <td><center>
-            <a href=\"$php_self?_sort=$sort&_action=view&_no=".$row['id']."\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
+            <a href=\"$php_self?_sort=$sort&_action=view&_no=" . $row['id'] . "\"><img src=\"images/cross_re.gif\" border=0 title=\"Klikk for &aring; editere...\"></a>
              </center></td>";
       echo
-      "<td><a href=\"prjInfo.php?id=".$row['id']."\">".$row['name']."</a></td>" .
-      "<td>".$row['semester']."-".$row['year']."</td>" .
+      "<td><a href=\"prjInfo.php?id=" . $row['id'] . "\">" . $row['name'] . "</a></td>" .
+      "<td>" . $row['semester'] . "-" . $row['year'] . "</td>" .
       "<td>" . $db->prj_stat[$row['status']] . "</td>" .
       "<td>" . strftime('%a %e.%b %y', $row['deadline']) . "</td>" .
       "<td>";
@@ -207,11 +209,11 @@ foreach ($stmt as $row)
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_no value='$no'>
     <td nowrap><input type=submit value=ok title=\"Lagere\" >
-    <input type=submit value=del name=_delete title=\"Slett\" onClick=\"return confirm('Sikkert at du vil slette ".$row['name']."?');\"></td>
-    <td><input type=text size=20 name=name value=\"".$row['name']."\" title=\"Navn på prosjekt\"></td>
+    <input type=submit value=del name=_delete title=\"Slett\" onClick=\"return confirm('Sikkert at du vil slette " . $row['name'] . "?');\"></td>
+    <td><input type=text size=20 name=name value=\"" . $row['name'] . "\" title=\"Navn på prosjekt\"></td>
     <td nowrap>";
       select_semester($row['semester']);
-      echo "<input type=text size=4 maxlength=4 name=year value=\"".$row['year']."\" title=\"Årstall (4 siffer)\"></td>
+      echo "<input type=text size=4 maxlength=4 name=year value=\"" . $row['year'] . "\" title=\"Årstall (4 siffer)\"></td>
     <td>";
       select_status($row['status']);
       echo "</th>";
@@ -222,7 +224,7 @@ foreach ($stmt as $row)
       echo " title=\"Merk av hvis dette er et tutti prosjekt\"></td>\<td>";
       select_valid_par_stat($row['valid_par_stat']);
       echo " </td>
-    <td><textarea cols=44 rows=10 wrap=virtual name=info title=\"Prosjektinfo\">".$row['info']."</textarea></td>
+    <td><textarea cols=44 rows=10 wrap=virtual name=info title=\"Prosjektinfo\">" . $row['info'] . "</textarea></td>
     </tr>";
    }
 }

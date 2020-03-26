@@ -331,9 +331,9 @@ class MENU
       }
 
       echo "<table id=no_border><tr>";
-      echo "<td><a href=\"$php_self" . $this->url() . "\" title=\"forrige semester...\" onClick=\"set_cookie('semester', '{$op_sem}.{$last_year}'); return true;\"><img src=\"images/left.gif\" height=20 border=0 ></a></td>\n";
+      echo "<td><a href=\"$php_self" . $this->url() . "\" title=\"forrige semester...\" onClick=\"set_cookie('_semester', '{$op_sem}.{$last_year}'); return true;\"><img src=\"images/left.gif\" height=20 border=0 ></a></td>\n";
       echo "<td>$sem$year</td>\n";
-      echo "<td><a href=\"$php_self" . $this->url() . "\" title=\"neste semester...\" onClick=\"set_cookie('semester', '{$op_sem}.{$next_year}'); return true;\"><img src=\"images/right.gif\" height=20 border=0></a></td>\n";
+      echo "<td><a href=\"$php_self" . $this->url() . "\" title=\"neste semester...\" onClick=\"set_cookie('_semester', '{$op_sem}.{$next_year}'); return true;\"><img src=\"images/right.gif\" height=20 border=0></a></td>\n";
       echo "</tr></table>";
    }
 
