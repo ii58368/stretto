@@ -448,12 +448,17 @@ echo "Styret</th>
 
 
 
-$query = "SELECT person.id as id, firstname, lastname, status, id_instruments " .
-        "FROM person, instruments " .
-        "where id_instruments = instruments.id " .
-        "and not (status = $db->per_stat_quited " .
-        "or status = $db->per_stat_apply) " .
-        "order by " . str_replace("+", " ", $sort);
+$query = "SELECT person.id as id, firstname, lastname, status, id_instruments "
+        . "FROM person, instruments "
+        . "where id_instruments = instruments.id "
+        . "and (not (status = $db->per_stat_quited "
+        . "or status = $db->per_stat_apply) "
+        . "or (person.id = "
+        . "(select id_person from participant "
+        . "where stat_final = $db->par_stat_yes "
+        . "and participant.id_person = person.id "
+        . "and participant.id_project = " .request('id') . "))) "
+        . "order by " . str_replace("+", " ", $sort);
 
 $stmt = $db->query($query);
 
