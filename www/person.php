@@ -9,8 +9,10 @@ if (is_null($sort))
 
 function send_mail($r)
 {
+   $recip = is_null(request('f_group')) ? 'bcc' : 'to';
+   
    reset($r);
-   echo "<a href=\"mailto:?bcc=";
+   echo "<a href=\"mailto:?$recip=";
    foreach ($r as $e)
       if (strlen($e['email']) > 0)
          echo $e['email'] . ",";
