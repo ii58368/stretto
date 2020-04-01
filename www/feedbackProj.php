@@ -7,7 +7,6 @@ if ($sort == NULL)
 
 
 echo "<h1>Tilbakemelding - tekst</h1>";
-echo "<form action=$php_self method=post>";
 
 $form = new FORM();
 $tb = new TABLE();
