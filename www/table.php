@@ -1,130 +1,123 @@
 <?php
 
-// =============================================================================
-// File: table.php
-// (C) Copyright KONGSBERG 2018
-// All rights reserved.
-// -----------------------------------------------------------------------------
-// Classification: UGRADERT
-// -----------------------------------------------------------------------------
-
 class TABLE
 {
+
    const UNDEF = 0;
-	const COMPLETED = 1;
-	const TABLE = 2;
-	const HEAD = 3;
-	const BODY = 4;
-	
-	private $state = self::UNDEF;
-	private $in_tr = false;
-	private $opt_td = null;
-	private $str = '';
+   const COMPLETED = 1;
+   const TABLE = 2;
+   const HEAD = 3;
+   const BODY = 4;
 
-	public function __construct($opt = null)
-	{
-		$this->str .= "<table";
-		if (!is_null($opt))
-			$this->str .= " $opt";
-		$this->str .= ">\n";
-		$this->state = self::TABLE;
-	}
+   private $state = self::UNDEF;
+   private $in_tr = false;
+   private $opt_td = null;
+   private $str = '';
 
-	public function __destruct()
-	{
-		$this->terminate();
-		if ($this->state == self::COMPLETED)
-		   echo $this->str;
-	}
+   public function __construct($opt = null)
+   {
+      $this->str .= "<table";
+      if (!is_null($opt))
+         $this->str .= " $opt";
+      $this->str .= ">\n";
+      $this->state = self::TABLE;
+   }
 
-	private function terminate()
-	{
-		if ($this->state >= self::TABLE)
-		{
-			$this->tr_end();
-			$this->str .= "</table>\n";
-			$this->state = self::COMPLETED;
-		}
-	}
+   public function __destruct()
+   {
+      $this->terminate();
+      if ($this->state == self::COMPLETED)
+         echo $this->str;
+   }
 
-	public function res()
-	{
-		$this->terminate();
-		$this->state = self::UNDEF;
-		return $this->str;
-	}
+   private function terminate()
+   {
+      if ($this->state >= self::TABLE)
+      {
+         $this->tr_end();
+         $this->str .= "</table>\n";
+         $this->state = self::COMPLETED;
+      }
+   }
 
-	private function thead()
-	{
-		$this->str .= "  <thead>\n";
-		$this->state = self::HEAD;
-	}
+   public function res()
+   {
+      $this->terminate();
+      $this->state = self::UNDEF;
+      return $this->str;
+   }
 
-	private function tbody()
-	{
-		$this->str .= "  <tbody>\n";
-		$this->state = self::BODY;
-	}
+   private function thead()
+   {
+      $this->str .= "  <thead>\n";
+      $this->state = self::HEAD;
+   }
 
-	private function tr_end()
-	{
-		if ($this->in_tr)
-		{
-			$this->str .= "  </tr>\n";
-			$this->in_tr = false;
-		}
-	}
+   private function tbody()
+   {
+      $this->str .= "  <tbody>\n";
+      $this->state = self::BODY;
+   }
 
-	public function tr($opt = null, $state = null)
-	{
-		if (!is_null($state))
-			$this->state = $state;
-		
-		$this->tr_end();
+   private function tr_end()
+   {
+      if ($this->in_tr)
+      {
+         $this->str .= "  </tr>\n";
+         $this->in_tr = false;
+      }
+   }
 
-		if ($this->state == self::HEAD)
-			$this->tbody();
-		if ($this->state == self::TABLE)
-			$this->thead();
+   public function tr($opt = null, $state = null)
+   {
+      if (!is_null($state))
+         $this->state = $state;
 
-		$this->str .= "  <tr";
-		if (!is_null($opt))
-			$this->str .= " $opt";
-		$this->str .= ">\n";
+      $this->tr_end();
 
-		$this->in_tr = true;
-	}
+      if ($this->state == self::HEAD)
+         $this->tbody();
+      if ($this->state == self::TABLE)
+         $this->thead();
 
-	public function th($cell = '', $opt = null)
-	{
-		if ($this->state == self::TABLE)
-			$this->tr();
+      $this->str .= "  <tr";
+      if (!is_null($opt))
+         $this->str .= " $opt";
+      $this->str .= ">\n";
 
-		$this->str .= "    <th";
-		if (!is_null($opt))
-			$this->str .= " $opt";
-		$this->str .= ">$cell</th>\n";
-	}
+      $this->in_tr = true;
+   }
 
-	public function td_opt($opt)
-	{
-		$this->opt_td = $opt;
-	}
+   public function th($cell = '', $opt = null)
+   {
+      if ($this->state == self::TABLE)
+         $this->tr();
 
-	public function td($cell = '', $opt = null)
-	{
-		if ($this->state == self::TABLE)
-		{
-			$this->state = self::HEAD;
-			$this->tr();
-		}
+      $this->str .= "    <th";
+      if (!is_null($opt))
+         $this->str .= " $opt";
+      $this->str .= ">$cell</th>\n";
+   }
 
-		$this->str .= "    <td";
-		if (!is_null($this->opt_td))
-			$this->str .= " $this->opt_td";
-		if (!is_null($opt))
-			$this->str .= " $opt";
-		$this->str .= ">$cell</td>\n";
-	}
+   public function td_opt($opt)
+   {
+      $this->opt_td = $opt;
+   }
+
+   public function td($cell = '', $opt = null)
+   {
+      if ($this->state == self::TABLE)
+      {
+         $this->state = self::HEAD;
+         $this->tr();
+      }
+
+      $this->str .= "    <td";
+      if (!is_null($this->opt_td))
+         $this->str .= " $this->opt_td";
+      if (!is_null($opt))
+         $this->str .= " $opt";
+      $this->str .= ">$cell</td>\n";
+   }
 
 }
