@@ -120,7 +120,6 @@ class SUBMENU
 
 class MENU
 {
-
    private $top_menu;
 
    function __construct()
@@ -247,7 +246,7 @@ class MENU
       $menu->add(null, "participant_x1.php", AUTH::RES);
       $menu->add(null, "participant_11.php", AUTH::RES_SELF);
       $menu->add(null, "contingentEdit.php", AUTH::CONT_RW);
-      $menu->add(null, "absenceEdit.php", AUTH::ABS_RW);
+      $menu->add(null, "absenceEdit.php", AUTH::MYPRJ);
       $menu->add(null, "index.php");
 
       $this->top_menu = $menu;
@@ -281,9 +280,11 @@ class MENU
       }
    }
 
-   private function url()
+   private function url($url = '')
    {
-      $url = '';
+      if (strlen($url) > 0)
+         $url = "?$url";
+      
       foreach ($_GET as $key => $value)
          if (is_string($value))
             $url .= ((strlen($url) > 0) ? '&' : '?') . $key . '=' . $value;
@@ -332,9 +333,9 @@ class MENU
       }
 
       echo "<table id=no_border><tr>";
-      echo "<td><a href=\"$php_self" . $this->url() . "\" title=\"forrige semester...\" onClick=\"set_cookie('_semester', '{$op_sem}.{$last_year}'); return true;\"><img src=\"images/left.gif\" height=20 border=0 ></a></td>\n";
+      echo "<td><a href=\"$php_self" . $this->url('season=adjust') . "\" title=\"forrige semester...\" onClick=\"set_cookie('_semester', '{$op_sem}.{$last_year}'); return true;\"><img src=\"images/left.gif\" height=20 border=0 ></a></td>\n";
       echo "<td>$sem$year</td>\n";
-      echo "<td><a href=\"$php_self" . $this->url() . "\" title=\"neste semester...\" onClick=\"set_cookie('_semester', '{$op_sem}.{$next_year}'); return true;\"><img src=\"images/right.gif\" height=20 border=0></a></td>\n";
+      echo "<td><a href=\"$php_self" . $this->url('season=adjust') . "\" title=\"neste semester...\" onClick=\"set_cookie('_semester', '{$op_sem}.{$next_year}'); return true;\"><img src=\"images/right.gif\" height=20 border=0></a></td>\n";
       echo "</tr></table>";
    }
 
