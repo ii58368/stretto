@@ -4,6 +4,61 @@ require 'framework.php';
 include_once 'participant_status.php';
 
 $id_person = (is_null(request('id_person'))) ? $whoami->id() : request('id_person');
+$id_project = request('id_project');
+
+function select_reason($selected)
+{
+   global $db;
+
+   $str = "<select name=status title=\"Type fravær...\">";
+   $str .= "<option value=null>Uavklart</option>\n";
+
+   for ($i = 0; $i < count($db->abs_stat); $i++)
+   {
+      $str .= "<option value=$i";
+      if (!is_null($selected) && $selected == $i)
+         $str .= " selected";
+      $str .= ">" . $db->abs_stat[$i] . "</option>\n";
+   }
+
+   $str .= "</select>";
+
+   return $str;
+}
+
+function get_lnk($e)
+{
+   global $db;
+   global $action;
+   global $php_self;
+   global $id_person;
+   global $id_project;
+
+   $status = $db->abs_stat_other;
+   $reason = 'Uregistrert';
+   if (!is_null($e['status']))
+   {
+      $status = $e['status'];
+      $reason = $e['reason'];
+   }
+   $img = "<img src=\"images/abs_stat_$status.gif\" title=\"" . $db->abs_stat[$status] . ": $reason\">";
+
+   $lnk = "<a href=\"$php_self?_action=edit&id_person=$id_person&id_project=$id_project&id_plan=" . $e['id_plan'] . "\">$img</a>";
+
+   if ($action == 'edit' && $e['id_plan'] == request('id_plan'))
+   {
+      $lnk = "<form method=post action=$php_self>\n";
+      $lnk .= "<input type=hidden name=id_person value=$id_person>\n";
+      $lnk .= "<input type=hidden name=id_project value=$id_project>\n";
+      $lnk .= "<input type=hidden name=id_plan value=" . $e['id_plan'] . ">\n";
+      $lnk .= "<input type=hidden name=_action value=abs_update>\n";
+      $lnk .= "<input type=submit value=Lagre title=Lagre><br>\n";
+      $lnk .= select_reason($e['status']) . "<br>";
+      $lnk .= "<input type=text name=reason value=\"" . $e['reason'] . "\" size=13 title=\"Eventuell kommentar...\">\n";
+      $lnk .= "</form>\n";
+   }
+   return $lnk;
+}
 
 if (!$access->auth(AUTH::RES))
 {
@@ -26,7 +81,7 @@ $pers = $stmt->fetch(PDO::FETCH_ASSOC);
 $query = "select name, deadline, orchestration, semester, year, "
         . "status, info, valid_par_stat"
         . " from project"
-        . " where id=" . request('id_project');
+        . " where id=$id_project";
 $stmt = $db->query($query);
 $prj = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -51,7 +106,16 @@ if (request('stat_self'))
       $query .= ", stat_final = $stat_self, " .
               "ts_final = $ts ";
    $query .= "where id_person = $id_person " .
-           "and id_project = " . request('id_project');
+           "and id_project = $id_project";
+   $db->query($query);
+}
+
+if ($action == "abs_update")
+{
+   $query = "replace into absence "
+           . "(id_person, id_plan, status, comment) "
+           . "values "
+           . "($id_person, " . request('id_plan') . ", " . request('status') . ", " . $db->qpost('reason') . ")";
    $db->query($query);
 }
 
@@ -59,7 +123,7 @@ $query = "select *"
         . " from participant, instruments"
         . " where participant.id_instruments = instruments.id "
         . " and id_person=$id_person"
-        . " and id_project=" . request('id_project');
+        . " and id_project=$id_project";
 $stmt = $db->query($query);
 if ($stmt->rowCount() > 0)
    $part = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -71,28 +135,37 @@ echo "<h2>Spilleplan</h2>\n";
 
 $tb = new TABLE('id=no_border');
 
+$tb->th('S');
 $tb->th('Dato');
 $tb->th('Prøvetid');
 $tb->th('Lokale');
 $tb->th('Merknad');
 $tb->tr();
 
-$query = "SELECT date, time, " .
-        "plan.location as location, location.name as lname, " .
-        "location.url as url, " .
-        "plan.comment as comment " .
-        "FROM project, plan, location " .
-        "where id_location = location.id " .
-        "and id_project = project.id " .
-        "and plan.id_project = " . request('id_project') . " " .
-        "and plan.event_type = $db->plan_evt_rehearsal " .
-        "order by date,tsort,time";
+$query = "SELECT plan.date as date, plan.time as time, "
+        . "plan.location as location, location.name as lname, "
+        . "plan.id as id_plan, "
+        . "location.url as url, "
+        . "plan.comment as comment, "
+        . "absence.status as status, "
+        . "absence.comment as reason "
+        . "FROM project, location, plan "
+        . "left join absence "
+        . "on absence.id_person = $id_person "
+        . "and absence.id_plan = plan.id "
+        . "where id_location = location.id "
+        . "and id_project = project.id "
+        . "and plan.id_project = $id_project "
+        . "and plan.event_type = $db->plan_evt_rehearsal "
+        . "order by date,tsort,time";
+
 
 $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
    $tb->tr();
+   $tb->td(($part['stat_final'] == $db->par_stat_yes) ? get_lnk($row) : '');
    $tb->td(strftime('%a %e.%b %y', $row['date']));
    $tb->td($row['time']);
    $lname = (strlen($row['url']) > 0) ? "<a href=\"" . $row['url'] . "\">" . $row['lname'] . "</a>" : $row['lname'];
@@ -107,10 +180,10 @@ $reg_header = ($isTutti) ? "Permisjonssøknad" : "Påmelding";
 echo "<h2>$reg_header</h2>";
 if ($isTutti)
    echo "Dette er et tuttiprosjekt. Dersom du ikke søker om permisjon vil du automatisk bli påmeldt når permisjonsfristen går ut.<p>\n";
-echo "<form action=$php_self method=post>
-   <input type=hidden name=_action value=update>
+$form = new FORM();
+echo "<input type=hidden name=_action value=update>
    <input type=hidden name=id_person value=$id_person>
-   <input type=hidden name=id_project value=" . request('id_project') . ">\n";
+   <input type=hidden name=id_project value=$id_project>\n";
 
 $tb = new TABLE('id=no_border');
 
@@ -121,15 +194,12 @@ $tb->td('Instrument:');
 $tb->td(isset($part) ? $part['instrument'] : $pers['instrument']);
 $tb->tr();
 $tb->td(($isTutti) ? "Permisjonsfrist:" : "Påmeldingsfrist:");
-$tb->td($prj['deadline'] < time()) ? "<font color=red>" . strftime('%a %e.%b %Y', $prj['deadline']) . "</font>" :
-                strftime('%a %e.%b %Y', $prj['deadline']);
+$tss = strftime('%a %e.%b %Y', $prj['deadline']);
+$tb->td($prj['deadline'] < time() ? "<font color=red>$tss</font>" : $tss);
 $tb->tr();
 $tb->td('Registrert:');
-if (isset($part) && $part['ts_self'] != 0)
-   $tb->td(is_null(request('stat_self')) ?
-                   strftime('%a %e.%b %Y', $part['ts_self']) :
-                   "<font color=green>" . strftime('%a %e.%b %Y', $part['ts_self']) .
-                   "</font> (Opplysningene kan endres på frem til og med dato for registreringsfrist)");
+$tss = (isset($part) && $part['ts_self'] != 0) ? strftime('%a %e.%b %Y', $part['ts_self']) : '';
+$tb->td(is_null(request('stat_self')) ? $tss : "<font color=green>$tss</font> (Opplysningene kan endres på frem til og med dato for registreringsfrist)");
 $tb->tr();
 if ($prj['deadline'] >= time() && $pers['id'] == $whoami->id())
 {
@@ -149,7 +219,7 @@ if ($prj['deadline'] >= time() && $pers['id'] == $whoami->id())
    $tb->tr();
    $error = ($isTutti && strlen($part['comment_self']) < 4) ? "<br><font color=red>Permisjonsbegrunnelse mangler!</font>" : '';
    $description = $isTutti ? "Begrunnelse:$error" : "Kommentar:";
-   $placeholder = $isTutti ? "Angi begrunnelse for å søke permisjon." : "Oppgi eventuell tillegsinformasjon som du ønsker skal bli tatt med i vurderingen";
+   $placeholder = $isTutti ? "Angi begrunnelse for å søke permisjon." : "Oppgi eventuell tilleggsinformasjon som du ønsker skal bli tatt med i vurderingen";
    $tb->td($description);
    $tb->td("<textarea title=\"$placeholder\" placeholder=\"$placeholder\" cols=30 rows=5 wrap=virtual name=comment_self>" . $part['comment_self'] . "</textarea>");
    $tb->tr();
@@ -168,7 +238,7 @@ else
       $tb->td('<b>' . str_replace("\n", "<br>\n", $part['comment_self']) . '</b>');
 }
 unset($tb);
-echo "</form>";
+unset($form);
 
 echo "<h2>Deltakerstatus</h2>";
 
@@ -263,3 +333,35 @@ else
    echo "<b>Styret:</b> ";
    echo "Du er ikke en del av besetningen på dette prosjektet.<br>\n";
 }
+
+$help = "Klikk for å registrere en ny tilbakemelding.\nTilbakemeldingen kan endres frem til det blir markert som lest av styret";
+$button = "<img src=images/cross_re.gif title=\"$help\">";
+$link = $access->auth(AUTH::FEEDBACK) ? "<a href=\"feedbackReg.php?_action=new&id_project=$id_project\">$button</a> " : "";
+
+echo "<h2>Tilbakemelding $link</h2>";
+
+$query = "select id, ts, status, comment "
+        . "from feedback "
+        . "where id_person = $id_person "
+        . "and id_project = $id_project "
+        . "order by status, ts desc";
+$stmt = $db->query($query);
+
+foreach ($stmt as $row)
+{
+   if ($row['status'] == $db->fbk_stat_new)
+   {
+      $help = "Klikk for å editere.\nTilbakemeldingen kan endres frem til det blir markert som lest av styret";
+      $button = "<img src=images/cross_re.gif title=\"$help\">";
+      echo "<a href=\"feedbackReg.php?_action=view&_no=" . $row['id'] . "&id_project=$id_project\">$button</a> ";
+   }
+   echo "<b>" . strftime('%e.%b %Y', $row['ts']) . "</b>\n";
+
+   echo "<br>";
+   $comment = str_replace("\n", "<br>\n", $row['comment']);
+   $comment = replace_links($comment);
+   echo $comment;
+
+   echo "<p>";
+}
+

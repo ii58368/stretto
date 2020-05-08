@@ -2,8 +2,6 @@
 
 require 'framework.php';
 
-$id_project = request('id_project');
-
 echo "<h1>Tilbakemeldinger</h1>\n";
 
 if ($action == 'update' && $access->auth(AUTH::FEEDBACK_W))
@@ -25,7 +23,7 @@ $query = "select feedback.id as id, feedback.ts as ts, "
         . "feedback.status as status, feedback.comment as comment, "
         . "project.name as pname, year, semester, "
         . "project.id as id_project, "
-        . "firstname, lastname, instrument "
+        . "firstname, lastname, instrument, email "
         . "from feedback left join project "
         . "on feedback.id_project = project.id "
         . "left join person "
@@ -43,7 +41,7 @@ foreach ($stmt as $row)
 {
    if ($row['status'] == $db->fbk_stat_discarded && $first_time_discarded)
    {
-      echo "<input type=button value=\"Slett listen under\" onClick=\"location.href='$php_self?_action=delete';\">";
+      echo "<input type=button value=\"Slett listen under\" onClick=\"location.href='$php_self?_action=delete';\"><br>\n";
       $first_time_discarded = FALSE;
    }
    
@@ -62,7 +60,7 @@ foreach ($stmt as $row)
       if ($row['status'] == $db->fbk_stat_read)
          $next_status = $db->fbk_stat_discarded;
       if ($row['status'] == $db->fbk_stat_discarded)
-         $next_status = $db->fbk_stat_new&_no;
+         $next_status = $db->fbk_stat_new;
       $href = "<a href=\"$php_self?_action=update&status=$next_status&_no=" . $row['id'] . "\">";
       $help .= ". Klick for å endre status til " . $db->fbk_stat[$next_status];
    }
@@ -75,7 +73,9 @@ foreach ($stmt as $row)
    {
       $tb->tr();
       $tb->td("<i>Prosjekt:</i>", 'align=right');
-      $tb->td($row['pname'] . " (" . $row['semester'] . "-" . $row['year'] . ")");
+      $project = $row['pname'] . " (" . $row['semester'] . "-" . $row['year'] . ")";
+      $hproject = "<a href=\"prjInfo.php?id=" . $row['id_project'] . "\">$project</a>";
+      $tb->td($hproject);
       $tb->tr();
    }
    
@@ -83,7 +83,9 @@ foreach ($stmt as $row)
    {
       $tb->tr();
       $tb->td("<i>Fra:</i>", 'align=right');
-      $tb->td($row['firstname'] . " " . $row['lastname'] . " (" . $row['instrument'] . ")");
+      $name = $row['firstname'] . " " . $row['lastname'] . " (" . $row['instrument'] . ")";
+      $hname = (strlen($row['email']) > 0) ? "<a href=\"mailto:?to=" . $row['email'] . "&subject=OSO: \">$name</a>" : $name;
+      $tb->td($hname);
       $tb->tr();
    }
    

@@ -59,8 +59,8 @@ foreach ($stmt as $row)
    $tb->td("<a href=\"prjInfo.php?id=" . $row['id'] . "\">" . $row['name'] . "</a>");
    $tb->td($row['semester'] . "-" . $row['year']);
    $tb->td($db->prj_stat[$row['status']]);
-   if ($row['orchestration'] == $db->prj_orch_tutti)
-      $tb->td("<img src=\"images/tick2.gif\" border=0>", 'align=center');
+   $tutti = ($row['orchestration'] == $db->prj_orch_tutti) ? "<img src=\"images/tick2.gif\" border=0>" : '';
+      $tb->td($tutti, 'align=center');
 
    if ($row['id'] != $no)
    {

@@ -20,12 +20,9 @@ function get_groups()
    global $db;
 
    $query = "select groups.id as id, groups.name as name "
-           . "from participant, instruments, groups, person, plan "
-           . "where participant.id_person = person.id "
-           . "and person.id = " . $whoami->id() . " "
-           . "and participant.id_project = plan.id_project "
-           . "and plan.id = " . request('id_plan') . " "
-           . "and participant.id_instruments = instruments.id "
+           . "from instruments, groups, person "
+           . "where person.id = " . $whoami->id() . " "
+           . "and person.id_instruments = instruments.id "
            . "and instruments.id_groups = groups.id";
    $stmt = $db->query($query);
    return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -72,22 +69,21 @@ if ($action == 'update')
 echo "
     <h1><a href=\"absence.php?id_project=" . $prj['id'] . "\">Fravær</a></h1>
     <h2>" . $prj['name'] . " " . $prj['semester'] . "-" . $prj['year'] . "</h2>
-    <h3>" . strftime('%a %e.%b', $prj['date']) . "</h3>
-    <form action='$php_self' method=post>
-    <input type=hidden name=id_plan value=" . request('id_plan') . ">
+    <h3>" . strftime('%a %e.%b', $prj['date']) . "</h3>";
+$form = new FORM();
+echo "<input type=hidden name=id_plan value=" . request('id_plan') . ">
     <input type=hidden name=_sort value=$sort>
     <input type=hidden name=_action value=update>
     <input type=submit value=Lagre $style  title=\"Lagre\">
-    <input type=submit name= clear value=Slett  title=\"Slett alt som er registrert for denne prøven\" onClick=\"return confirm('Sikkert at du vil slette alt for denne prøven?');\">
-    <table border=1>
-    <tr>
-      <th><a href=\"$php_self?id_plan=" . request('id_plan') . "&_sort=firstname,lastname\" title=\"Sorter på fornavn, deretter etternavn\">Navn</a></th>
-      <th><a href=\"$php_self?id_plan=" . request('id_plan') . "&_sort=list_order,-position+DESC,-def_pos+DESC,firstname,lastname\" title=\"Sorter på instrument, fornavn, etternavn\">Instrument</a></th>\n";
+    <input type=submit name= clear value=Slett  title=\"Slett alt som er registrert for denne prøven\" onClick=\"return confirm('Sikkert at du vil slette alt for denne prøven?');\"><p>\n";
+$tb = new TABLE('border=1');
+$tb->th("<a href=\"$php_self?id_plan=" . request('id_plan') . "&_sort=firstname,lastname\" title=\"Sorter på fornavn, deretter etternavn\">Navn</a>");
+$tb->th("<a href=\"$php_self?id_plan=" . request('id_plan') . "&_sort=list_order,-position+DESC,-def_pos+DESC,firstname,lastname\" title=\"Sorter på instrument, fornavn, etternavn\">Instrument</a>");
 
 for ($i = 0; $i < sizeof($db->abs_stat); $i++)
-   echo "<th>" . $db->abs_stat[$i] . "</th>\n";
+   $tb->th($db->abs_stat[$i]);
 
-echo "<th>Kommentar</th>\n</tr>\n";
+$tb->th("Kommentar");
 
 $query = "SELECT participant.id_person as id_person, firstname, lastname, "
         . "person.status as status, instrument, plan.id as id_plan "
@@ -106,9 +102,9 @@ $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
-   echo "<tr>
-      <td>" . $row['firstname'] . " " . $row['lastname'] . "</td>
-      <td>" . $row['instrument'] . "</td>\n";
+   $tb->tr();
+   $tb->td($row['firstname'] . " " . $row['lastname']);
+   $tb->td($row['instrument']);
 
    $q = "select status, comment from absence "
            . "where id_plan=" . request('id_plan') . " "
@@ -118,18 +114,16 @@ foreach ($stmt as $row)
 
    for ($i = 0; $i < sizeof($db->abs_stat); $i++)
    {
-      echo "<td align=center><input type=radio name=\"status:" . $row['id_person'] . "\" value=$i";
+      $input = "<input type=radio name=\"status:" . $row['id_person'] . "\" value=$i";
       if (!is_null($e) && $e['status'] == $i)
-         echo " checked";
-      echo "></td>\n";
+         $input .= " checked";
+      $input .= ">";
+      $tb->td($input, 'align=center');
    }
 
-   echo "<td><input type=text name=\"comment:" . $row['id_person'] . "\" value=\"" . $e['comment'] . "\" size=30 title=\"Eventuell tilleggskommentar\"></td>\n";
-   echo "</tr>";
+   $tb->td("<input type=text name=\"comment:" . $row['id_person'] . "\" value=\"" . $e['comment'] . "\" size=30 title=\"Eventuell tilleggskommentar\">");
 }
 
-echo "</table>\n";
-echo "</form>\n";
 
 
 
