@@ -1,4 +1,5 @@
 <?php
+
 require 'framework.php';
 
 if (is_null($sort))
@@ -98,53 +99,48 @@ echo "
 if (this_access_rw())
 {
    echo "For å legge til nye dokumenter:"
-           . "<ul>"
-           . "<li>Velg \"Nytt dokument\"</li>"
-           . "<li>Velg \"Browse\" og velg deretter lokal fil som skal lastes opp</li>"
-           . "<li>Velg \"ok\" for å laste opp</li>"
-           . "</ul>"
-           . "For å endre navn på eksisterende dokumenter:"
-           . "<ul>"
-           . "<li>Velg \"Edit-knapp\" for aktuelt dokument</li>"
-           . "<li>Endre navn i navnetekst</li>"
-           . "<li>Velg \"ok\""
-           . "</ul>"
-           . "For å slette eksisterende dokument:"
-           . "<ul>"
-           . "<li>Velg \"Edit-knapp\" for aktuelt dokument</li>"
-           . "<li>Velg \"Del\"</li>"
-           . "</ul>";
+   . "<ul>"
+   . "<li>Velg \"Nytt dokument\"</li>"
+   . "<li>Velg \"Browse\" og velg deretter lokal fil som skal lastes opp</li>"
+   . "<li>Velg \"ok\" for å laste opp</li>"
+   . "</ul>"
+   . "For å endre navn på eksisterende dokumenter:"
+   . "<ul>"
+   . "<li>Velg \"Edit-knapp\" for aktuelt dokument</li>"
+   . "<li>Endre navn i navnetekst</li>"
+   . "<li>Velg \"ok\""
+   . "</ul>"
+   . "For å slette eksisterende dokument:"
+   . "<ul>"
+   . "<li>Velg \"Edit-knapp\" for aktuelt dokument</li>"
+   . "<li>Velg \"Del\"</li>"
+   . "</ul>";
+   $form = new FORM();
    echo "
-    <form action=\"$php_self\" method=post>
       <input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=_action value=new>
       <input type=hidden name=path value=\"$path\">
-      <input type=submit value=\"Nytt dokument\" title=\"Last opp nytt dokument...\">
-    </form>";
+      <input type=submit value=\"Nytt dokument\" title=\"Last opp nytt dokument...\">";
+   unset($form);
 }
-echo "
-    <table border=1>
-    <tr>";
+
+$form = new FORM(null, 'post', 'multipart/form-data');
+$tb = new TABLE('border=1');
+
 if (this_access_rw())
-   echo "
-      <th>Edit</th>";
-echo "
-      <th>File</th>
-      <th>Size</th>
-      <th>Last modified</th>
-      </tr>";
+   $tb->th('Edit');
+$tb->th('File');
+$tb->th('Size');
+$tb->th('Last modified');
 
 if ($action == 'new')
 {
-   echo "  <tr>
-    <form action=$php_self method=post enctype=multipart/form-data>
-    <td align=left><input type=hidden name=_action value=update>
+   $tb->tr();
+   $tb->td("<input type=hidden name=_action value=update>
     <input type=hidden name=_sort value=\"$sort\">
     <input type=hidden name=path value=\"$path\">
-    <input type=submit value=ok title=Lagre></td>
-    <td colspan=3><input type=file name=filename id=filename title=\"Velg lokal fil som skal lastes opp...\"></td>
-    </form>
-  </tr>";
+    <input type=submit value=ok title=Lagre>", 'align=left');
+   $tb->td("<input type=file name=filename id=filename title=\"Velg lokal fil som skal lastes opp...\">", 'colspan=3');
 }
 
 if ($action == 'update' && this_access_rw())
@@ -185,6 +181,7 @@ if ($action == 'update' && this_access_rw())
       update_db($variant_idx, $id_project, $row);
 }
 
+
 if (is_dir($path))
 {
    if ($handle = opendir($path))
@@ -194,40 +191,38 @@ if (is_dir($path))
          $abs_file = $path . "/" . $file;
          if (!is_file($abs_file))
             continue;
-         $stat = stat($abs_file);
-         echo "<tr>";
-         if ($file != $no)
-         {
-            if (this_access_rw())
-               echo "<td><center>
-           <a href=\"$php_self?_sort=$sort&_action=view&_no=" . urlencode($file) . "&path=$path\" title=\"Endre navn eller slette...\" ><img src=\"images/cross_re.gif\" border=0></a>
-             </center></td>";
-            echo "
-             <td><a href=\"$abs_file\" target=\"_blank\" title=\"Klikk for å laste ned dokument\">$file</a></td>";
-         }
-         else
-         {
-            echo "
-            <form action=$php_self method=post>
-    <input type=hidden name=_action value=update>
+         $flist[$file] = $file;
+      }
+      closedir($handle);
+   }
+
+   asort($flist);
+
+   foreach ($flist as $file)
+   {
+      $abs_file = $path . "/" . $file;
+      $stat = stat($abs_file);
+      $tb->tr();
+      if ($file != $no)
+      {
+         if (this_access_rw())
+            $tb->td("<a href=\"$php_self?_sort=$sort&_action=view&_no=" . urlencode($file) . "&path=$path\" title=\"Endre navn eller slette...\" ><img src=\"images/cross_re.gif\" border=0></a>", 'align=center');
+         $tb->td("<a href=\"$abs_file\" target=\"_blank\" title=\"Klikk for å laste ned dokument\">$file</a>");
+      }
+      else
+      {
+         $tb->td("
+               <input type=hidden name=_action value=update>
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_filename value='$file'>
     <input type=hidden name=path value=\"$path\">
     <input type=hidden name=_no value=\"$no\">
-    <td nowrap><input type=submit value=ok title=Lagre>
-      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette $file?');\" title=\"Slett...\"></td>
-    <td><input type=text size=30 name=file value=\"$file\" title=\"Angi nytt filnavn...\"></td>
-         </form>";
-         }
-         $tsize = ($stat['size']/1024 > 1024) ? (int)($stat['size'] / (1024*1024)) . "MB" : (int)($stat['size'] / 1024) . "KB";
-         echo "<td>$tsize</td>" .
-         "<td>" . strftime('%e.%b %Y', $stat['mtime']) . "</td>" .
-         "</tr>";
+    <input type=submit value=ok title=Lagre>
+      <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette $file?');\" title=\"Slett...\">", 'nowrap');
+         $tb->td("<input type=text size=30 name=file value=\"$file\" title=\"Angi nytt filnavn...\">");
       }
-
-      closedir($handle);
+      $tsize = ($stat['size'] / 1024 > 1024) ? (int) ($stat['size'] / (1024 * 1024)) . "MB" : (int) ($stat['size'] / 1024) . "KB";
+      $tb->td($tsize);
+      $tb->td(strftime('%e.%b %Y', $stat['mtime']));
    }
 }
-?> 
-
-</table>
