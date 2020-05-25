@@ -3,11 +3,11 @@
 class FORM
 {
 
-   public function __construct($action = null, $method = 'post')
+   public function __construct($action = null, $method = 'post', $enctype='plain/text')
    {
       if (is_null($action))
          $action = $_SERVER['PHP_SELF'];
-      echo "<form action=\"$action#inProgress\" method=\"$method\">\n";
+      echo "<form action=\"$action\" method=\"$method\" enctype=\"$enctype\">\n";
    }
 
    public function __destruct()

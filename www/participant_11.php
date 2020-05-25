@@ -128,8 +128,8 @@ $stmt = $db->query($query);
 if ($stmt->rowCount() > 0)
    $part = $stmt->fetch(PDO::FETCH_ASSOC);
 
-echo "
-    <h1>" . $prj['name'] . " " . $prj['semester'] . "-" . $prj['year'] . "</h1>\n";
+$project_name = $prj['name'] . " " . $prj['semester'] . "-" . $prj['year'];
+echo "<h1>$project_name</h1>\n";
 echo str_replace("\n", "<br>\n", $prj['info']) . "\n";
 echo "<h2>Spilleplan</h2>\n";
 
@@ -239,6 +239,25 @@ else
 }
 unset($tb);
 unset($form);
+
+If ($prj['deadline'] < time())
+{
+   $query = "select firstname, lastname, email "
+           . "from person "
+           . "where id = "
+           . "(select id_person from person, instruments, groups "
+           . "where person.id_instruments = instruments.id "
+           . "and instruments.id_groups = groups.id "
+           . "and person.id = " . $whoami->id() . ")";
+   $stmt = $db->query($query);
+   $glead = $stmt->fetch(PDO::FETCH_ASSOC);
+
+   echo "Har det skjedd endringer som påvirker deltagelsen din på dette prosjektet, send mail til gruppelederen din ";
+   echo "<a href=\"mailto:?to=" . $glead['email'] . "&subject=OSO: $project_name\">" . $glead['firstname'] . " " . $glead['lastname'] . "</a> ";
+   echo "som vil videreformidle en innstilling om dette til styret.<br>\n";
+}
+echo "Dersom du ser deg nødt til å søke permisjon for et helt semester eller mer, må du sende en mail med permisjonssøknad direkte til ";
+echo "<a href=\"mailto:?to=sekretar@oslosymfoniorkester.no&cc=" . $glead['email'] . "&subject=OSO permisjonssøknad\">styret</a>. ";
 
 echo "<h2>Deltakerstatus</h2>";
 
