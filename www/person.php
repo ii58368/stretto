@@ -1,4 +1,5 @@
 <?php
+
 require 'framework.php';
 require 'person_query.php';
 
@@ -10,7 +11,7 @@ if (is_null($sort))
 function send_mail($r)
 {
    $recip = is_null(request('f_group')) ? 'bcc' : 'to';
-   
+
    reset($r);
    echo "<a href=\"mailto:?$recip=";
    foreach ($r as $e)
@@ -56,7 +57,7 @@ function select_filter()
    $s = $db->query("select id, instrument from instruments order by list_order");
    foreach ($s as $e)
    {
-      echo "<option value=".$e['id'];
+      echo "<option value=" . $e['id'];
       if (!is_null(request('f_instrument')))
          foreach (request('f_instrument') as $f_instrument)
             if ($f_instrument == $e['id'])
@@ -73,7 +74,7 @@ function select_filter()
            . "where groups.id = member.id_groups group by id order by name");
    foreach ($s as $e)
    {
-      echo "<option value=".$e['id'];
+      echo "<option value=" . $e['id'];
       if (!is_null(request('f_group')))
          foreach (request('f_group') as $f_group)
             if ($f_group == $e['id'])
@@ -87,19 +88,19 @@ function select_filter()
    echo "<select name=\"f_project[]\" multiple size=3 onChange=\"submit();\" title=\"Filter for prosjekt...\n$gen_htxt\">\n";
 
    $s = $db->query("select id, name, year, semester from project "
-           . "where year = ".$season->year()." "
-           . "and semester = '".$season->semester()."' "
+           . "where year = " . $season->year() . " "
+           . "and semester = '" . $season->semester() . "' "
            . "and (status = $db->prj_stat_real "
            . "or status = $db->prj_stat_internal) "
            . "order by id");
    foreach ($s as $e)
    {
-      echo "<option value=".$e['id'];
+      echo "<option value=" . $e['id'];
       if (!is_null(request('f_project')))
          foreach (request('f_project') as $f_project)
             if ($f_project == $e['id'])
                echo " selected";
-      echo ">" . $e['name']." (".$e['semester'].$e['year'].")</option>\n";
+      echo ">" . $e['name'] . " (" . $e['semester'] . $e['year'] . ")</option>\n";
    }
 
    echo "</select>\n";
@@ -110,7 +111,7 @@ function select_filter()
 function get_filter_as_url()
 {
    $filter = '';
-   
+
    if (!is_null(request('f_status')))
       foreach (request('f_status') as $f_status)
          $filter .= "&f_status[]=$f_status";
@@ -123,7 +124,7 @@ function get_filter_as_url()
    if (!is_null(request('f_project')))
       foreach (request('f_project') as $f_project)
          $filter .= "&f_project[]=$f_project";
-   
+
    return $filter;
 }
 
@@ -141,7 +142,7 @@ if (!is_null(request('f_project')))
    $stmt = $db->query($query);
    echo "<h2>";
    foreach ($stmt as $e)
-      echo $e['name']." (".$e['semester'].$e['year'].") ";
+      echo $e['name'] . " (" . $e['semester'] . $e['year'] . ") ";
    echo "</h2>\n";
 }
 
@@ -161,64 +162,45 @@ echo "<a href=\"person_pdf.php?_sort=list_order,-def_pos+desc,lastname,firstname
 if ($access->auth(AUTH::MEMB_RW, AUTH::MEMB_GREP))
 {
    send_mail($result);
+   echo "<a href=\"personExcel.php?_sort=$sort&$f_filter\" ><img border=0 src=images/excel.png height=20 hspace=5 vspace=5 title=\"Excel fil for innrapportering til VO...\"></a>\n";
    echo "<form action=\"$php_self\" method=post>\n";
    select_filter();
    echo "<font color=green>" . count($result) . " treff</font>\n";
    echo "</form>\n";
 }
 
-echo "
-    <form action='$pedit' method=post>
-    <table border=1>
-    <tr>";
+$tb = new TABLE('border=1');
+
 if ($access->auth(AUTH::MEMB_RW))
-   echo "
-      <th>Edit</th>";
-echo "
-      <th><a href=\"$php_self?_sort=list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på instrumentgruppe...\">Instrument</a></th>
-      <th><a href=\"$php_self?_sort=firstname,lastname$f_filter\" title=\"Sorter på fornavn...\">For</a>/
-                          <a href=\"$php_self?_sort=lastname,firstname$f_filter\" title=\"Sorter på etternavn...\">Etternavn</a></th>
-      <th><a href=\"$php_self?_sort=address,lastname,firstname$f_filter\" title=\"Sorter på addresse...\">Adresse</a></th>
-      <th><a href=\"$php_self?_sort=postcode,lastname,firstname$f_filter\" title=\"Sorter på postnummer...\">Postnr</a></th>
-      <th><a href=\"$php_self?_sort=city,lastname,firstname$f_filter\" title=\"Sorter på sted...\">Sted</a></th>
-      <th>Email</th>
-      <th>Mobil</th>
-      <th>Priv</th>
-      <th>Arbeid</th>
-      <th><a href=\"$php_self?_sort=status,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på status...\">Status</a></th>";
-      if ($access->auth(AUTH::MEMB_RW))
-        echo "<th>Født</th>";
-      echo "
-      </tr>";
+   $tb->th('Edit');
+
+$tb->th("<a href=\"$php_self?_sort=list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på instrumentgruppe...\">Instrument</a>");
+$tb->th("<a href=\"$php_self?_sort=firstname,lastname$f_filter\" title=\"Sorter på fornavn...\">For</a>/
+                          <a href=\"$php_self?_sort=lastname,firstname$f_filter\" title=\"Sorter på etternavn...\">Etternavn</a>");
+$tb->th("<a href=\"$php_self?_sort=address,lastname,firstname$f_filter\" title=\"Sorter på addresse...\">Adresse</a>");
+$tb->th("<a href=\"$php_self?_sort=postcode,lastname,firstname$f_filter\" title=\"Sorter på postnummer...\">Postnr</a>");
+$tb->th("<a href=\"$php_self?_sort=city,lastname,firstname$f_filter\" title=\"Sorter på sted...\">Sted</a>");
+$tb->th("Email");
+$tb->th("Mobil");
+$tb->th("Priv");
+$tb->th("Arbeid");
+$tb->th("<a href=\"$php_self?_sort=status,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på status...\">Status</a>");
 
 reset($result);
 
 foreach ($result as $row)
 {
-   echo "<tr>";
+   $tb->tr();
    if ($access->auth(AUTH::MEMB_RW))
-      echo "
-         <td><center>
-           <a href=\"$pedit?_sort=$sort&_action=view&_no=".$row['id'].$f_filter."\"><img src=\"images/cross_re.gif\" border=0 title=\"Editere person...\"></a>
-          </center></td>";
-   echo "<td>".$row['instrument']."</td>" .
-   "<td>".$row['firstname']." ".$row['middlename']." ".$row['lastname']."</td>" .
-   "<td>".$row['address']."</td>" .
-   "<td>" .
-   sprintf("%04d", $row['postcode']) .
-   "</td>" .
-   "<td>".$row['city']."</td>" .
-   "<td><a href=\"mailto:".$row['email']."?subject=OSO:\">".$row['email']."</a></td>" .
-   "<td nowrap>" . format_phone($row['phone1']) . "</td>" .
-   "<td>".$row['phone2']."</td>" .
-   "<td>".$row['phone3']."</td>" .
-   "<td>".$db->per_stat[$row['status']]."</td>";
-   if ($access->auth(AUTH::MEMB_RW))
-      echo "<td>".strftime('%e. %b %Y', $row['birthday'])."</td>";
-   echo
-   "</tr>";
+      $tb->td("<a href=\"$pedit?_sort=$sort&_action=view&_no=" . $row['id'] . $f_filter . "\"><img src=\"images/cross_re.gif\" border=0 title=\"Editere person...\"></a>", 'align=center');
+   $tb->td($row['instrument']);
+   $tb->td($row['firstname'] . " " . $row['middlename'] . " " . $row['lastname']);
+   $tb->td($row['address']);
+   $tb->td(sprintf("%04d", $row['postcode']));
+   $tb->td($row['city']);
+   $tb->td("<a href=\"mailto:" . $row['email'] . "?subject=OSO:\">" . $row['email'] . "</a>");
+   $tb->td(format_phone($row['phone1']), 'nowrap');
+   $tb->td($row['phone2']);
+   $tb->td($row['phone3']);
+   $tb->td($db->per_stat[$row['status']]);
 }
-?>
-
-</table>
-</form>

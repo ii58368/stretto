@@ -134,6 +134,13 @@ class DB extends myPDO
    public $per_stat_eng = 4;
    public $per_stat_apply = 5;
    public $per_stat = array("Sluttet", "Medlem", "Vikar", "Innleid", "Engasjert", "Søkt");
+// field: sex
+   public $per_sex_unknown = 0;
+   public $per_sex_male = 1;
+   public $per_sex_female = 2;
+   public $per_sex = array("Ukjent", "Mann", "Kvinne");
+   public $per_sex2 = array('', "M", "F");
+   
 // field: status_dir
    public $per_dir_avail = 0;
    public $per_dir_nocarry = 1;
