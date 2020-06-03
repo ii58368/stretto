@@ -22,7 +22,8 @@ foreach ($stmt as $e)
 */
    $sex = (is_null($e['sex'])) ? $db->per_sex_unknown : $e['sex'];
    $str = $e['firstname'] . " " . $e['middlename'] . ";" . $e['lastname'] . ";"
-         . $db->per_sex2[$sex] . ";" . date('d.m.Y', $e['birthday']) . ";;" . $e['postcode'] . ";;;;;;;;;";
+         . $db->per_sex2[$sex] . ";" . date('d.m.Y', $e['birthday']) . ";;"
+         . sprintf('%04d', $e['postcode']) . ";;;;;;;;;";
    echo mb_convert_encoding($str, 'UTF-8');
    
    echo "\n";
