@@ -137,7 +137,7 @@ class MENU
          $my_pages->add("Mine prosjekter", "participant_1x.php?id=" . $whoami->id(), AUTH::MYPRJ);
          $my_pages->add("Min spilleplan", "myplan.php?id_person=" . $whoami->id(), AUTH::MYPLAN);
          $my_pages->add("Min regi", "myDirection.php", AUTH::MYDIR);
-         $my_pages->add("Mine tilbakemeldinger", "feedback.php", AUTH::FEEDBACK);
+//         $my_pages->add("Mine tilbakemeldinger", "feedback.php", AUTH::FEEDBACK);
          $my_pages->add("Mine personopplysninger", "personEdit.php?_no=" . $whoami->id(), AUTH::PERS, AUTH::MEMB_RW);
       }
       {
@@ -168,8 +168,8 @@ class MENU
             $project = new SUBMENU("class=\"dl-submenu\"");
             $admin->add("Prosjekt", $project, AUTH::BOARD_RO);
             $project->add("Prosjekter", "project.php", AUTH::BOARD_RO);
-            $project->add("Tilbakemeldingstekst", "feedbackProj.php", AUTH::FEEDBACK_R);
-            $project->add("Tilbakemeldinger", "feedbackList.php", AUTH::FEEDBACK_R);
+//            $project->add("Tilbakemeldingstekst", "feedbackProj.php", AUTH::FEEDBACK_R);
+//            $project->add("Tilbakemeldinger", "feedbackList.php", AUTH::FEEDBACK_R);
             $project->add("Lokaler", "location.php", AUTH::BOARD_RO);
          }
          $admin->add("Ressurser", "participant_xx.php", AUTH::RES);
@@ -219,7 +219,7 @@ class MENU
             $project->add("Prosjektinfo", "prjInfo.php?id=$pid");
             $project->add("Beskjeder", "pevent.php?id_project=$pid");
             $project->add("Gruppeoppsett", "seating.php?id_project=$pid");
-            $project->add("Tilbakemelding", "feedbackReg.php?id_project=$pid");
+//            $project->add("Tilbakemelding", "feedbackReg.php?id_project=$pid");
             $project->add("Repertoar", "repository.php?id_project=$pid", AUTH::REP);
             $project->add("Musikere", "person.php?f_project[]=$pid");
             $project->add("Regikomité", "direction.php?id_project=$pid", AUTH::DIR_RO);
