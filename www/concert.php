@@ -242,6 +242,7 @@ $query = "SELECT concert.id as id, "
         . "and concert.id_location = location.id "
         . "and project.year = " . $season->year() . " "
         . "and project.semester = '" . $season->semester() . "' "
+        . "and not project.status = $db->prj_stat_canceled "
         . "order by $sort";
 
 $stmt = $db->query($query);
