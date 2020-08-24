@@ -8,18 +8,23 @@ $id_project = request('id_project');
 
 function get_img($id_project)
 {
-   $path = "project/" . $id_project . "/img/";
-   if (!file_exists($path))
+   $dir = "project/" . $id_project . "/img/";
+   if (!file_exists($dir))
       return null;
    
-   if ($handle = opendir($path))
+   $path = null;
+   
+   if ($handle = opendir($dir))
    {
       while (($file = readdir($handle)))
       {
-         if (is_file($path . $file))
-            $abs_file = $path . $file;
+         if (is_file($dir . $file))
+            $path = $dir . $file;
       }
       closedir($handle);
+      
+      if (!is_null($path))
+         return $path;
    }
    return null;
 }
