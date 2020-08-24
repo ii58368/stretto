@@ -43,8 +43,12 @@ function get_lnk($e)
    }
    $img = "<img src=\"images/abs_stat_$status.gif\" title=\"" . $db->abs_stat[$status] . ": $reason\">";
 
-   $lnk = "<a href=\"$php_self?_action=edit&id_person=$id_person&id_project=$id_project&id_plan=" . $e['id_plan'] . "\">$img</a>";
-
+   $one_day = 60*60*24;
+   if ($e['date'] + $one_day > time())
+      $lnk = "<a href=\"$php_self?_action=edit&id_person=$id_person&id_project=$id_project&id_plan=" . $e['id_plan'] . "\">$img</a>";
+   else
+      $lnk = $img;
+   
    if ($action == 'edit' && $e['id_plan'] == request('id_plan'))
    {
       $lnk = "<form method=post action=$php_self>\n";
@@ -199,7 +203,7 @@ $tb->td($prj['deadline'] < time() ? "<font color=red>$tss</font>" : $tss);
 $tb->tr();
 $tb->td('Registrert:');
 $tss = (isset($part) && $part['ts_self'] != 0) ? strftime('%a %e.%b %Y', $part['ts_self']) : '';
-$tb->td(is_null(request('stat_self')) ? $tss : "<font color=green>$tss</font> (Opplysningene kan endres på frem til og med dato for registreringsfrist)");
+$tb->td(is_null(request('stat_self')) ? $tss : "<font color=green>$tss</font> (Opplysningene kan endres til fristen går ut)");
 $tb->tr();
 if ($prj['deadline'] >= time() && $pers['id'] == $whoami->id())
 {
@@ -217,9 +221,9 @@ if ($prj['deadline'] >= time() && $pers['id'] == $whoami->id())
    }
    $tb->td($radio);
    $tb->tr();
-   $error = ($isTutti && strlen($part['comment_self']) < 4) ? "<br><font color=red>Permisjonsbegrunnelse mangler!</font>" : '';
+   $error = (isset($part) && $part['stat_self'] == $db->par_stat_no && $isTutti && strlen($part['comment_self']) < 4) ? "<br><font color=red>Permisjonsbegrunnelse mangler!</font>" : '';
    $description = $isTutti ? "Begrunnelse:$error" : "Kommentar:";
-   $placeholder = $isTutti ? "Angi begrunnelse for å søke permisjon." : "Oppgi eventuell tilleggsinformasjon som du ønsker skal bli tatt med i vurderingen";
+   $placeholder = $isTutti ? "Angi begrunnelse for å søke permisjon. Sensitive opplysninger? Send mail direkte til gruppeleder." : "Oppgi eventuell tilleggsinformasjon som du ønsker skal bli tatt med i vurderingen";
    $tb->td($description);
    $tb->td("<textarea title=\"$placeholder\" placeholder=\"$placeholder\" cols=30 rows=5 wrap=virtual name=comment_self>" . $part['comment_self'] . "</textarea>");
    $tb->tr();
@@ -240,24 +244,24 @@ else
 unset($tb);
 unset($form);
 
+$query = "select firstname, lastname, email "
+        . "from person "
+        . "where id = "
+        . "(select id_person from person, instruments, groups "
+        . "where person.id_instruments = instruments.id "
+        . "and instruments.id_groups = groups.id "
+        . "and person.id = " . $whoami->id() . ")";
+$stmt = $db->query($query);
+$glead = $stmt->fetch(PDO::FETCH_ASSOC);
+
 If ($prj['deadline'] < time())
 {
-   $query = "select firstname, lastname, email "
-           . "from person "
-           . "where id = "
-           . "(select id_person from person, instruments, groups "
-           . "where person.id_instruments = instruments.id "
-           . "and instruments.id_groups = groups.id "
-           . "and person.id = " . $whoami->id() . ")";
-   $stmt = $db->query($query);
-   $glead = $stmt->fetch(PDO::FETCH_ASSOC);
-
    echo "Har det skjedd endringer som påvirker deltagelsen din på dette prosjektet, send mail til gruppelederen din ";
    echo "<a href=\"mailto:?to=" . $glead['email'] . "&subject=OSO: $project_name\">" . $glead['firstname'] . " " . $glead['lastname'] . "</a> ";
    echo "som vil videreformidle en innstilling om dette til styret.<br>\n";
 }
-echo "Dersom du ser deg nødt til å søke permisjon for et helt semester eller mer, må du sende en mail med permisjonssøknad direkte til ";
-echo "<a href=\"mailto:?to=sekretar@oslosymfoniorkester.no&cc=" . $glead['email'] . "&subject=OSO permisjonssøknad\">styret</a>. ";
+echo "Dersom du må søke permisjon for ett helt semester eller mer, send mail til ";
+echo "<a href=\"mailto:?to=" . $glead['email'] . "&subject=OSO permisjonssøknad\">gruppeleder</a>. ";
 
 echo "<h2>Deltakerstatus</h2>";
 
