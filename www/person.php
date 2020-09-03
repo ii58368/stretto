@@ -91,7 +91,8 @@ function select_filter()
            . "where year = " . $season->year() . " "
            . "and semester = '" . $season->semester() . "' "
            . "and (status = $db->prj_stat_real "
-           . "or status = $db->prj_stat_internal) "
+           . "or status = $db->prj_stat_internal "
+           . "or status = $db->prj_stat_canceled) "
            . "order by id");
    foreach ($s as $e)
    {
