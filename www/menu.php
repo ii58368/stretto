@@ -186,11 +186,13 @@ class MENU
 
          if ($access->auth(AUTH::PRJM))
          {
-            $q = "select id, name, semester, year, orchestration, docs_avail, deadline "
+            $q = "select id, name, semester, year, orchestration, docs_avail, deadline, "
+                    . "project.status as status "
                     . "from project "
                     . "where (status = $db->prj_stat_real ";
             if ($access->auth(AUTH::PRJ_RO))
-               $q .= "or status = $db->prj_stat_draft ";
+               $q .= "or status = $db->prj_stat_draft "
+                    . "or status = $db->prj_stat_canceled ";
             $q .= "or status = $db->prj_stat_tentative) "
                     . "and year = " . $season->year() . " "
                     . "and semester = '" . $season->semester() . "' "
@@ -199,7 +201,8 @@ class MENU
          else
          {
             $q = "select project.id as id, project.name as name, semester, "
-                    . "year, orchestration, docs_avail, deadline "
+                    . "year, orchestration, docs_avail, deadline, "
+                    . "project.status as status "
                     . "from project, participant, person "
                     . "where project.id = participant.id_project "
                     . "and participant.id_person = person.id "
@@ -215,7 +218,10 @@ class MENU
             $pid = $e['id'];
 
             $project = new SUBMENU("class=\"dl-submenu\"");
-            $projects->add($e['name'] . " (" . $e['semester'] . " " . $e['year'] . ")", $project);
+            $item = $e['name'] . " (" . $e['semester'] . " " . $e['year'] . ")";
+            if ($e['status'] == $db->prj_stat_canceled)
+               $item .= " (Kansellert)";
+            $projects->add($item, $project);
             $project->add("Prosjektinfo", "prjInfo.php?id=$pid");
             $project->add("Beskjeder", "pevent.php?id_project=$pid");
             $project->add("Gruppeoppsett", "seating.php?id_project=$pid");

@@ -8,8 +8,10 @@ $query = "select name, orchestration, semester, year, "
 $stmt = $db->query($query);
 $prj = $stmt->fetch(PDO::FETCH_ASSOC);
 
-echo "<h1>Prosjektinfo</h1>
-    <h2>".$prj['name']." ".$prj['semester']."-".$prj['year']."<a href=prjinfo_pdf.php?id=".request('id')." title=\"PDF versjon\"><img src=images/pdf.jpeg height=30></a></h2>\n";
+echo "<h1>Prosjektinfo</h1>\n";
+if ($prj['status'] == $db->prj_stat_canceled)
+   echo "<h2><font color=red>Prosjektet er avlyst!</font></h2>\n";
+echo "<h2>".$prj['name']." ".$prj['semester']."-".$prj['year']."<a href=prjinfo_pdf.php?id=".request('id')." title=\"PDF versjon\"><img src=images/pdf.jpeg height=30></a></h2>\n";
 echo str_replace("\n", "<br>\n", $prj['info']) . "\n";
 
 echo "<h3>Repertoar</h3>
