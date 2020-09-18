@@ -87,13 +87,18 @@ function select_filter()
    // Project
    echo "<select name=\"f_project[]\" multiple size=3 onChange=\"submit();\" title=\"Filter for prosjekt...\n$gen_htxt\">\n";
 
-   $s = $db->query("select id, name, year, semester from project "
-           . "where year = " . $season->year() . " "
+   $q = "select id, name, year, semester from project "
+           . "where (year = " . $season->year() . " "
            . "and semester = '" . $season->semester() . "' "
            . "and (status = $db->prj_stat_real "
            . "or status = $db->prj_stat_internal "
-           . "or status = $db->prj_stat_canceled) "
-           . "order by id");
+           . "or status = $db->prj_stat_canceled)) ";
+   if (!is_null(request('f_project')))
+      foreach (request('f_project') as $f_project)
+         $q .= "or id = $f_project ";
+   $q .= "order by id";
+
+   $s = $db->query($q);
    foreach ($s as $e)
    {
       echo "<option value=" . $e['id'];
