@@ -20,7 +20,13 @@ class PDF extends PDF_util
       $prj = $stmt->fetch(PDO::FETCH_ASSOC);
 
       $this->header1($prj['name']." ".$prj['semester']."-".$prj['year']);
-      $this->MultiCell(0, 5, $this->sconv($prj['info']));
+      $txt = str_replace("<ul>", "", $prj['info']);
+      $txt = str_replace("<li>", "- ", $txt);
+      $txt = str_replace("</ul>", "", $txt);
+      $txt = str_replace("<u>", "", $txt);
+      $txt = str_replace("</u>", "", $txt);
+      
+      $this->MultiCell(0, 5, $this->sconv($txt));
       $this->Ln();
    }
 
