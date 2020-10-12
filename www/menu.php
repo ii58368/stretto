@@ -163,7 +163,7 @@ class MENU
             $groups->add("Tilgang", "access.php", AUTH::BOARD_RO);
             $groups->add("Tilgangsgrupper", "view.php", AUTH::BOARD_RO);
          }
-         $admin->add("Notearkiv", "repository.php", AUTH::BOARD_RO);
+         $admin->add("Notearkiv", "repository.php", AUTH::REP_RO);
          {
             $project = new SUBMENU("class=\"dl-submenu\"");
             $admin->add("Prosjekt", $project, AUTH::BOARD_RO);
@@ -252,7 +252,7 @@ class MENU
       $menu->add(null, "participant_x1.php", AUTH::RES);
       $menu->add(null, "participant_11.php", AUTH::RES_SELF);
       $menu->add(null, "contingentEdit.php", AUTH::CONT_RW);
-      $menu->add(null, "absenceEdit.php", AUTH::MYPRJ);
+      $menu->add(null, "absenceEdit.php", AUTH::ABS_RW);
       $menu->add(null, "index.php");
 
       $this->top_menu = $menu;
