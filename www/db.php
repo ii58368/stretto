@@ -195,7 +195,7 @@ class DB extends myPDO
    public $abs_stat_busy = 3;
    public $abs_stat_away = 4;
    public $abs_stat_other = 5;
-   public $abs_stat = array("Tilstede", "Delvis fravær", "Syk", "Opptatt", "Skulk", "Annet");
+   public $abs_stat = array("Tilstede", "Delvis fravær", "Syk", "Opptatt", "Fravær uten beskjed", "Annet");
 // table: event
    public $evt_importance_low = 0;
    public $evt_importance_norm = 1;
