@@ -51,8 +51,9 @@ class AUTH
    const FEEDBACK = 42; // Feedback, register own
    const FEEDBACK_R = 43; // Feedback, admin r/o
    const FEEDBACK_W = 44; // Feedback, admin r/w
+   const REP_RO = 45; // Music repository, r/o
    const ALL = 0x7fffffffffffffff; // 63 bits enabled
-   const NO_VIEWS = 45;
+   const NO_VIEWS = 46;
 
    private $access;
 
