@@ -43,12 +43,12 @@ function get_lnk($e)
    }
    $img = "<img src=\"images/abs_stat_$status.gif\" title=\"" . $db->abs_stat[$status] . ": $reason\">";
 
-   $one_day = 60*60*24;
+   $one_day = 60 * 60 * 24;
    if ($e['date'] + $one_day > time())
       $lnk = "<a href=\"$php_self?_action=edit&id_person=$id_person&id_project=$id_project&id_plan=" . $e['id_plan'] . "\">$img</a>";
    else
       $lnk = $img;
-   
+
    if ($action == 'edit' && $e['id_plan'] == request('id_plan'))
    {
       $lnk = "<form method=post action=$php_self>\n";
@@ -180,188 +180,190 @@ unset($tb);
 echo "<p>\n";
 
 $isTutti = ($prj['orchestration'] == $db->prj_orch_tutti);
-$reg_header = ($isTutti) ? "Permisjonssøknad" : "Påmelding";
-echo "<h2>$reg_header</h2>";
-if ($isTutti)
-   echo "Dette er et tuttiprosjekt. Dersom du ikke søker om permisjon vil du automatisk bli påmeldt når permisjonsfristen går ut.<p>\n";
-$form = new FORM();
-echo "<input type=hidden name=_action value=update>
+if ($prj['valid_par_stat'] > 0)
+{
+   $reg_header = ($isTutti) ? "Permisjonssøknad" : "Påmelding";
+   echo "<h2>$reg_header</h2>";
+   if ($isTutti)
+      echo "Dette er et tuttiprosjekt. Dersom du ikke søker om permisjon vil du automatisk bli påmeldt når permisjonsfristen går ut.<p>\n";
+   $form = new FORM();
+   echo "<input type=hidden name=_action value=update>
    <input type=hidden name=id_person value=$id_person>
    <input type=hidden name=id_project value=$id_project>\n";
 
-$tb = new TABLE('id=no_border');
+   $tb = new TABLE('id=no_border');
 
-$tb->td('Navn:');
-$tb->td($pers['firstname'] . " " . $pers['lastname']);
-$tb->tr();
-$tb->td('Instrument:');
-$tb->td(isset($part) ? $part['instrument'] : $pers['instrument']);
-$tb->tr();
-$tb->td(($isTutti) ? "Permisjonsfrist:" : "Påmeldingsfrist:");
-$tss = strftime('%a %e.%b %Y', $prj['deadline']);
-$tb->td($prj['deadline'] < time() ? "<font color=red>$tss</font>" : $tss);
-$tb->tr();
-$tb->td('Registrert:');
-$tss = (isset($part) && $part['ts_self'] != 0) ? strftime('%a %e.%b %Y', $part['ts_self']) : '';
-$tb->td(is_null(request('stat_self')) ? $tss : "<font color=green>$tss</font> (Opplysningene kan endres til fristen går ut)");
-$tb->tr();
-if ($prj['deadline'] >= time() && $pers['id'] == $whoami->id())
-{
-   $tb->td('Ønsker å være med:');
-   $radio = '';
-   for ($i = 0; $i < count($db->par_stat); $i++)
+   $tb->td('Navn:');
+   $tb->td($pers['firstname'] . " " . $pers['lastname']);
+   $tb->tr();
+   $tb->td('Instrument:');
+   $tb->td(isset($part) ? $part['instrument'] : $pers['instrument']);
+   $tb->tr();
+   $tb->td(($isTutti) ? "Permisjonsfrist:" : "Påmeldingsfrist:");
+   $tss = strftime('%a %e.%b %Y', $prj['deadline']);
+   $tb->td($prj['deadline'] < time() ? "<font color=red>$tss</font>" : $tss);
+   $tb->tr();
+   $tb->td('Registrert:');
+   $tss = (isset($part) && $part['ts_self'] != 0) ? strftime('%a %e.%b %Y', $part['ts_self']) : '';
+   $tb->td(is_null(request('stat_self')) ? $tss : "<font color=green>$tss</font> (Opplysningene kan endres til fristen går ut)");
+   $tb->tr();
+   if ($prj['deadline'] >= time() && $pers['id'] == $whoami->id())
    {
-      if ($prj['valid_par_stat'] & (1 << $i))
+      $tb->td('Ønsker å være med:');
+      $radio = '';
+      for ($i = 0; $i < count($db->par_stat); $i++)
       {
-         $radio .= "<input type=radio name=stat_self value=$i";
-         if (isset($part) && $part['stat_self'] == $i)
-            $radio .= " checked";
-         $radio .= ">" . $db->par_stat[$i] . "<br>\n";
+         if ($prj['valid_par_stat'] & (1 << $i))
+         {
+            $radio .= "<input type=radio name=stat_self value=$i";
+            if (isset($part) && $part['stat_self'] == $i)
+               $radio .= " checked";
+            $radio .= ">" . $db->par_stat[$i] . "<br>\n";
+         }
       }
+      $tb->td($radio);
+      $tb->tr();
+      $error = (isset($part) && $part['stat_self'] == $db->par_stat_no && $isTutti && strlen($part['comment_self']) < 4) ? "<br><font color=red>Permisjonsbegrunnelse mangler!</font>" : '';
+      $description = $isTutti ? "Begrunnelse:$error" : "Kommentar:";
+      $placeholder = $isTutti ? "Angi begrunnelse for å søke permisjon. Sensitive opplysninger? Send mail direkte til gruppeleder." : "Oppgi eventuell tilleggsinformasjon som du ønsker skal bli tatt med i vurderingen";
+      $tb->td($description);
+      $tb->td("<textarea title=\"$placeholder\" placeholder=\"$placeholder\" cols=30 rows=5 wrap=virtual name=comment_self>" . $part['comment_self'] . "</textarea>");
+      $tb->tr();
+      $tb->td();
+      $tb->td("<input type=submit value=Registrer title=\"Lagre tilbakemelding...\">"
+              . "<input type=submit name=del value=Slett title=\"Slett tilbakemelding...\" onClick=\"return confirm('Sikkert at du vil slette?');\">");
    }
-   $tb->td($radio);
-   $tb->tr();
-   $error = (isset($part) && $part['stat_self'] == $db->par_stat_no && $isTutti && strlen($part['comment_self']) < 4) ? "<br><font color=red>Permisjonsbegrunnelse mangler!</font>" : '';
-   $description = $isTutti ? "Begrunnelse:$error" : "Kommentar:";
-   $placeholder = $isTutti ? "Angi begrunnelse for å søke permisjon. Sensitive opplysninger? Send mail direkte til gruppeleder." : "Oppgi eventuell tilleggsinformasjon som du ønsker skal bli tatt med i vurderingen";
-   $tb->td($description);
-   $tb->td("<textarea title=\"$placeholder\" placeholder=\"$placeholder\" cols=30 rows=5 wrap=virtual name=comment_self>" . $part['comment_self'] . "</textarea>");
-   $tb->tr();
-   $tb->td();
-   $tb->td("<input type=submit value=Registrer title=\"Lagre tilbakemelding...\">"
-           . "<input type=submit name=del value=Slett title=\"Slett tilbakemelding...\" onClick=\"return confirm('Sikkert at du vil slette?');\">");
-}
-else
-{
-   $tb->td("Registrert svar:");
-   if (isset($part))
-      $tb->td('<b>' . $db->par_stat[$part['stat_self']] . '</b>');
-   $tb->tr();
-   $tb->td('Kommentar:');
-   if (isset($part))
-      $tb->td('<b>' . str_replace("\n", "<br>\n", $part['comment_self']) . '</b>');
-}
-unset($tb);
-unset($form);
-
-$query = "select firstname, lastname, email "
-        . "from person "
-        . "where id = "
-        . "(select id_person from person, instruments, groups "
-        . "where person.id_instruments = instruments.id "
-        . "and instruments.id_groups = groups.id "
-        . "and person.id = " . $whoami->id() . ")";
-$stmt = $db->query($query);
-$glead = $stmt->fetch(PDO::FETCH_ASSOC);
-
-If ($prj['deadline'] < time())
-{
-   echo "Har det skjedd endringer som påvirker deltagelsen din på dette prosjektet, send mail til gruppelederen din ";
-   echo "<a href=\"mailto:?to=" . $glead['email'] . "&subject=OSO: $project_name\">" . $glead['firstname'] . " " . $glead['lastname'] . "</a> ";
-   echo "som vil videreformidle en innstilling om dette til styret.<br>\n";
-}
-echo "Dersom du må søke permisjon for ett helt semester eller mer, send mail til ";
-echo "<a href=\"mailto:?to=" . $glead['email'] . "&subject=OSO permisjonssøknad\">gruppeleder</a>. ";
-
-echo "<h2>Deltakerstatus</h2>";
-
-$lstatus = on_leave($id_person, $prj['semester'], $prj['year']);
-
-if ($lstatus == $db->lea_stat_registered)
-{
-   echo "<img border=0 src=\"images/yellball.gif\">";
-   echo "Du har søkt om langtidspermisjon i samme semester som prosjektet pågår.<br>\n";
-}
-if ($lstatus == $db->lea_stat_granted)
-{
-   echo "<img border=0 src=\"images/ball_red.gif\">";
-   echo "Du har fått innvilget langtidspermisjon i samme semester som prosjektet pågår.<br>\n";
-}
-if ($lstatus == $db->lea_stat_rejected)
-{
-   echo "<img border=0 src=\"images/ball_pin.gif\">";
-   echo "Du har fått avslått søknad om langtidspermisjon i samme semester som prosjektet pågår.<br>\n";
-}
-
-if ($part['stat_inv'] == $db->par_stat_yes)
-{
-   if ($prj['orchestration'] == $db->prj_orch_tutti)
+   else
    {
-      if ($part['stat_reg'] != $db->par_stat_void)
-      {
-         echo "<img border=0 src=\"images/part_stat_" . $part['stat_reg'] . ".gif\">";
-         echo "<b>" . strftime('%e.%m', $part['ts_reg']) . " Sekretær:</b> ";
-         if ($part['stat_reg'] == $db->par_stat_no)
-            echo ": Permisjonssøknad mottatt: " . $part['comment_reg'];
-         if ($part['stat_reg'] == $db->par_stat_tentative)
-            echo ": Tentativt: " . $part['comment_reg'];
-         if ($part['stat_reg'] == $db->par_stat_can)
-            echo ": Kan være med hvis behov: " . $part['comment_reg'];
-         if ($part['stat_reg'] == $db->par_stat_yes)
-            echo ": Vil gjærne være med på prosjektet: " . $part['comment_reg'];
-         echo "<br>\n";
-      }
+      $tb->td("Registrert svar:");
+      if (isset($part))
+         $tb->td('<b>' . $db->par_stat[$part['stat_self']] . '</b>');
+      $tb->tr();
+      $tb->td('Kommentar:');
+      if (isset($part))
+         $tb->td('<b>' . str_replace("\n", "<br>\n", $part['comment_self']) . '</b>');
+   }
+   unset($tb);
+   unset($form);
 
-      echo "<img border=0 src=\"images/part_stat_" . $part['stat_final'] . ".gif\">";
-      echo "<b>";
-      if ($part['stat_final'] != $db->par_stat_void)
-         echo strftime('%e.%m', $part['ts_final']);
-      echo " Styret:</b> ";
-      if ($part['stat_final'] == $db->par_stat_void)
-         echo "Endelig besetning vil bli bestemt når styret har behandlet saken etter at permisjonsfristen har gått ut.<br>\n";
-      if ($part['stat_final'] == $db->par_stat_no)
-         echo "Du har fått innvilget permisjon til dette prosjektet.<br>\n";
-      if ($part['stat_final'] == $db->par_stat_yes)
-         echo ": Du er med på dette prosjektet.<br>\n";
+   $query = "select firstname, lastname, email "
+           . "from person "
+           . "where id = "
+           . "(select id_person from person, instruments, groups "
+           . "where person.id_instruments = instruments.id "
+           . "and instruments.id_groups = groups.id "
+           . "and person.id = " . $whoami->id() . ")";
+   $stmt = $db->query($query);
+   $glead = $stmt->fetch(PDO::FETCH_ASSOC);
+
+   If ($prj['deadline'] < time())
+   {
+      echo "Har det skjedd endringer som påvirker deltagelsen din på dette prosjektet, send mail til gruppelederen din ";
+      echo "<a href=\"mailto:?to=" . $glead['email'] . "&subject=OSO: $project_name\">" . $glead['firstname'] . " " . $glead['lastname'] . "</a> ";
+      echo "som vil videreformidle en innstilling om dette til styret.<br>\n";
+   }
+   echo "Dersom du må søke permisjon for ett helt semester eller mer, send mail til ";
+   echo "<a href=\"mailto:?to=" . $glead['email'] . "&subject=OSO permisjonssøknad\">gruppeleder</a>. ";
+
+   echo "<h2>Deltakerstatus</h2>";
+
+   $lstatus = on_leave($id_person, $prj['semester'], $prj['year']);
+
+   if ($lstatus == $db->lea_stat_registered)
+   {
+      echo "<img border=0 src=\"images/yellball.gif\">";
+      echo "Du har søkt om langtidspermisjon i samme semester som prosjektet pågår.<br>\n";
+   }
+   if ($lstatus == $db->lea_stat_granted)
+   {
+      echo "<img border=0 src=\"images/ball_red.gif\">";
+      echo "Du har fått innvilget langtidspermisjon i samme semester som prosjektet pågår.<br>\n";
+   }
+   if ($lstatus == $db->lea_stat_rejected)
+   {
+      echo "<img border=0 src=\"images/ball_pin.gif\">";
+      echo "Du har fått avslått søknad om langtidspermisjon i samme semester som prosjektet pågår.<br>\n";
    }
 
-   if ($prj['orchestration'] == $db->prj_orch_reduced)
+   if ($part['stat_inv'] == $db->par_stat_yes)
    {
-      if ($part['stat_reg'] != $db->par_stat_void)
+      if ($prj['orchestration'] == $db->prj_orch_tutti)
       {
-         echo "<img border=0 src=\"images/part_stat_" . $part['stat_reg'] . ".gif\">";
-         echo "<b>" . strftime('%e.%m', $part['ts_reg']) . " Sekretær:</b> ";
-         if ($part['stat_reg'] == $db->par_stat_no)
-            echo ": Kan ikke være med: " . $part['comment_reg'];
-         if ($part['stat_reg'] == $db->par_stat_tentative)
-            echo ": Tentativt: " . $part['comment_reg'];
-         if ($part['stat_reg'] == $db->par_stat_can)
-            echo ": Kan være med hvis behov: " . $part['comment_reg'];
-         if ($part['stat_reg'] == $db->par_stat_yes)
-            echo ": Vil gjerne være med på prosjektet: " . $part['comment_reg'];
-         echo "<br>\n";
+         if ($part['stat_reg'] != $db->par_stat_void)
+         {
+            echo "<img border=0 src=\"images/part_stat_" . $part['stat_reg'] . ".gif\">";
+            echo "<b>" . strftime('%e.%m', $part['ts_reg']) . " Sekretær:</b> ";
+            if ($part['stat_reg'] == $db->par_stat_no)
+               echo ": Permisjonssøknad mottatt: " . $part['comment_reg'];
+            if ($part['stat_reg'] == $db->par_stat_tentative)
+               echo ": Tentativt: " . $part['comment_reg'];
+            if ($part['stat_reg'] == $db->par_stat_can)
+               echo ": Kan være med hvis behov: " . $part['comment_reg'];
+            if ($part['stat_reg'] == $db->par_stat_yes)
+               echo ": Vil gjærne være med på prosjektet: " . $part['comment_reg'];
+            echo "<br>\n";
+         }
+
+         echo "<img border=0 src=\"images/part_stat_" . $part['stat_final'] . ".gif\">";
+         echo "<b>";
+         if ($part['stat_final'] != $db->par_stat_void)
+            echo strftime('%e.%m', $part['ts_final']);
+         echo " Styret:</b> ";
+         if ($part['stat_final'] == $db->par_stat_void)
+            echo "Endelig besetning vil bli bestemt når styret har behandlet saken etter at permisjonsfristen har gått ut.<br>\n";
+         if ($part['stat_final'] == $db->par_stat_no)
+            echo "Du har fått innvilget permisjon til dette prosjektet.<br>\n";
+         if ($part['stat_final'] == $db->par_stat_yes)
+            echo ": Du er med på dette prosjektet.<br>\n";
       }
 
-      echo "<img border=0 src=\"images/part_stat_" . $part['stat_final'] . ".gif\">";
-      echo "<b>";
-      if ($part['stat_final'] != $db->par_stat_void)
-         echo strftime('%e.%m', $part['ts_final']);
-      echo " Styret:</b> ";
-      if ($part['stat_final'] == $db->par_stat_void)
+      if ($prj['orchestration'] == $db->prj_orch_reduced)
       {
-         if ($prj['status'] == $db->prj_stat_internal)
-            echo "Vi ser frem til å høre fra deg...";
-         else
-            echo "Orkesteruttaket er ikke ferdigbehandlet.<br>\n";
+         if ($part['stat_reg'] != $db->par_stat_void)
+         {
+            echo "<img border=0 src=\"images/part_stat_" . $part['stat_reg'] . ".gif\">";
+            echo "<b>" . strftime('%e.%m', $part['ts_reg']) . " Sekretær:</b> ";
+            if ($part['stat_reg'] == $db->par_stat_no)
+               echo ": Kan ikke være med: " . $part['comment_reg'];
+            if ($part['stat_reg'] == $db->par_stat_tentative)
+               echo ": Tentativt: " . $part['comment_reg'];
+            if ($part['stat_reg'] == $db->par_stat_can)
+               echo ": Kan være med hvis behov: " . $part['comment_reg'];
+            if ($part['stat_reg'] == $db->par_stat_yes)
+               echo ": Vil gjerne være med på prosjektet: " . $part['comment_reg'];
+            echo "<br>\n";
+         }
+
+         echo "<img border=0 src=\"images/part_stat_" . $part['stat_final'] . ".gif\">";
+         echo "<b>";
+         if ($part['stat_final'] != $db->par_stat_void)
+            echo strftime('%e.%m', $part['ts_final']);
+         echo " Styret:</b> ";
+         if ($part['stat_final'] == $db->par_stat_void)
+         {
+            if ($prj['status'] == $db->prj_stat_internal)
+               echo "Vi ser frem til å høre fra deg...";
+            else
+               echo "Orkesteruttaket er ikke ferdigbehandlet.<br>\n";
+         }
+         if ($part['stat_final'] == $db->par_stat_no)
+            echo ": Du er ikke tatt ut for å være med på dette prosjektet.<br>\n";
+         if ($part['stat_final'] == $db->par_stat_yes)
+            echo ": Du er tatt ut til å være med på dette prosjektet.<br>\n";
       }
-      if ($part['stat_final'] == $db->par_stat_no)
-         echo ": Du er ikke tatt ut for å være med på dette prosjektet.<br>\n";
-      if ($part['stat_final'] == $db->par_stat_yes)
-         echo ": Du er tatt ut til å være med på dette prosjektet.<br>\n";
+   }
+   else
+   {
+      echo "<img border=0 src=\"images/part_stat_" . $part['stat_inv'] . ".gif\">";
+      echo "<b>Styret:</b> ";
+      echo "Du er ikke en del av besetningen på dette prosjektet.<br>\n";
    }
 }
-else
-{
-   echo "<img border=0 src=\"images/part_stat_" . $part['stat_inv'] . ".gif\">";
-   echo "<b>Styret:</b> ";
-   echo "Du er ikke en del av besetningen på dette prosjektet.<br>\n";
-}
-
 $help = "Klikk for å registrere en ny tilbakemelding.\nTilbakemeldingen kan endres frem til det blir markert som lest av styret";
 $button = "<img src=images/cross_re.gif title=\"$help\">";
 $link = $access->auth(AUTH::FEEDBACK) ? "<a href=\"feedbackReg.php?_action=new&id_project=$id_project\">$button</a> " : "";
 
-echo "<h2>Tilbakemelding $link</h2>";
+// echo "<h2>Tilbakemelding $link</h2>";
 
 $query = "select id, ts, status, comment "
         . "from feedback "
