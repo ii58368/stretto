@@ -140,6 +140,11 @@ class DB extends myPDO
    public $per_sex_female = 2;
    public $per_sex = array("Ukjent", "Mann", "Kvinne");
    public $per_sex2 = array('', "M", "F");
+// field: fee
+   public $per_fee_free = 0;
+   public $per_fee_reduced = 1;
+   public $per_fee_full = 2;
+   public $per_fee = array("Fritatt", "Redusert", "Full");
    
 // field: status_dir
    public $per_dir_avail = 0;

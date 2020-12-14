@@ -64,7 +64,7 @@ function select_sex($selected)
 {
    global $db;
 
-   $str .= "<select name=sex title=\"Velg kjønn\">\n";
+   $str = "<select name=sex title=\"Velg kjønn\">\n";
 
    for ($i = 0; $i < count($db->per_sex); $i++)
    {
@@ -72,6 +72,26 @@ function select_sex($selected)
       if ($selected == $i)
          $str .= " selected";
       $str .= ">" . $db->per_sex[$i] . "</option>\n";
+   }
+
+   $str .= "</select>";
+
+   return $str;
+}
+
+function select_fee($selected)
+{
+   global $db;
+
+   $str = "<input type=hidden name=fee_old value=$selected>\n";
+   $str .= "<select name=fee title=\"Velg medlemskontingent\">\n";
+
+   for ($i = 0; $i < count($db->per_fee); $i++)
+   {
+      $str .= "<option value=$i";
+      if ($selected == $i)
+         $str .= " selected";
+      $str .= ">" . $db->per_fee[$i] . "</option>\n";
    }
 
    $str .= "</select>";
@@ -130,14 +150,14 @@ if ($action == 'update_pers')
       {
          $query = "insert into person (id_instruments, firstname, middlename, lastname, sex, address, 
               postcode, city, email, uid, password, def_pos, 
-              phone1, phone2, phone3, status, birthday, comment)
+              phone1, phone2, phone3, status, fee, birthday, comment)
               values (" . request('id_instruments') . ", " . $db->qpost('firstname') . ", 
                       " . $db->qpost('middlename') . ", " . $db->qpost('lastname') . ", " . request('sex') . ", " . $db->qpost('address') . ",
                       " . request('postcode') . ", " . $db->qpost('city') . ", " . $db->qpost('email') . ",
                       " . $db->qpost('email') . ", MD5('OSO'),
                       " . request('def_pos') . ",
                       " . $db->qpost('phone1') . ", " . $db->qpost('phone2') . ", " . $db->qpost('phone3') . ", 
-                      " . $db->qpost('status') . ", $birthday, " . $db->qpost('comment') . ")";
+                      " . $db->qpost('status') . ", " .$db->qpost('fee') . ", $birthday, " . $db->qpost('comment') . ")";
          $db->query($query);
          $no = $db->lastInsertId();
          $db->query("insert into record (ts, status, comment, id_person) " .
@@ -180,6 +200,7 @@ if ($action == 'update_pers')
                     "birthday = $birthday,";
             if ($access->auth(AUTH::MEMB_RW))
                $query .= "status = " . request('status') . "," .
+                       "fee = " . request('fee') . "," .
                        "id_instruments = " . request('id_instruments') . ",";
             $query .= "comment = " . $db->qpost('comment') . " " .
                     "where id = $no";
@@ -187,6 +208,9 @@ if ($action == 'update_pers')
             if (request('status') != request('status_old'))
                $db->query("insert into record (ts, status, comment, id_person) " .
                        "values ($now, $db->rec_stat_info, 'Ny status: " . $db->per_stat[request('status')] . "', $no)");
+            if (request('fee') != request('fee_old'))
+               $db->query("insert into record (ts, status, comment, id_person) " .
+                       "values ($now, $db->rec_stat_info, 'Endret medlemskontingent: " . $db->per_fee[request('fee')] . "', $no)");
          }
       }
    } catch (PDOException $ex)
@@ -272,6 +296,9 @@ $row = array(
     'middlename' => '',
     'lastname' => '',
     'uid' => '',
+    'sex' => ' ',
+    'fee' => $db->per_fee_free,
+    'def_pos' => 0,
     'address' => '',
     'postcode' => 0,
     'city' => '',
@@ -280,6 +307,7 @@ $row = array(
     'phone2' => '',
     'phone3' => '',
     'status' => $db->per_stat_apply,
+    'fee' => $db->per_fee_free,
     'comment' => '',
     'comment_dir' => '',
     'birthday' => 0,
@@ -288,7 +316,7 @@ $row = array(
 if (!is_null($no))
 {
    $query = "SELECT person.id as id, id_instruments, instrument, firstname, middlename, lastname, " .
-           "sex, uid, address, postcode, city, def_pos, " .
+           "sex, fee, uid, address, postcode, city, def_pos, " .
            "email, phone1, phone2, phone3, status, person.comment as comment, " .
            "comment_dir, status_dir, birthday " .
            "FROM person, instruments " .
@@ -382,6 +410,12 @@ if ($action == 'edit_pers')
    else
       $tb->td($db->per_stat[$row['status']]);
    $tb->tr();
+   $tb->td("Medlemskontingent:");
+   if ($access->auth(AUTH::MEMB_RW))
+      $tb->td(select_fee($row['fee']));
+   else
+      $tb->td($db->per_fee[$row['fee']]);
+   $tb->tr();
    $tb->td("Fødselsdag:");
    $tb->td("<input type=date name=birthday size=15 value=\"" . date('Y-m-d', $row['birthday']) . "\" title=\"(frivillig) Eks: 10 jan 2017\">");
    $tb->tr();
@@ -428,6 +462,9 @@ else
    $tb->tr();
    $tb->td("Status:");
    $tb->td($db->per_stat[$row['status']]);
+   $tb->tr();
+   $tb->td("Medlemskontingent:");
+   $tb->td($db->per_fee[$row['fee']]);
    $tb->tr();
    $tb->td("Fødselsdag:");
    $tb->td(strftime('%e. %b %Y', $row['birthday']));
