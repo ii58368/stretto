@@ -41,7 +41,8 @@ require_once 'form.php';
             require 'menu.php';
             require 'page.php';
 
-            $access->page_deny();
+            $access->reject_if_unauth();
+            $access->confirm_pers_info();
             ?>
 
 

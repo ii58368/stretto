@@ -7,6 +7,9 @@ $personList = "person.php";
 if ($sort == NULL)
    $sort = 'list_order,-def_pos+desc,lastname,firstname';
 
+if (is_null($no))
+   $no = $whoami->id();
+
 if (!$access->auth(AUTH::MEMB_RW))
 {
    if ($no != $whoami->id())
@@ -44,8 +47,7 @@ function select_status($selected)
    if (is_null($selected))
       $selected = $db->per_stat_standin;
 
-   $str = "<input type=hidden name=status_old value=$selected>\n";
-   $str .= "<select name=status title=\"Medlemsstatus\">\n";
+   $str = "<select name=status title=\"Medlemsstatus\">\n";
 
    for ($i = 0; $i < count($db->per_stat); $i++)
    {
@@ -83,8 +85,7 @@ function select_fee($selected)
 {
    global $db;
 
-   $str = "<input type=hidden name=fee_old value=$selected>\n";
-   $str .= "<select name=fee title=\"Velg medlemskontingent\">\n";
+   $str = "<select name=fee title=\"Velg medlemskontingent\">\n";
 
    for ($i = 0; $i < count($db->per_fee); $i++)
    {
@@ -139,83 +140,141 @@ function select_status_log($selected)
    return $str;
 }
 
-if ($action == 'update_pers')
+function insert_log($status, $text, $person_id = null)
 {
-   $birthday = strtotime($_POST['birthday']);
+   global $db;
+   global $whoami;
+
    $now = strtotime("now");
 
-   try
-   {
-      if ($no == NULL)
-      {
-         $query = "insert into person (id_instruments, firstname, middlename, lastname, sex, address, 
+   if (is_null($person_id))
+      $person_id = $whoami->id();
+
+   $q = "insert into record (ts, status, comment, id_person, id_editor) " .
+           "values ($now, $status, " . $db->quote($text) . ", $person_id, " . $whoami->id() . ")";
+   $db->query($q);
+}
+
+function insert_pers()
+{
+   global $db;
+
+   $birthday = strtotime($_POST['birthday']);
+   $now = strtotime("now");
+   $gdpr_ts = is_null(request('gdpr')) ? 0 : $now;
+
+   $query = "insert into person (id_instruments, firstname, middlename, lastname, sex, address, 
               postcode, city, email, uid, password, def_pos, 
-              phone1, phone2, phone3, status, fee, birthday, comment)
+              phone1, gdpr_ts, status, fee, birthday, comment)
               values (" . request('id_instruments') . ", " . $db->qpost('firstname') . ", 
                       " . $db->qpost('middlename') . ", " . $db->qpost('lastname') . ", " . request('sex') . ", " . $db->qpost('address') . ",
                       " . request('postcode') . ", " . $db->qpost('city') . ", " . $db->qpost('email') . ",
                       " . $db->qpost('email') . ", MD5('OSO'),
                       " . request('def_pos') . ",
-                      " . $db->qpost('phone1') . ", " . $db->qpost('phone2') . ", " . $db->qpost('phone3') . ", 
-                      " . $db->qpost('status') . ", " .$db->qpost('fee') . ", $birthday, " . $db->qpost('comment') . ")";
-         $db->query($query);
-         $no = $db->lastInsertId();
-         $db->query("insert into record (ts, status, comment, id_person) " .
-                 "values ($now, $db->rec_stat_info, 'Ny status: " . $db->per_stat[$_POST['status']] . "', $no)");
+                      " . $db->qpost('phone1') . ", $gdpr_ts,
+                      " . $db->qpost('status') . ", " . request('fee') . ", $birthday, " . $db->qpost('comment') . ")";
+   $db->query($query);
+
+   $no = $db->lastInsertId();
+   insert_log($db->rec_stat_info, 'Registret, ny status: ' . $db->per_stat[$_POST['status']], $no);
+
+   return $no;
+}
+
+function log_if_changed($status, $text, $no, $e, $field1, $field2 = null, $field3 = null)
+{
+   $rfield1 = request($field1);
+   if (request($field1) == 'null')
+      $rfield1 = '';
+   if ($rfield1 != $e[$field1] || ($field2 != null && request($field2) != $e[$field2]) || ($field3 != null && request($field3) != $e[$field3]))
+      insert_log($status, $text, $no);
+}
+
+function log_changes($no)
+{
+   global $db;
+   global $access;
+
+   $s = $db->query("select * from person where id = $no");
+   $e = $s->fetch(PDO::FETCH_ASSOC);
+
+   if ($access->auth(AUTH::MEMB_RW))
+   {
+      log_if_changed($db->rec_stat_board, 'Oppdatert Navn', $no, $e, 'firstname', 'middlename', 'lastname');
+      log_if_changed($db->rec_stat_board, 'Oppdatert stemmegruppe', $no, $e, 'id_instruments');
+      log_if_changed($db->rec_stat_board, 'Oppdatert standard stemme/plassering', $no, $e, 'def_pos');
+      log_if_changed($db->rec_stat_info, 'Ny status: ' . $db->per_stat[request('status')], $no, $e, 'status');
+      log_if_changed($db->rec_stat_board, 'Endret medlemskontingent fra ' . $db->per_fee[$e['fee']] . ' til ' . $db->per_fee[request('fee')], $no, $e, 'fee');
+   }
+   if (is_null(request('gdpr')) && $e['gdpr_ts'] > 0)
+      insert_log($db->rec_stat_board, "Aksepterer ikke lenger at OSO kan behandle min kontaktinformasjonen for spesifikke formål.");
+   if (!is_null(request('gdpr')) && $e['gdpr_ts'] == 0)
+      insert_log($db->rec_stat_board, "Samtykker til at OSO kan behandle min kontaktinformasjonen for spesifikke formål.");
+   log_if_changed($db->rec_stat_board, 'Oppdatert adresse', $no, $e, 'address', 'postcode', 'city');
+   log_if_changed($db->rec_stat_board, 'Oppdatert e-post adresse', $no, $e, 'email');
+   log_if_changed($db->rec_stat_board, 'Oppdatert telefonnummer', $no, $e, 'phone1');
+   log_if_changed($db->rec_stat_board, 'Oppdatert kommentar', $no, $e, 'comment');
+}
+
+function update_pers($no)
+{
+   global $delete;
+   global $access;
+   global $db;
+   global $action;
+   global $whoami;
+
+   if ($delete != NULL)
+   {
+      $s = $db->query("select id_person from participant where id_person = $no");
+      if ($s->rowCount() > 0)
+      {
+         echo "<font color=red>Kan ikke slettes siden vedkommende allerede har vært med på et prosjekt!</font>";
+         $action = 'view';
+         $delete = null;
       }
       else
       {
-         if ($delete != NULL)
-         {
-            $s = $db->query("select id from participant where id_person = $no");
-            if ($s->rowCount() > 0)
-            {
-               echo "<font color=red>Kan ikke slettes siden vedkommende allerede har vært med på et prosjekt!</font>";
-            }
-            else
-            {
-               $db->query("delete from record where id_person = $no");
-               $query = "DELETE FROM person WHERE id = $no";
-               $result = $db->query($query);
-               $no = NULL;
-               update_htpasswd();
-            }
-         }
-         else
-         {
-            $query = "update person set ";
-            if ($access->auth(AUTH::MEMB_RW))
-               $query .= "firstname = " . $db->qpost('firstname') . "," .
-                       "middlename = " . $db->qpost('middlename') . "," .
-                       "lastname = " . $db->qpost('lastname') . "," .
-                       "sex = " . request('sex') . "," .
-                       "def_pos = " . request('def_pos') . ",";
-            $query .= "address = " . $db->qpost('address') . "," .
-                    "postcode = " . request('postcode') . "," .
-                    "city = " . $db->qpost('city') . "," .
-                    "email = " . $db->qpost('email') . "," .
-                    "phone1 = " . $db->qpost('phone1') . "," .
-                    "phone2 = " . $db->qpost('phone2') . "," .
-                    "phone3 = " . $db->qpost('phone3') . "," .
-                    "birthday = $birthday,";
-            if ($access->auth(AUTH::MEMB_RW))
-               $query .= "status = " . request('status') . "," .
-                       "fee = " . request('fee') . "," .
-                       "id_instruments = " . request('id_instruments') . ",";
-            $query .= "comment = " . $db->qpost('comment') . " " .
-                    "where id = $no";
-            $db->query($query);
-            if (request('status') != request('status_old'))
-               $db->query("insert into record (ts, status, comment, id_person) " .
-                       "values ($now, $db->rec_stat_info, 'Ny status: " . $db->per_stat[request('status')] . "', $no)");
-            if (request('fee') != request('fee_old'))
-               $db->query("insert into record (ts, status, comment, id_person) " .
-                       "values ($now, $db->rec_stat_info, 'Endret medlemskontingent: " . $db->per_fee[request('fee')] . "', $no)");
-         }
+         $db->query("delete from record where id_person = $no");
+         $query = "DELETE FROM person WHERE id = $no";
+         $result = $db->query($query);
+         $no = NULL;
+         update_htpasswd();
       }
-   } catch (PDOException $ex)
+   }
+   else
    {
-      echo "<font color=red>Failed to update</font>";
+      $birthday = strtotime($_POST['birthday']);
+      $now = strtotime("now");
+      $gdpr_ts = is_null(request('gdpr')) ? 0 : $now;
+
+      log_changes($no);
+
+      $query = "update person set ";
+      if ($access->auth(AUTH::MEMB_RW))
+         $query .= "firstname = " . $db->qpost('firstname') . "," .
+                 "middlename = " . $db->qpost('middlename') . "," .
+                 "lastname = " . $db->qpost('lastname') . "," .
+                 "sex = " . request('sex') . "," .
+                 "def_pos = " . request('def_pos') . ",";
+      $query .= "address = " . $db->qpost('address') . "," .
+              "postcode = " . request('postcode') . "," .
+              "city = " . $db->qpost('city') . "," .
+              "email = " . $db->qpost('email') . "," .
+              "phone1 = " . $db->qpost('phone1') . "," .
+              "birthday = $birthday,";
+      if ($whoami->id() == $no)
+      {
+         $query .= "confirmed_ts = $now," .
+                 "gdpr_ts = $gdpr_ts,";
+      }
+      if ($access->auth(AUTH::MEMB_RW))
+         $query .= "status = " . request('status') . "," .
+                 "fee = " . request('fee') . "," .
+                 "id_instruments = " . request('id_instruments') . ",";
+      $query .= "comment = " . $db->qpost('comment') . " " .
+              "where id = $no";
+      $db->query($query);
    }
 }
 
@@ -279,12 +338,16 @@ function update_pwd($no)
    {
       echo "<font color=red>Failed to update</font>";
    }
-   $stmt = $db->query("select uid from person where id = $no");
-   $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+   insert_log($db->rec_stat_board, "Oppdatert passord", $no);
 
    update_htpasswd();
 }
 
+if ($action == 'update_pers')
+   update_pers($no);
+if ($action == 'insert_pers')
+   $no = insert_pers();
 if ($action == 'update_pwd')
    update_pwd($no);
 
@@ -296,7 +359,7 @@ $row = array(
     'middlename' => '',
     'lastname' => '',
     'uid' => '',
-    'sex' => ' ',
+    'sex' => $db->per_sex_unknown,
     'fee' => $db->per_fee_free,
     'def_pos' => 0,
     'address' => '',
@@ -304,21 +367,24 @@ $row = array(
     'city' => '',
     'email' => '',
     'phone1' => '',
-    'phone2' => '',
-    'phone3' => '',
     'status' => $db->per_stat_apply,
     'fee' => $db->per_fee_free,
     'comment' => '',
     'comment_dir' => '',
     'birthday' => 0,
+    'gdpr_ts' => 0,
+    'confirmed_ts' => 0
 );
 
-if (!is_null($no))
+$do_lookup = !($action == 'new_pers' || ($action == 'update_pers' && !is_null($delete)));
+
+if ($do_lookup)
 {
    $query = "SELECT person.id as id, id_instruments, instrument, firstname, middlename, lastname, " .
            "sex, fee, uid, address, postcode, city, def_pos, " .
-           "email, phone1, phone2, phone3, status, person.comment as comment, " .
-           "comment_dir, status_dir, birthday " .
+           "email, phone1, status, person.comment as comment, " .
+           "comment_dir, status_dir, birthday, " .
+           "gdpr_ts, confirmed_ts " .
            "FROM person, instruments " .
            "where id_instruments = instruments.id " .
            "and person.id = $no";
@@ -334,19 +400,34 @@ if (!is_null($no))
    $stmt2 = $db->query($query2);
 }
 
-$person = is_null($no) ? "Ny person" : $row['firstname'] . " " . $row['middlename'] . " " . $row['lastname'];
 $postcode = sprintf("%04d", $row['postcode']);
 
-echo "<h1>$person</h1>\n";
-
-echo "Oversikt over dine personopplysninger. Disse kan du oppdatere forløpende. 
-	Her bestemmer du brukernavn og passord for din bruker. <p>";
+if ($action == 'new_pers')
+{
+   echo "<h1>Ny person</h1>\n";
+   echo "Ta gjerne en sjekk på om personen finnes fra før du registrerer en ny.";
+}
+else
+{
+   if (is_null($delete))
+   {
+      echo "<h1>" . $row['firstname'] . " " . $row['middlename'] . " " . $row['lastname'] . "</h1>\n";
+      echo "Oversikt over dine personopplysninger. Disse kan du oppdatere forløpende. 
+	Her bestemmer du brukernavn og passord for din bruker.";
+   }
+   else
+   {
+      echo "<h1>Slettet</h1>";
+   }
+}
+echo "<p>\n";
 
 if ($access->auth(AUTH::MEMB_RW))
 {
    echo "<a href=\"person.php?_sort=$sort&f_status[]=$db->per_stat_member&f_status[]=$db->per_stat_eng&f_status[]=$db->per_stat_standin\" title=\"Til adresselisten...\"><img src=\"images/index.gif\" border=0 hspace=5></a>\n";
-   echo "<a href=\"$php_self?_sort=$sort&_action=edit_pers\" title=\"Registrere ny person...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
-   echo "<a href=\"access.php?f_person=$no\" title=\"Endre tilgang...\"><img src=\"images/stop_red.gif\" border=0 hspace=5 vspace=5></a>\n";
+   echo "<a href=\"$php_self?_sort=$sort&_action=new_pers\" title=\"Registrere ny person...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
+   if ($action != 'new_pers' && is_null($delete))
+      echo "<a href=\"access.php?f_person=$no\" title=\"Endre tilgang...\"><img src=\"images/stop_red.gif\" border=0 hspace=5 vspace=5></a>\n";
 }
 
 $form = new FORM();
@@ -354,15 +435,16 @@ $tb = new TABLE('id=no_border');
 
 $tb->th("Personalia", "style=\"text-align:left\"");
 
-if ($action == 'edit_pers')
+if ($action == 'edit_pers' || $action == 'new_pers')
 {
+   $action_next = ($action == 'edit_pers') ? 'update_pers' : 'insert_pers';
    $cell = "<input type=hidden name=_sort value='$sort'>
         <input type=hidden name=_no value='$no'>
-        <input type=hidden name=_action value=update_pers>
+        <input type=hidden name=_action value='$action_next'>
         <input type=submit value=\"Lagre\">\n";
-   if ($no != null && $access->auth(AUTH::MEMB_RW))
+   if ($action != 'new_pers' && $access->auth(AUTH::MEMB_RW))
       $cell .= "<input type=hidden name=uid value=\"" . $row['uid'] . "\">
-        <input type=submit name=_delete value=slett title=\"Kan slettes fra medlemsregisteret dersom vedkommende ikke har vært med på noen prosjekter\">\n";
+        <input type=submit name=_delete value=slett title=\"Kan slettes fra medlemsregisteret dersom vedkommende ikke har vært med på noen prosjekter\" onClick=\"return confirm('Sikkert at du vil slette?');\">\n";
    $tb->th($cell, "style=\"text-align:left\"");
    $tb->tr();
    $tb->td("Navn:");
@@ -399,10 +481,8 @@ if ($action == 'edit_pers')
    $tb->td("Mail:");
    $tb->td("<input type=text name=email size=40 value=\"" . $row['email'] . "\" title=\"Mailadresse\">");
    $tb->tr();
-   $tb->td("Telefon:");
-   $tb->td("mob:<input type=text name=phone1 size=12 value=\"" . $row['phone1'] . "\" title=\"Mobilnummer\">
-          priv:<input type=text name=phone2 size=12 value=\"" . $row['phone2'] . "\" title=\"Privat (fasttelefon)\">
-          jobb:<input type=text name=phone3 size=12 value=\"" . $row['phone3'] . "\" title=\"Evt. telefonnummer arbeidssted\">");
+   $tb->td("Mobil:");
+   $tb->td("<input type=text name=phone1 size=12 value=\"" . $row['phone1'] . "\" title=\"Mobilnummer\">");
    $tb->tr();
    $tb->td("Status:");
    if ($access->auth(AUTH::MEMB_RW))
@@ -411,23 +491,31 @@ if ($action == 'edit_pers')
       $tb->td($db->per_stat[$row['status']]);
    $tb->tr();
    $tb->td("Medlemskontingent:");
-   if ($access->auth(AUTH::MEMB_RW))
-      $tb->td(select_fee($row['fee']));
-   else
-      $tb->td($db->per_fee[$row['fee']]);
+   $tb->td(select_fee($row['fee']));
    $tb->tr();
    $tb->td("Fødselsdag:");
-   $tb->td("<input type=date name=birthday size=15 value=\"" . date('Y-m-d', $row['birthday']) . "\" title=\"(frivillig) Eks: 10 jan 2017\">");
+   $tb->td("<input type=date name=birthday size=15 value=\"" . date('Y-m-d', $row['birthday']) . "\" title=\"Nødvendig for å kunne rapportere VO-midler\">");
    $tb->tr();
+   if ($whoami->id() == $no)
+   {
+      $tb->td("Samtykke:");
+      $checked = ($row['gdpr_ts'] > strtotime("-1 year")) ? 'checked' : '';
+      $tb->td("<input type=checkbox name=gdpr $checked \" title=\"Kryss av for å godkjenne samtykke.\">"
+              . "Samtykker til at OSO kan behandle min informasjonen min for spesifikke formål, og jeg kan trekke tilbake samtykket når som helst. "
+              . "<a href=\"personvern.pdf\">Personvern</a><br>"
+              . "Det er viktig for OSO at du godkjenner samtykke for at orkesteret skal få økonomisk støtte gjennom VO-midler");
+      $tb->tr();
+   }
    $tb->td("Kommentar:");
    $tb->td("<input type=text name=comment size=50 value=\"" . $row['comment'] . "\" title=\"Legg inn eventuell kommentar\">");
 }
 else
 {
-   $tb->th("<input type=hidden name=_sort value='$sort'>
+   $cell = ($do_lookup) ? "<input type=hidden name=_sort value='$sort'>
         <input type=hidden name=_no value='$no'>
         <input type=hidden name=_action value=edit_pers>
-        <input type=submit value=\"Endre\" title=\"Klikk for for å endre personalia...\">", "style=\"text-align:left\"");
+        <input type=submit value=\"Endre\" title=\"Klikk for for å endre personalia...\">" : "";
+   $tb->th($cell, "style=\"text-align:left\"");
    $tb->tr();
    $tb->td("Navn:");
    $tb->td($row['firstname'] . " " . $row['middlename'] . " " . $row['lastname']);
@@ -435,8 +523,7 @@ else
    if ($access->auth(AUTH::MEMB_RW))
    {
       $tb->td("Kjønn:");
-      $sex = (is_null($row['sex'])) ? $db->per_sex_unknown : $row['sex'];
-      $tb->td($db->per_sex[$sex]);
+      $tb->td($row['sex'] != '' ? $db->per_sex[$row['sex']] : '');
       $tb->tr();
    }
    $tb->td("Instrument:");
@@ -454,12 +541,6 @@ else
    $tb->td("Mobil:");
    $tb->td($row['phone1']);
    $tb->tr();
-   $tb->td("Privat:");
-   $tb->td($row['phone2']);
-   $tb->tr();
-   $tb->td("Jobb:");
-   $tb->td($row['phone3']);
-   $tb->tr();
    $tb->td("Status:");
    $tb->td($db->per_stat[$row['status']]);
    $tb->tr();
@@ -469,6 +550,16 @@ else
    $tb->td("Fødselsdag:");
    $tb->td(strftime('%e. %b %Y', $row['birthday']));
    $tb->tr();
+   $tb->td("Samtykke:");
+   $cell = ($row['gdpr_ts'] > strtotime("-1 year")) ? "Samtykker til at OSO kan behandle informasjonen min for spesifikke formål, og jeg kan trekke tilbake samtykket når som helst." : 'Aksepterer ikke at OSO kan behandle informasjonen min for spesifikke formål';
+   $tb->td($cell);
+   $tb->tr();
+   if ($access->auth(AUTH::MEMB_RW))
+   {
+      $tb->td("Oppdatert:");
+      $tb->td(strftime('%e. %b %Y', $row['confirmed_ts']));
+      $tb->tr();
+   }
    $tb->td("Kommentar:");
    $tb->td($row['comment']);
 }
@@ -476,7 +567,7 @@ else
 unset($tb);
 unset($form);
 
-if (!is_null($no))
+if ($do_lookup)
 {
    echo "<p>\n";
    $form = new FORM();
@@ -522,98 +613,109 @@ if (!is_null($no))
    unset($form);
 }
 
-
-echo "<h3>Logg</h3>";
-if ($access->auth(AUTH::MEMB_RW))
+if ($do_lookup)
 {
-   $form = new FORM();
-   echo "<input type=hidden name=_sort value=\"$sort\">
+   echo "<h3>Logg</h3>";
+   if ($access->auth(AUTH::MEMB_RW))
+   {
+      $form = new FORM();
+      echo "<input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=_no value='$no'>
       <input type=hidden name=_action value=new_log>
       <input type=submit value=\"Legg til\" title=\"Loggføring av medlemsinformasjon...\">";
-   unset($form);
-}
-
-$form = new FORM();
-$tb = new TABLE('id=no_border');
-
-if ($access->auth(AUTH::MEMB_RW))
-   $tb->th("Edit");
-$tb->th("Dato");
-$tb->th("Type");
-$tb->th("Tekst");
-
-$rno = request('_rno');
-
-if ($action == 'new_log')
-{
-   $tb->tr();
-   $tb->td("<input type=hidden name=_action value=update_log>
-    <input type=hidden name=_sort value=\"$sort\">
-    <input type=hidden name=_no value=$no>
-    <input type=submit value=ok title=\"Klikk for registrering...\">", 'align=left');
-   $tb->td("<input type=date size=15 value=\"" . date('Y-m-d') . "\" name=ts title=\"Dato for registrering (Eks.: 17. oct 17)\">");
-   $tb->td(select_status_log(null));
-   $tb->td("<textarea cols=60 rows=3 wrap=virtual name=comment title=\"Logginfo\"></textarea>");
-}
-
-if ($action == 'update_log' && $access->auth(AUTH::MEMB_RW))
-{
-   $ts = strtotime(request('ts'));
-
-   if (is_null($rno))
-      $query = "insert into record (ts, status, comment, id_person) " .
-              "values ($ts, " . request('status') . ", " . $db->qpost('comment') . ", $no)";
-   else
-   {
-      if (!is_null($delete))
-      {
-         $query = "delete from record where id = " . request('_rno');
-      }
-      else
-      {
-         $query = "update record set ts = $ts," .
-                 "status = " . request('status') . "," .
-                 "comment = " . $db->qpost('comment') . " " .
-                 "where id = $rno";
-      }
-      $rno = null;
+      unset($form);
    }
-   $db->query($query);
-}
 
-$query = "select id, ts, status, comment "
-        . "from record "
-        . "where id_person = $no ";
-if (!$access->auth(AUTH::BOARD_RO))
-   $query .= "and status = $db->rec_stat_info ";
-$query .= "order by ts";
+   $form = new FORM();
+   $tb = new TABLE('id=no_border');
 
-$stmt = $db->query($query);
+   if ($access->auth(AUTH::MEMB_RW))
+      $tb->th("Edit");
+   $tb->th("Dato");
+   $tb->th("Type");
+   $tb->th("Tekst");
 
-foreach ($stmt as $row)
-{
-   if ($row['id'] != $rno)
-   {
-      $tb->tr();
-      if ($access->auth(AUTH::MEMB_RW))
-         $tb->td("<a href=\"$php_self?_sort=$sort&_action=view_log&_rno=" . $row['id'] . "&_no=$no\"><img src=\"images/cross_re.gif\" border=0></a>", 'align=left');
-      $tb->td(strftime('%e. %b %Y', $row['ts']));
-      $tb->td($db->rec_stat[$row['status']]);
-      $tb->td(str_replace("\n", "<br>\n", $row['comment']));
-   }
-   else
+   $rno = request('_rno');
+
+   if ($action == 'new_log')
    {
       $tb->tr();
       $tb->td("<input type=hidden name=_action value=update_log>
+    <input type=hidden name=_sort value=\"$sort\">
+    <input type=hidden name=_no value=$no>
+    <input type=submit value=ok title=\"Klikk for registrering...\">", 'align=left');
+      $tb->td("<input type=date size=15 value=\"" . date('Y-m-d') . "\" name=ts title=\"Dato for registrering (Eks.: 17. oct 17)\">");
+      $tb->td(select_status_log(null));
+      $tb->td("<textarea cols=60 rows=3 wrap=virtual name=comment title=\"Logginfo\"></textarea>");
+   }
+
+   if ($action == 'update_log' && $access->auth(AUTH::MEMB_RW))
+   {
+      $ts = strtotime(request('ts'));
+
+      if (is_null($rno))
+         $query = "insert into record (ts, status, comment, id_person, id_editor) " .
+                 "values ($ts, " . request('status') . ", " . $db->qpost('comment') . ", $no, " . $whoami->id() . ")";
+      else
+      {
+         if (!is_null($delete))
+         {
+            $query = "delete from record where id = " . request('_rno');
+         }
+         else
+         {
+            $query = "update record set ts = $ts," .
+                    "status = " . request('status') . "," .
+                    "comment = " . $db->qpost('comment') . ", " .
+                    "id_editor = " . $whoami->id() . " " .
+                    "where id = $rno";
+         }
+         $rno = null;
+      }
+      $db->query($query);
+   }
+
+   $query = "select record.id as id, "
+           . "record.ts as ts, "
+           . "record.status as status, "
+           . "record.comment as comment, "
+           . "person.firstname as firstname, "
+           . "person.lastname as lastname "
+           . "from record left join person "
+           . "on record.id_editor = person.id "
+           . "where record.id_person = $no ";
+   if (!$access->auth(AUTH::BOARD_RO))
+      $query .= "and status = $db->rec_stat_info ";
+   $query .= "order by ts desc";
+
+   $stmt = $db->query($query);
+
+   foreach ($stmt as $row)
+   {
+      if ($row['id'] != $rno)
+      {
+         $tb->tr();
+         if ($access->auth(AUTH::MEMB_RW))
+         {
+            $title = "Click to edit...\nLast changed by " . $row['firstname'] . " " . $row['lastname'];
+            $tb->td("<a href=\"$php_self?_sort=$sort&_action=view_log&_rno=" . $row['id'] . "&_no=$no\" title=\"$title\"><img src=\"images/cross_re.gif\" border=0></a>", 'align=left');
+         }
+         $tb->td(strftime('%e. %b %Y', $row['ts']));
+         $tb->td($db->rec_stat[$row['status']]);
+         $tb->td(str_replace("\n", "<br>\n", $row['comment']));
+      }
+      else
+      {
+         $tb->tr();
+         $tb->td("<input type=hidden name=_action value=update_log>
     <input type=hidden name=_sort value='$sort'>
     <input type=hidden name=_rno value=$rno>
     <input type=hidden name=_no value=$no>
     <input type=submit value=ok>
       <input type=submit value=del name=_delete onClick=\"return confirm('Sikkert at du vil slette?');\">", 'no_wrap');
-      $tb->td("<input type=date size=15 name=ts value=\"" . date('Y-m-d', $row['ts']) . "\" title=\"Eks: 10 dec 201\">");
-      $tb->td(select_status_log($row['status']));
-      $tb->td("<textarea cols=60 rows=3 wrap=virtual name=comment>" . $row['comment'] . "</textarea>");
+         $tb->td("<input type=date size=15 name=ts value=\"" . date('Y-m-d', $row['ts']) . "\" title=\"Eks: 10 dec 201\">");
+         $tb->td(select_status_log($row['status']));
+         $tb->td("<textarea cols=60 rows=3 wrap=virtual name=comment>" . $row['comment'] . "</textarea>");
+      }
    }
 }
-

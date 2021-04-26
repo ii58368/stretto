@@ -43,7 +43,7 @@ class AUTH
    const RES_FIN = 34; // Resources available, decided, r/w
    const LEAVE_RO = 35; // Leave r/o
    const ABS_ALL = 36; // Absence, for all participants, not only for a group e.g. violin 1
-   const MEMB_GREP = 37; // List of memeber, possible to select filter
+   const MEMB_GREP = 37; // List of member, possible to select filter
    const CONS = 38; // concert schedule, r/w
    const EVENT = 39; // What´s on?
    const RES_INV = 40; // Resources line-up, registered by art director r/w
@@ -56,6 +56,7 @@ class AUTH
    const NO_VIEWS = 46;
 
    private $access;
+   protected $confirmed_ts;  // retreived for real_uid
 
    function __construct()
    {
@@ -69,6 +70,8 @@ class AUTH
       {
          $this->access = ($this->access & $su_bit) | ($this->auth_access($whoami->uid()) & ~$su_bit);
       }
+
+      $this->confirmed_ts = $this->auth_confirm_ts($whoami->real_uid());
    }
 
    /* PHP 5.6+
@@ -91,10 +94,27 @@ class AUTH
       return $acc;
    }
 
+   private function auth_confirm_ts($uid)
+   {
+      global $db;
+
+      if (is_null($uid))
+         return 0;
+
+      $q = "select confirmed_ts "
+              . "from person "
+              . "where uid = '$uid'";
+
+      $s = $db->query($q);
+      $e = $s->fetch(PDO::FETCH_ASSOC);
+
+      return $e['confirmed_ts'];
+   }
+
    private function auth_access($uid)
    {
       global $db;
-      
+
       if (is_null($uid))
          return 0;
 
@@ -106,9 +126,9 @@ class AUTH
       $stmt = $db->query($query);
 
       $access = 0;
-      foreach ($stmt as $row)
+      foreach ($stmt as $e)
       {
-         $access |= $row['access'];
+         $access |= $e['access'];
       }
 
       return $access;
@@ -141,12 +161,12 @@ class AUTH
 
       return $this->auth_bit($auth);
    }
-   
+
    public function auth_uid()
    {
       $uid = func_get_arg(0);
       $access = $this->auth_access($uid);
-      
+
       $auth = 0;
 
       for ($i = 1; $i < func_num_args(); $i++)
@@ -154,7 +174,7 @@ class AUTH
 
       return ($access & $auth);
    }
-   
+
 }
 
 class ACCESS extends AUTH
@@ -164,8 +184,8 @@ class ACCESS extends AUTH
 
    public function page_add($filename, $acc)
    {
-      $this->list_ro[$filename] = isset($this->list_ro[$filename]) ? 
-         $this->list_ro[$filename] | $acc : $acc;
+      $this->list_ro[$filename] = isset($this->list_ro[$filename]) ?
+              $this->list_ro[$filename] | $acc : $acc;
    }
 
    private function page_access($page = NULL)
@@ -187,14 +207,93 @@ class ACCESS extends AUTH
       return true;
    }
 
-   public function page_deny()
+   public function reject_if_unauth($a = 0)
    {
-      if ($this->page_access())
-         return;
+      if (!$this->page_access() || !$this->auth($a))
+      {
+         echo "<h1>Permission denied</h1>";
+         echo "Kontakt <a href=\"mailto:sekretar@oslosymfoniorkester.no\">Sekretæren</a> for å få nødvendig tilgang";
+         exit(0);
+      }
+   }
 
-      echo "<h1>Permission denied</h1>";
-      echo "Kontakt <a href=\"mailto:sekretar@oslosymfoniorkester.no\">Sekretæren</a> for å få nødvendig tilgang";
-      exit(0);
+   public function confirm_pers_info()
+   {
+      global $whoami;
+      global $db;
+      global $php_self;
+      
+      $url_edit = "personEdit.php";
+      
+      if (request('confirm'))
+      {
+         $this->confirmed_ts = strtotime("now");
+         $q = "update person set confirmed_ts = " . $this->confirmed_ts . " where uid = '" . $whoami->real_uid() . "'";
+         $db->query($q);
+      }
+
+      if ($this->confirmed_ts < strtotime("-6 months"))
+      {
+         if (strstr($php_self, $url_edit) == false)
+         {
+            echo "<h1>Bekreft personalia</h1>\n";
+            echo "Bekreft at personalia er oppdatert<p>\n";
+
+            $q = "SELECT instrument, firstname, middlename, lastname, " .
+                    "fee, address, postcode, city, def_pos, " .
+                    "email, phone1, status, birthday, " .
+                    "gdpr_ts, confirmed_ts " .
+                    "FROM person, instruments " .
+                    "where id_instruments = instruments.id " .
+                    "and person.uid = '" . $whoami->real_uid() . "'";
+
+            $s = $db->query($q);
+            $e = $s->fetch(PDO::FETCH_ASSOC);
+
+            $tb = new TABLE('id=no_border');
+
+            $tb->td("Navn:");
+            $tb->td($e['firstname'] . " " . $e['middlename'] . " " . $e['lastname']);
+            $tb->tr();
+            $tb->td("Instrument:");
+            $tb->td(is_null($e['def_pos'] ? "" : $e['def_pos'] . ". ") . $e['instrument']);
+            $tb->tr();
+            $tb->td("Adresse:");
+            $tb->td($e['address']);
+            $tb->tr();
+            $tb->td("Post:");
+            $tb->td(sprintf("%04d %s", $e['postcode'], $e['city']));
+            $tb->tr();
+            $tb->td("Mail:");
+            $tb->td($e['email']);
+            $tb->tr();
+            $tb->td("Mobil:");
+            $tb->td($e['phone1']);
+            $tb->tr();
+            $tb->td("Status:");
+            $tb->td($db->per_stat[$e['status']]);
+            $tb->tr();
+            $tb->td("Medlemskontingent:");
+            $tb->td($db->per_fee[$e['fee']]);
+            $tb->tr();
+            $tb->td("Fødselsdag:");
+            $tb->td(strftime('%e. %b %Y', $e['birthday']));
+            $tb->tr();
+            $tb->td("Samtykke:");
+            $cell = ($e['gdpr_ts'] > strtotime("-1 year")) 
+                    ? "Samtykker til at OSO kan behandle informasjonen min for spesifikke formål, og jeg kan trekke tilbake samtykket når som helst." 
+                    : 'Aksepterer ikke at OSO kan behandle informasjonen min for spesifikke formål';
+            $tb->td($cell);
+
+            unset($tb);
+
+            echo "<p>";
+            echo "<button style=\"background-color:lightgreen;margin:5px\" onClick=\"window.location.href='$php_self?confirm=true'\">Bekreft personalia</button>";
+            echo "<button onClick=\"window.location.href='$url_edit?_action=edit_pers'\">Endre</button>";
+
+            exit(0);
+         }
+      }
    }
 
 }

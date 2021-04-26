@@ -138,7 +138,7 @@ class MENU
          $my_pages->add("Min spilleplan", "myplan.php?id_person=" . $whoami->id(), AUTH::MYPLAN);
          $my_pages->add("Min regi", "myDirection.php", AUTH::MYDIR);
 //         $my_pages->add("Mine tilbakemeldinger", "feedback.php", AUTH::FEEDBACK);
-         $my_pages->add("Mine personopplysninger", "personEdit.php?_no=" . $whoami->id(), AUTH::PERS, AUTH::MEMB_RW);
+         $my_pages->add("Mine personopplysninger", "personEdit.php" , AUTH::PERS, AUTH::MEMB_RW);
       }
       {
          $direction = new SUBMENU("class=\"dl-submenu\"");

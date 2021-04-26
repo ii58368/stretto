@@ -131,7 +131,25 @@ function get_filter_as_url()
       foreach (request('f_project') as $f_project)
          $filter .= "&f_project[]=$f_project";
 
+   if (!is_null(request('showlog')))
+      $filter .= "&showlog=true";
+
    return $filter;
+}
+
+function date2str($ts, $limit)
+{
+   if ($ts == 0 || $ts == -3600)
+      return ($limit < 0) ? '' : '<font color=red>Ubekreftet</font>';
+
+   $sdate = strftime('%e. %b %Y', $ts);
+
+   if ($limit < 0)
+      return $sdate;
+   if ($ts < $limit)
+      return "<font color=red>$sdate</font>";
+
+   return $sdate;
 }
 
 echo "
@@ -152,8 +170,7 @@ if (!is_null(request('f_project')))
    echo "</h2>\n";
 }
 
-
-$query = person_query();
+$query = request('showlog') ? log_query(request('logg')) : person_query();
 
 $stmt = $db->query($query);
 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -161,52 +178,110 @@ $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $f_filter = get_filter_as_url();
 
 if ($access->auth(AUTH::MEMB_RW))
-   echo "<a href=\"$pedit?_sort=$sort&_action=edit_pers$f_filter\" title=\"Registrer ny person...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
+   echo "<a href=\"$pedit?_sort=$sort&_action=new_pers$f_filter\" title=\"Registrer ny person...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
 
 echo "<a href=\"person_pdf.php?_sort=list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"PDF versjon...\"><img src=images/pdf.jpeg height=22 border=0 hspace=5 vspace=5></a>\n";
 
-if ($access->auth(AUTH::MEMB_RW, AUTH::MEMB_GREP))
+if ($access->auth(AUTH::MEMB_RW))
 {
    send_mail($result);
+}
+if ($access->auth(AUTH::CONT_RO))
+{
    echo "<a href=\"personExcel.php?_sort=$sort&$f_filter\" ><img border=0 src=images/excel.png height=20 hspace=5 vspace=5 title=\"Excel fil for innrapportering til VO...\"></a>\n";
-   echo "<form action=\"$php_self\" method=post>\n";
+}
+
+echo "<form action=\"$php_self\" method=post>\n";
+if ($access->auth(AUTH::MEMB_GREP))
+{
    select_filter();
    echo "<font color=green>" . count($result) . " treff</font>\n";
-   echo "</form>\n";
 }
+if ($access->auth(AUTH::MEMB_RW))
+{
+   echo "<input type=checkbox name=showlog title=\"Vis logg\" onChange=\"submit();\"";
+   if (!is_null(request('showlog')))
+      echo " checked";
+   echo ">\n";
+}
+echo "</form>\n";
 
 $tb = new TABLE('border=1');
 
 if ($access->auth(AUTH::MEMB_RW))
    $tb->th('Edit');
 
-$tb->th("<a href=\"$php_self?_sort=list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på instrumentgruppe...\">Instrument</a>");
-$tb->th("<a href=\"$php_self?_sort=firstname,lastname$f_filter\" title=\"Sorter på fornavn...\">For</a>/
-                          <a href=\"$php_self?_sort=lastname,firstname$f_filter\" title=\"Sorter på etternavn...\">Etternavn</a>");
-$tb->th("<a href=\"$php_self?_sort=address,lastname,firstname$f_filter\" title=\"Sorter på addresse...\">Adresse</a>");
-$tb->th("<a href=\"$php_self?_sort=postcode,lastname,firstname$f_filter\" title=\"Sorter på postnummer...\">Postnr</a>");
-$tb->th("<a href=\"$php_self?_sort=city,lastname,firstname$f_filter\" title=\"Sorter på sted...\">Sted</a>");
-$tb->th("Email");
-$tb->th("Mobil");
-$tb->th("Priv");
-$tb->th("Arbeid");
-$tb->th("<a href=\"$php_self?_sort=status,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på status...\">Status</a>");
-
-reset($result);
-
-foreach ($result as $row)
+if (request('showlog'))
 {
-   $tb->tr();
-   if ($access->auth(AUTH::MEMB_RW))
-      $tb->td("<a href=\"$pedit?_sort=$sort&_action=view&_no=" . $row['id'] . $f_filter . "\"><img src=\"images/cross_re.gif\" border=0 title=\"Editere person...\"></a>", 'align=center');
-   $tb->td($row['instrument']);
-   $tb->td($row['firstname'] . " " . $row['middlename'] . " " . $row['lastname']);
-   $tb->td($row['address']);
-   $tb->td(sprintf("%04d", $row['postcode']));
-   $tb->td($row['city']);
-   $tb->td("<a href=\"mailto:" . $row['email'] . "?subject=OSO:\">" . $row['email'] . "</a>");
-   $tb->td(format_phone($row['phone1']), 'nowrap');
-   $tb->td($row['phone2']);
-   $tb->td($row['phone3']);
-   $tb->td($db->per_stat[$row['status']]);
+   $access->reject_if_unauth(AUTH::MEMB_GREP);
+   
+   $tb->th("<a href=\"$php_self?_sort=list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på instrumentgruppe...\">Instrument</a>");
+   $tb->th("<a href=\"$php_self?_sort=firstname,lastname$f_filter\" title=\"Sorter på fornavn...\">For</a>/
+                          <a href=\"$php_self?_sort=lastname,firstname$f_filter\" title=\"Sorter på etternavn...\">Etternavn</a>");
+   $tb->th("<a href=\"$php_self?_sort=list_order,uid$f_filter\" title=\"Sorter på Bruker-id...\">UID</a>");
+   $tb->th("<a href=\"$php_self?_sort=status,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på status...\">Status</a>");
+   $tb->th("<a href=\"$php_self?_sort=birthday$f_filter\" title=\"Sorter på Fødselsdag...\">Fødtselsdag</a>");
+   $tb->th("<a href=\"$php_self?_sort=fee,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på type kontingent...\">Kontingent</a>");
+   $tb->th("<a href=\"$php_self?_sort=gdpr_ts,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på dato for samtykke...\">Samtykke</a>");
+   $tb->th("<a href=\"$php_self?_sort=confirmed_ts,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på dato for bekreftelse av personopplysninger...\">Oppdatert</a>");
+   $tb->th("Kommentar");
+   $tb->th("<a href=\"$php_self?_sort=$sort$f_filter&logg=full\" title=\"Vis full logg\">Logg</a>");
+
+   $old_id = 0;
+   $log = '';
+
+   foreach ($stmt as $row)
+   {
+      if ($old_id != $row['id'])
+      {
+         if ($old_id != 0)
+            $tb->td($log);
+
+         $tb->tr();
+         if ($access->auth(AUTH::MEMB_RW))
+            $tb->td("<a href=\"$pedit?_sort=$sort&_action=view&_no=" . $row['id'] . $f_filter . "\"><img src=\"images/cross_re.gif\" border=0 title=\"Editere person...\"></a>", 'align=center');
+         $tb->td($row['instrument']);
+         $tb->td($row['firstname'] . ' ' . $row['middlename'] . ' ' . $row['lastname']);
+         $tb->td($row['uid']);
+         $tb->td($db->per_stat[$row['status']]);
+         $tb->td(date2str($row['birthday'], -1), 'align=right');
+         $tb->td($db->per_fee[$row['fee']]);
+         $tb->td(date2str($row['gdpr_ts'], strtotime("-1 year")), 'align=right');
+         $tb->td(date2str($row['confirmed_ts'], strtotime("-6 months")), 'align=right');
+         $tb->td($row['comment']);
+         $old_id = $row['id'];
+         $log = '';
+      }
+      if ($row['rts'] > 0)
+         $log .= strftime('%e. %b %Y', $row['rts']) . ' ' . $row['rcomment'] . "<br>\n";
+   }
+}
+else
+{
+   $tb->th("<a href=\"$php_self?_sort=list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på instrumentgruppe...\">Instrument</a>");
+   $tb->th("<a href=\"$php_self?_sort=firstname,lastname$f_filter\" title=\"Sorter på fornavn...\">For</a>/
+                          <a href=\"$php_self?_sort=lastname,firstname$f_filter\" title=\"Sorter på etternavn...\">Etternavn</a>");
+   $tb->th("<a href=\"$php_self?_sort=address,lastname,firstname$f_filter\" title=\"Sorter på addresse...\">Adresse</a>");
+   $tb->th("<a href=\"$php_self?_sort=postcode,lastname,firstname$f_filter\" title=\"Sorter på postnummer...\">Postnr</a>");
+   $tb->th("<a href=\"$php_self?_sort=city,lastname,firstname$f_filter\" title=\"Sorter på sted...\">Sted</a>");
+   $tb->th("Email");
+   $tb->th("Mobil");
+   $tb->th("<a href=\"$php_self?_sort=status,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på status...\">Status</a>");
+
+   reset($result);
+
+   foreach ($result as $row)
+   {
+      $tb->tr();
+      if ($access->auth(AUTH::MEMB_RW))
+         $tb->td("<a href=\"$pedit?_sort=$sort&_action=view&_no=" . $row['id'] . $f_filter . "\"><img src=\"images/cross_re.gif\" border=0 title=\"Editere person...\"></a>", 'align=center');
+      $tb->td($row['instrument']);
+      $tb->td($row['firstname'] . " " . $row['middlename'] . " " . $row['lastname']);
+      $tb->td($row['address']);
+      $tb->td(sprintf("%04d", $row['postcode']));
+      $tb->td($row['city']);
+      $tb->td("<a href=\"mailto:" . $row['email'] . "?subject=OSO:\">" . $row['email'] . "</a>");
+      $tb->td(format_phone($row['phone1']), 'nowrap');
+      $tb->td($db->per_stat[$row['status']]);
+   }
 }
