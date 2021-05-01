@@ -491,7 +491,8 @@ if ($action == 'edit_pers' || $action == 'new_pers')
       $tb->td($db->per_stat[$row['status']]);
    $tb->tr();
    $tb->td("Medlemskontingent:");
-   $tb->td(select_fee($row['fee']));
+   $fee_selectable  = ($row['status'] == $db->per_stat_member) || $access->auth(AUTH::MEMB_RW);
+   $tb->td($fee_selectable ? select_fee($row['fee']) : $db->per_fee[$row['fee']]);
    $tb->tr();
    $tb->td("Fødselsdag:");
    $tb->td("<input type=date name=birthday size=15 value=\"" . date('Y-m-d', $row['birthday']) . "\" title=\"Nødvendig for å kunne rapportere VO-midler\">");
