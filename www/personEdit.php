@@ -503,7 +503,7 @@ if ($action == 'edit_pers' || $action == 'new_pers')
       $checked = ($row['gdpr_ts'] > strtotime("-1 year")) ? 'checked' : '';
       $tb->td("<input type=checkbox name=gdpr $checked \" title=\"Kryss av for å godkjenne samtykke.\">"
               . "Samtykker til at OSO kan behandle min informasjonen min for spesifikke formål, og jeg kan trekke tilbake samtykket når som helst. "
-              . "<a href=\"personvern.pdf\">Personvern</a><br>"
+              . "<a href=\"Personvernerklaering_Oslo_symfoniorkester_v1.pdf\">Personvern</a><br>"
               . "Det er viktig for OSO at du godkjenner samtykke for at orkesteret skal få økonomisk støtte gjennom VO-midler");
       $tb->tr();
    }
