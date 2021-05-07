@@ -235,6 +235,7 @@ function update_pers($no)
       }
       else
       {
+         $db->query("delete from auth_person where id_person = $no");
          $db->query("delete from record where id_person = $no");
          $query = "DELETE FROM person WHERE id = $no";
          $result = $db->query($query);

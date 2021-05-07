@@ -212,11 +212,11 @@ if ($access->auth(AUTH::MEMB_RW))
    $tb->th('Edit');
 
 if (request('showlog') && $access->auth(AUTH::MEMB_GREP))
-{   
+{
    $tb->th("<a href=\"$php_self?_sort=list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på instrumentgruppe...\">Instrument</a>");
    $tb->th("<a href=\"$php_self?_sort=firstname,lastname$f_filter\" title=\"Sorter på fornavn...\">For</a>/
                           <a href=\"$php_self?_sort=lastname,firstname$f_filter\" title=\"Sorter på etternavn...\">Etternavn</a>");
-   $tb->th("<a href=\"$php_self?_sort=list_order,uid$f_filter\" title=\"Sorter på Bruker-id...\">UID</a>");
+   $tb->th("<a href=\"$php_self?_sort=uid$f_filter\" title=\"Sorter på Bruker-id...\">UID</a>");
    $tb->th("<a href=\"$php_self?_sort=status,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på status...\">Status</a>");
    $tb->th("<a href=\"$php_self?_sort=birthday$f_filter\" title=\"Sorter på Fødselsdag...\">Fødtselsdag</a>");
    $tb->th("<a href=\"$php_self?_sort=fee,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på type kontingent...\">Kontingent</a>");
@@ -253,6 +253,8 @@ if (request('showlog') && $access->auth(AUTH::MEMB_GREP))
       if ($row['rts'] > 0)
          $log .= strftime('%e. %b %Y', $row['rts']) . ' ' . $row['rcomment'] . "<br>\n";
    }
+   if ($old_id != 0)
+      $tb->td($log);
 }
 else
 {
