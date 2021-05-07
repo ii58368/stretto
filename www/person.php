@@ -170,7 +170,7 @@ if (!is_null(request('f_project')))
    echo "</h2>\n";
 }
 
-$query = request('showlog') ? log_query(request('logg')) : person_query();
+$query = (request('showlog') && $access->auth(AUTH::MEMB_GREP)) ? log_query(request('logg')) : person_query();
 
 $stmt = $db->query($query);
 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -211,10 +211,8 @@ $tb = new TABLE('border=1');
 if ($access->auth(AUTH::MEMB_RW))
    $tb->th('Edit');
 
-if (request('showlog'))
-{
-   $access->reject_if_unauth(AUTH::MEMB_GREP);
-   
+if (request('showlog') && $access->auth(AUTH::MEMB_GREP))
+{   
    $tb->th("<a href=\"$php_self?_sort=list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på instrumentgruppe...\">Instrument</a>");
    $tb->th("<a href=\"$php_self?_sort=firstname,lastname$f_filter\" title=\"Sorter på fornavn...\">For</a>/
                           <a href=\"$php_self?_sort=lastname,firstname$f_filter\" title=\"Sorter på etternavn...\">Etternavn</a>");

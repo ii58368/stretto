@@ -207,9 +207,9 @@ class ACCESS extends AUTH
       return true;
    }
 
-   public function reject_if_unauth($a = 0)
+   public function reject_if_unauth()
    {
-      if (!$this->page_access() || !$this->auth($a))
+      if (!$this->page_access())
       {
          echo "<h1>Permission denied</h1>";
          echo "Kontakt <a href=\"mailto:sekretar@oslosymfoniorkester.no\">Sekretæren</a> for å få nødvendig tilgang";
