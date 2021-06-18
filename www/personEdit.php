@@ -184,6 +184,8 @@ function insert_pers()
 function log_if_changed($status, $text, $no, $e, $field1, $field2 = null, $field3 = null)
 {
    $rfield1 = request($field1);
+   if (is_null($rfield1))
+      return;
    if (request($field1) == 'null')
       $rfield1 = '';
    if ($rfield1 != $e[$field1] || ($field2 != null && request($field2) != $e[$field2]) || ($field3 != null && request($field3) != $e[$field3]))
@@ -198,18 +200,20 @@ function log_changes($no)
    $s = $db->query("select * from person where id = $no");
    $e = $s->fetch(PDO::FETCH_ASSOC);
 
-   if ($access->auth(AUTH::MEMB_RW))
-   {
-      log_if_changed($db->rec_stat_board, 'Oppdatert Navn', $no, $e, 'firstname', 'middlename', 'lastname');
-      log_if_changed($db->rec_stat_board, 'Oppdatert stemmegruppe', $no, $e, 'id_instruments');
-      log_if_changed($db->rec_stat_board, 'Oppdatert standard stemme/plassering', $no, $e, 'def_pos');
+   log_if_changed($db->rec_stat_board, 'Oppdatert Navn', $no, $e, 'firstname', 'middlename', 'lastname');
+   log_if_changed($db->rec_stat_board, 'Oppdatert stemmegruppe', $no, $e, 'id_instruments');
+   log_if_changed($db->rec_stat_board, 'Oppdatert standard stemmegruppeplassering', $no, $e, 'def_pos');
+   
+   if (request('status'))
       log_if_changed($db->rec_stat_info, 'Ny status: ' . $db->per_stat[request('status')], $no, $e, 'status');
+   if (request('fee'))
       log_if_changed($db->rec_stat_board, 'Endret medlemskontingent fra ' . $db->per_fee[$e['fee']] . ' til ' . $db->per_fee[request('fee')], $no, $e, 'fee');
-   }
+ 
    if (is_null(request('gdpr')) && $e['gdpr_ts'] > 0)
       insert_log($db->rec_stat_board, "Aksepterer ikke lenger at OSO kan behandle min kontaktinformasjonen for spesifikke formål.");
    if (!is_null(request('gdpr')) && $e['gdpr_ts'] == 0)
       insert_log($db->rec_stat_board, "Samtykker til at OSO kan behandle min kontaktinformasjonen for spesifikke formål.");
+   
    log_if_changed($db->rec_stat_board, 'Oppdatert adresse', $no, $e, 'address', 'postcode', 'city');
    log_if_changed($db->rec_stat_board, 'Oppdatert e-post adresse', $no, $e, 'email');
    log_if_changed($db->rec_stat_board, 'Oppdatert telefonnummer', $no, $e, 'phone1');
@@ -270,9 +274,10 @@ function update_pers($no)
                  "gdpr_ts = $gdpr_ts,";
       }
       if ($access->auth(AUTH::MEMB_RW))
-         $query .= "status = " . request('status') . "," .
-                 "fee = " . request('fee') . "," .
-                 "id_instruments = " . request('id_instruments') . ",";
+         $query .= "status = " . request('status') . ",";
+      $query .= "fee = " . request('fee') . ",";
+      if ($access->auth(AUTH::MEMB_RW))
+         $query .= "id_instruments = " . request('id_instruments') . ",";
       $query .= "comment = " . $db->qpost('comment') . " " .
               "where id = $no";
       $db->query($query);
@@ -343,6 +348,13 @@ function update_pwd($no)
    insert_log($db->rec_stat_board, "Oppdatert passord", $no);
 
    update_htpasswd();
+}
+
+function get_gdpr($gdpr_ts)
+{
+   if ($gdpr_ts > strtotime("-1 year"))
+      return "Samtykker til at OSO kan behandle informasjonen min for spesifikke formål, og jeg kan trekke tilbake samtykket når som helst.";
+   return "Aksepterer <b>ikke</b> at OSO kan behandle informasjonen min for spesifikke formål";
 }
 
 if ($action == 'update_pers')
@@ -498,16 +510,21 @@ if ($action == 'edit_pers' || $action == 'new_pers')
    $tb->td("Fødselsdag:");
    $tb->td("<input type=date name=birthday size=15 value=\"" . date('Y-m-d', $row['birthday']) . "\" title=\"Nødvendig for å kunne rapportere VO-midler\">");
    $tb->tr();
+   $tb->td("Samtykke:");
    if ($whoami->id() == $no)
    {
-      $tb->td("Samtykke:");
       $checked = ($row['gdpr_ts'] > strtotime("-1 year")) ? 'checked' : '';
-      $tb->td("<input type=checkbox name=gdpr $checked \" title=\"Kryss av for å godkjenne samtykke.\">"
+      $cell = "<input type=checkbox name=gdpr $checked title=\"Kryss av for å godkjenne samtykke.\">"
               . "Samtykker til at OSO kan behandle min informasjonen min for spesifikke formål, og jeg kan trekke tilbake samtykket når som helst. "
               . "<a href=\"Personvernerklaering_Oslo_symfoniorkester_v1.pdf\">Personvern</a><br>"
-              . "Det er viktig for OSO at du godkjenner samtykke for at orkesteret skal få økonomisk støtte gjennom VO-midler");
-      $tb->tr();
+              . "Det er viktig for OSO at du godkjenner samtykke for at orkesteret skal få økonomisk støtte gjennom VO-midler";
    }
+   else
+   {
+      $cell = get_gdpr($row['gdpr_ts']);
+   }
+   $tb->td($cell);
+   $tb->tr();
    $tb->td("Kommentar:");
    $tb->td("<input type=text name=comment size=50 value=\"" . $row['comment'] . "\" title=\"Legg inn eventuell kommentar\">");
 }
@@ -553,8 +570,7 @@ else
    $tb->td(strftime('%e. %b %Y', $row['birthday']));
    $tb->tr();
    $tb->td("Samtykke:");
-   $cell = ($row['gdpr_ts'] > strtotime("-1 year")) ? "Samtykker til at OSO kan behandle informasjonen min for spesifikke formål, og jeg kan trekke tilbake samtykket når som helst." : 'Aksepterer ikke at OSO kan behandle informasjonen min for spesifikke formål';
-   $tb->td($cell);
+   $tb->td(get_gdpr($row['gdpr_ts']));
    $tb->tr();
    if ($access->auth(AUTH::MEMB_RW))
    {
