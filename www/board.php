@@ -2,6 +2,13 @@
 
 require 'framework.php';
 
+function echof($t)
+{
+   $t2 = str_replace("\n", "<br>\n", $t);
+   echo replace_links($t2);
+}
+
+
 if ($action == 'update' && $access->auth(AUTH::GRP))
 {
    $query = "update groups set info = " . $db->qpost('info') . " "
@@ -40,8 +47,7 @@ foreach ($stmt as $row)
          if ($row['id'] != $no)
          {
             echo "<a href=\"$php_self?_sort=$sort&_action=view&_no=" . $row['id'] . "\" title=\"Endre tekst...\"><img src=\"images/cross_re.gif\" border=0></a> ";
-            $info = str_replace("\n", "<br>\n", $row['info']);
-            echo replace_links($info);
+            echof($row['info']);
          }
          else
          {
@@ -50,6 +56,10 @@ foreach ($stmt as $row)
             . "<input type=submit value=ok title=\"Lagre endringer\"><br>\n";
             echo "<textarea cols=60 rows=7 wrap=virtual name=info title=\"Fritekst\">" . $row['info'] . "</textarea>";
          }
+      }
+      else
+      {
+         echof($row['info']);
       }
       echo "<p>";
       $tb = new TABLE('id=no_border');
