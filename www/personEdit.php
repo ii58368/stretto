@@ -271,11 +271,12 @@ function update_pers($no)
       if ($whoami->id() == $no)
       {
          $query .= "confirmed_ts = $now," .
-                 "gdpr_ts = $gdpr_ts,";
+                 "gdpr_ts = IF(gdpr_ts > 0 AND $gdpr_ts > 0, gdpr_ts, $gdpr_ts),";
       }
       if ($access->auth(AUTH::MEMB_RW))
          $query .= "status = " . request('status') . ",";
-      $query .= "fee = " . request('fee') . ",";
+      if (request('fee') != NULL)
+         $query .= "fee = " . request('fee') . ",";
       if ($access->auth(AUTH::MEMB_RW))
          $query .= "id_instruments = " . request('id_instruments') . ",";
       $query .= "comment = " . $db->qpost('comment') . " " .
