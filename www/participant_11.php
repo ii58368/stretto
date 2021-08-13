@@ -3,7 +3,11 @@
 require 'framework.php';
 include_once 'participant_status.php';
 
-$id_person = (is_null(request('id_person'))) ? $whoami->id() : request('id_person');
+$id_person = $whoami->id();
+
+if ($access->auth(AUTH::RES) && request('id_person') != null)
+   $id_person = request('id_person');
+
 $id_project = request('id_project');
 
 function select_reason($selected)
