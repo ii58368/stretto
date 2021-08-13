@@ -8,14 +8,13 @@ echo "<h1>Spilleplan for " . $whoami->name() . "</h1>
      du skal være med på. 
      <p>";
 
-echo "<table><tr>
-      <th>Dato</th>
-      <th>Prøvetid</th>
-      <th>Lokale</th>
-      <th>Prosjekt</th>
-      <th>Merknad</th>
-    </tr>";
+$tb = new TABLE();
 
+$tb->th("Dato");
+$tb->th("Prøvetid");
+$tb->th("Lokale");
+$tb->th("Prosjekt");
+$tb->th("Merknad");
 
 $query = "SELECT plan.id as id, "
         . "plan.date as date, "
@@ -58,37 +57,27 @@ foreach ($stmt as $row)
    $pname = $row['pname'];
    $comment = str_replace("\n", "<br>\n", $row['comment']);
    
-   echo "<tr>";
+   $tb->tr();
+   
+   $tutti = ($row['orchestration'] == $db->prj_orch_reduced) ? '' : '*';
    
    if ($row['stat_final'] == $db->par_stat_void)
    {
       if ($row['orchestration'] == $db->prj_orch_reduced && time() > $row['deadline'])
          continue;
-      echo "<td align=right nowrap>$gfont$date</font></td>"
-              . "<td>$gfont$time</font></td>"
-              . "<td>$gfont$lname $location</font></td>"
-              . "<td>$gfont$pname";
-      if ($row['orchestration'] == $db->prj_orch_reduced)
-         echo '*';
-      echo "</font></td>"
-      . "<td>$gfont$comment</font></td>";
+      $tb->td("$gfont$date</font>", 'align=right nowrap');
+      $tb->td("$gfont$time</font>");
+      $tb->td("$gfont$lname</font>");
+      $tb->td("$gfont$pname$tutti</font>");
+      $tb->td("$gfont$comment</font>");
    }
    else
    {
-      echo "<td align=right nowrap>$date</td>"
-              . "<td>$time</td>";
-      if (strlen($url) > 0)
-         echo "<td><a href=\"$url\">$lname</a> $location</td>";
-      else
-         echo "<td>$lname $location</td>";
-      echo "<td><a href=\"prjInfo.php?id=".$row['id_project']."\">$pname</a>";
-      if ($row['orchestration'] == $db->prj_orch_reduced)
-         echo '*';
-      echo "</td>"
-      . "<td>$comment</td>";     
-   }
-     
-   echo "</tr>";
+      $tb->td("$date", 'align=right nowrap');
+      $tb->td("$time");
+      $hlname = (strlen($url) > 0) ? "<a href=\"$url\">$lname</a>" : $lname;
+      $tb->td("$hlname $location");
+      $tb->td("<a href=\"prjInfo.php?id=".$row['id_project']."\">$pname</a>$tutti");
+      $tb->td("$comment");
+   }    
 }
-
-echo "</table>";
