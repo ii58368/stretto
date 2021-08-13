@@ -152,6 +152,23 @@ function date2str($ts, $limit)
    return $sdate;
 }
 
+function count_person($a)
+{
+   $old_id = 0;
+   $count = 0;
+   
+   foreach ($a as $e)
+   {
+      if ($e['id'] != $old_id)
+      {
+         $count++;
+         $old_id = $e['id'];
+      }
+   }
+   
+   return $count;
+}
+
 echo "
     <h1>Adresseliste</h1>
     Oversikt og kontaktinformasjon til orkesterets medlemmer. 
@@ -191,11 +208,11 @@ if ($access->auth(AUTH::CONT_RO))
    echo "<a href=\"personExcel.php?_sort=$sort&$f_filter\" ><img border=0 src=images/excel.png height=20 hspace=5 vspace=5 title=\"Excel fil for innrapportering til VO...\"></a>\n";
 }
 
-echo "<form action=\"$php_self\" method=post>\n";
+$form = new FORM();
 if ($access->auth(AUTH::MEMB_GREP))
 {
-   select_filter();
-   echo "<font color=green>" . count($result) . " treff</font>\n";
+   select_filter();  
+   echo "<font color=green>" . count_person($result) . " treff</font>\n";
 }
 if ($access->auth(AUTH::MEMB_RW))
 {
@@ -204,7 +221,7 @@ if ($access->auth(AUTH::MEMB_RW))
       echo " checked";
    echo ">\n";
 }
-echo "</form>\n";
+unset($form);
 
 $tb = new TABLE('border=1');
 
