@@ -134,8 +134,8 @@ class MENU
          $my_pages = new SUBMENU("class=\"dl-submenu\"");
          $menu->add("Mine sider", $my_pages);
 
-         $my_pages->add("Mine prosjekter", "participant_1x.php?id=" . $whoami->id(), AUTH::MYPRJ);
-         $my_pages->add("Min spilleplan", "myplan.php?id_person=" . $whoami->id(), AUTH::MYPLAN);
+         $my_pages->add("Mine prosjekter", "participant_1x.php", AUTH::MYPRJ);
+         $my_pages->add("Min spilleplan", "myplan.php", AUTH::MYPLAN);
          $my_pages->add("Min regi", "myDirection.php", AUTH::MYDIR);
 //         $my_pages->add("Mine tilbakemeldinger", "feedback.php", AUTH::FEEDBACK);
          $my_pages->add("Mine personopplysninger", "personEdit.php" , AUTH::PERS, AUTH::MEMB_RW);
