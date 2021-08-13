@@ -2,12 +2,17 @@
 require 'framework.php';
 include_once 'participant_status.php';
 
+$person_id = $whoami->id();
+
+if ($access->auth(AUTH::RES) && request('id') != null)
+   $person_id = request('id');
+
 if (is_null($sort))
    $sort = 'year,semester DESC,id';
 
 $query = "select person.id as id, firstname, lastname, instrument"
         . " from person, instruments"
-        . " where person.id = " . request('id') . " "
+        . " where person.id = $person_id "
         . " and person.id_instruments = instruments.id";
 $stmt = $db->query($query);
 $pers = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -50,7 +55,7 @@ $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
-   list($status, $blink) = participant_status(request('id'), $row['id']);
+   list($status, $blink) = participant_status($person_id, $row['id']);
    
    $lstatus = on_leave($pers['id'], $row['semester'], $row['year']);
    $bgcolor = '';
