@@ -176,7 +176,7 @@ function insert_pers()
    $db->query($query);
 
    $no = $db->lastInsertId();
-   insert_log($db->rec_stat_info, 'Registret, ny status: ' . $db->per_stat[$_POST['status']], $no);
+   insert_log($db->rec_stat_info, 'Registrert, ny status: ' . $db->per_stat[$_POST['status']], $no);
 
    return $no;
 }
