@@ -199,9 +199,10 @@ foreach ($stmt as $row)
     <td align=right><i>Prosjekt:</i></td><td>";
       if ($row['id_project'] > 0)
       {
-         $s = $db->query("select name, semester, year from project where id=" . $row['id_project']);
+         $s = $db->query("select name, semester, year, status from project where id=" . $row['id_project']);
          $e = $s->fetch(PDO::FETCH_ASSOC);
-         echo $e['name'] . " (" . $e['semester'] . "-" . $e['year'] . ")";
+         $pname = $e['name'] . " (" . $e['semester'] . "-" . $e['year'] . ")";
+         echo ($e['status'] == $db->prj_stat_draft) ? $pname : "<a href=prjInfo.php?id=" .$row['id_project'] . ">$pname</a>";
       }
 
       echo "</td>
