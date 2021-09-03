@@ -59,7 +59,7 @@ foreach ($stmt as $row)
    
    $tb->tr();
    
-   $tutti = ($row['orchestration'] == $db->prj_orch_reduced) ? '' : '*';
+   $tutti = ($row['orchestration'] == $db->prj_orch_reduced) ? '*' : '';
    
    if ($row['stat_final'] == $db->par_stat_void)
    {
