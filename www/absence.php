@@ -68,7 +68,7 @@ if ($access->auth(AUTH::ABS_ALL))
            . "and person.id = participant.id_person "
            . "and plan.id_project = ".request('id_project')." "
            . "and plan.event_type = $db->plan_evt_rehearsal "
-           . "order by " . str_replace("+", " ", $sort) . ",plan.date";
+           . "order by " . str_replace("+", " ", $sort) . ",plan.date,plan.id";
 }
 else
 {
@@ -84,7 +84,7 @@ else
            . "and person.id = participant.id_person "
            . "and plan.id_project = ".request('id_project')." "
            . "and plan.event_type = $db->plan_evt_rehearsal "
-           . "order by " . str_replace("+", " ", $sort) . ",plan.date";
+           . "order by " . str_replace("+", " ", $sort) . ",plan.date,plan.id";
 
 }
 
