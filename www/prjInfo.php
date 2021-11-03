@@ -14,8 +14,9 @@ if ($prj['status'] == $db->prj_stat_canceled)
 echo "<h2>".$prj['name']." ".$prj['semester']."-".$prj['year']."<a href=prjinfo_pdf.php?id=".request('id')." title=\"PDF versjon\"><img src=images/pdf.jpeg height=30></a></h2>\n";
 echo str_replace("\n", "<br>\n", $prj['info']) . "\n";
 
-echo "<h3>Repertoar</h3>
-    <table id=\"no_border\">\n";
+echo "<h3>Repertoar</h3>";
+   
+$tb = new TABLE('id=no_border');
 
 $query = "SELECT title, work, firstname, lastname, "
         . " music.comment as comment, "
@@ -30,13 +31,15 @@ $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
-   echo "<tr><td valign=top>".$row['firstname']." ".$row['lastname'].":</td><td>".$row['title']."<br>".$row['r_comment']."</td>";
+   $tb->td($row['firstname'] . ' ' . $access->hyperlink("repository.php?search=" . urlencode($row['lastname']), $row['lastname'], 'valign=top'));
+   $tb->td($row['title']."<br>".$row['r_comment']);
    if (strlen($row['work']) > 0)
-      echo "<td valign=top>fra ".$row['work']."</td>";
-   echo "<td valign=top>".$row['comment']."</td>\n";
-   echo "</tr>\n";
+      $tb->td("fra ".$row['work'], 'valign=top');
+   $tb->td($row['comment'], 'valign=top');
+   $tb->tr();
 }
-echo "</table><p>\n";
+
+unset($tb);
 
 echo "<h3>Prøveplan</h3>
     <table id=\"no_border\">
