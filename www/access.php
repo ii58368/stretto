@@ -20,16 +20,16 @@ if ($action == 'delete')
 
 $sort_view = "view.name,view.id";
 if (is_null($sort))
-  $sort = "list_order, lastname, firstname, $sort_view";
+  $sort = "list_order,lastname,firstname,$sort_view";
 
-echo "
-    <h1>Tilgang</h1>
-    <table border=1>
-    <tr>
-      <th><a href=$php_self?_sort=firstname,lastname,$sort_view title=\"Sorter p&aring; fornavn\">Fornavn</a>/
-                          <a href=$php_self?_sort=lastname,firstname,$sort_view title=\"Sorter p&aring; etternavn\">Etternavn</a></th>
-      <th><a href=$php_self?_sort=list_order,lastname,firstname,$sort_view title=\"Sorter p&aring; instrumentgruppe\">Instrument</a></th>
-      <th><a href=$php_self?_sort=status,list_order,lastname,firstname,$sort_view title=\"Sorter p&aring; status\">Status</a></th>";
+echo "<h1>Tilgang</h1>";
+
+$tb = new TABLE('border=');
+
+$tb->th("<a href=$php_self?_sort=firstname,lastname,$sort_view title=\"Sorter p&aring; fornavn\">Fornavn</a>/
+                          <a href=$php_self?_sort=lastname,firstname,$sort_view title=\"Sorter p&aring; etternavn\">Etternavn</a>");
+$tb->th("<a href=$php_self?_sort=list_order,lastname,firstname,$sort_view title=\"Sorter p&aring; instrumentgruppe\">Instrument</a>");
+$tb->th("<a href=$php_self?_sort=status,list_order,lastname,firstname,$sort_view title=\"Sorter p&aring; status\">Status</a>");
  
 $query  = "SELECT name " .
           "FROM view " .
@@ -37,21 +37,21 @@ $query  = "SELECT name " .
 $stmt = $db->query($query);
 
 foreach($stmt as $row)
-  echo "<th>".$row['name']."</td>";
-echo "</tr><tr>";
+  $tb->th($row['name']);
 
-$query  = "SELECT person.id as person_id, " .
-          "view.id as view_id,  " .
-          "view.name as view_name, " .
-          "firstname, lastname, instrument, status, " .
-          "view.comment as view_comment " .
-          "FROM person, instruments, view " .
-          "where instruments.id = id_instruments ";
+$query  = "SELECT person.id as person_id, "
+          . "view.id as view_id,  "
+          . "view.name as view_name, "
+          . "firstname, lastname, instrument, status, "
+          . "view.comment as view_comment "
+          . "FROM person, instruments, view "
+          . "where instruments.id = id_instruments ";
 if (is_null($f_person))
    $query .= "and not person.status = $db->per_stat_quited ";
 else
    $query .= "and person.id = $f_person ";
 $query .= "order by $sort";
+
 $stmt = $db->query($query);
 
 $prev_id = 0;
@@ -60,9 +60,10 @@ foreach($stmt as $row)
 {
   if ($row['person_id'] != $prev_id)
   {
-    echo "</tr><tr><td nowrap><a href=\"personEdit.php?_no=".$row['person_id']."\" title=\"Gå til personopplysninger...\">".$row['firstname']." ".$row['lastname']."</a>";   
-    echo "</td><td>".$row['instrument']."</td>";
-    echo "</td><td>" . $db->per_stat[$row['status']] . "</td>";
+    $tb->tr();
+    $tb->td("<a href=\"personEdit.php?_no=".$row['person_id']."\" title=\"Gå til personopplysninger...\">".$row['firstname']." ".$row['lastname']."</a>", 'nowrap');
+    $tb->td($row['instrument']);
+    $tb->td($db->per_stat[$row['status']]);
     $prev_id = $row['person_id'];
   }
   $query  = "SELECT auth_person.ts as ts, "
@@ -84,14 +85,9 @@ foreach($stmt as $row)
      $image = "images/tick2.gif";
      $ts_txt = "Tilgang gitt:" . strftime('%a %e.%b %y', $row2['ts']) . " av ".$row2['firstname']." ".$row2['lastname'];
   }
+  $href = "\"$php_self?_action=$action&id_person=".$row['person_id']."&id_view=".$row['view_id']."&_sort=$sort$url_filter\" onClick=\"return confirm('$warning');\"";
   if ($access->auth(AUTH::ACC))
-     echo "<td align=center><a href=\"$php_self?_action=$action&id_person=".$row['person_id']."&id_view=".$row['view_id']."&_sort=$sort$url_filter\" onClick=\"return confirm('$warning');\"><img src=\"$image\" border=0 title=\"Klikk for å endre tilgang. $ts_txt\"></td>";
+     $tb->td("<a href=$href><img src=\"$image\" border=0 title=\"Klikk for å endre tilgang. $ts_txt\">", 'align=center');
   else
-     echo "<td align=center><img src=\"$image\" border=0 title=\"$ts_txt\"></td>";
+     $tb->td("<img src=\"$image\" border=0 title=\"$ts_txt\">", 'align=center'); 
 } 
-
-
-?> 
-    </tr>
-    </table>
-  
