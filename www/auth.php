@@ -197,6 +197,12 @@ class ACCESS extends AUTH
          $e = explode('/', $php_self);
          $page = array_pop($e); // Pick the last element in the array
       }
+      
+      if (strchr($page, '?'))
+      {
+         $e = explode('?', $page);
+         $page = $e[0];
+      }
 
       if (is_null($acc = $this->list_ro[$page]))
          return false;
@@ -215,6 +221,18 @@ class ACCESS extends AUTH
          echo "Kontakt <a href=\"mailto:sekretar@oslosymfoniorkester.no\">Sekretæren</a> for å få nødvendig tilgang";
          exit(0);
       }
+   }
+   
+   public function hyperlink($url, $text, $opt = null, $text2 = null)
+   {
+      if (is_null($text2))
+         $text2 = $text;
+      
+      if (!$this->page_access($url))
+         return $text2;
+      
+      $o = is_null($opt) ? '' : "\"$opt\"";
+      return "<a href=\"$url\" $o>$text</a>";
    }
 
    public function confirm_pers_info()
