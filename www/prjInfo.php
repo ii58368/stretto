@@ -31,7 +31,7 @@ $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
-   $tb->td($row['firstname'] . ' ' . $access->hyperlink("repository.php?search=" . urlencode($row['lastname']), $row['lastname'], 'valign=top'));
+   $tb->td($row['firstname'] . ' ' . $access->hlink2("repository.php?search=" . urlencode($row['lastname']), $row['lastname']), 'valign=top');
    $tb->td($row['title']."<br>".$row['r_comment']);
    if (strlen($row['work']) > 0)
       $tb->td("fra ".$row['work'], 'valign=top');
@@ -41,14 +41,14 @@ foreach ($stmt as $row)
 
 unset($tb);
 
-echo "<h3>Prøveplan</h3>
-    <table id=\"no_border\">
-    <tr>
-      <th>Dato</th>
-      <th>Prøvetid</th>
-      <th>Lokale</th>
-      <th>Merknad</th>
-    </tr>";
+echo "<h3>Prøveplan</h3>";
+
+$tb = new TABLE('no_border');
+
+$tb->th('Dato');
+$tb->th('Prøvetid');
+$tb->th('Lokale');
+$tb->th('Merknad');
 
 $query = "SELECT date, time, " .
         "plan.location as location, location.name as lname, " .
@@ -65,20 +65,16 @@ $stmt = $db->query($query);
 
 foreach ($stmt as $row)
 {
-   echo "<tr>
-       <td>" . strftime('%a %e.%b', $row['date']) . "</td>" .
-   "<td>".$row['time']."</td><td>";
-   if (strlen($row['url']) > 0)
-      echo "<a href=\"".$row['url']."\">".$row['lname']."</a>";
-   else
-      echo $row['lname'];
-   echo ' ' . $row['location'];
-   echo "</td><td>";
-   echo str_replace("\n", "<br>\n", $row['comment']);
-   echo "</td>" .
-   "</tr>\n";
+   $tb->tr();
+   $tb->td(strftime('%a %e.%b', $row['date']));
+   $tb->td($row['time']);
+   $tb->td($access->hlink(strlen($row['url']) > 0, $row['url'], $row['lname']) . ' ' . $row['location']);
+   $tb->td(str_replace("\n", "<br>\n", $row['comment']));
 }
-echo "</table><p>\n";
+
+unset($tb);
+
+echo "<p>\n";
 
 echo "<h3>Musikere</h3>\n";
 
