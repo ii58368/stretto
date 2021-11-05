@@ -25,16 +25,15 @@ echo "
 
     Under status ser du status for uttaket, 
     om styret har vedtatt hvem som skal være med etc. 
-<p>
-    <form action='$php_self' method=post>
-    <table border=1>
-    <tr>
-      <th>Prosjekt</th>
-      <th>Sem</th>
-      <th>Status</th>
-      <th>Påmelding-/permisjonsfrist</th>
-      <th>Tutti</th>
-    </tr>";
+<p>";
+
+$tb = new TABLE('border=1');
+
+$tb->th("Prosjekt");
+$tb->th("Sem");
+$tb->th("Status");
+$tb->th("Påmelding-/permisjonsfrist");
+$tb->th("Tutti");
 
 $qperiod = "(project.year > " . $season->year() . " " .
         "  or (project.year = " . $season->year() . " ";
@@ -66,22 +65,16 @@ foreach ($stmt as $row)
    if ($lstatus == $db->lea_stat_rejected)
       $bgcolor = 'bgcolor=pink';
 
-   echo "<tr>
-      <td>";
+   $tb->tr();
    
    $request = ($row['status'] == $db->prj_stat_real && 
            $status != $db->par_stat_void && 
            $lstatus != $db->lea_stat_granted) ||
            $row['status'] == $db->prj_stat_internal;
       
-   if ($request)
-      echo "<a href=\"participant_11.php?id_project=".$row['id']."&id_person=".$pers['id']."\" title=\"Klikk for påmelding eller søk om permisjon...\">";
-   echo $row['name'];
-   if ($request)
-      echo "</a>";
-   echo "</td>\n" .
-      "<td>".$row['semester']." ".$row['year']."</td>" .
-   "<td align=center $bgcolor>";
+   $tb->td($access->hlink($request, "participant_11.php?id_project=".$row['id']."&id_person=".$pers['id'],  $row['name'], "title=\"Klikk for å se eller endre på deltagerstatus...\""));
+   $tb->td($row['semester']." ".$row['year']);
+
    $tstat = $db->par_stat[$status];
    if (!is_null($blink) && strtotime('today') > $row['deadline'])
       $tstat .= "\n(tilbakemeldingen er under behandling i styret...)";
@@ -92,18 +85,14 @@ foreach ($stmt as $row)
       else
          $tstat .= "\n(Påmeldingsprosjekt, du må melde deg på for å bli med...)";
    }
+   $cell = '';
    if ($row['status'] == $db->prj_stat_real || $row['status'] == $db->prj_stat_internal)
-      echo "<img src=\"images/part_stat_$status$blink.gif\" border=0 title=\"$tstat\">";
-   echo "</td>\n";
-   echo "<td>" . strftime('%a %e.%b %y', $row['deadline']) . "</td>" .
-   "<td>";
+      $cell = "<img src=\"images/part_stat_$status$blink.gif\" border=0 title=\"$tstat\">";
+   $tb->td($cell, "align=center $bgcolor");
+   $cell = $request ? strftime('%a %e.%b %y', $row['deadline']) : '';
+   $tb->td($cell);
+   $cell = '';
    if ($row['orchestration'] == $db->prj_orch_tutti)
-      echo "<center><img src=\"images/tick2.gif\" border=0></center>";
-   echo "</td>
-         </tr>";
+      $cell = "<center><img src=\"images/tick2.gif\" border=0></center>";
+   $tb->td($cell);
 }
-?> 
-
-</table>
-</form>
-
