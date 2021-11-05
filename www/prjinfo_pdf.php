@@ -74,7 +74,7 @@ class PDF extends PDF_util
    
       $this->header1("Prøveplan");
 
-      $w = array(30, 30, 30, 50);
+      $w = array(30, 30, 30, 100);
       $h = array("Dato", "Prøvetid", "Lokale", "Merknad");
 
       $this->setFillColor(0xE0, 0xE0, 0xE0);
