@@ -223,18 +223,23 @@ class ACCESS extends AUTH
       }
    }
    
-   public function hyperlink($url, $text, $opt = null, $text2 = null)
+   public function hlink($enable, $url, $text, $opt = null, $text2 = null)
    {
       if (is_null($text2))
          $text2 = $text;
       
-      if (!$this->page_access($url))
+      if (!$enable)
          return $text2;
       
       $o = is_null($opt) ? '' : "\"$opt\"";
       return "<a href=\"$url\" $o>$text</a>";
    }
 
+   public function hlink2($url, $text, $opt = null, $text2 = null)
+   {
+      return $this->hlink($this->page_access($url), $url, $text, $opt, $text2);
+   }
+   
    public function confirm_pers_info()
    {
       global $whoami;
