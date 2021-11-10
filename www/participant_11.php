@@ -209,9 +209,9 @@ if ($prj['valid_par_stat'] > 0)
    $tb->tr();
    $tb->td('Registrert:');
    $tss = (isset($part) && $part['ts_self'] != 0) ? strftime('%a %e.%b %Y', $part['ts_self']) : '';
-   $tb->td(is_null(request('stat_self')) ? $tss : "<font color=green>$tss</font> (Opplysningene kan endres til fristen går ut)");
+   $tb->td(is_null(request('stat_self')) ? $tss : "<font color=green>$tss</font>");
    $tb->tr();
-   if ($prj['deadline'] >= time() && $pers['id'] == $whoami->id())
+   if ($prj['deadline'] >= time() && $pers['id'] == $whoami->id() && isset($part) && ($part['ts_self'] == 0 || request('edit')))
    {
       $tb->td('Ønsker å være med:');
       $radio = '';
@@ -234,7 +234,7 @@ if ($prj['valid_par_stat'] > 0)
       $tb->td("<textarea title=\"$placeholder\" placeholder=\"$placeholder\" cols=30 rows=5 wrap=virtual name=comment_self>" . $part['comment_self'] . "</textarea>");
       $tb->tr();
       $tb->td();
-      $tb->td("<input type=submit value=Registrer title=\"Lagre tilbakemelding...\">"
+      $tb->td("<input type=submit value=\"Send inn\" title=\"Lagre tilbakemelding...\">"
               . "<input type=submit name=del value=Slett title=\"Slett tilbakemelding...\" onClick=\"return confirm('Sikkert at du vil slette?');\">");
    }
    else
@@ -246,6 +246,12 @@ if ($prj['valid_par_stat'] > 0)
       $tb->td('Kommentar:');
       if (isset($part))
          $tb->td('<b>' . str_replace("\n", "<br>\n", $part['comment_self']) . '</b>');
+      if ($prj['deadline'] >= time() && $pers['id'] == $whoami->id())
+      {
+         $tb->tr();
+         $tb->td();
+         $tb->td("<input type=submit value=Endre name=edit title=\"Klikk for å endre på registrert svar. Opplysningene kan endres til fristen går ut\">");
+      }
    }
    unset($tb);
    unset($form);
@@ -260,14 +266,17 @@ if ($prj['valid_par_stat'] > 0)
    $stmt = $db->query($query);
    $glead = $stmt->fetch(PDO::FETCH_ASSOC);
 
-   If ($prj['deadline'] < time())
+   if ($prj['status'] != $db->prj_stat_internal)
    {
-      echo "Har det skjedd endringer som påvirker deltagelsen din på dette prosjektet, send mail til gruppelederen din ";
-      echo "<a href=\"mailto:?to=" . $glead['email'] . "&subject=OSO: $project_name\">" . $glead['firstname'] . " " . $glead['lastname'] . "</a> ";
-      echo "som vil videreformidle en innstilling om dette til styret.<br>\n";
+      If ($prj['deadline'] < time())
+      {
+         echo "Dersom det har skjedd endringer som påvirker deltagelsen din på dette prosjektet, send mail til gruppelederen din ";
+         echo "<a href=\"mailto:?to=" . $glead['email'] . "&subject=OSO: $project_name\">" . $glead['firstname'] . " " . $glead['lastname'] . "</a> ";
+         echo "som vil videreformidle en innstilling om dette til styret.<br>\n";
+      }
+      echo "Dersom du må søke permisjon for ett helt semester eller mer, send mail til ";
+      echo "<a href=\"mailto:?to=" . $glead['email'] . "&subject=OSO permisjonssøknad\">gruppeleder</a>. ";
    }
-   echo "Dersom du må søke permisjon for ett helt semester eller mer, send mail til ";
-   echo "<a href=\"mailto:?to=" . $glead['email'] . "&subject=OSO permisjonssøknad\">gruppeleder</a>. ";
 
    echo "<h2>Deltakerstatus</h2>";
 
