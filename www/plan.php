@@ -41,7 +41,7 @@ function select_project($selected)
    global $db;
    global $season;
 
-   echo "<select name=id_project title=\"Velg hvilket prosjekt prøven gjelder for...\">";
+   echo "<select name=sid_project title=\"Velg hvilket prosjekt prøven gjelder for...\">";
 
    $year = date("Y");
    $q = "SELECT id, name, semester, year, orchestration FROM project " .
@@ -76,8 +76,9 @@ else
 }
 echo "<h2>$h2</h2>\n";
 
+$ndate = is_null(request('date')) ? 0 : request('date');
 if ($access->auth(AUTH::PLAN_RW))
-   echo "<a href=\"$php_self?id_project=$id_project&_action=new&id_location=" . request('id_location') . "\" title=\"Registrer ny prøve...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
+   echo "<a href=\"$php_self?id_project=$id_project&_action=new&date=$ndate&id_location=" . request('id_location') . "\" title=\"Registrer ny prøve...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
 echo "<a href=\"plan_pdf.php\" title=\"PDF versjon...\"><img src=images/pdf.jpeg height=22 border=0 hspace=5 vspace=5></a>\n";
 
 echo "
@@ -102,7 +103,7 @@ if ($action == 'new')
    echo "<tr>
     <td align=left><input type=hidden name=_action value=update>
     <input type=submit value=ok title=\"Registrer...\"></td>
-    <td><input type=date size=10 name=date title=\"$hlp_date\"></td>
+    <td><input type=date size=10 name=date value=$ndate title=\"$hlp_date\"></td>
     <td nowrap>";
    select_tsort(null);
    echo "<input type=text size=11 name=time value=\"18:30-21:30\" title=\"Prøvetid\"></td>
@@ -126,14 +127,14 @@ if ($action == 'update' && $access->auth(AUTH::PLAN_RW))
    {
       if ($no == NULL)
       {
-         $query2 = "select id_person from project where id = $id_project";
+         $query2 = "select id_person from project where id = " . request('sid_project');
          $stmt = $db->query($query2);
          $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
          $query = "insert into plan (date, tsort, time, id_location, location, id_project, " .
                  "id_responsible, comment, event_type) " .
                  "values ($ts, " . request('tsort') . ", " . $db->qpost('time') . ", " .
-                 request('id_location') . ", " . $db->qpost('location') . ", $id_project, " . $row['id_person'] . ", " .
+                 request('id_location') . ", " . $db->qpost('location') . ", " . request('sid_project') . ", " . $row['id_person'] . ", " .
                  $db->qpost('comment') . ", " . $db->plan_evt_rehearsal . ")";
       }
       else
@@ -149,7 +150,7 @@ if ($action == 'update' && $access->auth(AUTH::PLAN_RW))
                     "tsort = ".request('tsort')."," .
                     "id_location = ".request('id_location')."," .
                     "location = ".$db->qpost('location')."," .
-                    "id_project = $id_project," .
+                    "id_project = ".request('sid_project')."," .
                     "comment = ".$db->qpost('comment')."," .
                     "event_type = $db->plan_evt_rehearsal " .
                     "where id = $no";
