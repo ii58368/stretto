@@ -220,8 +220,9 @@ class DB extends myPDO
    public $lea_stat = array("ukjent", "registrert", "avslått", "innvilget");
 // table: record
    public $rec_stat_info = 0;
-   public $rec_stat_board = 1;
-   public $rec_stat = array("Info", "For styret");
+   public $rec_stat_mr = 1;
+   public $rec_stat_board = 2;
+   public $rec_stat = array("Info", "For MR", "For styret");
 // table: feedback
    public $fbk_stat_new = 0;
    public $fbk_stat_read = 1;
