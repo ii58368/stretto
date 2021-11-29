@@ -156,7 +156,7 @@ function count_person($a)
 {
    $old_id = 0;
    $count = 0;
-   
+
    foreach ($a as $e)
    {
       if ($e['id'] != $old_id)
@@ -165,7 +165,7 @@ function count_person($a)
          $old_id = $e['id'];
       }
    }
-   
+
    return $count;
 }
 
@@ -211,10 +211,10 @@ if ($access->auth(AUTH::CONT_RO))
 $form = new FORM();
 if ($access->auth(AUTH::MEMB_GREP))
 {
-   select_filter();  
+   select_filter();
    echo "<font color=green>" . count_person($result) . " treff</font>\n";
 }
-if ($access->auth(AUTH::MEMB_RW))
+if ($access->auth(AUTH::SHOW_LOG))
 {
    echo "<input type=checkbox name=showlog title=\"Vis logg\" onChange=\"submit();\"";
    if (!is_null(request('showlog')))
@@ -228,17 +228,20 @@ $tb = new TABLE('border=1');
 if ($access->auth(AUTH::MEMB_RW))
    $tb->th('Edit');
 
-if (request('showlog') && $access->auth(AUTH::MEMB_GREP))
+if (request('showlog') && $access->auth(AUTH::SHOW_LOG))
 {
    $tb->th("<a href=\"$php_self?_sort=list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på instrumentgruppe...\">Instrument</a>");
    $tb->th("<a href=\"$php_self?_sort=firstname,lastname$f_filter\" title=\"Sorter på fornavn...\">For</a>/
                           <a href=\"$php_self?_sort=lastname,firstname$f_filter\" title=\"Sorter på etternavn...\">Etternavn</a>");
    $tb->th("<a href=\"$php_self?_sort=uid$f_filter\" title=\"Sorter på Bruker-id...\">UID</a>");
    $tb->th("<a href=\"$php_self?_sort=status,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på status...\">Status</a>");
-   $tb->th("<a href=\"$php_self?_sort=birthday$f_filter\" title=\"Sorter på Fødselsdag...\">Fødtselsdag</a>");
-   $tb->th("<a href=\"$php_self?_sort=fee,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på type kontingent...\">Kontingent</a>");
-   $tb->th("<a href=\"$php_self?_sort=gdpr_ts,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på dato for samtykke...\">Samtykke</a>");
-   $tb->th("<a href=\"$php_self?_sort=confirmed_ts,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på dato for bekreftelse av personopplysninger...\">Oppdatert</a>");
+   if ($access->auth(AUTH::BOARD_RO))
+   {
+      $tb->th("<a href=\"$php_self?_sort=birthday$f_filter\" title=\"Sorter på Fødselsdag...\">Fødtselsdag</a>");
+      $tb->th("<a href=\"$php_self?_sort=fee,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på type kontingent...\">Kontingent</a>");
+      $tb->th("<a href=\"$php_self?_sort=gdpr_ts,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på dato for samtykke...\">Samtykke</a>");
+      $tb->th("<a href=\"$php_self?_sort=confirmed_ts,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på dato for bekreftelse av personopplysninger...\">Oppdatert</a>");
+   }
    $tb->th("Kommentar");
    $tb->th("<a href=\"$php_self?_sort=$sort$f_filter&logg=full\" title=\"Vis full logg\">Logg</a>");
 
@@ -259,10 +262,14 @@ if (request('showlog') && $access->auth(AUTH::MEMB_GREP))
          $tb->td($row['firstname'] . ' ' . $row['middlename'] . ' ' . $row['lastname']);
          $tb->td($row['uid']);
          $tb->td($db->per_stat[$row['status']]);
-         $tb->td(date2str($row['birthday'], -1), 'align=right');
-         $tb->td($db->per_fee[$row['fee']]);
-         $tb->td(date2str($row['gdpr_ts'], strtotime("-1 year")), 'align=right');
-         $tb->td(date2str($row['confirmed_ts'], strtotime("-6 months")), 'align=right');
+         if ($access->auth(AUTH::BOARD_RO))
+         {
+
+            $tb->td(date2str($row['birthday'], -1), 'align=right');
+            $tb->td($db->per_fee[$row['fee']]);
+            $tb->td(date2str($row['gdpr_ts'], strtotime("-1 year")), 'align=right');
+            $tb->td(date2str($row['confirmed_ts'], strtotime("-6 months")), 'align=right');
+         }
          $tb->td($row['comment']);
          $old_id = $row['id'];
          $log = '';
