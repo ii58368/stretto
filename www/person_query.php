@@ -6,6 +6,8 @@ require_once 'request.php';
 function log_query($full)
 {
    global $sort;
+   global $access;
+   global $db;
    
    $select = "select person.id as id, "
            . "instrument, firstname, middlename, lastname, "
@@ -22,6 +24,8 @@ function log_query($full)
            . "from instruments, person left join record on person.id = record.id_person ";
    
    $where = is_null($full) ? "and record.ts > " . strtotime("-1 year") . " " : " ";
+   if (!$access->auth(AUTH::BOARD_RO))
+      $where .= "and record.status <= " . $db->rec_stat_mr . " ";
    
    $qsort = str_replace("+", " ", $sort);
    return $select . $where . from_filter() . where_filter() . " order by $qsort,record.ts desc";
