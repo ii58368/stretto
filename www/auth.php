@@ -52,8 +52,9 @@ class AUTH
    const FEEDBACK_R = 43; // Feedback, admin r/o
    const FEEDBACK_W = 44; // Feedback, admin r/w
    const REP_RO = 45; // Music repository, r/o
+   const SHOW_LOG = 46; // Show log in person repository
    const ALL = 0x7fffffffffffffff; // 63 bits enabled
-   const NO_VIEWS = 46;
+   const NO_VIEWS = 47;
 
    private $access;
    protected $confirmed_ts;  // retreived for real_uid
@@ -231,7 +232,7 @@ class ACCESS extends AUTH
       if (!$enable)
          return $text2;
       
-      $o = is_null($opt) ? '' : "\"$opt\"";
+      $o = is_null($opt) ? '' : "$opt";
       return "<a href=\"$url\" $o>$text</a>";
    }
 
