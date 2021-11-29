@@ -165,7 +165,7 @@ add_li("Meny", 1);
    }
    add_li("Admin", 1);
    {
-      add_li("Medlemsliste", 0, AUTH::MEMB_RO, AUTH::MEMB_RW, "Medlemsliste/musikere. <font color=green>" . AUTH::MEMB_GREP . "</font>: Filter for å filtrere ut musikere.");
+      add_li("Medlemsliste", 0, AUTH::MEMB_RO, AUTH::MEMB_RW, "Medlemsliste/musikere. <font color=green>" . AUTH::MEMB_GREP . "</font>: Filter for å filtrere ut musikere. <font color=green>" . AUTH::SHOW_LOG . "</font>: Checkbox to show logs.");
       add_li("Prøveplan", 0, AUTH::PLAN_RO, AUTH::PLAN_RW, "Prøveplan, alle prosjekter");
       add_li("Tilgang/grupper", 1, AUTH::BOARD_RO);
       {
