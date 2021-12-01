@@ -243,7 +243,8 @@ if (request('showlog') && $access->auth(AUTH::SHOW_LOG))
       $tb->th("<a href=\"$php_self?_sort=confirmed_ts,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på dato for bekreftelse av personopplysninger...\">Oppdatert</a>");
    }
    $tb->th("Kommentar");
-   $tb->th("<a href=\"$php_self?_sort=$sort$f_filter&logg=full\" title=\"Vis full logg\">Logg</a>");
+   $th = request('logg') == 'full' ? 'Full logg' : 'Logg - siste 12 mnd';
+   $tb->th("<a href=\"$php_self?_sort=$sort$f_filter&logg=full\" title=\"Klikk for å vise full logg\">$th</a>");
 
    $old_id = 0;
    $log = '';
@@ -275,7 +276,7 @@ if (request('showlog') && $access->auth(AUTH::SHOW_LOG))
          $log = '';
       }
       if ($row['rts'] > 0)
-         $log .= strftime('%e. %b %Y', $row['rts']) . ' ' . $row['rcomment'] . "<br>\n";
+         $log .= "<font color=grey>" . strftime('%e. %b %Y', $row['rts']) . '</font> ' . $row['rcomment'] . "<br>\n";
    }
    if ($old_id != 0)
       $tb->td($log);
