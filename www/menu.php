@@ -238,7 +238,7 @@ class MENU
             if ($e['docs_avail'] & (1 << $db->prj_docs_avail_doc) || $access->auth(AUTH::PRJDOC))
                $project->add("Dokumenter", "document.php?path=project/$pid/doc");
             if (time() < $e['deadline'])
-               $project->add(($e['orchestration'] == $db->prj_orch_tutti) ? "Permisjonssøknad" : "Påmelding", "participant_11.php?id_project=$pid", AUTH::RES_SELF);
+               $project->add(($e['orchestration'] == $db->prj_type_tutti) ? "Permisjonssøknad" : "Påmelding", "participant_11.php?id_project=$pid", AUTH::RES_SELF);
             $c = $db->query("select id from concert where id_project=$pid");
             if ($c->rowCount() > 0)
                $project->add("Konsertreklame", "calendar.php?id_project=$pid");
@@ -254,6 +254,7 @@ class MENU
       $menu->add(null, "contingentEdit.php", AUTH::CONT_RW);
       $menu->add(null, "absenceEdit.php", AUTH::ABS_RW);
       $menu->add(null, "index.php");
+      $menu->add(null, "prjInfo.php");
 
       $this->top_menu = $menu;
    }
