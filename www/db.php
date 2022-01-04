@@ -139,7 +139,6 @@ class DB extends myPDO
    public $per_sex_male = 1;
    public $per_sex_female = 2;
    public $per_sex = array("Ukjent", "Mann", "Kvinne");
-   public $per_sex2 = array('', "M", "F");
 // field: fee
    public $per_fee_free = 0;
    public $per_fee_reduced = 1;
@@ -163,13 +162,16 @@ class DB extends myPDO
        "Permisjon", "Regiansvarlig", "Er ikke med på prosjektet");
 // table: project
    public $prj_stat_real = 0;
-   public $prj_stat_internal = 1;
+   public $prj_stat_postponed = 1;
    public $prj_stat_tentative = 2;
    public $prj_stat_draft = 3;
    public $prj_stat_canceled = 4;
-   public $prj_stat = array("Reelt", "Internt", "Tentativt", "Draft", "Kansellert");
-   public $prj_orch_reduced = 0;
-   public $prj_orch_tutti = 1;
+   public $prj_stat = array("Reelt", "Utsatt", "Tentativt", "Draft", "Kansellert");
+   public $prj_type_reduced = 0; // In the future, prefix should be renamed to prj_type
+   public $prj_type_tutti = 1;
+   public $prj_type_primavista = 2;
+   public $prj_type_social = 3;
+   public $prj_type = array("Redusert", "Tutti", "Bladspill", "Sosialt");
    public $prj_docs_avail_rec = 0;
    public $prj_docs_avail_sheet = 1;
    public $prj_docs_avail_doc = 2;
