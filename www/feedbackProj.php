@@ -59,7 +59,7 @@ foreach ($stmt as $row)
    $tb->td("<a href=\"prjInfo.php?id=" . $row['id'] . "\">" . $row['name'] . "</a>");
    $tb->td($row['semester'] . "-" . $row['year']);
    $tb->td($db->prj_stat[$row['status']]);
-   $tutti = ($row['orchestration'] == $db->prj_orch_tutti) ? "<img src=\"images/tick2.gif\" border=0>" : '';
+   $tutti = ($row['orchestration'] == $db->prj_type_tutti) ? "<img src=\"images/tick2.gif\" border=0>" : '';
       $tb->td($tutti, 'align=center');
 
    if ($row['id'] != $no)
