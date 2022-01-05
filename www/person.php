@@ -91,7 +91,7 @@ function select_filter()
            . "where (year = " . $season->year() . " "
            . "and semester = '" . $season->semester() . "' "
            . "and (status = $db->prj_stat_real "
-           . "or status = $db->prj_stat_internal "
+           . "or status = $db->prj_stat_postponed "
            . "or status = $db->prj_stat_canceled)) ";
    if (!is_null(request('f_project')))
       foreach (request('f_project') as $f_project)
