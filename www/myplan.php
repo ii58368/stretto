@@ -39,8 +39,7 @@ $query = "SELECT plan.id as id, "
         . "and not participant.stat_final = $db->par_stat_no "
         . "and plan.event_type = $db->plan_evt_rehearsal "
         . "and plan.date >= " . strtotime('today') . " "
-        . "and (project.status = $db->prj_stat_real "
-        . " or project.status = $db->prj_stat_internal) "
+        . "and project.status = $db->prj_stat_real "
         . "order by plan.date,plan.tsort,plan.time";
 
 $stmt = $db->query($query);
@@ -59,11 +58,11 @@ foreach ($stmt as $row)
    
    $tb->tr();
    
-   $tutti = ($row['orchestration'] == $db->prj_orch_reduced) ? '*' : '';
+   $tutti = ($row['orchestration'] == $db->prj_type_reduced) ? '*' : '';
    
    if ($row['stat_final'] == $db->par_stat_void)
    {
-      if ($row['orchestration'] == $db->prj_orch_reduced && time() > $row['deadline'])
+      if ($row['orchestration'] == $db->prj_type_reduced && time() > $row['deadline'])
          continue;
       $tb->td("$gfont$date</font>", 'align=right nowrap');
       $tb->td("$gfont$time</font>");
