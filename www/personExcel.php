@@ -10,6 +10,8 @@ $stmt = $db->query($query);
 
 // Required format: fornavn;etternavn;Medlemskontingent;kjønn;fødselsdato;;postnummer;;;;;;;;;
 
+echo "Navn;Adresse;Postnummer;Poststed;Epostadresse;Telefon;Kjønn;Fødselsår;Godtatt deling av info\n";
+
 foreach ($stmt as $e)
 {
    /*
@@ -20,14 +22,26 @@ foreach ($stmt as $e)
      . "and instruments.id = person.id_instruments";
      $stmt = $db->query($query);
      $e = $stmt->fetch(PDO::FETCH_ASSOC);
+    * 
+    * Example:
+    * Navn                    | Adresse | Postnummer | Poststed    | Epostadresse | Telefon | Kjønn  | Fødselsår | Godtatt deling av info
+    * Håvard Hungnes Lien     |         | 0464       | Oslo        |              |         | Mann   | 1975      |
+    * Gislaug Marie Moe Gimse |         | 2214       | Kongsvinger |              |         | Kvinne | 1978      | nei
     */
-   $sex = (is_null($e['sex'])) ? $db->per_sex_unknown : $e['sex'];
-   $str = $e['firstname'] . " " . $e['middlename'] . ";" . $e['lastname'] . ";"
-           . $db->per_fee[$e['fee']] . ";"
-           . $db->per_sex2[$sex] . ";" . date('d.m.Y', $e['birthday']) . ";;"
-           . sprintf('%04d', $e['postcode']) . ";;;;;;;;;";
+   
+   $name = $e['firstname'] . " " . $e['middlename'] . " " . $e['lastname'];
+   $address = $e['address'];
+   $postcode = sprintf('%04d', $e['postcode']);
+   $city = $e['city'];
+   $email = $e['email'];
+   $phone = $e['phone1'];
+   $sex = $db->per_sex[(is_null($e['sex'])) ? $db->per_sex_unknown : $e['sex']];
+   $born = date('Y', $e['birthday']);
+   $gdpr = $e['gdpr_ts'] > 0 ? 'ja' : 'nei';
+   
+   $str = "$name;$address;$postcode;$city;$email;$phone;$sex;$born;$gdpr";
    echo mb_convert_encoding($str, 'UTF-8');
 
-   echo "\n";
+   echo "\n"; 
 }
 
