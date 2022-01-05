@@ -110,7 +110,7 @@ if (request('stat_self'))
            "stat_self = $stat_self, " .
            "ts_self = $ts, " .
            "comment_self = $comment_self ";
-   if ($prj['status'] == $db->prj_stat_internal)
+   if ($prj['status'] == $db->prj_stat_sosial)
       $query .= ", stat_final = $stat_self, " .
               "ts_final = $ts ";
    $query .= "where id_person = $id_person " .
@@ -183,7 +183,7 @@ foreach ($stmt as $row)
 unset($tb);
 echo "<p>\n";
 
-$isTutti = ($prj['orchestration'] == $db->prj_orch_tutti);
+$isTutti = ($prj['orchestration'] == $db->prj_type_tutti);
 if ($prj['valid_par_stat'] > 0)
 {
    $reg_header = ($isTutti) ? "Permisjonssøknad" : "Påmelding";
@@ -266,7 +266,7 @@ if ($prj['valid_par_stat'] > 0)
    $stmt = $db->query($query);
    $glead = $stmt->fetch(PDO::FETCH_ASSOC);
 
-   if ($prj['status'] != $db->prj_stat_internal)
+   if ($prj['orchestration'] == $db->prj_type_reduced || $prj['orchestration'] == $db->prj_type_tutti)
    {
       If ($prj['deadline'] < time())
       {
@@ -300,7 +300,7 @@ if ($prj['valid_par_stat'] > 0)
 
    if ($part['stat_inv'] == $db->par_stat_yes)
    {
-      if ($prj['orchestration'] == $db->prj_orch_tutti)
+      if ($prj['orchestration'] == $db->prj_type_tutti)
       {
          if ($part['stat_reg'] != $db->par_stat_void)
          {
@@ -330,7 +330,7 @@ if ($prj['valid_par_stat'] > 0)
             echo ": Du er med på dette prosjektet.<br>\n";
       }
 
-      if ($prj['orchestration'] == $db->prj_orch_reduced)
+      if ($prj['orchestration'] == $db->prj_type_reduced)
       {
          if ($part['stat_reg'] != $db->par_stat_void)
          {
@@ -354,9 +354,9 @@ if ($prj['valid_par_stat'] > 0)
          echo " Styret:</b> ";
          if ($part['stat_final'] == $db->par_stat_void)
          {
-            if ($prj['status'] == $db->prj_stat_internal)
+            if ($prj['orchestration'] == $db->prj_type_social)
                echo "Vi ser frem til å høre fra deg...";
-            else
+            if ($prj['orchestration'] == $db->prj_type_reduced || $prj['orchestration'] == $db->prj_type_tutti)
                echo "Orkesteruttaket er ikke ferdigbehandlet.<br>\n";
          }
          if ($part['stat_final'] == $db->par_stat_no)

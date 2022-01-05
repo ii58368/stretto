@@ -1,4 +1,5 @@
 <?php
+
 require 'framework.php';
 include_once 'participant_status.php';
 
@@ -31,9 +32,10 @@ $tb = new TABLE('border=1');
 
 $tb->th("Prosjekt");
 $tb->th("Sem");
+$tb->th("Delt");
 $tb->th("Status");
-$tb->th("Påmelding-/permisjonsfrist");
-$tb->th("Tutti");
+$tb->th("Frist");
+$tb->th("Type");
 
 $qperiod = "(project.year > " . $season->year() . " " .
         "  or (project.year = " . $season->year() . " ";
@@ -47,7 +49,7 @@ $query = "SELECT project.id as id, name, semester, year, status, " .
         "where $qperiod " .
         "and (status = $db->prj_stat_real " .
         "or status = $db->prj_stat_tentative " .
-        "or status = $db->prj_stat_internal) " .
+        "or status = $db->prj_stat_postponed) " .
         "order by $sort";
 
 $stmt = $db->query($query);
@@ -55,44 +57,52 @@ $stmt = $db->query($query);
 foreach ($stmt as $row)
 {
    list($status, $blink) = participant_status($person_id, $row['id']);
-   
+
    $lstatus = on_leave($pers['id'], $row['semester'], $row['year']);
    $bgcolor = '';
    if ($lstatus == $db->lea_stat_registered)
-      $bgcolor = 'bgcolor=yellow';
+      $bgcolor = ";background-color:yellow";
    if ($lstatus == $db->lea_stat_granted)
-      $bgcolor = 'bgcolor=red';
+      $bgcolor = ";background-color:red";
    if ($lstatus == $db->lea_stat_rejected)
-      $bgcolor = 'bgcolor=pink';
+      $bgcolor = ";background-color:pink";
 
    $tb->tr();
-   
-   $request = ($row['status'] == $db->prj_stat_real && 
-           $status != $db->par_stat_void && 
-           $lstatus != $db->lea_stat_granted) ||
-           $row['status'] == $db->prj_stat_internal;
-      
-   $tb->td($access->hlink($request, "participant_11.php?id_project=".$row['id']."&id_person=".$pers['id'],  $row['name'], "title=\"Klikk for å se eller endre på deltagerstatus...\""));
-   $tb->td($row['semester']." ".$row['year']);
+
+   $request = $row['status'] == $db->prj_stat_real &&
+           $status != $db->par_stat_void &&
+           $lstatus != $db->lea_stat_granted;
+
+   $tb->td($access->hlink2("prjInfo.php?id=" . $row['id'], $row['name'], "title=\"Klikk for å se prosjektinfo...\""));
+   $tb->td($row['semester'] . " " . $row['year']);
 
    $tstat = $db->par_stat[$status];
    if (!is_null($blink) && strtotime('today') > $row['deadline'])
       $tstat .= "\n(tilbakemeldingen er under behandling i styret...)";
    if (!is_null($blink) && strtotime('today') <= $row['deadline'])
    {
-      if ($row['orchestration'] == $db->prj_orch_tutti)
+      if ($row['orchestration'] == $db->prj_type_tutti)
          $tstat .= "\nTutti. (Du må søke permisjon hvis du ikke kan være med på dette prosjektet...)";
       else
          $tstat .= "\n(Påmeldingsprosjekt, du må melde deg på for å bli med...)";
    }
    $cell = '';
-   if ($row['status'] == $db->prj_stat_real || $row['status'] == $db->prj_stat_internal)
+   if ($row['status'] == $db->prj_stat_real)
       $cell = "<img src=\"images/part_stat_$status$blink.gif\" border=0 title=\"$tstat\">";
-   $tb->td($cell, "align=center $bgcolor");
-   $cell = $request ? strftime('%a %e.%b %y', $row['deadline']) : '';
-   $tb->td($cell);
-   $cell = '';
-   if ($row['orchestration'] == $db->prj_orch_tutti)
-      $cell = "<center><img src=\"images/tick2.gif\" border=0></center>";
-   $tb->td($cell);
+   $tb->td($cell, "style=\"vertical-align:middle; text-align:center $bgcolor\"");
+   $tb->td($db->prj_stat[$row['status']]);
+   $deadline = $request ? strftime('%a %e.%b %y', $row['deadline']) : '';
+   if ($row['orchestration'] == $db->prj_type_tutti)
+   {
+      $tb->td($access->hlink($request, "participant_11.php?id_project=" . $row['id'] . "&id_person=" . $pers['id'], $deadline, "title=\"Klikk for å søke permisjon...\""));
+   }
+   if ($row['orchestration'] == $db->prj_type_reduced || $row['orchestration'] == $db->prj_type_social)
+   {
+      $tb->td($access->hlink($request, "participant_11.php?id_project=" . $row['id'] . "&id_person=" . $pers['id'], $deadline, "title=\"Klikk for påmelding...\""));
+   }
+   if ($row['orchestration'] == $db->prj_type_primavista)
+   {
+      $tb->td();
+   }
+   $tb->td($db->prj_type[$row['orchestration']]);
 }

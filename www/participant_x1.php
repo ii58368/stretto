@@ -149,7 +149,7 @@ function manage_req($part, $row, $edit, $orchestration)
    {
       if ($edit && $access->auth(AUTH::RES_REQ))
       {
-         if ($orchestration == $db->prj_orch_tutti)
+         if ($orchestration == $db->prj_type_tutti)
          {
             $htext = "Kryss av for å anbefale permisjon";
             $val = $db->par_stat_no;
@@ -160,8 +160,8 @@ function manage_req($part, $row, $edit, $orchestration)
             $val = $db->par_stat_yes;
          }
          echo "<input type=checkbox name=stat_req:$row title=\"$htext\"";
-         if (($part['stat_req'] == $db->par_stat_no && $orchestration == $db->prj_orch_tutti)
-          || ($part['stat_req'] == $db->par_stat_yes && $orchestration == $db->prj_orch_reduced))
+         if (($part['stat_req'] == $db->par_stat_no && $orchestration == $db->prj_type_tutti)
+          || ($part['stat_req'] == $db->par_stat_yes && $orchestration == $db->prj_type_reduced))
             echo " checked";
          echo " value=$val>";
          
@@ -197,7 +197,7 @@ function manage_final($part, $row, $edit, $orchestration)
          if ($part['stat_final'] == $db->par_stat_yes || 
                  ($part['stat_final'] == $db->par_stat_void && 
                  $part['stat_inv'] == $db->par_stat_yes &&
-                 $orchestration == $db->prj_orch_tutti &&
+                 $orchestration == $db->prj_type_tutti &&
                  $part['stat_req'] != $db->par_stat_no))
             echo " checked";
          echo " value=" . $db->par_stat_yes . " title=\"Merk av dersom vedkommende er tatt ut til å delta på prosjektet\">";
@@ -343,7 +343,7 @@ if ($action == 'update')
          $stat_final = $db->par_stat_no;
       if (is_null($stat_inv))
          $stat_final = $db->par_stat_void;
-      if ($prj['orchestration'] == $db->prj_orch_reduced &&
+      if ($prj['orchestration'] == $db->prj_type_reduced &&
           $part['stat_self'] == $db->par_stat_void &&
           $part['stat_reg'] == $db->par_stat_void &&
           $stat_final == $db->par_stat_no)
@@ -352,7 +352,7 @@ if ($action == 'update')
          $stat_final = null;
       $comment_final = request("comment_final:$no");
       update_cell($no, "final", $stat_final, $comment_final, $id_instruments);
-      if ($prj['status'] == $db->prj_stat_internal)
+      if ($prj['orchestration'] == $db->prj_type_social)
          update_cell($no, "final", $stat_reg, $comment_reg, $id_instruments);
 
       $no = null;
@@ -372,7 +372,7 @@ if ($action == 'update')
                   $id_instruments = $part['id_instruments'];
               
                if ($col == 'final' && is_null($stat))
-                  $stat = ($prj['orchestration'] == $db->prj_orch_reduced &&
+                  $stat = ($prj['orchestration'] == $db->prj_type_reduced &&
                            $part['stat_self'] == $db->par_stat_void &&
                            $part['stat_reg'] == $db->par_stat_void) ? 
                        $db->par_stat_void : $db->par_stat_no;
@@ -403,7 +403,7 @@ if ($action == 'reset')
 echo "
     <h1>Deltagelse " . $prj['name'] . " (" . $prj['semester'] . "-" . $prj['year'] . ")</h1>
     <h2>";
-if ($prj['orchestration'] == $db->prj_orch_tutti)
+if ($prj['orchestration'] == $db->prj_type_tutti)
    echo "Permisjonsfrist: ";
 else
    echo "Påmeldingsfrist: ";
@@ -430,7 +430,7 @@ echo "Bes</th>
 if ($access->auth(AUTH::RES_REG))
    manage_col("reg", "Tilbakemelding via styret/sekretær");
 echo "Sekretær</th>"; */
-if ($prj['status'] != $db->prj_stat_internal)
+if ($prj['orchestration'] == $db->prj_type_reduced || $prj['orchestration'] == $db->prj_type_tutti)
 {
    echo "<th>";
    if ($access->auth(AUTH::RES_REQ))
@@ -438,7 +438,7 @@ if ($prj['status'] != $db->prj_stat_internal)
    echo "MR</th>";
 }
 echo "<th>";
-if ($access->auth(AUTH::RES_FIN) && $prj['status'] != $db->prj_stat_internal)
+if ($access->auth(AUTH::RES_FIN) && ($prj['orchestration'] == $db->prj_type_reduced || $prj['orchestration'] == $db->prj_type_tutti))
 {
    manage_col("final", "Vedtatt av styret");
    reset_col("final");
@@ -491,7 +491,7 @@ foreach ($stmt as $row)
    view_leave($row['id'], $prj['year'], $prj['semester']);
    manage_self($part, $row['id'], false);
 //   manage_reg($part, $row['id'], $row['id'] == $no || request('col') == "reg", $prj['valid_par_stat']);
-   if ($prj['status'] != $db->prj_stat_internal)
+   if ($prj['orchestration'] == $db->prj_type_reduced || $prj['orchestration'] == $db->prj_type_tutti)
       manage_req($part, $row['id'], $row['id'] == $no || request('col') == "req", $prj['orchestration']);
    manage_final($part, $row['id'], ($row['id'] == $no || request('col') == "final") && $prj['status'] != $db->prj_stat_internal, $prj['orchestration']);
 

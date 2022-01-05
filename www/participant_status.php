@@ -31,7 +31,7 @@ function participant_status($person_id, $project_id)
    if ($part['stat_final'] == $db->par_stat_void &&
       $part['stat_self'] == $db->par_stat_void &&
       $part['stat_reg'] == $db->par_stat_void &&
-      $part['orchestration'] == $db->prj_orch_reduced &&
+      $part['orchestration'] == $db->prj_type_reduced &&
       strtotime('today') > $part['deadline'])
       return array($status, $blink);
 
@@ -41,7 +41,7 @@ function participant_status($person_id, $project_id)
    if ($part['stat_final'] == $db->par_stat_void)
    {
       $blink = 'b';
-      $status = ($part['orchestration'] == $db->prj_orch_reduced) ?
+      $status = ($part['orchestration'] == $db->prj_type_reduced) ?
               $db->par_stat_no : $db->par_stat_yes;
 
       if ($part['stat_self'] != $db->par_stat_void)
