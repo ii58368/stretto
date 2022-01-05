@@ -204,9 +204,9 @@ function log_changes($no)
    log_if_changed($db->rec_stat_board, 'Oppdatert stemmegruppe', $no, $e, 'id_instruments');
    log_if_changed($db->rec_stat_board, 'Oppdatert standard stemmegruppeplassering', $no, $e, 'def_pos');
    
-   if (request('status'))
+   if (!is_null(request('status')))
       log_if_changed($db->rec_stat_info, 'Ny status: ' . $db->per_stat[request('status')], $no, $e, 'status');
-   if (request('fee'))
+   if (!is_null(request('fee')))
       log_if_changed($db->rec_stat_board, 'Endret medlemskontingent fra ' . $db->per_fee[$e['fee']] . ' til ' . $db->per_fee[request('fee')], $no, $e, 'fee');
  
    if (is_null(request('gdpr')) && $e['gdpr_ts'] > 0)
