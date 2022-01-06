@@ -54,8 +54,7 @@ class PDF extends PDF_util
               "and (project.status = $db->prj_stat_real ";
       if ($access->auth(AUTH::PRJ_RO))
          $query .= "or project.status = $db->prj_stat_draft ";
-      $query .= "or project.status = $db->prj_stat_tentative "
-              . "or project.status = $db->prj_stat_internal) "
+      $query .= "or project.status = $db->prj_stat_tentative) "
               . "order by date,tsort,time";
 
       $stmt = $db->query($query);
@@ -88,7 +87,7 @@ class PDF extends PDF_util
 
          $this->Cell($tab[$idx++], $hight, $this->sconv($e['lname']." ".$e['location']));
          $project = $this->sconv($e['pname']);
-         if ($e['orchestration'] == $db->prj_orch_reduced)
+         if ($e['orchestration'] == $db->prj_type_reduced)
             $project .= '*';
          $this->Cell($tab[$idx++], $hight, $project);
          $this->MultiCell($tab[$idx++], $hight, $this->sconv($e['comment']));
@@ -154,7 +153,7 @@ class PDF extends PDF_util
          $s = $db->query($q);
 
          $h2 = "";
-         if ($prj['orchestration'] == $db->prj_orch_reduced)
+         if ($prj['orchestration'] == $db->prj_type_reduced)
             $h2 = "* ";
          $h2 .= $prj['name'] . " ";
          foreach ($s as $e)
