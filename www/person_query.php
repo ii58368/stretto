@@ -34,7 +34,7 @@ function log_query($full)
 function person_query()
 {
    $query = "SELECT person.id as id, instruments.id as id_instruments, instrument, firstname, middlename, lastname, "
-           . "sex, fee, address, postcode, city, "
+           . "sex, fee, address, postcode, city, gdpr_ts, "
            . "person.email as email, phone1, phone2, phone3, birthday, person.status as status, person.comment as comment "
            . "FROM person, instruments ";
    
@@ -99,6 +99,9 @@ function where_filter()
 function sort_filter()
 {
    global $sort;
+   
+   if ($sort == '')
+      $sort = "lastname,firstname";
 
    $qsort = str_replace("+", " ", $sort);
    $query = "group by person.id order by $qsort";
