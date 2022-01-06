@@ -56,7 +56,7 @@ function select_project($selected)
       if ($e['id'] == $selected)
          echo " selected";
       echo ">" . $e['name'] . " (" . $e['semester'], $e['year'] . ")";
-      if ($e['orchestration'] == $db->prj_orch_reduced)
+      if ($e['orchestration'] == $db->prj_type_reduced)
          echo '*';
    }
    echo "</select>";
@@ -178,8 +178,7 @@ if ($id_project == '%')
 $query .= "and (project.status = $db->prj_stat_real ";
 if ($access->auth(AUTH::PRJ_RO))
     $query .= "or project.status = $db->prj_stat_draft ";
-$query .= "or project.status = $db->prj_stat_tentative "
-       . "or project.status = $db->prj_stat_internal) "
+$query .= "or project.status = $db->prj_stat_tentative) "
        . "order by date,tsort,time";
 
 $stmt = $db->query($query);
@@ -215,7 +214,7 @@ foreach ($stmt as $row)
          echo $row['lname'];
       echo " ".$row['location'];
       echo "</font></td><td>$gfont<a href=\"prjInfo.php?id=".$row['id_project']."\">".$row['pname']."</a>";
-      if ($row['orchestration'] == $db->prj_orch_reduced)
+      if ($row['orchestration'] == $db->prj_type_reduced)
          echo '*';
       echo "</font></td><td>$gfont";
       echo str_replace("\n", "<br>\n", $row['comment']);
