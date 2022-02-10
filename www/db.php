@@ -166,7 +166,13 @@ class DB extends myPDO
    public $prj_stat_tentative = 2;
    public $prj_stat_draft = 3;
    public $prj_stat_canceled = 4;
-   public $prj_stat = array("Reelt", "Utsatt", "Tentativt", "Draft", "Kansellert");
+   public $prj_stat = array("Reelt", "Utsatt", "Tentativt", "Utkast", "Kansellert");
+   public $prj_stat_txt = array(
+       "Prosjektet er ferdig planglagt og vedtatt.",
+       "Prosjektet er utsatt!",
+       "Prosjektet er under planlegging. Nye detaljer blir lagt inn forløpende.",
+       "Prosjektet er forløpig et utkast, kun synlig for MR og styret.",
+       "Prosjektet er avlyst!");
    public $prj_type_reduced = 0; // In the future, prefix should be renamed to prj_type
    public $prj_type_tutti = 1;
    public $prj_type_primavista = 2;
