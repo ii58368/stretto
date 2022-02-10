@@ -139,16 +139,6 @@ if ($stmt->rowCount() > 0)
 $project_name = $prj['name'] . " " . $prj['semester'] . "-" . $prj['year'];
 echo "<h1>$project_name</h1>\n";
 echo str_replace("\n", "<br>\n", $prj['info']) . "\n";
-echo "<h2>Spilleplan</h2>\n";
-
-$tb = new TABLE('id=no_border');
-
-$tb->th('S');
-$tb->th('Dato');
-$tb->th('Prøvetid');
-$tb->th('Lokale');
-$tb->th('Merknad');
-$tb->tr();
 
 $query = "SELECT plan.date as date, plan.time as time, "
         . "plan.location as location, location.name as lname, "
@@ -167,21 +157,47 @@ $query = "SELECT plan.date as date, plan.time as time, "
         . "and plan.event_type = $db->plan_evt_rehearsal "
         . "order by date,tsort,time";
 
-
 $stmt = $db->query($query);
 
-foreach ($stmt as $row)
+if ($prj['orchestration'] == $db->prj_type_tutti || $prj['orchestration'] == $db->prj_type_reduced || $prj['orchestration'] == $db->prj_type_primavista)
 {
+   echo "<h2>Spilleplan</h2>\n";
+
+   $tb = new TABLE('id=no_border');
+
+   $tb->th('S');
+   $tb->th('Dato');
+   $tb->th('Prøvetid');
+   $tb->th('Lokale');
+   $tb->th('Merknad');
    $tb->tr();
-   $tb->td(($part['stat_final'] == $db->par_stat_yes) ? get_lnk($row) : '');
-   $tb->td(strftime('%a %e.%b %y', $row['date']));
-   $tb->td($row['time']);
-   $lname = (strlen($row['url']) > 0) ? "<a href=\"" . $row['url'] . "\">" . $row['lname'] . "</a>" : $row['lname'];
-   $tb->td($lname . ' ' . $row['location']);
-   $tb->td(str_replace("\n", "<br>\n", $row['comment']));
+
+   foreach ($stmt as $row)
+   {
+      $tb->tr();
+      $tb->td(($part['stat_final'] == $db->par_stat_yes) ? get_lnk($row) : '');
+      $tb->td(strftime('%a %e.%b %y', $row['date']));
+      $tb->td($row['time']);
+      $lname = (strlen($row['url']) > 0) ? "<a href=\"" . $row['url'] . "\">" . $row['lname'] . "</a>" : $row['lname'];
+      $tb->td($lname . ' ' . $row['location']);
+      $tb->td(str_replace("\n", "<br>\n", $row['comment']));
+   }
+   unset($tb);
+   echo "<p>\n";
 }
-unset($tb);
-echo "<p>\n";
+
+if ($prj['orchestration'] == $db->prj_type_social)
+{
+   foreach ($stmt as $row)
+   {
+      echo "<h2>Når</h2>\n";
+      echo strftime('%a %e.%b %y', $row['date']);
+      echo "<h2>Hvor</h2>\n";
+      $lname = (strlen($row['url']) > 0) ? "<a href=\"" . $row['url'] . "\">" . $row['lname'] . "</a>" : $row['lname'];
+      echo $lname . ' ' . $row['location'];
+   }
+}
+
 
 $isTutti = ($prj['orchestration'] == $db->prj_type_tutti);
 if ($prj['valid_par_stat'] > 0)

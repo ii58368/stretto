@@ -21,18 +21,17 @@ $pers = $stmt->fetch(PDO::FETCH_ASSOC);
 echo "
     <h1>Prosjekter for " . $pers['firstname'] . " " . $pers['lastname'] . " (" . $pers['instrument'] . ")</h1>
     Dette er oversikten over alle orkesterets prosjekter og hvilke av disse du skal være med på. 
-    Kolonnen Tutti viser om prosjektet er et tuttiprosjekt 
-    for alle eller om det er et prosjekt med redusert besetning. 
-
-    Under status ser du status for uttaket, 
-    om styret har vedtatt hvem som skal være med etc. 
+    Merk at prosjekter med redusert besetning må du aktivt melde deg på for å bli med.
+    Kolonnen <i>Frist</i> viser fristen for å melde seg på eller søke permisjon. 
+    Krikk på datoen for å melde deg på eller søke permisjon.
+    Blinkende status-lamper viser hva deltagelsen din blir hvis du ikke foretar deg noe innen fristen.
+    Prosjekter uten frist.-dato krever ingen av- eller påmelding.
 <p>";
 
 $tb = new TABLE('border=1');
 
 $tb->th("Prosjekt");
 $tb->th("Sem");
-$tb->th("Delt");
 $tb->th("Status");
 $tb->th("Frist");
 $tb->th("Type");
@@ -47,9 +46,7 @@ $query = "SELECT project.id as id, name, semester, year, status, " .
         "deadline, orchestration " .
         "FROM project " .
         "where $qperiod " .
-        "and (status = $db->prj_stat_real " .
-        "or status = $db->prj_stat_tentative " .
-        "or status = $db->prj_stat_postponed) " .
+        "and not status = $db->prj_stat_draft " .
         "order by $sort";
 
 $stmt = $db->query($query);
@@ -89,20 +86,21 @@ foreach ($stmt as $row)
    $cell = '';
    if ($row['status'] == $db->prj_stat_real)
       $cell = "<img src=\"images/part_stat_$status$blink.gif\" border=0 title=\"$tstat\">";
+   if ($row['status'] == $db->prj_stat_postponed || $row['status'] == $db->prj_stat_canceled)
+      $cell = $db->prj_stat[$row['status']];
    $tb->td($cell, "style=\"vertical-align:middle; text-align:center $bgcolor\"");
-   $tb->td($db->prj_stat[$row['status']]);
-   $deadline = $request ? strftime('%a %e.%b %y', $row['deadline']) : '';
+   $deadline = $request ? strftime('%e.%b %Y', $row['deadline']) : '';
+   
+   $cell = '';
    if ($row['orchestration'] == $db->prj_type_tutti)
    {
-      $tb->td($access->hlink($request, "participant_11.php?id_project=" . $row['id'] . "&id_person=" . $pers['id'], $deadline, "title=\"Klikk for å søke permisjon...\""));
+      $cell = $access->hlink($request, "participant_11.php?id_project=" . $row['id'] . "&id_person=" . $pers['id'], $deadline, "title=\"Klikk for å søke permisjon...\"");
    }
    if ($row['orchestration'] == $db->prj_type_reduced || $row['orchestration'] == $db->prj_type_social)
    {
-      $tb->td($access->hlink($request, "participant_11.php?id_project=" . $row['id'] . "&id_person=" . $pers['id'], $deadline, "title=\"Klikk for påmelding...\""));
+      $cell = $access->hlink($request, "participant_11.php?id_project=" . $row['id'] . "&id_person=" . $pers['id'], $deadline, "title=\"Klikk for påmelding...\"");
    }
-   if ($row['orchestration'] == $db->prj_type_primavista)
-   {
-      $tb->td();
-   }
+   $tb->td($cell);
+   
    $tb->td($db->prj_type[$row['orchestration']]);
 }
