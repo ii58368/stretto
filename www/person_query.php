@@ -10,7 +10,7 @@ function log_query($full)
    global $db;
    
    $select = "select person.id as id, "
-           . "instrument, firstname, middlename, lastname, "
+           . "instrument, firstname, middlename, lastname, email, "
            . "person.uid as uid, "
            . "person.status as status, "
            . "person.fee as fee, "
