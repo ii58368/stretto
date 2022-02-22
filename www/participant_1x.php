@@ -23,7 +23,7 @@ echo "
     Dette er oversikten over alle orkesterets prosjekter og hvilke av disse du skal være med på. 
     Merk at prosjekter med redusert besetning må du aktivt melde deg på for å bli med.
     Kolonnen <i>Frist</i> viser fristen for å melde seg på eller søke permisjon. 
-    Krikk på datoen for å melde deg på eller søke permisjon.
+    Klikk på datoen for å melde deg på eller søke permisjon.
     Blinkende status-lamper viser hva deltagelsen din blir hvis du ikke foretar deg noe innen fristen.
     Prosjekter uten frist.-dato krever ingen av- eller påmelding.
 <p>";
@@ -92,13 +92,15 @@ foreach ($stmt as $row)
    $deadline = $request ? strftime('%e.%b %Y', $row['deadline']) : '';
    
    $cell = '';
+   $pid = ($pers['id'] == $whoami->id()) ? '' : "&id_person=" . $pers['id'];
+   
    if ($row['orchestration'] == $db->prj_type_tutti)
    {
-      $cell = $access->hlink($request, "participant_11.php?id_project=" . $row['id'] . "&id_person=" . $pers['id'], $deadline, "title=\"Klikk for å søke permisjon...\"");
+      $cell = $access->hlink($request, "participant_11.php?id_project=" . $row['id'] . $pid, $deadline, "title=\"Klikk for å søke permisjon...\"");
    }
    if ($row['orchestration'] == $db->prj_type_reduced || $row['orchestration'] == $db->prj_type_social)
    {
-      $cell = $access->hlink($request, "participant_11.php?id_project=" . $row['id'] . "&id_person=" . $pers['id'], $deadline, "title=\"Klikk for påmelding...\"");
+      $cell = $access->hlink($request, "participant_11.php?id_project=" . $row['id'] . $pid, $deadline, "title=\"Klikk for påmelding...\"");
    }
    $tb->td($cell);
    
