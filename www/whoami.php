@@ -9,6 +9,7 @@ class WHOAMI
    private $firstname;
    private $lastname;
    private $uid = null;
+   private $status;
    private $instrument;
    private $real_uid = null;
 
@@ -30,7 +31,8 @@ class WHOAMI
       if (isset($_COOKIE['uid']))
          $uid = $_COOKIE['uid'];
 
-      $q = "select firstname, lastname, person.id as id, instrument "
+      $q = "select firstname, lastname, person.id as id, instrument, "
+              . "person.status as status "
               . "from person, instruments "
               . " where uid = '$uid' "
               . "and person.id_instruments = instruments.id";
@@ -44,6 +46,7 @@ class WHOAMI
       $this->firstname = $e['firstname'];
       $this->lastname = $e['lastname'];
       $this->instrument = $e['instrument'];
+      $this->status = $e['status'];
    }
 
    public function name()
@@ -64,6 +67,11 @@ class WHOAMI
    public function instrument()
    {
       return $this->instrument;
+   }
+
+   public function status()
+   {
+      return $this->status;
    }
 
    public function real_uid()

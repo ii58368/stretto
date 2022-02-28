@@ -42,12 +42,23 @@ if ($season->semester() == 'H')
    $qperiod .= "and project.semester = '" . $season->semester() . "' ";
 $qperiod .= "))";
 
-$query = "SELECT project.id as id, name, semester, year, status, " .
-        "deadline, orchestration " .
-        "FROM project " .
-        "where $qperiod " .
-        "and not status = $db->prj_stat_draft " .
-        "order by $sort";
+$query = "SELECT project.id as id, "
+        . "project.name as name, "
+        . "project.semester as semester, "
+        . "project.year as year, "
+        . "project.status as status, " 
+        . "project.deadline as deadline, "
+        . "project.orchestration as orchestration "
+        . "FROM project ";
+if ($whoami->status() == $db->per_stat_standin)
+   $query .= ", participant where project.id = participant.id_project "
+        . "and participant.stat_inv = $db->par_stat_yes "
+        . "and participant.id_person = " . $whoami->id() . " and ";
+else
+   $query .= "where ";
+$query .= " $qperiod "
+       . "and not status = $db->prj_stat_draft "
+       . "order by $sort";
 
 $stmt = $db->query($query);
 
