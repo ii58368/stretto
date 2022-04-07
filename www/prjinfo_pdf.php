@@ -20,13 +20,8 @@ class PDF extends PDF_util
       $prj = $stmt->fetch(PDO::FETCH_ASSOC);
 
       $this->header1($prj['name'] . " " . $prj['semester'] . "-" . $prj['year']);
-      $txt = str_replace("<ul>", "", $prj['info']);
-      $txt = str_replace("<li>", "- ", $txt);
-      $txt = str_replace("</ul>", "", $txt);
-      $txt = str_replace("<u>", "", $txt);
-      $txt = str_replace("</u>", "", $txt);
-
-      $this->MultiCell(0, 5, $this->sconv($txt));
+      $info = strip_tags($prj['info']);
+      $this->MultiCell(0, 5, $this->sconv($info));
       $this->Ln();
    }
 
@@ -95,7 +90,7 @@ class PDF extends PDF_util
          $w = array(30, 30, 30, 100);
          $h = array("Dato", "Prøvetid", "Lokale", "Merknad");
 
-         $this->setFillColor(0xE0, 0xE0, 0xE0);
+         $this->setFillColor(0xE0);
          for ($i = 0; $i < count($w); $i++)
             $this->Cell($w[$i], 5, $this->sconv($h[$i]), 0, 0, "L", true);
          $this->Ln();
@@ -142,7 +137,7 @@ class PDF extends PDF_util
             if ($last_instrument != $e['instrument'])
             {
                $this->colLn();
-               if ($this->GetY() > $this->GetPageHeight() - 30)
+               if ($this->GetY() > $this->GetPageHeight() - 28)
                   $this->colNext(41);
                $this->bold($e['instrument'] . ":");
                $this->colLn(2);
@@ -150,7 +145,7 @@ class PDF extends PDF_util
             $name = $e['firstname'] . " " . $e['lastname'];
             $this->Cell(0, 4, $this->sconv($name));
             $this->colLn();
-            if ($this->GetY() > $this->GetPageHeight() - 30)
+            if ($this->GetY() > $this->GetPageHeight() - 27)
                $this->colNext(41);
             $last_instrument = $e['instrument'];
          }

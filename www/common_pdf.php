@@ -94,11 +94,13 @@ class PDF_util extends FPDF
       }
       $this->SetXY($this->col, $this->line);
    }
-
+   
    function colLn($h = null)
    {
       if ($h == null)
          $h = $this->lasth;
+      if ($this->GetY() == $this->line && $this->GetX() == $this->col)
+         $h = 0;
       $this->SetXY($this->col, $this->GetY() + $h);
    }
 

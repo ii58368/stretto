@@ -95,7 +95,8 @@ class PDF extends PDF_util
       }
 
       $this->SetFont('Arial', 'I', 8);
-      $this->Cell(0, 30, "* : redusert besetning", 0, 0, 'LB');
+      $this->setY(270);   
+      $this->Cell(0, 5, "* : redusert besetning", 0, 0, 'LB');
    }
 
    public function repertoire()
@@ -158,7 +159,7 @@ class PDF extends PDF_util
          $h2 .= $prj['name'] . " ";
          foreach ($s as $e)
             $h2 .= ', ' . $e['lname'] . ' ' . strftime('%A %e. %B', $e['ts']);
-         $this->Cell(100, 5, $this->sconv($h2), "B");
+         $this->Cell(150, 5, $this->sconv($h2), "B");
 
          $this->Ln(7);
 
@@ -187,20 +188,21 @@ class PDF extends PDF_util
          }
 
          $this->Ln(4);
-         $this->MultiCell(100, 5, $this->sconv($prj['info']));
+         $this->MultiCell(180, 5, $this->sconv(strip_tags($prj['info'])));
          $this->Ln(7);
       }
 
       $this->SetFont('Arial', 'I', 8);
-      $this->Cell(0, 30, "* : redusert besetning", 0, 0, 'LB');
+      $this->setY(270);
+      $this->Cell(0, 5, "* : redusert besetning", 0, 0, 'LB');
    }
 
 }
 
 if (($year = request('year')) != null)
    $season->set_year($year);
-if (!is_null($semester = $_GET['semester']))
-   $season->set_semester($semester);
+if (isset($_GET['semester']))
+   $season->set_semester($_GET['semester']);
 
 $pdf = new PDF();
 $pdf->AliasNbPages();
