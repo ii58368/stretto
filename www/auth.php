@@ -304,7 +304,7 @@ class ACCESS extends AUTH
             $tb->td(strftime('%e. %b %Y', $e['birthday']));
             $tb->tr();
             $tb->td("Samtykke:");
-            $cell = ($e['gdpr_ts'] > strtotime("-1 year")) 
+            $cell = ($e['gdpr_ts'] > 0) 
                     ? "Samtykker til at OSO kan behandle informasjonen min for spesifikke formål, og jeg kan trekke tilbake samtykket når som helst." 
                     : 'Aksepterer ikke at OSO kan behandle informasjonen min for spesifikke formål';
             $tb->td($cell);

@@ -268,7 +268,7 @@ if (request('showlog') && $access->auth(AUTH::SHOW_LOG))
 
             $tb->td(date2str($row['birthday'], -1), 'align=right');
             $tb->td($db->per_fee[$row['fee']]);
-            $tb->td(date2str($row['gdpr_ts'], strtotime("-1 year")), 'align=right');
+            $tb->td(date2str($row['gdpr_ts'], 0), 'align=right');
             $tb->td(date2str($row['confirmed_ts'], strtotime("-6 months")), 'align=right');
          }
          $tb->td($row['comment']);

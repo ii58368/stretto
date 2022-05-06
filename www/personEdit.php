@@ -353,7 +353,7 @@ function update_pwd($no)
 
 function get_gdpr($gdpr_ts)
 {
-   if ($gdpr_ts > strtotime("-1 year"))
+   if ($gdpr_ts > 0)
       return "Samtykker til at OSO kan behandle informasjonen min for spesifikke formål, og jeg kan trekke tilbake samtykket når som helst.";
    return "Aksepterer <b>ikke</b> at OSO kan behandle informasjonen min for spesifikke formål";
 }
@@ -514,7 +514,7 @@ if ($action == 'edit_pers' || $action == 'new_pers')
    $tb->td("Samtykke:");
    if ($whoami->id() == $no)
    {
-      $checked = ($row['gdpr_ts'] > strtotime("-1 year")) ? 'checked' : '';
+      $checked = ($row['gdpr_ts'] > 0) ? 'checked' : '';
       $cell = "<input type=checkbox name=gdpr $checked title=\"Kryss av for å godkjenne samtykke.\">"
               . "Samtykker til at OSO kan behandle min informasjonen min for spesifikke formål, og jeg kan trekke tilbake samtykket når som helst. "
               . "<a href=\"Personvernerklaering_Oslo_symfoniorkester_v1.pdf\">Personvern</a><br>"
