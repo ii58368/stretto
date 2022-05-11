@@ -2,6 +2,22 @@
 
 require 'framework.php';
 
+function insert_log($text)
+{
+   global $db;
+   global $whoami;
+
+   $s = $db->query("select name from view where id = " . request('id_view'));
+   $e = $s->fetch(PDO::FETCH_ASSOC);
+   $text .= $e['name'];
+   
+   $now = strtotime("now");
+
+   $q = "insert into record (ts, status, comment, id_person, id_editor) " .
+           "values ($now, $db->rec_stat_board, " . $db->quote($text) . ", " . request('id_person') . ", " . $whoami->id() . ")";
+   $db->query($q);
+}
+
 $f_person = request('f_person');
 
 if ($action == 'insert')
@@ -10,12 +26,16 @@ if ($action == 'insert')
    $query = "insert into auth_person (id_view, id_person, ts, id_auth) " .
             "values (".request('id_view').", ".request('id_person').", $ts, " . $whoami->id() . ")";
    $db->query($query);
+   
+   insert_log("Lagt til i tilgangsgruppe: ");
 }   
 
 if ($action == 'delete')
 {
    $query = "delete from auth_person where id_view = ".request('id_view')." and id_person = ".request('id_person');
    $db->query($query);
+   
+   insert_log("Slettet fra tilgangsgruppe: ");
 }   
 
 $sort_view = "view.name,view.id";
