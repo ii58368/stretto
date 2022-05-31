@@ -207,8 +207,9 @@ class MENU
                     . "where project.id = participant.id_project "
                     . "and participant.id_person = person.id "
                     . "and person.id = " . $whoami->id() . " "
-                    . "and participant.stat_final = $db->par_stat_yes "
+                    . "and participant.stat_inv = $db->par_stat_yes "
                     . "and year = " . $season->year() . " "
+                    . "and semester = '" . $season->semester() . "' "
                     . "order by year,semester DESC";
          }
          $s = $db->query($q);
