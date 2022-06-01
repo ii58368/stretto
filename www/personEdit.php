@@ -173,10 +173,15 @@ function insert_pers()
                       " . request('def_pos') . ",
                       " . $db->qpost('phone1') . ", $gdpr_ts,
                       " . $db->qpost('status') . ", " . request('fee') . ", $birthday, " . $db->qpost('comment') . ")";
-   $db->query($query);
-
+   $rc = $db->query($query);
    $no = $db->lastInsertId();
-   insert_log($db->rec_stat_info, 'Registrert, ny status: ' . $db->per_stat[$_POST['status']], $no);
+   
+   if ($rc == TRUE)
+   {
+      insert_log($db->rec_stat_info, 'Registrert, ny status: ' . $db->per_stat[$_POST['status']], $no);
+      $id_visma = $no + 10000;
+      $db->query("update person set id_visma = $id_visma where id = $no");    
+   }
 
    return $no;
 }
@@ -278,7 +283,10 @@ function update_pers($no)
       if (request('fee') != NULL)
          $query .= "fee = " . request('fee') . ",";
       if ($access->auth(AUTH::MEMB_RW))
+      {
          $query .= "id_instruments = " . request('id_instruments') . ",";
+         $query .= "id_visma = " . request('id_visma') . ",";
+      }
       $query .= "comment = " . $db->qpost('comment') . " " .
               "where id = $no";
       $db->query($query);
@@ -387,7 +395,8 @@ $row = array(
     'comment_dir' => '',
     'birthday' => 0,
     'gdpr_ts' => 0,
-    'confirmed_ts' => 0
+    'confirmed_ts' => 0,
+    'id_visma' => 0
 );
 
 $do_lookup = !($action == 'new_pers' || ($action == 'update_pers' && !is_null($delete)));
@@ -398,7 +407,7 @@ if ($do_lookup)
            "sex, fee, uid, address, postcode, city, def_pos, " .
            "email, phone1, status, person.comment as comment, " .
            "comment_dir, status_dir, birthday, " .
-           "gdpr_ts, confirmed_ts " .
+           "gdpr_ts, id_visma, confirmed_ts " .
            "FROM person, instruments " .
            "where id_instruments = instruments.id " .
            "and person.id = $no";
@@ -512,7 +521,7 @@ if ($action == 'edit_pers' || $action == 'new_pers')
    $tb->td("<input type=date name=birthday size=15 value=\"" . date('Y-m-d', $row['birthday']) . "\" title=\"Nødvendig for å kunne rapportere VO-midler\">");
    $tb->tr();
    $tb->td("Samtykke:");
-   if ($whoami->id() == $no)
+   if ($action == 'edit_pers' && $whoami->id() == $no)
    {
       $checked = ($row['gdpr_ts'] > 0) ? 'checked' : '';
       $cell = "<input type=checkbox name=gdpr $checked title=\"Kryss av for å godkjenne samtykke.\">"
@@ -525,6 +534,14 @@ if ($action == 'edit_pers' || $action == 'new_pers')
       $cell = get_gdpr($row['gdpr_ts']);
    }
    $tb->td($cell);
+   
+   if ($action == 'edit_pers' && $access->auth(AUTH::MEMB_RW))
+   {
+      $tb->tr();
+      $tb->td("Visma kundenummer:");
+      $tb->td("<input type=text name=id_visma size=15 value=\"" . $row['id_visma'] . "\" title=\"Kundenummer i Visma\">");
+   }
+
    $tb->tr();
    $tb->td("Kommentar:");
    $tb->td("<input type=text name=comment size=50 value=\"" . $row['comment'] . "\" title=\"Legg inn eventuell kommentar\">");
@@ -572,13 +589,18 @@ else
    $tb->tr();
    $tb->td("Samtykke:");
    $tb->td(get_gdpr($row['gdpr_ts']));
-   $tb->tr();
    if ($access->auth(AUTH::MEMB_RW))
    {
+      $tb->tr();
+      $tb->td("Visma kundenummer:");
+      $tb->td($row['id_visma']);
+      
+      $tb->tr();
       $tb->td("Oppdatert:");
       $tb->td(strftime('%e. %b %Y', $row['confirmed_ts']));
-      $tb->tr();
    }
+   
+   $tb->tr();
    $tb->td("Kommentar:");
    $tb->td($row['comment']);
 }

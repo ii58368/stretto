@@ -10,12 +10,12 @@ $stmt = $db->query($query);
 
 // Required format: fornavn;etternavn;Medlemskontingent;kjønn;fødselsdato;;postnummer;;;;;;;;;
 
-echo "Navn;Adresse;Postnummer;Poststed;Epostadresse;Telefon;Kjønn;Fødselsår;Godtatt deling av info\n";
+echo "Kundenummer;Navn;Adresse;Postnummer;Poststed;Epostadresse;Telefon;Kjønn;Fødselsår;Godtatt deling av info\n";
 
 foreach ($stmt as $e)
 {
    /*
-     $query = "select person.id as id, firstname, middlename, lastname, "
+     $query = "select person.id as id, id_visma, firstname, middlename, lastname, "
      . "status, instrument, email, phone1 "
      . "from person, instruments "
      . "where person.id = $id "
@@ -29,6 +29,7 @@ foreach ($stmt as $e)
     * Gislaug Marie Moe Gimse |         | 2214       | Kongsvinger |              |         | Kvinne | 1978      | nei
     */
    
+   $custom_id = $e['id_visma'];
    $name = $e['firstname'] . " " . $e['middlename'] . " " . $e['lastname'];
    $address = $e['address'];
    $postcode = sprintf('%04d', $e['postcode']);
@@ -39,7 +40,7 @@ foreach ($stmt as $e)
    $born = date('Y', $e['birthday']);
    $gdpr = $e['gdpr_ts'] > 0 ? 'ja' : 'nei';
    
-   $str = "$name;$address;$postcode;$city;$email;$phone;$sex;$born;$gdpr";
+   $str = "$custom_id;$name;$address;$postcode;$city;$email;$phone;$sex;$born;$gdpr";
    echo mb_convert_encoding($str, 'UTF-8');
 
    echo "\n"; 
