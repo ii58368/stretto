@@ -539,7 +539,7 @@ if ($action == 'edit_pers' || $action == 'new_pers')
    {
       $tb->tr();
       $tb->td("Visma kundenummer:");
-      $tb->td("<input type=text name=id_visma size=15 value=\"" . $row['id_visma'] . "\" title=\"Kundenummer i Visma\">");
+      $tb->td("<input type=number min=0 name=id_visma value=\"" . $row['id_visma'] . "\" title=\"Kundenummer i Visma\">");
    }
 
    $tb->tr();
