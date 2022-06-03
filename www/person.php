@@ -233,7 +233,10 @@ if (request('showlog') && $access->auth(AUTH::SHOW_LOG))
    $tb->th("<a href=\"$php_self?_sort=list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på instrumentgruppe...\">Instrument</a>");
    $tb->th("<a href=\"$php_self?_sort=firstname,lastname$f_filter\" title=\"Sorter på fornavn...\">For</a>/
                           <a href=\"$php_self?_sort=lastname,firstname$f_filter\" title=\"Sorter på etternavn...\">Etternavn</a>");
-   $tb->th("<a href=\"$php_self?_sort=uid$f_filter\" title=\"Sorter på Bruker-id...\">UID</a>");
+   if ($access->auth(AUTH::BOARD_RO))
+   {
+      $tb->th("<a href=\"$php_self?_sort=uid$f_filter\" title=\"Sorter på Bruker-id...\">UID</a>");
+   }
    $tb->th("<a href=\"$php_self?_sort=status,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på status...\">Status</a>");
    if ($access->auth(AUTH::BOARD_RO))
    {
@@ -261,11 +264,13 @@ if (request('showlog') && $access->auth(AUTH::SHOW_LOG))
             $tb->td("<a href=\"$pedit?_sort=$sort&_action=view&_no=" . $row['id'] . $f_filter . "\"><img src=\"images/cross_re.gif\" border=0 title=\"Editere person...\"></a>", 'align=center');
          $tb->td($row['instrument']);
          $tb->td($row['firstname'] . ' ' . $row['middlename'] . ' ' . $row['lastname']);
-         $tb->td($row['uid']);
+         if ($access->auth(AUTH::BOARD_RO))
+         {
+            $tb->td($row['uid']);
+         }
          $tb->td($db->per_stat[$row['status']]);
          if ($access->auth(AUTH::BOARD_RO))
          {
-
             $tb->td(date2str($row['birthday'], -1), 'align=right');
             $tb->td($db->per_fee[$row['fee']]);
             $tb->td(date2str($row['gdpr_ts'], 0), 'align=right');
