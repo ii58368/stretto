@@ -201,6 +201,7 @@ function log_changes($no)
 {
    global $db;
    global $access;
+   global $whoami;
 
    $s = $db->query("select * from person where id = $no");
    $e = $s->fetch(PDO::FETCH_ASSOC);
@@ -214,10 +215,13 @@ function log_changes($no)
    if (!is_null(request('fee')))
       log_if_changed($db->rec_stat_board, 'Endret medlemskontingent fra ' . $db->per_fee[$e['fee']] . ' til ' . $db->per_fee[request('fee')], $no, $e, 'fee');
  
-   if (is_null(request('gdpr')) && $e['gdpr_ts'] > 0)
-      insert_log($db->rec_stat_board, "Aksepterer ikke lenger at OSO kan behandle min kontaktinformasjonen for spesifikke formål.");
-   if (!is_null(request('gdpr')) && $e['gdpr_ts'] == 0)
-      insert_log($db->rec_stat_board, "Samtykker til at OSO kan behandle min kontaktinformasjonen for spesifikke formål.");
+   if ($whoami->id() == $no)
+   {
+      if (is_null(request('gdpr')) && $e['gdpr_ts'] > 0)
+         insert_log($db->rec_stat_board, "Aksepterer ikke lenger at OSO kan behandle min kontaktinformasjonen for spesifikke formål.", $no);
+      if (!is_null(request('gdpr')) && $e['gdpr_ts'] == 0)
+         insert_log($db->rec_stat_board, "Samtykker til at OSO kan behandle min kontaktinformasjonen for spesifikke formål.", $no);
+   }
    
    log_if_changed($db->rec_stat_board, 'Oppdatert adresse', $no, $e, 'address', 'postcode', 'city');
    log_if_changed($db->rec_stat_board, 'Oppdatert e-post adresse', $no, $e, 'email');
