@@ -289,7 +289,9 @@ function update_pers($no)
       if ($access->auth(AUTH::MEMB_RW))
       {
          $query .= "id_instruments = " . request('id_instruments') . ",";
-         $query .= "id_visma = " . request('id_visma') . ",";
+         $id_visma = request('id_visma');
+         if (is_numeric($id_visma))
+            $query .= "id_visma = $id_visma,";
       }
       $query .= "comment = " . $db->qpost('comment') . " " .
               "where id = $no";
