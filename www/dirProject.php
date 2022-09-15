@@ -95,7 +95,7 @@ function mail2dir($id_project)
    if (strlen($r2['email']) > 0)
       $str .= $r2['email'];
 
-   $str .= "?subject=OSO: Regikomit&eacute;, $project_name&body=Se oppdatert regiplan: http://" . $_SERVER['SERVER_NAME'] . "/stretto/direction.php?id_project=$id_project\"><image border=0 src=images/image1.gif hspace=20 title=\"Send mail alle i regikomit&eacute;en\"></a>";
+   $str .= "?subject=OSO: Regikomit&eacute;, $project_name&body=Se oppdatert regiplan: https://" . $_SERVER['SERVER_NAME'] . "/direction.php?id_project=$id_project\"><image border=0 src=images/image1.gif hspace=20 title=\"Send mail alle i regikomit&eacute;en\"></a>";
 
    $str .= "<a href=\"sms:";
    reset($r);
