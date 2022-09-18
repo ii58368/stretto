@@ -493,7 +493,7 @@ foreach ($stmt as $row)
 //   manage_reg($part, $row['id'], $row['id'] == $no || request('col') == "reg", $prj['valid_par_stat']);
    if ($prj['orchestration'] == $db->prj_type_reduced || $prj['orchestration'] == $db->prj_type_tutti)
       manage_req($part, $row['id'], $row['id'] == $no || request('col') == "req", $prj['orchestration']);
-   manage_final($part, $row['id'], ($row['id'] == $no || request('col') == "final") && $prj['status'] != $db->prj_stat_internal, $prj['orchestration']);
+   manage_final($part, $row['id'], ($row['id'] == $no || request('col') == "final"), $prj['orchestration']);
 
    echo "</tr>";
 }
