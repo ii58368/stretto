@@ -6,7 +6,7 @@ require 'person_query.php';
 $pedit = "personEdit.php";
 
 if (is_null($sort))
-   $sort = 'list_order,-def_pos+desc,lastname,firstname';
+   $sort = 'instrument';
 
 function send_mail($r)
 {
@@ -188,7 +188,6 @@ if (!is_null(request('f_project')))
 }
 
 $query = (request('showlog') && $access->auth(AUTH::MEMB_GREP)) ? log_query(request('logg')) : person_query();
-
 $stmt = $db->query($query);
 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -197,7 +196,7 @@ $f_filter = get_filter_as_url();
 if ($access->auth(AUTH::MEMB_RW))
    echo "<a href=\"$pedit?_sort=$sort&_action=new_pers$f_filter\" title=\"Registrer ny person...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
 
-echo "<a href=\"person_pdf.php?_sort=list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"PDF versjon...\"><img src=images/pdf.jpeg height=22 border=0 hspace=5 vspace=5></a>\n";
+echo "<a href=\"person_pdf.php?_sort=instrument$f_filter\" title=\"PDF versjon...\"><img src=images/pdf.jpeg height=22 border=0 hspace=5 vspace=5></a>\n";
 
 if ($access->auth(AUTH::MEMB_RW))
 {
@@ -230,20 +229,20 @@ if ($access->auth(AUTH::MEMB_RW))
 
 if (request('showlog') && $access->auth(AUTH::SHOW_LOG))
 {
-   $tb->th("<a href=\"$php_self?_sort=list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på instrumentgruppe...\">Instrument</a>");
+   $tb->th("<a href=\"$php_self?_sort=instrument$f_filter\" title=\"Sorter på instrumentgruppe...\">Instrument</a>");
    $tb->th("<a href=\"$php_self?_sort=firstname,lastname$f_filter\" title=\"Sorter på fornavn...\">For</a>/
                           <a href=\"$php_self?_sort=lastname,firstname$f_filter\" title=\"Sorter på etternavn...\">Etternavn</a>");
    if ($access->auth(AUTH::BOARD_RO))
    {
       $tb->th("<a href=\"$php_self?_sort=uid$f_filter\" title=\"Sorter på Bruker-id...\">UID</a>");
    }
-   $tb->th("<a href=\"$php_self?_sort=status,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på status...\">Status</a>");
+   $tb->th("<a href=\"$php_self?_sort=status,instrument$f_filter\" title=\"Sorter på status...\">Status</a>");
    if ($access->auth(AUTH::BOARD_RO))
    {
       $tb->th("<a href=\"$php_self?_sort=birthday$f_filter\" title=\"Sorter på Fødselsdag...\">Fødtselsdag</a>");
-      $tb->th("<a href=\"$php_self?_sort=fee,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på type kontingent...\">Kontingent</a>");
-      $tb->th("<a href=\"$php_self?_sort=gdpr_ts,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på dato for samtykke...\">Samtykke</a>");
-      $tb->th("<a href=\"$php_self?_sort=confirmed_ts,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på dato for bekreftelse av personopplysninger...\">Oppdatert</a>");
+      $tb->th("<a href=\"$php_self?_sort=fee,instrument$f_filter\" title=\"Sorter på type kontingent...\">Kontingent</a>");
+      $tb->th("<a href=\"$php_self?_sort=gdpr_ts,instrument$f_filter\" title=\"Sorter på dato for samtykke...\">Samtykke</a>");
+      $tb->th("<a href=\"$php_self?_sort=confirmed_ts,instrument$f_filter\" title=\"Sorter på dato for bekreftelse av personopplysninger...\">Oppdatert</a>");
    }
    $tb->th("Kommentar");
    $th = request('logg') == 'full' ? 'Full logg' : 'Logg - siste 12 mnd';
@@ -288,7 +287,7 @@ if (request('showlog') && $access->auth(AUTH::SHOW_LOG))
 }
 else
 {
-   $tb->th("<a href=\"$php_self?_sort=list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på instrumentgruppe...\">Instrument</a>");
+   $tb->th("<a href=\"$php_self?_sort=instrument$f_filter\" title=\"Sorter på instrumentgruppe...\">Instrument</a>");
    $tb->th("<a href=\"$php_self?_sort=firstname,lastname$f_filter\" title=\"Sorter på fornavn...\">For</a>/
                           <a href=\"$php_self?_sort=lastname,firstname$f_filter\" title=\"Sorter på etternavn...\">Etternavn</a>");
    $tb->th("<a href=\"$php_self?_sort=address,lastname,firstname$f_filter\" title=\"Sorter på addresse...\">Adresse</a>");
@@ -296,7 +295,7 @@ else
    $tb->th("<a href=\"$php_self?_sort=city,lastname,firstname$f_filter\" title=\"Sorter på sted...\">Sted</a>");
    $tb->th("Email");
    $tb->th("Mobil");
-   $tb->th("<a href=\"$php_self?_sort=status,list_order,-def_pos+desc,lastname,firstname$f_filter\" title=\"Sorter på status...\">Status</a>");
+   $tb->th("<a href=\"$php_self?_sort=status,instrument$f_filter\" title=\"Sorter på status...\">Status</a>");
 
    reset($result);
 
