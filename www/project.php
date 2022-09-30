@@ -125,7 +125,7 @@ if ($action == 'new')
    $tb->td("<input type=date size=10 name=deadline value=\"" .
            date('j. M y', time() + 60 * 60 * 24 * 7 * 12) . // Default dealine: 12 weeks from now
            "\" title=\"Frist for permisjon/påmelding.\nFormat: <dato>. <mnd> [<år>]\nMerk: Måned på engelsk. Eksempel: 12. dec\">");
-   $tb->td(select_type($selected));
+   $tb->td(select_type($db->prj_type_tutti));
    $tb->td(select_valid_par_stat(1 << $db->par_stat_no));
    $hinfo = "Informasjon om prosjektet. Blir synlig på planen for prosjektinfo. "
            . "Nyttig  info:\n"
