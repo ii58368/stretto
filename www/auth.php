@@ -53,8 +53,9 @@ class AUTH
    const FEEDBACK_W = 44; // Feedback, admin r/w
    const REP_RO = 45; // Music repository, r/o
    const SHOW_LOG = 46; // Show log in person repository
+   const REP_RO_LIM = 47; // Music repository, limited r/o
    const ALL = 0x7fffffffffffffff; // 63 bits enabled
-   const NO_VIEWS = 47;
+   const NO_VIEWS = 48;
 
    private $access;
    protected $confirmed_ts;  // retreived for real_uid

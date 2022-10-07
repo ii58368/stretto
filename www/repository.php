@@ -73,7 +73,7 @@ if ($id_project > 0)
    unset($form);
 }
 
-echo "<h1>Notearkiv</h1>\n";
+echo "<h1>Repertoar</h1>\n";
 $form = new FORM();
 echo "<input type=hidden name=_sort value=\"$sort\">
       <input type=hidden name=id_project value=$id_project>
@@ -81,10 +81,8 @@ echo "<input type=hidden name=_sort value=\"$sort\">
       <input type=text name=search value=\"$search\" title=\"Søk på hele eller deler av komponistnavn eller tittel og trykk enter\">\n";
 unset($form);
 
-if ($access->auth(AUTH::REP))
-   echo "<a href=\"$php_self?_sort=$sort&_action=new&id_project=$id_project&search=$search\" title=\"Registrer nytt verk...\"><img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5></a>\n";
-
-echo "<a href=\"repository_pdf.php\" title=\"PDF versjon av alle verk som har arkivref OSO\"><img src=images/pdf.jpeg height=22 border=0 hspace=5 vspace=5></a>\n";
+echo $access->hlink($access->auth(AUTH::REP), "$php_self?_sort=$sort&_action=new&id_project=$id_project&search=$search", "<img src=\"images/new_inc.gif\" border=0 hspace=5 vspace=5>", "title=\"Registrer nytt verk...\"", "");
+echo $access->hlink($access->auth(AUTH::REP_RO), "repository_pdf.php", "<img src=images/pdf.jpeg height=22 border=0 hspace=5 vspace=5>", "title=\"PDF versjon av alle verk som har arkivref OSO\"", "");
 
 $form = new FORM();
 $tb = new TABLE('border=1');
@@ -94,11 +92,12 @@ if ($access->auth(AUTH::REP))
 $tb->th("<a href=\"$php_self?_sort=lastname,firstname,title&id_project=$id_project&search=$search\" title=\"Sorter på komponistnavn\">Komponist</a>");
 $tb->th("<a href=\"$php_self?_sort=title,lastname,firstname&id_project=$id_project&search=$search\" title=\"Sorter på tittel\">Tittle</a>");
 $tb->th("Fra");
-$tb->th("<a href=\"$php_self?_sort=archive,tag&id_project=$id_project&search=$search\" title=\"Sorter på arkivreferanse\">Arkivref</a>");
+if (!$access->auth(AUTH::REP_RO_LIM))
+   $tb->th("<a href=\"$php_self?_sort=archive,tag&id_project=$id_project&search=$search\" title=\"Sorter på arkivreferanse\">Arkivref</a>");
 $tb->th("Kommentar");
 $tb->th("Prosjekt");
 
-if ($action == 'new')
+if ($access->auth(AUTH::REP) && $action == 'new')
 {
    $s = $db->query("select max(tag) as max_tag from repository where archive = 'OSO'");
    $e = $s->fetch(PDO::FETCH_ASSOC);
@@ -217,7 +216,8 @@ foreach ($stmt as $row)
       $tb->td($row['lastname'] . ", " . $row['firstname']);
       $tb->td($row['title']);
       $tb->td($row['work']);
-      $tb->td($row['archive'] . ":" . $row['tag']);
+      if (!$access->auth(AUTH::REP_RO_LIM))
+         $tb->td($row['archive'] . ":" . $row['tag']);
       $tb->td(str_replace("\n", "<br>\n", $row['comment']));
       $plist .= ($access->auth(AUTH::REP) && !$is_included && $id_project > 0) ?
               "<a href=\"$php_self?_action=rep_update&_no=" . $row['id'] . "&_sort=$sort&id_project=$id_project&search=$search\"><img src=\"images/folder.open.gif\" border=0 title=\"Legg til dette verket i repertoarlisten\"></a>" : '';
@@ -238,7 +238,7 @@ foreach ($stmt as $row)
       $tb->td("<input type=text size=30 name=title value=\"" . $row['title'] . "\" title=\"Verk\">");
       $tb->td("<input type=text size=30 name=work value=\"" . $row['work'] . "\" title=\"Navn på hovedverk hvis dette er et utdrag\">");
       $tb->td("<input type=text size=8 name=archive value=\"" . $row['archive'] . "\" title=\"Referanse på hvor noter er leid eller lånt\">
-         <input type=text size=6 name=tag value=\"" . $row['tag'] . "\" title=\"Eventuelt referansenummer\">");
+                  <input type=text size=6 name=tag value=\"" . $row['tag'] . "\" title=\"Eventuelt referansenummer\">");
       $tb->td("<textarea cols=50 rows=2 wrap=virtual name=comment title=\"Fritekst\">" . $row['comment'] . "</textarea>");
       $tb->td($plist);
    }

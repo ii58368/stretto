@@ -174,7 +174,7 @@ add_li("Meny", 1);
          add_li("Tilgang", 0, AUTH::BOARD_RO, AUTH::ACC, "Liste over tilganger for hver enkelt musiker");
          add_li("Tilgangsgrupper", -1, AUTH::BOARD_RO, AUTH::ACCGRP, "Definering av tilgangsgrupper");
       }
-      add_li("Notearkiv", 0, AUTH::REP_RO, AUTH::REP, "Oversikt over notearkiv");
+      add_li("Repertoar", 0, AUTH::REP_RO, AUTH::REP, "Oversikt over repertoar, <font color=green>" . AUTH::REP_RO_LIM . "</font>: Begrenset oversikt");
       add_li("Prosjekt", 1, AUTH::BOARD_RO);
       {
          add_li("Prosjekter", 0, AUTH::PRJ_RO, AUTH::PRJ, "Overordnet administrasjon/oversikt over planlagte prosjekter");

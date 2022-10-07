@@ -163,7 +163,7 @@ class MENU
             $groups->add("Tilgang", "access.php", AUTH::BOARD_RO);
             $groups->add("Tilgangsgrupper", "view.php", AUTH::BOARD_RO);
          }
-         $admin->add("Notearkiv", "repository.php", AUTH::REP_RO);
+         $admin->add("Repertoar", "repository.php", AUTH::REP_RO, AUTH::REP_RO_LIM);
          {
             $project = new SUBMENU("class=\"dl-submenu\"");
             $admin->add("Prosjekt", $project, AUTH::BOARD_RO);
@@ -227,7 +227,7 @@ class MENU
             $project->add("Beskjeder", "pevent.php?id_project=$pid");
             $project->add("Gruppeoppsett", "seating.php?id_project=$pid");
 //            $project->add("Tilbakemelding", "feedbackReg.php?id_project=$pid");
-            $project->add("Repertoar", "repository.php?id_project=$pid", AUTH::REP);
+            $project->add("Progrsm", "repository.php?id_project=$pid", AUTH::REP);
             $project->add("Musikere", "person.php?f_project[]=$pid");
             $project->add("Regikomité", "direction.php?id_project=$pid", AUTH::DIR_RO);
             $project->add("Fravær", "absence.php?id_project=$pid", AUTH::ABS_RO);
@@ -275,6 +275,7 @@ class MENU
               . "or person.status = $db->per_stat_standin "
               . "or person.status = $db->per_stat_hired "
               . "or person.status = $db->per_stat_eng) "
+              . "and not person.uid = '' "
               . "and person.id_instruments = instruments.id "
               . "order by list_order, lastname, firstname";
       $s = $db->query($q);
