@@ -2,8 +2,9 @@
 
 require 'person_query.php';
 
-header("Content-Type: application/vnd.ms-excel");
-header("Content-disposition: attachment; filename=participants.xls");
+$filename = 'person.csv';
+header("Content-Type: text/csv; name=\"$filename\"");
+header("Content-disposition: attachment; filename=\"$filename\"");
 
 $query = person_query();
 $stmt = $db->query($query);
