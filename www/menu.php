@@ -227,7 +227,7 @@ class MENU
             $project->add("Beskjeder", "pevent.php?id_project=$pid");
             $project->add("Gruppeoppsett", "seating.php?id_project=$pid");
 //            $project->add("Tilbakemelding", "feedbackReg.php?id_project=$pid");
-            $project->add("Progrsm", "repository.php?id_project=$pid", AUTH::REP);
+            $project->add("Program", "repository.php?id_project=$pid", AUTH::REP);
             $project->add("Musikere", "person.php?f_project[]=$pid");
             $project->add("Regikomité", "direction.php?id_project=$pid", AUTH::DIR_RO);
             $project->add("Fravær", "absence.php?id_project=$pid", AUTH::ABS_RO);
