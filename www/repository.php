@@ -92,7 +92,7 @@ if ($access->auth(AUTH::REP))
 $tb->th("<a href=\"$php_self?_sort=lastname,firstname,title&id_project=$id_project&search=$search\" title=\"Sorter på komponistnavn\">Komponist</a>");
 $tb->th("<a href=\"$php_self?_sort=title,lastname,firstname&id_project=$id_project&search=$search\" title=\"Sorter på tittel\">Tittle</a>");
 $tb->th("Fra");
-if (!$access->auth(AUTH::REP_RO_LIM))
+if ($access->auth(AUTH::REP_RO))
    $tb->th("<a href=\"$php_self?_sort=archive,tag&id_project=$id_project&search=$search\" title=\"Sorter på arkivreferanse\">Arkivref</a>");
 $tb->th("Kommentar");
 $tb->th("Prosjekt");
@@ -216,7 +216,7 @@ foreach ($stmt as $row)
       $tb->td($row['lastname'] . ", " . $row['firstname']);
       $tb->td($row['title']);
       $tb->td($row['work']);
-      if (!$access->auth(AUTH::REP_RO_LIM))
+      if ($access->auth(AUTH::REP_RO))
          $tb->td($row['archive'] . ":" . $row['tag']);
       $tb->td(str_replace("\n", "<br>\n", $row['comment']));
       $plist .= ($access->auth(AUTH::REP) && !$is_included && $id_project > 0) ?
