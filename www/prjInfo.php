@@ -3,7 +3,7 @@
 require 'framework.php';
 
 $query = "select name, orchestration, semester, year, "
-        . "status, info "
+        . "status, info, orchestration "
         . " from project"
         . " where id=" . request('id');
 $stmt = $db->query($query);
@@ -15,8 +15,6 @@ if ($prj['status'] != $db->prj_stat_real)
 if ($prj['status'] == $db->prj_stat_real)
    echo "<h2>" . $prj['name'] . " " . $prj['semester'] . "-" . $prj['year'] . "<a href=prjinfo_pdf.php?id=" . request('id') . " title=\"PDF versjon\"><img src=images/pdf.jpeg height=30></a></h2>\n";
 echo str_replace("\n", "<br>\n", $prj['info']) . "\n";
-
-echo "<h3>Repertoar</h3>";
 
 $tb = new TABLE('id=no_border');
 
@@ -31,17 +29,22 @@ $query = "SELECT title, work, firstname, lastname, "
 
 $stmt = $db->query($query);
 
-foreach ($stmt as $row)
+if ($stmt->rowCount() > 0)
 {
-   $tb->td($row['firstname'] . ' ' . $access->hlink2("repository.php?search=" . urlencode($row['lastname']), $row['lastname']), 'valign=top');
-   $tb->td($row['title'] . "<br>" . $row['r_comment']);
-   if (strlen($row['work']) > 0)
-      $tb->td("fra " . $row['work'], 'valign=top');
-   $tb->td($row['comment'], 'valign=top');
-   $tb->tr();
-}
+   echo "<h3>Repertoar</h3>";
 
-unset($tb);
+   foreach ($stmt as $row)
+   {
+      $tb->td($row['firstname'] . ' ' . $access->hlink2("repository.php?search=" . urlencode($row['lastname']), $row['lastname']), 'valign=top');
+      $tb->td($row['title'] . "<br>" . $row['r_comment']);
+      if (strlen($row['work']) > 0)
+         $tb->td("fra " . $row['work'], 'valign=top');
+      $tb->td($row['comment'], 'valign=top');
+      $tb->tr();
+   }
+
+   unset($tb);
+}
 
 $query = "SELECT date, time, " .
         "plan.location as location, location.name as lname, " .
@@ -59,7 +62,8 @@ $stmt = $db->query($query);
 
 if ($stmt->rowCount() > 0)
 {
-   echo "<h3>Prøveplan</h3>";
+   $plan = ($prj['orchestration'] == $db->prj_type_social) ? "Tid og sted" : "Prøveplan";
+   echo "<h3>$plan</h3>";
 
    $tb = new TABLE();
 
