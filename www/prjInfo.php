@@ -122,7 +122,8 @@ $stmt = $db->query($query);
 
 if ($stmt->rowCount() > 0)
 {
-   echo "<h3>Musikere</h3>\n";
+   $participants = ($prj['orchestration'] == $db->prj_type_social) ? "Deltakere" : "Musikere";
+   echo "<h3>$participants</h3>\n";
 
    $last_instrument = '';
 
