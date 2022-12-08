@@ -173,6 +173,7 @@ function insert_pers()
                       " . request('def_pos') . ",
                       " . $db->qpost('phone1') . ", $gdpr_ts,
                       " . $db->qpost('status') . ", " . request('fee') . ", $birthday, " . $db->qpost('comment') . ")";
+   echo $query;
    $rc = $db->query($query);
    $no = $db->lastInsertId();
    
@@ -732,7 +733,7 @@ if ($do_lookup)
            . "on record.id_editor = person.id "
            . "where record.id_person = $no ";
    if (!$access->auth(AUTH::BOARD_RO))
-      $query .= "and status = $db->rec_stat_info ";
+      $query .= "and record.status = $db->rec_stat_info ";
    $query .= "order by ts desc";
 
    $stmt = $db->query($query);
