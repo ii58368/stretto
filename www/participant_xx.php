@@ -3,7 +3,7 @@ require 'framework.php';
 require 'participant_status.php';
 
 echo "
-    <h1>Prosjektressurser</h1>
+    <h1>Ressurser</h1>
     <table border=1>
     <tr>
       <th>
