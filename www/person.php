@@ -198,7 +198,7 @@ if ($access->auth(AUTH::MEMB_RW))
 
 echo "<a href=\"person_pdf.php?_sort=instrument$f_filter\" title=\"PDF versjon...\"><img src=images/pdf.jpeg height=22 border=0 hspace=5 vspace=5></a>\n";
 
-if ($access->auth(AUTH::MEMB_RW))
+if ($access->auth(AUTH::MEMB_GREP))
 {
    send_mail($result);
 }
