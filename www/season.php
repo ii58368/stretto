@@ -51,7 +51,7 @@ class SEASON
       $t_date = ($this->semester == 'V') ? "30. jun" : "31. dec";
 
       $f_ts = strtotime("$f_date " . $this->year);
-      $t_ts = strtotime("$t_date " . $this->year);
+      $t_ts = strtotime("$t_date " . $this->year) + 60*60*24;
 
       return array($f_ts, $t_ts);
    }
