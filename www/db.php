@@ -134,7 +134,8 @@ class DB extends myPDO
    public $per_stat_eng = 4;
    public $per_stat_apply = 5;
    public $per_stat_extra = 6;
-   public $per_stat = array("Sluttet", "Medlem", "Vikar", "Innleid", "Engasjert", "Søkt", "Ekstra");
+   public $per_stat_removed = 7;
+   public $per_stat = array("Sluttet", "Medlem", "Vikar", "Innleid", "Engasjert", "Søkt", "Ekstra", "Slettet");
 // field: sex
    public $per_sex_unknown = 0;
    public $per_sex_male = 1;
