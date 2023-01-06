@@ -652,7 +652,7 @@ if ($do_lookup)
       $tb->tr();
       $tb->td("Tilgangsgruppe(r):");
       $str = '';
-      $warn = ($row['status'] == $db->per_stat_quited) ? "<img src=images/caution.gif height=17>" : "";
+      $warn = ($row['status'] == $db->per_stat_quited or $row['status'] == $db->per_stat_removed) ? "<img src=images/caution.gif height=17 title=\"Vedkommende har tilgang selv om status er sluttet eller slettet\">" : "";
       foreach ($stmt2 as $acc)
          $str .= $acc['name'] . "$warn<br>";
       $tb->td($str);

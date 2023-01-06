@@ -51,6 +51,7 @@ $query = "SELECT person.id as person_id, " .
         "FROM person, instruments, project " .
         "where instruments.id = id_instruments " .
         "and not (person.status = $db->per_stat_quited " .
+        "or person.status = $db->per_stat_removed " .
         "or person.status = $db->per_stat_apply) " .
         "and $qstat " .
         "and $qperiod " .

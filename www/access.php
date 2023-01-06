@@ -67,7 +67,7 @@ $query  = "SELECT person.id as person_id, "
           . "FROM person, instruments, view "
           . "where instruments.id = id_instruments ";
 if (is_null($f_person))
-   $query .= "and not person.status = $db->per_stat_quited ";
+   $query .= "and not (person.status = $db->per_stat_quited or person.status = $db->per_stat_removed)";
 else
    $query .= "and person.id = $f_person ";
 $query .= "order by $sort";

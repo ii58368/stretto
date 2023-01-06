@@ -35,7 +35,7 @@ function member_select($id_groups)
    $q = "SELECT person.id as id, firstname, lastname, instrument " .
            "FROM person, instruments " .
            "where instruments.id = person.id_instruments " .
-           "and not person.status = $db->per_stat_quited " .
+           "and not (person.status = $db->per_stat_quited or person.status = $db->per_stat_removed) " .
            "order by instruments.list_order, lastname, firstname";
    $s = $db->query($q);
 
@@ -135,9 +135,10 @@ function person_select($selected)
 
    $str = "<select name=id_person title=\"Angi hvem som er leder/kontaktperson for gruppen\">";
 
-   $q = "SELECT person.id as id, firstname, lastname, instrument FROM person, instruments " .
-           "where person.id_instruments = instruments.id " .
-           "order by list_order, lastname, firstname";
+   $q = "SELECT person.id as id, firstname, lastname, instrument FROM person, instruments "
+           . "where person.id_instruments = instruments.id "
+           . "and not (person.status = $db->per_stat_quited or person.status = $db->per_stat_removed) "
+           . "order by list_order, lastname, firstname";
 
    $s = $db->query($q);
 
