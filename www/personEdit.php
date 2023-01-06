@@ -165,14 +165,14 @@ function insert_pers()
 
    $query = "insert into person (id_instruments, firstname, middlename, lastname, sex, address, 
               postcode, city, email, uid, password, def_pos, 
-              phone1, gdpr_ts, status, fee, birthday, comment)
+              phone1, gdpr_ts, status, fee, birthday)
               values (" . request('id_instruments') . ", " . $db->qpost('firstname') . ", 
                       " . $db->qpost('middlename') . ", " . $db->qpost('lastname') . ", " . request('sex') . ", " . $db->qpost('address') . ",
                       " . request('postcode') . ", " . $db->qpost('city') . ", " . $db->qpost('email') . ",
                       " . $db->qpost('email') . ", MD5('OSO'),
                       " . request('def_pos') . ",
                       " . $db->qpost('phone1') . ", $gdpr_ts,
-                      " . $db->qpost('status') . ", " . request('fee') . ", $birthday, " . $db->qpost('comment') . ")";
+                      " . $db->qpost('status') . ", " . request('fee') . ", $birthday)";
    echo $query;
    $rc = $db->query($query);
    $no = $db->lastInsertId();
@@ -227,7 +227,6 @@ function log_changes($no)
    log_if_changed($db->rec_stat_board, 'Oppdatert adresse', $no, $e, 'address', 'postcode', 'city');
    log_if_changed($db->rec_stat_board, 'Oppdatert e-post adresse', $no, $e, 'email');
    log_if_changed($db->rec_stat_board, 'Oppdatert telefonnummer', $no, $e, 'phone1');
-   log_if_changed($db->rec_stat_board, 'Oppdatert kommentar', $no, $e, 'comment');
 }
 
 function update_pers($no)
@@ -272,12 +271,6 @@ function update_pers($no)
                  "lastname = " . $db->qpost('lastname') . "," .
                  "sex = " . request('sex') . "," .
                  "def_pos = " . request('def_pos') . ",";
-      $query .= "address = " . $db->qpost('address') . "," .
-              "postcode = " . request('postcode') . "," .
-              "city = " . $db->qpost('city') . "," .
-              "email = " . $db->qpost('email') . "," .
-              "phone1 = " . $db->qpost('phone1') . "," .
-              "birthday = $birthday,";
       if ($whoami->id() == $no)
       {
          $query .= "confirmed_ts = $now," .
@@ -294,8 +287,13 @@ function update_pers($no)
          if (is_numeric($id_visma))
             $query .= "id_visma = $id_visma,";
       }
-      $query .= "comment = " . $db->qpost('comment') . " " .
-              "where id = $no";
+      $query .= "address = " . $db->qpost('address') . "," .
+              "postcode = " . request('postcode') . "," .
+              "city = " . $db->qpost('city') . "," .
+              "email = " . $db->qpost('email') . "," .
+              "phone1 = " . $db->qpost('phone1') . "," .
+              "birthday = $birthday ";
+      $query .= "where id = $no";
       $db->query($query);
    }
 }
@@ -398,7 +396,6 @@ $row = array(
     'phone1' => '',
     'status' => $db->per_stat_apply,
     'fee' => $db->per_fee_free,
-    'comment' => '',
     'comment_dir' => '',
     'birthday' => 0,
     'gdpr_ts' => 0,
@@ -412,7 +409,7 @@ if ($do_lookup)
 {
    $query = "SELECT person.id as id, id_instruments, instrument, firstname, middlename, lastname, " .
            "sex, fee, uid, address, postcode, city, def_pos, " .
-           "email, phone1, status, person.comment as comment, " .
+           "email, phone1, status, " .
            "comment_dir, status_dir, birthday, " .
            "gdpr_ts, id_visma, confirmed_ts " .
            "FROM person, instruments " .
@@ -550,8 +547,6 @@ if ($action == 'edit_pers' || $action == 'new_pers')
    }
 
    $tb->tr();
-   $tb->td("Kommentar:");
-   $tb->td("<input type=text name=comment size=50 value=\"" . $row['comment'] . "\" title=\"Legg inn eventuell kommentar\">");
 }
 else
 {
@@ -608,8 +603,6 @@ else
    }
    
    $tb->tr();
-   $tb->td("Kommentar:");
-   $tb->td($row['comment']);
 }
 
 unset($tb);

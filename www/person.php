@@ -244,7 +244,6 @@ if (request('showlog') && $access->auth(AUTH::SHOW_LOG))
       $tb->th("<a href=\"$php_self?_sort=gdpr_ts,instrument$f_filter\" title=\"Sorter på dato for samtykke...\">Samtykke</a>");
       $tb->th("<a href=\"$php_self?_sort=confirmed_ts,instrument$f_filter\" title=\"Sorter på dato for bekreftelse av personopplysninger...\">Oppdatert</a>");
    }
-   $tb->th("Kommentar");
    $th = request('logg') == 'full' ? 'Full logg' : 'Logg - siste 12 mnd';
    $tb->th("<a href=\"$php_self?_sort=$sort$f_filter&logg=full\" title=\"Klikk for å vise full logg\">$th</a>");
 
@@ -275,7 +274,6 @@ if (request('showlog') && $access->auth(AUTH::SHOW_LOG))
             $tb->td(date2str($row['gdpr_ts'], 0), 'align=right');
             $tb->td(date2str($row['confirmed_ts'], strtotime("-6 months")), 'align=right');
          }
-         $tb->td($row['comment']);
          $old_id = $row['id'];
          $log = '';
       }
