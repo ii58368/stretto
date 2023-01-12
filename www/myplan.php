@@ -29,7 +29,8 @@ $query = "SELECT plan.id as id, "
         . "location.url as url, "
         . "plan.comment as comment, "
         . "orchestration, "
-        . "participant.stat_final as stat_final "
+        . "participant.stat_final as stat_final, "
+        . "participant.stat_self as stat_self "
         . "FROM project, plan, location, participant "
         . "where plan.id_location = location.id "
         . "and plan.id_project = project.id "
@@ -62,7 +63,8 @@ foreach ($stmt as $row)
    
    if ($row['stat_final'] == $db->par_stat_void)
    {
-      if ($row['orchestration'] == $db->prj_type_reduced && time() > $row['deadline'])
+      if ($row['orchestration'] == $db->prj_type_reduced && time() > $row['deadline'] 
+              && ($row['stat_self'] == $db->par_stat_void || $row['stat_self'] == $db->par_stat_no))
          continue;
       $tb->td("$gfont$date</font>", 'align=right nowrap');
       $tb->td("$gfont$time</font>");
