@@ -1,14 +1,16 @@
 <?php
 
-require 'person_query.php';
+require 'request.php';
 
-$filename = 'person.csv';
+$id_project = request('id_project');
+
+$filename = "absence_$id_project.csv";
 header("Content-Type: text/csv; name=\"$filename\"");
 header("Content-disposition: attachment; filename=\"$filename\"");
 
 $query = "SELECT date, time "
         . "FROM plan "
-        . "where plan.id_project = " . request('id_project') . " "
+        . "where plan.id_project = $id_project "
         . "and plan.event_type = $db->plan_evt_rehearsal "
         . "order by date";
 
@@ -79,7 +81,7 @@ $query = "SELECT person.id as id, "
         . "FROM plan, participant, person "
         . "left join absence "
         . "on absence.id_person = person.id "
-        . "where participant.id_project = " . request('id_project') . " "
+        . "where participant.id_project = $id_project "
         . "and participant.stat_final = $db->par_stat_yes "
         . "and person.id = participant.id_person "
         . "and plan.id_project = participant.id_project "
