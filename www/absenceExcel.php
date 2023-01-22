@@ -75,18 +75,13 @@ $query = "SELECT person.id as id, "
         . "person.phone1 as phone1, "
         . "person.sex as sex, "
         . "person.birthday as birthday, "
-        . "plan.date as date, "
-        . "plan.time as time, "
-        . "absence.status as status "
-        . "FROM plan, participant, person "
-        . "left join absence "
-        . "on absence.id_person = person.id "
+        . "plan.id as id_plan "
+        . "FROM person, participant, plan "
         . "where participant.id_project = $id_project "
         . "and participant.stat_final = $db->par_stat_yes "
         . "and person.id = participant.id_person "
         . "and plan.id_project = participant.id_project "
         . "and plan.event_type = $db->plan_evt_rehearsal "
-        . "and absence.id_plan = plan.id "
         . "order by person.firstname, person.lastname, person.id, plan.date";
 
 $stmt = $db->query($query);
@@ -112,7 +107,14 @@ foreach ($stmt as $e)
       echo mb_convert_encoding($str, 'UTF-8');
    }
    
-   echo ($e['status'] == $db->abs_stat_in || $e['status'] == $db->abs_stat_part) ? ";x" : ";";
+   $q = "select status, comment from absence "
+           . "where id_person = ".$e['id']." "
+           . "and id_plan = ".$e['id_plan'];
+
+   $s = $db->query($q);
+   $e2 = $s->fetch(PDO::FETCH_ASSOC);
+
+   echo ($e2 && ($e2['status'] == $db->abs_stat_in || $e2['status'] == $db->abs_stat_part)) ? ";x" : ";";
 
    $prev_id = $e['id'];
 }
