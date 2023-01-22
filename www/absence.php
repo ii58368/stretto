@@ -36,6 +36,11 @@ $prj = get_project();
 echo "<h1>Fravær</h1>
     <h2>".$prj['name']." ".$prj['semester']."-".$prj['year']."</h2>\n";
 
+if ($access->auth(AUTH::CONT_RO))
+{
+   echo "<a href=\"absenceExcel.php?id_project=".request('id_project')."\" ><img border=0 src=images/excel.png height=20 hspace=5 vspace=5 title=\"Excel fil for innrapportering til VO...\"></a>\n";
+}
+
 $tb = new TABLE('border=1');
 $tb->th("<a href=\"$php_self?id_project=".request('id_project')."&_sort=firstname,lastname\" title=\"Sorter på fornavn, deretter etternavn\">Navn</a>");
 $tb->th("<a href=\"$php_self?id_project=".request('id_project')."&_sort=list_order,-position+DESC,-def_pos+DESC,firstname,lastname\" title=\"Sorter i partiturrekkefølge, deretter fornavn og deretter etternavn\">Instrument</a>");
