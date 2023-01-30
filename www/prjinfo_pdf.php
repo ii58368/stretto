@@ -101,7 +101,7 @@ class PDF extends PDF_util
             $this->Cell($w[0], $height, $this->sconv(strftime('%a %e.%b', $row['date'])));
             $this->Cell($w[1], $height, $row['time']);
             $this->Cell($w[2], $height, $this->sconv($row['lname'] . " " . $row['location']));
-            $this->MultiCell($w[3], $height, $this->sconv($row['comment']));
+            $this->MultiCell($w[3], $height, $this->sconv(strip_tags($row['comment'])));
             $this->Ln(1);
          }
          $this->Ln();

@@ -90,7 +90,7 @@ class PDF extends PDF_util
          if ($e['orchestration'] == $db->prj_type_reduced)
             $project .= '*';
          $this->Cell($tab[$idx++], $hight, $project);
-         $this->MultiCell($tab[$idx++], $hight, $this->sconv($e['comment']));
+         $this->MultiCell($tab[$idx++], $hight, $this->sconv(strip_tags($e['comment'])));
          $this->Ln(2);
       }
 
