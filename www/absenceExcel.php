@@ -57,8 +57,11 @@ echo "Navn;Adresse;Postnummer;Poststed;Epostadresse;Telefon;Kjønn;Fødselsår;T
 reset($r);
 foreach ($r as $e)
 {
-   $t = explode('-', $e['time']);
-   echo ";", intval($t[1]) - intval($t[0]);
+   $dt = explode('-', $e['time']);
+   $st = strtotime($dt[0]);
+   $et = strtotime($dt[1]);
+   $dh = ($et - $st)/3600;
+   echo ";", number_format($dh, 1);
 }
 echo "\n";
 
