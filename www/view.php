@@ -186,8 +186,7 @@ add_li("Meny", 1);
       add_li("Permisjoner", 0, AUTH::LEAVE_RO, AUTH::LEAVE_RW, "Oversikt over langtidspermisjoner");
       add_li("Dokumenter", 0, AUTH::DOC_RO, AUTH::DOC_RW, "Tilgang til generelle dokumenter som vedtekter, generalforsamlingspapirer, ol.");
       add_li("Kontigent", 0, AUTH::CONT_RO, AUTH::CONT_RW, "Oversikt over kontigentinnbetalinger");
-      add_li("Konserter", 0, AUTH::BOARD_RO, AUTH::CONS, "Spesifikasjon av konserter");
-      add_li("Om $prj_name", -1, false, false, "Generell informasjon om $prj_name");
+      add_li("Konserter", -1, AUTH::BOARD_RO, AUTH::CONS, "Spesifikasjon av konserter");
    }
    add_li("Prosjekter", 1);
    {
@@ -210,7 +209,8 @@ add_li("Meny", 1);
          add_li("Konsertkalender", -2, AUTH::BOARD_RO, AUTH::CONS, "Redigering av konsertkalender");
       }
    }
-   add_li("Hva skjer?", -1, AUTH::PRJM, AUTH::EVENT);
+   add_li("Hva skjer?", 0, AUTH::PRJM, AUTH::EVENT);
+   add_li("Om $prj_name", -1, false, false, "Generell informasjon om $prj_name");
 }
 
 echo "</ul>\n";

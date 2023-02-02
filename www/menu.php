@@ -178,7 +178,6 @@ class MENU
          $admin->add("Kontingent", "contingent.php?f_status[]=$db->per_stat_member", AUTH::CONT_RO);
          $admin->add("Styrefunksjoner", "board.php");
          $admin->add("Konserter", "concert.php", AUTH::BOARD_RO, AUTH::CONS);
-         $admin->add("Om $prj_name", "about.php");
       }
       {
          $projects = new SUBMENU("class=\"dl-submenu\"");
@@ -250,6 +249,7 @@ class MENU
       }
 
       $menu->add("Hva skjer?", "event.php", AUTH::PRJM);
+      $menu->add("Om $prj_name", "about.php");
 
       // Pages in use, but not linked to the menu system
       $menu->add(null, "participant_xx.php", AUTH::BOARD_RO);
