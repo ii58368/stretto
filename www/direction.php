@@ -131,7 +131,7 @@ $row = $stmt->fetch(PDO::FETCH_ASSOC);
 $project_info = str_replace("\n", "<br>\n", $row['info_dir']);
 
 echo "
-    <h1>Regiplan for " . $row['name'] . ", " . $row['semester'] . "-" . $row['year'] . "</h1>
+    <h1>Regiplan for " . $access->hlink(true, "prjInfo.php?id=" . request('id_project'), $row['name'] . ", " . $row['semester'] . "-" . $row['year']) . "</h1>
 Oppgaven til regikomitéen består av å klargjøre lokalet før prøver og konserter. 
 Til vanlige orkesterprøver gjør 5 stykker jobben greit på 10 minutter. 
 Mengden regioppgaver i selve konsertlokalet vil variere så her vil behovet for 
@@ -142,7 +142,7 @@ regikomitéens innsats blir vurdert fra prosjekt til prosjekt.
     <li>Rydde bort bord/stoler til vanlige øvelser med oppmøte 20 minutter før prøven begynner
     <li>Rigge opp orkesteret til prøver og konserter. Riggen skal stå klar 10 minutter før prøven begynner.
     <li>Slippe folk inn hoveddøren fra 15 min før prøven begynner.
-    <li>Delta ved transport av utstyr mellom HiOA og konsertlokalet.
+    <li>Delta ved transport av utstyr mellom OsloMet og konsertlokalet.
 </ul>
 <b>Alle</b> medlemmer er ansvarlig for å:
 <ul>
