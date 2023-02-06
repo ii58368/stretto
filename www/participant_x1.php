@@ -425,7 +425,7 @@ if ($access->auth(AUTH::RES_INV))
    manage_col("inv", "Besetningsliste. \nMerk av alle som må ta stilling til om de skal være med på prosjektet.");
 echo "Bes</th>
       <th>Permisjon</th>
-      <th>Egen</th>";
+      <th>Medlem</th>";
 /* echo "<th>";
 if ($access->auth(AUTH::RES_REG))
    manage_col("reg", "Tilbakemelding via styret/sekretær");
