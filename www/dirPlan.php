@@ -374,7 +374,7 @@ foreach ($stmt as $row)
       else
          echo $row['lname'];
       echo " " . $row['location'];
-      echo "</td><td>" . $row['pname'] . "</td><td nowrap>";
+      echo "</td><td>" . $access->hlink(true, "prjInfo.php?id=" . $row['id_project'], $row['pname']) . "</td><td nowrap>";
       if ($row['event_type'] == $db->plan_evt_direction)
       {
          echo "<b>" . $row['firstname'] . " " . $row['lastname'] . "</b><br>\n";
