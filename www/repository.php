@@ -90,7 +90,7 @@ $tb = new TABLE('border=1');
 if ($access->auth(AUTH::REP))
    $tb->th("<a href=\"$php_self?_sort=id+DESC&id_project=$id_project&search=$search\" title=\"Sorter i omvendt registreringsrekkefølge\">Edit</a>");
 $tb->th("<a href=\"$php_self?_sort=lastname,firstname,title&id_project=$id_project&search=$search\" title=\"Sorter på komponistnavn\">Komponist</a>");
-$tb->th("<a href=\"$php_self?_sort=title,lastname,firstname&id_project=$id_project&search=$search\" title=\"Sorter på tittel\">Tittle</a>");
+$tb->th("<a href=\"$php_self?_sort=title,lastname,firstname&id_project=$id_project&search=$search\" title=\"Sorter på tittel\">Tittel</a>");
 $tb->th("Fra");
 if ($access->auth(AUTH::REP_RO))
    $tb->th("<a href=\"$php_self?_sort=archive,tag&id_project=$id_project&search=$search\" title=\"Sorter på arkivreferanse\">Arkivref</a>");
