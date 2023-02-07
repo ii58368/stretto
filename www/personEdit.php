@@ -180,8 +180,6 @@ function insert_pers()
    if ($rc == TRUE)
    {
       insert_log($db->rec_stat_info, 'Registrert, ny status: ' . $db->per_stat[$_POST['status']], $no);
-      $id_visma = $no + 10000;
-      $db->query("update person set id_visma = $id_visma where id = $no");    
    }
 
    return $no;
