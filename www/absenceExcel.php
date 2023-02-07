@@ -61,7 +61,7 @@ foreach ($r as $e)
    $st = strtotime($dt[0]);
    $et = strtotime($dt[1]);
    $dh = ($et - $st)/3600;
-   echo ";", number_format($dh, 1);
+   echo ";", number_format($dh, 0);
 }
 echo "\n";
 
@@ -103,7 +103,7 @@ foreach ($stmt as $e)
       $city = $e['city'];
       $email = $e['email'];
       $phone = str_replace(' ', '', $e['phone1']);
-      $sex = $db->per_sex[(is_null($e['sex'])) ? $db->per_sex_unknown : $e['sex']];
+      $sex = $db->per_sex2[(is_null($e['sex'])) ? $db->per_sex_unknown : $e['sex']];
       $born = date('Y', $e['birthday']);
 
       $str = "$name;$address;$postcode;$city;$email;$phone;$sex;$born;";      
