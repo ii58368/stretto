@@ -2,6 +2,7 @@
 require 'framework.php';
 
 $id_project = request('id_project');
+$id_event = request('id');
 
 function select_project($selected)
 {
@@ -147,6 +148,8 @@ $query = "select event.id as id, subject, ts_create, ts_update, importance, body
         . "and person.id_instruments = instruments.id ";
 if ($id_project)
    $query .= "and event.id_project = $id_project ";
+elseif ($id_event)
+   $query .= "and event.id = $id_event ";
 else
    $query .= "and ts_create > " . $season->ts()[0] . " "
            . "and ts_create < " . $season->ts()[1] . " ";
