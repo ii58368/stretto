@@ -23,7 +23,7 @@ function log_query($full)
            . "record.comment as rcomment "
            . "from instruments, person left join record on person.id = record.id_person ";
    
-   $where = is_null($full) ? "and record.ts > " . strtotime("-1 year") . " " : " ";
+   $where = $full ? " " : "and record.ts > " . strtotime("-1 year") . " ";
    if (!$access->auth(AUTH::BOARD_RO))
       $where .= "and record.status <= " . $db->rec_stat_mr . " ";
    

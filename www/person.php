@@ -114,6 +114,25 @@ function select_filter()
    echo "<input type=hidden name=_sort value=\"$sort\">\n";
 }
 
+function select_view()
+{
+   $view = array("Adresseliste", "logg (12 mnd)", "logg (full)");
+   $tag = 'view';
+   
+   echo "<select name=\"$tag\" onChange=\"submit();\" title=\"Velg presentasjonsform...\">\n";
+
+   for ($i = 0; $i < count($view); $i++)
+   {
+      echo "<option value=$i";
+      if (!is_null(request($tag)))
+            if (request($tag) == $i)
+               echo " selected";
+      echo ">" . $view[$i] . "</option>\n";
+   }
+
+   echo "</select>\n";
+}
+
 function get_filter_as_url()
 {
    $filter = '';
@@ -131,8 +150,8 @@ function get_filter_as_url()
       foreach (request('f_project') as $f_project)
          $filter .= "&f_project[]=$f_project";
 
-   if (!is_null(request('showlog')))
-      $filter .= "&showlog=true";
+   if (!is_null(request('view')))
+      $filter .= "&view=" . request('view');
 
    return $filter;
 }
@@ -187,7 +206,7 @@ if (!is_null(request('f_project')))
    echo "</h2>\n";
 }
 
-$query = (request('showlog') && $access->auth(AUTH::MEMB_GREP)) ? log_query(request('logg')) : person_query();
+$query = (request('view') > 0 && $access->auth(AUTH::MEMB_GREP)) ? log_query(request('view') == 2) : person_query();
 $stmt = $db->query($query);
 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -215,11 +234,10 @@ if ($access->auth(AUTH::MEMB_GREP))
 }
 if ($access->auth(AUTH::SHOW_LOG))
 {
-   echo "<input type=checkbox name=showlog title=\"Vis logg\" onChange=\"submit();\"";
-   if (!is_null(request('showlog')))
-      echo " checked";
-   echo ">\n";
+   echo "&nbsp;&nbsp;&nbsp;&nbsp;";
+   select_view();
 }
+
 unset($form);
 
 $tb = new TABLE('border=1');
@@ -227,7 +245,7 @@ $tb = new TABLE('border=1');
 if ($access->auth(AUTH::MEMB_RW))
    $tb->th('Edit');
 
-if (request('showlog') && $access->auth(AUTH::SHOW_LOG))
+if (request('view') > 0 && $access->auth(AUTH::SHOW_LOG))
 {
    $tb->th("<a href=\"$php_self?_sort=instrument$f_filter\" title=\"Sorter på instrumentgruppe...\">Instrument</a>");
    $tb->th("<a href=\"$php_self?_sort=firstname,lastname$f_filter\" title=\"Sorter på fornavn...\">For</a>/
@@ -244,8 +262,8 @@ if (request('showlog') && $access->auth(AUTH::SHOW_LOG))
       $tb->th("<a href=\"$php_self?_sort=gdpr_ts,instrument$f_filter\" title=\"Sorter på dato for samtykke...\">Samtykke</a>");
       $tb->th("<a href=\"$php_self?_sort=confirmed_ts,instrument$f_filter\" title=\"Sorter på dato for bekreftelse av personopplysninger...\">Oppdatert</a>");
    }
-   $th = request('logg') == 'full' ? 'Full logg' : 'Logg - siste 12 mnd';
-   $tb->th("<a href=\"$php_self?_sort=$sort$f_filter&logg=full\" title=\"Klikk for å vise full logg\">$th</a>");
+   
+  $tb->th("Logg");
 
    $old_id = 0;
    $log = '';
