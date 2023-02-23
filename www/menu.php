@@ -259,6 +259,7 @@ class MENU
       $menu->add(null, "absenceEdit.php", AUTH::ABS_RW);
       $menu->add(null, "index.php");
       $menu->add(null, "prjInfo.php");
+      $menu->add(null, "seating_pdf.php", AUTH::SEAT);
 
       $this->top_menu = $menu;
    }
