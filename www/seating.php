@@ -182,7 +182,8 @@ if ($access->auth(AUTH::SEAT))
    {
       echo "<input type=hidden name=_action value=update>
     <input type=hidden name=id_project value=" . request('id_project') . ">
-    <input type=submit value=Lagre title=\"Lagre gruppeoppsett\">";
+    <input type=submit value=Lagre title=\"Lagre gruppeoppsett\">
+    <input type=reset value=Tilbakestill title=\"Tilbbakestill endringer uten å lagre\">";
    }
    
    echo "<p>";
