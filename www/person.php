@@ -221,10 +221,8 @@ if ($access->auth(AUTH::MEMB_GREP))
 {
    send_mail($result);
 }
-if ($access->auth(AUTH::CONT_RO))
-{
-   echo "<a href=\"personExcel.php?_sort=$sort&$f_filter\" ><img border=0 src=images/excel.png height=20 hspace=5 vspace=5 title=\"Excel fil for innrapportering til VO...\"></a>\n";
-}
+
+echo $access->hlink($access->auth(AUTH::CSV_EXP), "personExcel.php?_sort=$sort&$f_filter", "<img border=0 src=images/excel.png height=20 hspace=5 vspace=5", "title=\"Excel fil for export til Visma etc...\"", '');
 
 $form = new FORM();
 if ($access->auth(AUTH::MEMB_GREP))

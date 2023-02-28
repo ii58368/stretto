@@ -165,7 +165,9 @@ add_li("Meny", 1);
    }
    add_li("Admin", 1);
    {
-      add_li("Medlemsliste", 0, AUTH::MEMB_RO, AUTH::MEMB_RW, "Medlemsliste/musikere. <font color=green>" . AUTH::MEMB_GREP . "</font>: Filter for å filtrere ut musikere. <font color=green>" . AUTH::SHOW_LOG . "</font>: Checkbox to show logs.");
+      add_li("Medlemsliste", 0, AUTH::MEMB_RO, AUTH::MEMB_RW, "Medlemsliste/musikere. <font color=green>" . AUTH::MEMB_GREP . "</font>: Filter for å filtrere ut musikere. <font color=green>" 
+              . AUTH::SHOW_LOG . "</font>: Tilgang for å liste logger."
+              . "<font color=green>" . AUTH::CSV_EXP . "</font>: Ikon for eksportering til CSV-fil");
       add_li("Prøveplan", 0, AUTH::PLAN_RO, AUTH::PLAN_RW, "Prøveplan, alle prosjekter");
       add_li("Tilgang/grupper", 1, AUTH::BOARD_RO);
       {
@@ -200,7 +202,9 @@ add_li("Meny", 1);
          add_li("Repertoar", 0, AUTH::REP, AUTH::REP, "Legge inn akttuelt repertoar");
          add_li("Musikere", 0, false, AUTH::MEMB_RW, "Adresseliste over musikere for dette prosjektet");
          add_li("Regikomité", 0, AUTH::DIR_RO, false, "Full oversikt over gjeldende regiprosjekt");
-         add_li("Fravær", 0, AUTH::ABS_RO, AUTH::ABS_RW, AUTH::ABS_ALL . " gir kunne fraværsoversikt for alle prosjektdeltagere, ikke bare en gruppe som f.eks. 1 fele. Oversikt over fravær for alle ressurser for et prosjekt og registrering av fravær pr. gruppe ");
+         add_li("Fravær", 0, AUTH::ABS_RO, AUTH::ABS_RW, AUTH::ABS_ALL . " gir kunne fraværsoversikt for alle prosjektdeltagere, ikke bare en gruppe som f.eks. 1 fele. "
+                 . "Oversikt over fravær for alle ressurser for et prosjekt og registrering av fravær pr. gruppe. "
+                 . "<font color=green>" . AUTH::CSV_EXP . "</font>: Ikon for eksportering til CSV-fil");
          add_li("Prosjektressurser", 0, AUTH::RES, "Besetning: " . AUTH::RES_INV . " Sekretær: " . AUTH::RES_REG . ", MR: " . AUTH::RES_REQ . ", Styret: " . AUTH::RES_FIN, "Registrering av prosjektressurser");
          add_li("Noter", 0, false, AUTH::PRJDOC, "Oversikt/administrajon av øvingsnoter");
          add_li("Innspilling", 0, false, AUTH::PRJDOC, "Oversikt/administrajon av egne opptak og andre innspillinger");

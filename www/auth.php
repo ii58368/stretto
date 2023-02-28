@@ -54,8 +54,9 @@ class AUTH
    const REP_RO = 45; // Music repository, r/o
    const SHOW_LOG = 46; // Show log in person repository
    const REP_RO_LIM = 47; // Music repository, limited r/o
+   const CSV_EXP = 48; // Enable export to csv-file
    const ALL = 0x7fffffffffffffff; // 63 bits enabled
-   const NO_VIEWS = 48;
+   const NO_VIEWS = 49;
 
    private $access;
    protected $confirmed_ts;  // retreived for real_uid
@@ -232,7 +233,6 @@ class ACCESS extends AUTH
       
       if (!$enable)
          return $text2;
-      
       $o = is_null($opt) ? '' : "$opt";
       return "<a href=\"$url\" $o>$text</a>";
    }
