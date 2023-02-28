@@ -176,7 +176,7 @@ if ($access->auth(AUTH::SEAT))
    {
       echo "<input type=hidden name=_action value=edit>
     <input type=hidden name=id_project value=" . request('id_project') . ">
-    <input type=submit value=Edit title=\"Endre gruppeoppsett...\">";
+    <input type=submit value=Endre title=\"Endre gruppeoppsett...\">";
    }
    else
    {
