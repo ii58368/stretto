@@ -258,7 +258,8 @@ if (request('view') > 0 && $access->auth(AUTH::SHOW_LOG))
       $tb->th("<a href=\"$php_self?_sort=birthday$f_filter\" title=\"Sorter på Fødselsdag...\">Fødtselsdag</a>");
       $tb->th("<a href=\"$php_self?_sort=fee,instrument$f_filter\" title=\"Sorter på type kontingent...\">Kontingent</a>");
       $tb->th("<a href=\"$php_self?_sort=gdpr_ts,instrument$f_filter\" title=\"Sorter på dato for samtykke...\">Samtykke</a>");
-      $tb->th("<a href=\"$php_self?_sort=confirmed_ts,instrument$f_filter\" title=\"Sorter på dato for bekreftelse av personopplysninger...\">Oppdatert</a>");
+      $tb->th("<a href=\"$php_self?_sort=confirmed_ts,instrument$f_filter\" title=\"Sorter på dato for bekreftelse av personopplysninger...\">Bekreftet</a>");
+      $tb->th("<a href=\"$php_self?_sort=updated_ts,instrument$f_filter\" title=\"Sorter på dato for siste oppdatering av personpplysninger...\">Oppdatert</a>");
    }
    
   $tb->th("Logg");
@@ -289,6 +290,7 @@ if (request('view') > 0 && $access->auth(AUTH::SHOW_LOG))
             $tb->td($db->per_fee[$row['fee']]);
             $tb->td(date2str($row['gdpr_ts'], 0), 'align=right');
             $tb->td(date2str($row['confirmed_ts'], strtotime("-6 months")), 'align=right');
+            $tb->td(date2str($row['updated_ts'], -1), 'align=right');
          }
          $old_id = $row['id'];
          $log = '';

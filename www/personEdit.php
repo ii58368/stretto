@@ -172,8 +172,7 @@ function insert_pers()
                       " . $db->qpost('email') . ", MD5('OSO'),
                       " . request('def_pos') . ",
                       " . $db->qpost('phone1') . ", $gdpr_ts,
-                      " . $db->qpost('status') . ", " . request('fee') . ", $birthday)";
-   echo $query;
+                      " . request('status') . ", " . request('fee') . ", $birthday)";
    $rc = $db->query($query);
    $no = $db->lastInsertId();
    
@@ -285,12 +284,13 @@ function update_pers($no)
          if (is_numeric($id_visma))
             $query .= "id_visma = $id_visma,";
       }
-      $query .= "address = " . $db->qpost('address') . "," .
-              "postcode = " . request('postcode') . "," .
-              "city = " . $db->qpost('city') . "," .
-              "email = " . $db->qpost('email') . "," .
-              "phone1 = " . $db->qpost('phone1') . "," .
-              "birthday = $birthday ";
+      $query .= "address = " . $db->qpost('address') . "," 
+              . "postcode = " . request('postcode') . "," 
+              . "city = " . $db->qpost('city') . ","
+              . "email = " . $db->qpost('email') . ","
+              . "phone1 = " . $db->qpost('phone1') . ","
+              . "birthday = $birthday, "
+              . "updated_ts = $now ";
       $query .= "where id = $no";
       $db->query($query);
    }
@@ -347,8 +347,12 @@ function update_pwd($no)
 
    $pwd = request('pwd1');
    $hash_pwd = crypt($pwd, base64_encode($pwd));
-   $query = "update person set uid = " . $db->qpost('uid2') . ", password = " . $db->quote($hash_pwd) .
-           " where id = $no";
+   $now = strtotime("now");
+
+   $query = "update person set uid = " . $db->qpost('uid2') . ", "
+           . "password = " . $db->quote($hash_pwd) . ", "
+           . "updated_ts = $now " 
+           . " where id = $no";
    try
    {
       $db->query($query);
@@ -398,7 +402,8 @@ $row = array(
     'birthday' => 0,
     'gdpr_ts' => 0,
     'confirmed_ts' => 0,
-    'id_visma' => 0
+    'id_visma' => 0,
+    'update_ts' => strtotime("now")
 );
 
 $do_lookup = !($action == 'new_pers' || ($action == 'update_pers' && !is_null($delete)));
@@ -409,7 +414,7 @@ if ($do_lookup)
            "sex, fee, uid, address, postcode, city, def_pos, " .
            "email, phone1, status, " .
            "comment_dir, status_dir, birthday, " .
-           "gdpr_ts, id_visma, confirmed_ts " .
+           "gdpr_ts, id_visma, confirmed_ts, updated_ts, login_ts " .
            "FROM person, instruments " .
            "where id_instruments = instruments.id " .
            "and person.id = $no";
@@ -596,9 +601,18 @@ else
       $tb->td($row['id_visma']);
       
       $tb->tr();
-      $tb->td("Oppdatert:");
+      $tb->td("Sist bekreftet:");
       $tb->td(strftime('%e. %b %Y', $row['confirmed_ts']));
+      
+      $tb->tr();
+      $tb->td("Sist login:");
+      $tb->td(strftime('%e. %b %Y', $row['login_ts']));
    }
+   
+   $tb->tr();
+   $tb->td("Oppdatert:");
+   $tb->td(strftime('%e. %b %Y', $row['updated_ts']));
+
    
    $tb->tr();
 }

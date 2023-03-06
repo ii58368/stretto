@@ -59,7 +59,8 @@ class AUTH
    const NO_VIEWS = 49;
 
    private $access;
-   protected $confirmed_ts;  // retreived for real_uid
+   protected $confirmed_ts = 0;  // retreived for real_uid
+   protected $real_person;
 
    function __construct()
    {
@@ -74,7 +75,13 @@ class AUTH
          $this->access = ($this->access & $su_bit) | ($this->auth_access($whoami->uid()) & ~$su_bit);
       }
 
-      $this->confirmed_ts = $this->auth_confirm_ts($whoami->real_uid());
+      $this->real_person = $this->get_real_person($whoami->real_uid());
+      
+      if (!is_null($this->real_person))
+      {
+         $this->confirmed_ts = $this->real_person['confirmed_ts'];
+         $this->update_login_ts($this->real_person['login_ts']);
+      }
    }
 
    /* PHP 5.6+
@@ -88,6 +95,18 @@ class AUTH
      }
     */
 
+   function update_login_ts($ts)
+   {
+      global $whoami;
+      global $db;
+      
+      if ($ts < strtotime("yesterday"))
+      {
+        $q = "update person set login_ts = " . strtotime("now") . " where uid = '" . $whoami->real_uid() . "'";
+        $db->query($q);
+      }
+   }
+   
    protected function bit()
    {
       $acc = 0;
@@ -97,21 +116,21 @@ class AUTH
       return $acc;
    }
 
-   private function auth_confirm_ts($uid)
+   private function get_real_person($uid)
    {
       global $db;
 
       if (is_null($uid))
-         return 0;
+         return null;
 
-      $q = "select confirmed_ts "
+      $q = "select confirmed_ts, expired_ts, login_ts "
               . "from person "
               . "where uid = '$uid'";
 
       $s = $db->query($q);
       $e = $s->fetch(PDO::FETCH_ASSOC);
 
-      return $e['confirmed_ts'];
+      return $e;
    }
 
    private function auth_access($uid)

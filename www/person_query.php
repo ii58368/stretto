@@ -16,6 +16,7 @@ function log_query($full)
            . "person.fee as fee, "
            . "person.gdpr_ts as gdpr_ts, "
            . "person.confirmed_ts as confirmed_ts, "
+           . "person.updated_ts as updated_ts, "
            . "person.birthday as birthday, "
            . "person.comment as comment, "
            . "record.status as rstatus, "
