@@ -203,7 +203,7 @@ if ($access->auth(AUTH::SEAT))
       {
          $tb->td($row['firstname'] . " " . $row['lastname']);
          $tb->td($row['instrument']);
-         $tb->td("<input type=number size=2 name=position:" . $row['id'] . " value=\"" . $row['position'] . "\" title=\"Plassnummer\">");
+         $tb->td("<input type=number min=0 max=30 name=position:" . $row['id'] . " value=\"" . $row['position'] . "\" title=\"Plassnummer\">");
          $tb->td("<input type=text size=30 name=comment_pos:" . $row['id'] . " value=\"" . $row['comment_pos'] . "\" title=\"Fritekst, kun synlig for gruppeleder\">");
       }
       else
