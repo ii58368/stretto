@@ -406,6 +406,15 @@ $row = array(
     'update_ts' => strtotime("now")
 );
 
+function date2str($ts)
+{
+   if ($ts == 0 || $ts == -3600)
+      return '';
+
+   return strftime('%e. %b %Y', $ts);
+}
+
+
 $do_lookup = !($action == 'new_pers' || ($action == 'update_pers' && !is_null($delete)));
 
 if ($do_lookup)
@@ -590,7 +599,7 @@ else
    $tb->td($db->per_fee[$row['fee']]);
    $tb->tr();
    $tb->td("Fødselsdag:");
-   $tb->td(strftime('%e. %b %Y', $row['birthday']));
+   $tb->td(date2str($row['birthday']));
    $tb->tr();
    $tb->td("Samtykke:");
    $tb->td(get_gdpr($row['gdpr_ts']));
@@ -602,16 +611,16 @@ else
       
       $tb->tr();
       $tb->td("Sist bekreftet:");
-      $tb->td(strftime('%e. %b %Y', $row['confirmed_ts']));
+      $tb->td(date2str($row['confirmed_ts']));
       
       $tb->tr();
       $tb->td("Sist login:");
-      $tb->td(strftime('%e. %b %Y', $row['login_ts']));
+      $tb->td(date2str($row['login_ts']));
    }
    
    $tb->tr();
    $tb->td("Oppdatert:");
-   $tb->td(strftime('%e. %b %Y', $row['updated_ts']));
+   $tb->td(date2str($row['updated_ts']));
 
    
    $tb->tr();
@@ -753,7 +762,7 @@ if ($do_lookup)
             $title = "Click to edit...\nLast changed by " . $row['firstname'] . " " . $row['lastname'];
             $tb->td("<a href=\"$php_self?_sort=$sort&_action=view_log&_rno=" . $row['id'] . "&_no=$no\" title=\"$title\"><img src=\"images/cross_re.gif\" border=0></a>", 'align=left');
          }
-         $tb->td(strftime('%e. %b %Y', $row['ts']));
+         $tb->td(date2str($row['ts']));
          $tb->td($db->rec_stat[$row['status']]);
          $tb->td(str_replace("\n", "<br>\n", $row['comment']));
       }
