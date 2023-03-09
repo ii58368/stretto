@@ -161,17 +161,16 @@ function insert_pers()
 
    $birthday = strtotime($_POST['birthday']);
    $now = strtotime("now");
-   $gdpr_ts = is_null(request('gdpr')) ? 0 : $now;
 
    $query = "insert into person (id_instruments, firstname, middlename, lastname, sex, address, 
               postcode, city, email, uid, password, def_pos, 
-              phone1, gdpr_ts, status, fee, birthday)
+              phone1, updated_ts, status, fee, birthday)
               values (" . request('id_instruments') . ", " . $db->qpost('firstname') . ", 
                       " . $db->qpost('middlename') . ", " . $db->qpost('lastname') . ", " . request('sex') . ", " . $db->qpost('address') . ",
                       " . request('postcode') . ", " . $db->qpost('city') . ", " . $db->qpost('email') . ",
                       " . $db->qpost('email') . ", MD5('OSO'),
                       " . request('def_pos') . ",
-                      " . $db->qpost('phone1') . ", $gdpr_ts,
+                      " . $db->qpost('phone1') . ", $now,
                       " . request('status') . ", " . request('fee') . ", $birthday)";
    $rc = $db->query($query);
    $no = $db->lastInsertId();
