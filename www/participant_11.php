@@ -278,7 +278,7 @@ if ($prj['valid_par_stat'] > 0)
            . "(select id_person from person, instruments, groups "
            . "where person.id_instruments = instruments.id "
            . "and instruments.id_groups = groups.id "
-           . "and person.id = " . $whoami->id() . ")";
+           . "and person.id =  $id_person)";
    $stmt = $db->query($query);
    $glead = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -329,7 +329,7 @@ if ($prj['valid_par_stat'] > 0)
             if ($part['stat_reg'] == $db->par_stat_can)
                echo ": Kan være med hvis behov: " . $part['comment_reg'];
             if ($part['stat_reg'] == $db->par_stat_yes)
-               echo ": Vil gjærne være med på prosjektet: " . $part['comment_reg'];
+               echo ": Vil gjerne være med på prosjektet: " . $part['comment_reg'];
             echo "<br>\n";
          }
 
