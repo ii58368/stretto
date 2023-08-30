@@ -157,7 +157,7 @@ echo "
 if ($access->auth(AUTH::SEAT))
 {
 
-   $query = "SELECT participant.id_person as id, firstname, lastname, instrument, position, comment_pos "
+   $query = "SELECT participant.id_person as id, firstname, lastname, instrument, position, comment_pos, comment_final "
            . "FROM person, participant, instruments, groups "
            . "where person.id = participant.id_person "
            . "and participant.id_project = " . request('id_project') . " "
@@ -194,6 +194,7 @@ if ($access->auth(AUTH::SEAT))
    $tb->th('Instrument');
    $tb->th("<a href=\"$php_self?id_project=" . request('id_project') . "&_sort=list_order,-position+DESC,-def_pos+DESC,firstname,lastname\" title=\"Sorter på plassnummer\">Plass</a>");
    $tb->th('Kommentar');
+   $tb->th("Merknad");
 
    foreach ($stmt as $row)
    {
@@ -205,6 +206,7 @@ if ($access->auth(AUTH::SEAT))
          $tb->td($row['instrument']);
          $tb->td("<input type=number min=0 max=30 name=position:" . $row['id'] . " value=\"" . $row['position'] . "\" title=\"Plassnummer\">");
          $tb->td("<input type=text size=30 name=comment_pos:" . $row['id'] . " value=\"" . $row['comment_pos'] . "\" title=\"Fritekst, kun synlig for gruppeleder\">");
+         $tb->td($row['comment_final']);
       }
       else
       {
@@ -212,6 +214,7 @@ if ($access->auth(AUTH::SEAT))
          $tb->td($row['instrument']);
          $tb->td($row['position']);
          $tb->td($row['comment_pos']);
+         $tb->td($row['comment_final']);
       }
    }
 
