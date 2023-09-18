@@ -172,7 +172,7 @@ if ($access->auth(AUTH::SEAT))
 
    $form = new FORM();
 
-   if (is_null($action) || $action == 'update')
+   if (is_null($action) || $action == 'update' || $action == 'template')
    {
       echo "<input type=hidden name=_action value=edit>
     <input type=hidden name=id_project value=" . request('id_project') . ">
