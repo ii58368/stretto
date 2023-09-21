@@ -72,9 +72,10 @@ if ($action != 'new' && $access->auth(AUTH::EVENT))
 {
    echo "<form action=\"$php_self\" method=post>
       <input type=hidden name=_sort value=\"$sort\">
-      <input type=hidden name=_action value=new>
-      <input type=hidden name=id_project value=\"$id_project\">
-      <input type=submit value=\"Nytt event\">
+      <input type=hidden name=_action value=new>";
+   if ($id_project)
+      echo "<input type=hidden name=id_project value=\"$id_project\">";
+    echo "  <input type=submit value=\"Nytt event\">
     </form>\n";
 }
 
@@ -95,7 +96,7 @@ if ($action == 'new')
    echo "</td>
      </tr><tr>
      <td><i>Viktighetsgrad:</i></td><td>";
-   select_importance($db->$evt_importance_norm);
+   select_importance($db->evt_importance_norm);
    echo "</td>
      </tr><tr>";
    echo "<input type=hidden name=status value=".$db->evt_status_public.">";
