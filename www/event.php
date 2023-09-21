@@ -95,7 +95,7 @@ if ($action == 'new')
    echo "</td>
      </tr><tr>
      <td><i>Viktighetsgrad:</i></td><td>";
-   select_importance(null);
+   select_importance($db->$evt_importance_norm);
    echo "</td>
      </tr><tr>";
    echo "<input type=hidden name=status value=".$db->evt_status_public.">";
@@ -138,6 +138,8 @@ if ($action == 'update' && $access->auth(AUTH::EVENT))
       $no = NULL;
    }
    $db->query($query);
+   $id_project = null;
+   $id_event = null;
 }
 
 $query = "select event.id as id, subject, ts_create, ts_update, importance, body, "
