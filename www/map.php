@@ -229,7 +229,7 @@ $template = array(
     $v1_20
 );
 
-$img = imagecreatetruecolor(650, 690);
+$img = imagecreatetruecolor(650, 695);
 $bgcol = imagecolorAllocate($img, 0xff, 0xfc, 0xf5);
 imagefill($img, 0, 0, $bgcol);
 
