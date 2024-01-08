@@ -67,7 +67,8 @@ function select_template($selected)
        "Violin 2, 9 pulter",
        "Viola, 9 pulter",
        "Cello, 8 pulter",
-       "Cello, 7,5 pulter"
+       "Cello, 7,5 pulter",
+       "Violin 1, 10 pulter"
    );
    echo "<select name=template onChange=\"submit();\"  title=\"Velg aktuell template for dette prosjektet\">\n";
    for ($i = 0; $i < sizeof($opt); $i++)
