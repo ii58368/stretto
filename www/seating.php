@@ -13,7 +13,7 @@ function get_project()
    return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-function get_groups()
+function get_mygroup()
 {
    global $whoami;
    global $db;
@@ -47,7 +47,7 @@ function get_groups()
 function get_seating($id_groups)
 {
    global $db;
-
+   
    $query = "select template, firstname, lastname, seating.ts as ts "
            . "from seating, person "
            . "where seating.id_person = person.id "
@@ -56,6 +56,45 @@ function get_seating($id_groups)
 
    $stmt = $db->query($query);
    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function select_group($selected)
+{
+   global $db;
+
+   echo "<select name=id_group onChange=\"submit();\"  title=\"Velg stemmegruppe\">\n>";
+
+   $q = "select groups.id as id, groups.name as name "
+       . "from instruments, groups "
+       . "where instruments.id_groups = groups.id";
+   $s = $db->query($q);
+
+   foreach ($s as $e)
+   {
+      echo "<option value=\"" . $e['id'] . "\"";
+      if ($e['id'] == $selected)
+         echo " selected";
+      echo ">" . $e['name'] . "</option>";
+   }
+   echo "</select>";
+}
+
+function get_group()
+{
+   $gname = 'id_group';
+   
+   $gid = request($gname);
+   
+   if (!is_null($gid))
+   {
+      setcookie($gname, $gid);
+      return $gid;
+   }
+   
+   if (isset($_COOKCIE[$gname]))
+      return $_COOKCIE[$gname];
+ 
+   return get_mygroup();
 }
 
 function select_template($selected)
@@ -108,7 +147,7 @@ function update_seating($id_groups, $template)
    $db->query($query);
 }
 
-$grp_id = get_groups();
+$grp_id = get_group();
 
 if ($action == 'template')
 {
@@ -157,7 +196,8 @@ echo "
     <h2>" . $prj['name'] . " " . $prj['semester'] . "-" . $prj['year'] . "</h2>";
 if ($access->auth(AUTH::SEAT))
 {
-
+   select_group($grp_id);
+   
    $query = "SELECT participant.id_person as id, firstname, lastname, instrument, position, comment_pos, comment_final "
            . "FROM person, participant, instruments, groups "
            . "where person.id = participant.id_person "
