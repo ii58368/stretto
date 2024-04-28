@@ -150,9 +150,9 @@ $query = "select event.id as id, subject, ts_create, ts_update, importance, body
         . "where person.id = event.id_person "
         . "and person.id_instruments = instruments.id ";
 if ($id_project)
-   $query .= "and event.id = $id_event ";
-elseif ($id_event)
    $query .= "and event.id_project = $id_project ";
+elseif ($id_event)
+   $query .= "and event.id = $id_event ";
 else
    $query .= "and ts_create > " . $season->ts()[0] . " "
            . "and ts_create < " . $season->ts()[1] . " ";
