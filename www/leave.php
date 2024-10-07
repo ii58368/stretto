@@ -40,7 +40,8 @@ function select_person($selected)
 
    $q = "SELECT person.id as id, firstname, middlename, lastname, instrument "
            . "FROM person, instruments "
-           . "where person.status = $db->per_stat_member "
+           . "where (person.status = $db->per_stat_member "
+           . "or person.id = $selected) "
            . "and person.id_instruments = instruments.id "
            . "order by list_order, lastname, firstname";
 
@@ -88,7 +89,7 @@ if ($action == 'new')
     <input type=submit value=ok title=\"Lagre\">", 'align=left');
    $tb->td(strftime('%e.%b %y'));
    $tb->td(strftime('%e.%b %y'));
-   $tb->td(select_person(null));
+   $tb->td(select_person(0));
    $tb->td(select_status(null));
    $tb->td("<input type=date size=10 name=ts_from title=\"Dato permisjonssøknaden gjelder fra. Format: eks: 3. dec 2017\">");
    $tb->td("<input type=date size=10 name=ts_to title=\"Dato permisjonssøknaden gjelder til. Format: eks: 3. dec 2017\">");
