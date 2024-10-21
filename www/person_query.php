@@ -112,6 +112,8 @@ function sort_filter()
       $sort = "lastname,firstname";
    
    $f_projects = request('f_project');
+   if ($f_projects == null)
+      $f_projects = array();
    $position = (count($f_projects) == 1) ? "-participant.position desc," : "";
    $nsort = str_replace("instrument", "list_order," . $position . "-def_pos desc,lastname,firstname", $sort);
    $qsort = str_replace("+", " ", $nsort);
@@ -123,10 +125,13 @@ function group_filter()
 {
    $query = "";
 
-   if (count(request('f_project')) > 1)
-   {
-      $query .= "group by person.id ";
-   }
+   $f_project = request('f_project');
    
-   return $query;
+   if ($f_project == null)
+      return "";
+   
+   if (count($f_project) < 2)
+      return "";
+   
+   return "group by person.id ";
 }
