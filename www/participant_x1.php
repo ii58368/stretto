@@ -406,7 +406,7 @@ echo "
 if ($prj['orchestration'] == $db->prj_type_tutti)
    echo "Permisjonsfrist: ";
 else
-   echo "Påmeldingsfrist: ";
+   echo "Registreringsfrist: ";
 echo strftime('%e. %b %Y', $prj['deadline']) . "</h2>
     <form action='$php_self' method=post>
     <input type=hidden name=_action value=update>
