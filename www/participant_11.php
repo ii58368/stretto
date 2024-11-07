@@ -202,10 +202,12 @@ if ($prj['orchestration'] == $db->prj_type_social)
 $isTutti = ($prj['orchestration'] == $db->prj_type_tutti);
 if ($prj['valid_par_stat'] > 0)
 {
-   $reg_header = ($isTutti) ? "Permisjonssøknad" : "Påmelding";
+   $reg_header = ($isTutti) ? "Permisjonssøknad" : "Registrering (obligatorisk)";
    echo "<h2>$reg_header</h2>";
    if ($isTutti)
       echo "Dette er et tuttiprosjekt. Dersom du ikke søker om permisjon vil du automatisk bli påmeldt når permisjonsfristen går ut.<p>\n";
+   else
+      echo "Selv om dette er et prosjekt med redusert besetining, er det viktig for styret at du gir tilbakemelding uansett om du kan eller ikke.<p>\n";
    $form = new FORM();
    echo "<input type=hidden name=_action value=update>
    <input type=hidden name=id_person value=$id_person>
