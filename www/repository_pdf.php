@@ -23,7 +23,7 @@ class PDF extends PDF_util
       $this->SetTextColor(0, 0, 0);
 
       $query = "select * from repository "
-              . "where archive = 'OSO' "
+              . "where sheet_type = " . $db->rep_stype_local . " "
               . "order by lastname, firstname, work";
       $stmt = $db->query($query);
 
@@ -89,7 +89,7 @@ class PDF extends PDF_util
       $this->SetTextColor(0, 0, 0);
 
       $query = "select * from repository "
-              . "where archive = 'OSO' "
+              . "where sheet_type = " . $db->rep_stype_local . " "
               . "order by tag";
       $stmt = $db->query($query);
 
