@@ -47,7 +47,7 @@ function get_mygroup()
 function get_seating($id_groups)
 {
    global $db;
-   
+
    $query = "select template, firstname, lastname, seating.ts as ts "
            . "from seating, person "
            . "where seating.id_person = person.id "
@@ -61,12 +61,15 @@ function get_seating($id_groups)
 function select_group($selected)
 {
    global $db;
+   $form = new FORM();
 
+   echo "<input type=hidden name=id_project value=" . request('id_project') . ">\n";
    echo "<select name=id_group onChange=\"submit();\"  title=\"Velg stemmegruppe\">\n>";
 
    $q = "select groups.id as id, groups.name as name "
-       . "from instruments, groups "
-       . "where instruments.id_groups = groups.id";
+           . "from instruments, groups "
+           . "where instruments.id_groups = groups.id "
+           . "group by groups.id ";
    $s = $db->query($q);
 
    foreach ($s as $e)
@@ -77,23 +80,19 @@ function select_group($selected)
       echo ">" . $e['name'] . "</option>";
    }
    echo "</select>";
+   unset($form);
 }
 
 function get_group()
 {
    $gname = 'id_group';
-   
    $gid = request($gname);
-   
+
    if (!is_null($gid))
    {
-      setcookie($gname, $gid);
       return $gid;
    }
-   
-   if (isset($_COOKCIE[$gname]))
-      return $_COOKCIE[$gname];
- 
+
    return get_mygroup();
 }
 
@@ -197,80 +196,83 @@ echo "
 if ($access->auth(AUTH::SEAT))
 {
    select_group($grp_id);
-   
-   $query = "SELECT participant.id_person as id, firstname, lastname, instrument, position, comment_pos, comment_final "
-           . "FROM person, participant, instruments, groups "
-           . "where person.id = participant.id_person "
-           . "and participant.id_project = " . request('id_project') . " "
-           . "and participant.stat_inv = $db->par_stat_yes "
-           . "and participant.stat_final = $db->par_stat_yes "
-           . "and participant.id_instruments = instruments.id "
-           . "and instruments.id_groups = groups.id "
-           . "and groups.id = $grp_id "
-           . "order by " . str_replace("+", " ", $sort);
 
-   $stmt = $db->query($query);
-
-   $form = new FORM();
-
-   if (is_null($action) || $action == 'update' || $action == 'template')
+   if ($grp_id == get_mygroup())
    {
-      echo "<input type=hidden name=_action value=edit>
+      $query = "SELECT participant.id_person as id, firstname, lastname, instrument, position, comment_pos, comment_final "
+              . "FROM person, participant, instruments, groups "
+              . "where person.id = participant.id_person "
+              . "and participant.id_project = " . request('id_project') . " "
+              . "and participant.stat_inv = $db->par_stat_yes "
+              . "and participant.stat_final = $db->par_stat_yes "
+              . "and participant.id_instruments = instruments.id "
+              . "and instruments.id_groups = groups.id "
+              . "and groups.id = $grp_id "
+              . "order by " . str_replace("+", " ", $sort);
+
+      $stmt = $db->query($query);
+
+      $form = new FORM();
+
+      if (is_null($action) || $action == 'update' || $action == 'template')
+      {
+         echo "<input type=hidden name=_action value=edit>
     <input type=hidden name=id_project value=" . request('id_project') . ">
     <input type=submit value=Endre title=\"Endre gruppeoppsett...\">";
-   }
-   else
-   {
-      echo "<input type=hidden name=_action value=update>
-    <input type=hidden name=id_project value=" . request('id_project') . ">
-    <input type=submit value=Lagre title=\"Lagre gruppeoppsett\">
-    <input type=reset value=Tilbakestill title=\"Tilbbakestill endringer uten å lagre\">";
-   }
-   
-   echo "<p>";
-   
-   $tb = new TABLE('border=1');
-
-   $tb->th("<a href=\"$php_self?id_project=" . request('id_project') . "&_sort=firstname,lastname\" title=\"Sorter på fornavn, deretter etternavn\">Navn</a>");
-   $tb->th('Instrument');
-   $tb->th("<a href=\"$php_self?id_project=" . request('id_project') . "&_sort=list_order,-position+DESC,-def_pos+DESC,firstname,lastname\" title=\"Sorter på plassnummer\">Plass</a>");
-   $tb->th('Kommentar');
-   $tb->th("Merknad");
-
-   foreach ($stmt as $row)
-   {
-      $tb->tr();
-
-      if ($action == 'edit')
-      {
-         $tb->td($row['firstname'] . " " . $row['lastname']);
-         $tb->td($row['instrument']);
-         $tb->td("<input type=number min=0 max=30 name=position:" . $row['id'] . " value=\"" . $row['position'] . "\" title=\"Plassnummer\">");
-         $tb->td("<input type=text size=30 name=comment_pos:" . $row['id'] . " value=\"" . $row['comment_pos'] . "\" title=\"Fritekst, kun synlig for gruppeleder\">");
-         $tb->td($row['comment_final']);
       }
       else
       {
-         $tb->td($row['firstname'] . " " . $row['lastname']);
-         $tb->td($row['instrument']);
-         $tb->td($row['position']);
-         $tb->td($row['comment_pos']);
-         $tb->td($row['comment_final']);
+         echo "<input type=hidden name=_action value=update>
+    <input type=hidden name=id_project value=" . request('id_project') . ">
+    <input type=submit value=Lagre title=\"Lagre gruppeoppsett\">
+    <input type=reset value=Tilbakestill title=\"Tilbbakestill endringer uten å lagre\">";
       }
-   }
 
-   unset($tb);
-   unset($form);
-   
-   $form = new FORM();
+      echo "<p>";
 
-   echo "
+      $tb = new TABLE('border=1');
+
+      $tb->th("<a href=\"$php_self?id_project=" . request('id_project') . "&_sort=firstname,lastname\" title=\"Sorter på fornavn, deretter etternavn\">Navn</a>");
+      $tb->th('Instrument');
+      $tb->th("<a href=\"$php_self?id_project=" . request('id_project') . "&_sort=list_order,-position+DESC,-def_pos+DESC,firstname,lastname\" title=\"Sorter på plassnummer\">Plass</a>");
+      $tb->th('Kommentar');
+      $tb->th("Merknad");
+
+      foreach ($stmt as $row)
+      {
+         $tb->tr();
+
+         if ($action == 'edit')
+         {
+            $tb->td($row['firstname'] . " " . $row['lastname']);
+            $tb->td($row['instrument']);
+            $tb->td("<input type=number min=0 max=30 name=position:" . $row['id'] . " value=\"" . $row['position'] . "\" title=\"Plassnummer\">");
+            $tb->td("<input type=text size=30 name=comment_pos:" . $row['id'] . " value=\"" . $row['comment_pos'] . "\" title=\"Fritekst, kun synlig for gruppeleder\">");
+            $tb->td($row['comment_final']);
+         }
+         else
+         {
+            $tb->td($row['firstname'] . " " . $row['lastname']);
+            $tb->td($row['instrument']);
+            $tb->td($row['position']);
+            $tb->td($row['comment_pos']);
+            $tb->td($row['comment_final']);
+         }
+      }
+
+      unset($tb);
+      unset($form);
+
+      $form = new FORM();
+
+      echo "
        <input type=hidden name=_action value=template>
        <input type=hidden name=_sort value='$sort'>
        <input type=hidden name=id_project value=" . request('id_project') . ">\n";
-   select_template($seat['template']);
+      select_template($seat['template']);
 
-   unset($form);
+      unset($form);
+   }
 }
 
 echo "<img src=\"map.php?id_groups=$grp_id&id_project=" . request('id_project') . "&template=" . $seat['template'] . "&uid=" . $whoami->uid() . "\" width=500><br>\n";
