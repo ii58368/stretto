@@ -18,14 +18,31 @@ function get_groups()
    global $whoami;
    global $db;
 
-   $query = "select groups.id as id, groups.name as name "
+   $query = "select groups.id as id "
+           . "from participant, instruments, groups, person "
+           . "where participant.id_person = person.id "
+           . "and person.id = " . $whoami->id() . " "
+           . "and participant.id_project = " . request('id_project') . " "
+           . "and participant.id_instruments = instruments.id "
+           . "and instruments.id_groups = groups.id";
+
+   $stmt = $db->query($query);
+   $grp = $stmt->fetch(PDO::FETCH_ASSOC);
+   $grp_prj = $grp['id'];
+
+   $query = "select groups.id as id "
            . "from instruments, groups, person "
            . "where person.id = " . $whoami->id() . " "
            . "and person.id_instruments = instruments.id "
            . "and instruments.id_groups = groups.id";
+
    $stmt = $db->query($query);
-   return $stmt->fetch(PDO::FETCH_ASSOC);
+   $grp = $stmt->fetch(PDO::FETCH_ASSOC);
+   $grp_def = $grp['id'];
+
+   return array($grp_prj, $grp_def);
 }
+
 
 if ($sort == NULL)
    $sort = 'list_order,-position+DESC,-def_pos+DESC,firstname,lastname';
@@ -77,7 +94,7 @@ else
    $query = "SELECT participant.id_person as id_person, firstname, lastname, "
            . "person.status as status, instrument, plan.id as id_plan "
            . "FROM person, participant, instruments, groups, plan "
-           . "where groups.id = ".$grp['id']." "
+           . "where (groups.id = ".$grp[0]." or groups.id = ".$grp[1] . ") "
            . "and instruments.id_groups = groups.id "
            . "and participant.id_instruments = instruments.id "
            . "and participant.id_project = ".request('id_project')." "
