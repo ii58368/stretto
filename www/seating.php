@@ -28,20 +28,19 @@ function get_mygroup()
 
    $stmt = $db->query($query);
    $grp = $stmt->fetch(PDO::FETCH_ASSOC);
+   $grp_prj = $grp['id'];
 
-   if ($grp == null)
-   {
-      $query = "select groups.id as id "
-              . "from instruments, groups, person "
-              . "where person.id = " . $whoami->id() . " "
-              . "and person.id_instruments = instruments.id "
-              . "and instruments.id_groups = groups.id";
+   $query = "select groups.id as id "
+           . "from instruments, groups, person "
+           . "where person.id = " . $whoami->id() . " "
+           . "and person.id_instruments = instruments.id "
+           . "and instruments.id_groups = groups.id";
 
-      $stmt = $db->query($query);
-      $grp = $stmt->fetch(PDO::FETCH_ASSOC);
-   }
+   $stmt = $db->query($query);
+   $grp = $stmt->fetch(PDO::FETCH_ASSOC);
+   $grp_def = $grp['id'];
 
-   return $grp['id'];
+   return array($grp_prj, $grp_def);
 }
 
 function get_seating($id_groups)
@@ -93,7 +92,7 @@ function get_group()
       return $gid;
    }
 
-   return get_mygroup();
+   return get_mygroup()[0];
 }
 
 function select_template($selected)
@@ -196,8 +195,9 @@ echo "
 if ($access->auth(AUTH::SEAT))
 {
    select_group($grp_id);
-
-   if ($grp_id == get_mygroup())
+   $mygrp = get_mygroup();
+   
+   if ($grp_id == $mygrp[0] || $grp_id == $mygrp[1])
    {
       $query = "SELECT participant.id_person as id, firstname, lastname, instrument, position, comment_pos, comment_final "
               . "FROM person, participant, instruments, groups "
@@ -218,12 +218,14 @@ if ($access->auth(AUTH::SEAT))
       {
          echo "<input type=hidden name=_action value=edit>
     <input type=hidden name=id_project value=" . request('id_project') . ">
+    <input type=hidden name=id_group value=" . request('id_group') . ">
     <input type=submit value=Endre title=\"Endre gruppeoppsett...\">";
       }
       else
       {
          echo "<input type=hidden name=_action value=update>
     <input type=hidden name=id_project value=" . request('id_project') . ">
+    <input type=hidden name=id_group value=" . request('id_group') . ">
     <input type=submit value=Lagre title=\"Lagre gruppeoppsett\">
     <input type=reset value=Tilbakestill title=\"Tilbbakestill endringer uten å lagre\">";
       }
@@ -232,9 +234,10 @@ if ($access->auth(AUTH::SEAT))
 
       $tb = new TABLE('border=1');
 
-      $tb->th("<a href=\"$php_self?id_project=" . request('id_project') . "&_sort=firstname,lastname\" title=\"Sorter på fornavn, deretter etternavn\">Navn</a>");
+      $options = "id_project=" . request('id_project') . "&id_group=" . request('id_group');
+      $tb->th("<a href=\"$php_self?$options&_sort=firstname,lastname\" title=\"Sorter på fornavn, deretter etternavn\">Navn</a>");
       $tb->th('Instrument');
-      $tb->th("<a href=\"$php_self?id_project=" . request('id_project') . "&_sort=list_order,-position+DESC,-def_pos+DESC,firstname,lastname\" title=\"Sorter på plassnummer\">Plass</a>");
+      $tb->th("<a href=\"$php_self?$options&_sort=list_order,-position+DESC,-def_pos+DESC,firstname,lastname\" title=\"Sorter på plassnummer\">Plass</a>");
       $tb->th('Kommentar');
       $tb->th("Merknad");
 
@@ -268,6 +271,7 @@ if ($access->auth(AUTH::SEAT))
       echo "
        <input type=hidden name=_action value=template>
        <input type=hidden name=_sort value='$sort'>
+       <input type=hidden name=id_group value=" . request('id_group') . ">
        <input type=hidden name=id_project value=" . request('id_project') . ">\n";
       select_template($seat['template']);
 
