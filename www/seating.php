@@ -218,14 +218,14 @@ if ($access->auth(AUTH::SEAT))
       {
          echo "<input type=hidden name=_action value=edit>
     <input type=hidden name=id_project value=" . request('id_project') . ">
-    <input type=hidden name=id_group value=" . request('id_group') . ">
+    <input type=hidden name=id_group value=$grp_id>
     <input type=submit value=Endre title=\"Endre gruppeoppsett...\">";
       }
       else
       {
          echo "<input type=hidden name=_action value=update>
     <input type=hidden name=id_project value=" . request('id_project') . ">
-    <input type=hidden name=id_group value=" . request('id_group') . ">
+    <input type=hidden name=id_group value=$grp_id>
     <input type=submit value=Lagre title=\"Lagre gruppeoppsett\">
     <input type=reset value=Tilbakestill title=\"Tilbbakestill endringer uten å lagre\">";
       }
@@ -234,7 +234,7 @@ if ($access->auth(AUTH::SEAT))
 
       $tb = new TABLE('border=1');
 
-      $options = "id_project=" . request('id_project') . "&id_group=" . request('id_group');
+      $options = "id_project=" . request('id_project') . "&id_group=$grp_id";
       $tb->th("<a href=\"$php_self?$options&_sort=firstname,lastname\" title=\"Sorter på fornavn, deretter etternavn\">Navn</a>");
       $tb->th('Instrument');
       $tb->th("<a href=\"$php_self?$options&_sort=list_order,-position+DESC,-def_pos+DESC,firstname,lastname\" title=\"Sorter på plassnummer\">Plass</a>");
@@ -271,7 +271,7 @@ if ($access->auth(AUTH::SEAT))
       echo "
        <input type=hidden name=_action value=template>
        <input type=hidden name=_sort value='$sort'>
-       <input type=hidden name=id_group value=" . request('id_group') . ">
+       <input type=hidden name=id_group value=$grp_id>
        <input type=hidden name=id_project value=" . request('id_project') . ">\n";
       select_template($seat['template']);
 
