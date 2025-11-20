@@ -239,4 +239,10 @@ class DB extends myPDO
    public $fbk_stat_read = 1;
    public $fbk_stat_discarded = 2;
    public $fbk_stat = array("Ny", "Lest", "Forkastet");
+// table: repository
+   public $rep_stype_unknown = 0;
+   public $rep_stype_external = 1;
+   public $rep_stype_local = 2;
+   public $rep_stype_digital = 3;
+   public $rep_stype = array("Ukjent", "Eksternt", "Internt", "Digitalt");
 }
