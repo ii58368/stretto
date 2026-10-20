@@ -19,7 +19,7 @@ function get_groups()
    global $db;
 
    $query = "select groups.id as id "
-           . "from participant, instruments, groups, person "
+           . "from participant, instruments, `groups`, person "
            . "where participant.id_person = person.id "
            . "and person.id = " . $whoami->id() . " "
            . "and participant.id_project = " . request('id_project') . " "
@@ -31,7 +31,7 @@ function get_groups()
    $grp_prj = $grp['id'];
 
    $query = "select groups.id as id "
-           . "from instruments, groups, person "
+           . "from instruments, `groups`, person "
            . "where person.id = " . $whoami->id() . " "
            . "and person.id_instruments = instruments.id "
            . "and instruments.id_groups = groups.id";
@@ -93,7 +93,7 @@ else
 {
    $query = "SELECT participant.id_person as id_person, firstname, lastname, "
            . "person.status as status, instrument, plan.id as id_plan "
-           . "FROM person, participant, instruments, groups, plan "
+           . "FROM person, participant, instruments, `groups`, plan "
            . "where (groups.id = ".$grp[0]." or groups.id = ".$grp[1] . ") "
            . "and instruments.id_groups = groups.id "
            . "and participant.id_instruments = instruments.id "
