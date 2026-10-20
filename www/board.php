@@ -11,7 +11,7 @@ function echof($t)
 
 if ($action == 'update' && $access->auth(AUTH::GRP))
 {
-   $query = "update groups set info = " . $db->qpost('info') . " "
+   $query = "update `groups` set info = " . $db->qpost('info') . " "
            . "where id = $no";
    $db->query($query);
 
@@ -25,7 +25,7 @@ $query = "SELECT groups.id as id, groups.name as gname, firstname, lastname, per
         . "groups.comment as comment, groups.info as info, "
         . "instrument, member.role as role, "
         . "member.email as gemail "
-        . "FROM person, instruments, member, groups "
+        . "FROM person, instruments, member, `groups` "
         . "where instruments.id = person.id_instruments "
         . "and groups.id = member.id_groups "
         . "and person.id = member.id_person "
