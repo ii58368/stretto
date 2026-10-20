@@ -49,7 +49,7 @@ function from_filter()
    if (!is_null(request('f_project')))
       $query .= ", participant, project ";
    if (!is_null(request('f_group')))
-      $query .= ", groups, member ";
+      $query .= ", `groups`, member ";
 
    return $query;
 }
