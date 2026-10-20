@@ -77,7 +77,7 @@ function member_list($id_groups)
    
    $q = "SELECT firstname, lastname, instrument, member.role as role, "
            . "person.id as id_person, groups.id as id_groups, member.email as email "
-           . "FROM person, instruments, member, groups "
+           . "FROM person, instruments, member, `groups` "
            . "where instruments.id = person.id_instruments "
            . "and groups.id = member.id_groups "
            . "and person.id = member.id_person "
@@ -197,7 +197,7 @@ if ($action == 'update' && $access->auth(AUTH::GRP))
 
    if (is_null($no))
    {
-      $query = "insert into groups (name, id_person, comment) " .
+      $query = "insert into `groups` (name, id_person, comment) " .
               "values (" . $db->qpost('name') . ", $id_person, " . $db->qpost('comment') . ")";
       $db->query($query);
       $no = $db->lastInsertId();
@@ -213,14 +213,14 @@ if ($action == 'update' && $access->auth(AUTH::GRP))
          if ($e['count'] == 0)
          {
             $db->query("delete from member where id_groups = $no");
-            $db->query("DELETE FROM groups WHERE id = $no");
+            $db->query("DELETE FROM `groups` WHERE id = $no");
          }
          else
             echo "<font color=red>Error: Some instruments are already part of this group</font>";
       }
       else
       {
-         $query = "update groups set name = " . $db->qpost('name') . "," .
+         $query = "update `groups` set name = " . $db->qpost('name') . "," .
                  "id_person = $id_person," .
                  "comment = " . $db->qpost('comment') . " " .
                  "where id = $no";
@@ -247,7 +247,7 @@ if ($action == 'update_role' && $access->auth(AUTH::GRP))
 $query = "SELECT groups.id as id, groups.name as name, firstname, lastname, instrument, "
         . "groups.comment as comment, "
         . "person.id as id_person "
-        . "FROM groups, person, instruments "
+        . "FROM `groups`, person, instruments "
         . "where person.id = groups.id_person "
         . "and instruments.id = person.id_instruments "
         . "order by " . str_replace("+", " ", $sort);
