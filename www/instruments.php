@@ -34,7 +34,7 @@ function select_groups($selected)
 
    echo "<select name=id_groups title=\"Ansvarlig ledergruppe\">";
 
-   $q = "SELECT id, name FROM groups " .
+   $q = "SELECT id, name FROM `groups` " .
            "order by name";
 
    $s = $db->query($q);
@@ -125,7 +125,7 @@ $query = "SELECT instruments.id as id, instrument, list_order, "
         . "id_groups, groups.name as name, instr_grp.name as igname, "
         . "instruments.id_instr_grp as id_instr_grp, "
         . "instruments.comment as comment "
-        . "FROM instruments, groups, instr_grp "
+        . "FROM instruments, `groups`, instr_grp "
         . "where instruments.id_instr_grp = instr_grp.id "
         . "and instruments.id_groups = groups.id "
         . " order by {$sort}";
