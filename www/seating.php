@@ -19,7 +19,7 @@ function get_mygroup()
    global $db;
 
    $query = "select groups.id as id "
-           . "from participant, instruments, groups, person "
+           . "from participant, instruments, `groups`, person "
            . "where participant.id_person = person.id "
            . "and person.id = " . $whoami->id() . " "
            . "and participant.id_project = " . request('id_project') . " "
@@ -31,7 +31,7 @@ function get_mygroup()
    $grp_prj = $grp['id'];
 
    $query = "select groups.id as id "
-           . "from instruments, groups, person "
+           . "from instruments, `groups`, person "
            . "where person.id = " . $whoami->id() . " "
            . "and person.id_instruments = instruments.id "
            . "and instruments.id_groups = groups.id";
@@ -66,7 +66,7 @@ function select_group($selected)
    echo "<select name=id_group onChange=\"submit();\"  title=\"Velg stemmegruppe\">\n>";
 
    $q = "select groups.id as id, groups.name as name "
-           . "from instruments, groups "
+           . "from instruments, `groups` "
            . "where instruments.id_groups = groups.id "
            . "group by groups.id ";
    $s = $db->query($q);
@@ -200,7 +200,7 @@ if ($access->auth(AUTH::SEAT))
    if ($grp_id == $mygrp[0] || $grp_id == $mygrp[1])
    {
       $query = "SELECT participant.id_person as id, firstname, lastname, instrument, position, comment_pos, comment_final "
-              . "FROM person, participant, instruments, groups "
+              . "FROM person, participant, instruments, `groups` "
               . "where person.id = participant.id_person "
               . "and participant.id_project = " . request('id_project') . " "
               . "and participant.stat_inv = $db->par_stat_yes "
