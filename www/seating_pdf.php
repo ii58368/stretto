@@ -20,7 +20,7 @@ class PDF extends PDF_util
       $this->SetLineWidth(1);
       //     $this->Line(10, 20, 200, 20);
 
-      $query = "select name from groups where id = $id_groups";
+      $query = "select name from `groups` where id = $id_groups";
       $stmt = $db->query($query);
       $e = $stmt->fetch(PDO::FETCH_ASSOC);
 
