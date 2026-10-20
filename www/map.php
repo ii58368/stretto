@@ -101,7 +101,7 @@ function draw_group($img, $lineup)
       return;
 
    $query = "SELECT position, firstname, lastname, uid "
-           . "FROM person, participant, instruments, `groups "
+           . "FROM person, participant, instruments, `groups` "
            . "where person.id = participant.id_person "
            . "and participant.id_project = $id_project "
            . "and participant.id_instruments = instruments.id "
