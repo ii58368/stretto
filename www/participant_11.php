@@ -277,7 +277,7 @@ if ($prj['valid_par_stat'] > 0)
    $query = "select firstname, lastname, email "
            . "from person "
            . "where id = "
-           . "(select id_person from person, instruments, groups "
+           . "(select id_person from person, instruments, `groups` "
            . "where person.id_instruments = instruments.id "
            . "and instruments.id_groups = groups.id "
            . "and person.id =  $id_person)";
