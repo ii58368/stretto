@@ -70,7 +70,7 @@ function select_filter()
 // Groups
    echo "<select name=\"f_group[]\" multiple size=3 onChange=\"submit();\" title=\"Filter for gruppering registrert under grupper...\n$gen_htxt\">\n";
 
-   $s = $db->query("select id, name from groups, member "
+   $s = $db->query("select id, name from `groups`, member "
            . "where groups.id = member.id_groups group by id order by name");
    foreach ($s as $e)
    {
